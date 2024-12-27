@@ -81,13 +81,12 @@ bool token_parse_binop(Tokenizer *tokenizer) {
 }
 
 bool token_parse_keyword(Tokenizer *tokenizer, const char *keyword, TokenType type) {
-	printf("NEXT\n");
     for (size_t i = 0; keyword[i] != '\0'; i++) {
-		printf("'%c' vs '%c'\n", TOKENIZER_NEXT_CHAR, keyword[i]);
 		if (i != 0 && !ftx_next(tokenizer->reader)) {
             ftx_rollback(tokenizer->reader);
             return false;
 		}
+		printf("%ld: '%c' vs '%c'\n", i, TOKENIZER_NEXT_CHAR, keyword[i]);
         if (TOKENIZER_NEXT_CHAR != keyword[i]) {
             ftx_rollback(tokenizer->reader);
             return false;
@@ -102,10 +101,9 @@ bool is_not_whitespace(char c) {
 }
 
 bool token_next(Tokenizer *tokenizer) {
-    if (!ftx_first(tokenizer->reader, is_not_whitespace)) {
+    if (!ftx_skip(tokenizer->reader, is_not_whitespace)) {
         return false;
     }
-	ftx_commit(tokenizer->reader);
     if (
         token_parse_onechar(tokenizer) || 
         token_parse_brace(tokenizer) || 

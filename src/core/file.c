@@ -19,9 +19,10 @@ FileReader file_reader_new(File file) {
 
 bool file_reader_next(FileReader *reader) {
     char c = fgetc(reader->file);
-	if (c == 0xFF) {
+	if (c == EOF) {
 		return false;
 	}
+    printf("READ: '%c'\n", c);
     reader->value = c;
     if (c == '\n') {
         reader->location.line++;

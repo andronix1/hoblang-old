@@ -5,8 +5,8 @@
 #include "fatptr.h"
 
 typedef struct {
-	int idx;
-	int size;
+	size_t idx;
+	size_t size;
 	FatPtr buffer;
 	char value;
 } TxReadBuffer;
