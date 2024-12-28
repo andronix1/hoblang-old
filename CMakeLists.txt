@@ -4,10 +4,11 @@ project(hoblang)
 set(SOURCE_FILES
     src/main.c
 	src/tokenizer/tokenizer.c
-    src/core/file.c
-    src/core/tx_buffer.c
-    src/core/ftx.c
+	src/tokenizer/print.c
+	src/tokenizer/base.c
+	src/lexer/base.c
     src/core/fatptr.c
+    src/core/vec.c
 )
 
 add_executable(hoblang ${SOURCE_FILES})

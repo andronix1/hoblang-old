@@ -1,5 +1,5 @@
 let() = fun * let;
 
 fun() {
-
+	let cool = 123;
 }

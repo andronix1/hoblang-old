@@ -1,120 +1,128 @@
 #include "tokenizer.h"
 
-#define TOKENIZER_NEXT_CHAR tokenizer->reader->value
+typedef enum {
+	TOKEN_PARSE_OK = 0,
+	TOKEN_PARSE_ERR,
+	TOKEN_PARSE_MISSMATCH
+} TokenParseErr;
 
-Tokenizer tokenizer_new(FileTxReader *reader) {
-    Tokenizer result = {
-        .reader = reader,
-    };
-    return result;
-}
-
-#define TOKENIZER_SET_ONECHAR(token_type) \
-        tokenizer->token.type = token_type; \
-        return true; \
-
-#define CASE_ONECHAR(c, token_type) case c: { TOKENIZER_SET_ONECHAR(token_type) }
-
-bool token_parse_onechar(Tokenizer *tokenizer) {
-    switch (TOKENIZER_NEXT_CHAR) {
-        CASE_ONECHAR(':', TOKEN_COLON)
-        CASE_ONECHAR(',', TOKEN_COMMA)
-        CASE_ONECHAR(';', TOKEN_SEMICOLON)
-    }
-    return false;
-}
-
-#define CASE_BRACE(c, brace_type, _opening) \
-    case c: { \
-        tokenizer->token.type = TOKEN_BRACE; \
-        tokenizer->token.brace.type = brace_type; \
-        tokenizer->token.brace.opening = _opening; \
-        return true; \
-    }
-
-#define CASE_BRACES(opening_c, closing_c, brace_type) \
-    CASE_BRACE(opening_c, brace_type, true) \
-    CASE_BRACE(closing_c, brace_type, false)
-
-bool token_parse_brace(Tokenizer *tokenizer) {
-    switch (TOKENIZER_NEXT_CHAR) {
-        CASE_BRACES('(', ')', TOKEN_BRACE_CIRCLE)
-        CASE_BRACES('{', '}', TOKEN_BRACE_FIGURE)
-        CASE_BRACES('[', ']', TOKEN_BRACE_SQUARE)
-    }
-    return false;
-}
-
-#define TOKENIZER_SET_BINOP(_binop_type) \
-    tokenizer->token.type = TOKEN_BINOP; \
-    tokenizer->token.binop_type = _binop_type; \
-    return true;
-
-#define CASE_BINOP(c, _binop_type) case c: { TOKENIZER_SET_BINOP(_binop_type) }
-#define CASE_BINOP_WITH_NEXT_TYPED(c, nc, set_type, set_next_type) \
-    case c: { \
-		ftx_commit(tokenizer->reader); \
-        if (!ftx_next(tokenizer->reader)) { \
-            set_type \
-        } \
-        char value = TOKENIZER_NEXT_CHAR; \
-        if (value == nc) { \
-            set_next_type; \
-        } \
-		ftx_rollback(tokenizer->reader); \
-        set_type \
-    }
-#define CASE_TOKEN_WITH_NEXT_BINOP(c, nc, _token_type, _next_binop_type) CASE_BINOP_WITH_NEXT_TYPED(c, nc, TOKENIZER_SET_ONECHAR(_token_type), TOKENIZER_SET_BINOP(_next_binop_type))
-#define CASE_BINOP_WITH_NEXT(c, nc, _binop_type, _next_binop_type) CASE_BINOP_WITH_NEXT_TYPED(c, nc, TOKENIZER_SET_BINOP(_binop_type), TOKENIZER_SET_BINOP(_next_binop_type))
-
-bool token_parse_binop(Tokenizer *tokenizer) {
-    switch (tokenizer->reader->value) {
-        CASE_BINOP('+', TOKEN_BINOP_ADD)
-        CASE_BINOP('-', TOKEN_BINOP_MINUS)
-        CASE_BINOP('*', TOKEN_BINOP_MULTIPLY)
-        CASE_BINOP('/', TOKEN_BINOP_DIVIDE)
-        CASE_BINOP_WITH_NEXT('>', '=', TOKEN_BINOP_GREATER, TOKEN_BINOP_GREATER_OR_EQUALS)
-        CASE_BINOP_WITH_NEXT('<', '=', TOKEN_BINOP_LESS, TOKEN_BINOP_LESS_OR_EQUALS)
-        CASE_TOKEN_WITH_NEXT_BINOP('=', '=', TOKEN_ASSIGN, TOKEN_BINOP_LESS_OR_EQUALS)
-    }
-    return false;
-}
-
-bool token_parse_keyword(Tokenizer *tokenizer, const char *keyword, TokenType type) {
-    for (size_t i = 0; keyword[i] != '\0'; i++) {
-		if (i != 0 && !ftx_next(tokenizer->reader)) {
-            ftx_rollback(tokenizer->reader);
-            return false;
+TokenParseErr tokenizer_parse_keyword(Tokenizer *tokenizer, const char *keyword, TokenType type) {
+	for (size_t i = 0; keyword[i] != '\0'; i++) {
+		if (tokenizer_next_char(tokenizer) != keyword[i]) {
+			return TOKEN_PARSE_MISSMATCH;
 		}
-		printf("%ld: '%c' vs '%c'\n", i, TOKENIZER_NEXT_CHAR, keyword[i]);
-        if (TOKENIZER_NEXT_CHAR != keyword[i]) {
-            ftx_rollback(tokenizer->reader);
-            return false;
-        }
-    }
-    tokenizer->token.type = type;
-    return true;
+	}
+	tokenizer->token.type = type;
+	if (char_is_ident(tokenizer_future_char(tokenizer))) {
+		return TOKEN_PARSE_MISSMATCH;
+	}
+	return TOKEN_PARSE_OK;
 }
 
-bool is_not_whitespace(char c) {
-    return c != '\n' && c != ' ' && c != '\t';
+TokenParseErr tokenizer_parse_symbol_with_next(Tokenizer *tokenizer, char symbol, char next, TokenType type, TokenType next_type) {
+	if (symbol == tokenizer_next_char(tokenizer)) {
+		if (tokenizer_future_char(tokenizer) == next) {
+			tokenizer_next_char(tokenizer);
+			tokenizer->token.type = next_type;
+			return TOKEN_PARSE_OK;
+		}
+		tokenizer->token.type = type;
+		return TOKEN_PARSE_OK;
+	}
+	return TOKEN_PARSE_MISSMATCH;
 }
 
-bool token_next(Tokenizer *tokenizer) {
-    if (!ftx_skip(tokenizer->reader, is_not_whitespace)) {
-        return false;
-    }
-    if (
-        token_parse_onechar(tokenizer) || 
-        token_parse_brace(tokenizer) || 
-        token_parse_binop(tokenizer) ||
-        token_parse_keyword(tokenizer, "fun", TOKEN_FUN) || 
-        token_parse_keyword(tokenizer, "let", TOKEN_VAR)
-    ) {
-		ftx_commit(tokenizer->reader);
-        return true;
-    }
-    printf("unknown token!\n");
-    ftx_rollback(tokenizer->reader);
-    return false;
+TokenParseErr tokenizer_parse_symbol(Tokenizer *tokenizer, char symbol, TokenType type) {
+	if (symbol == tokenizer_next_char(tokenizer)) {
+		tokenizer->token.type = type;
+		return TOKEN_PARSE_OK;
+	}
+	return TOKEN_PARSE_MISSMATCH;
+}
+
+TokenParseErr tokenizer_parse_ident(Tokenizer *tokenizer) {
+	if (!char_is_ident_start(tokenizer_next_char(tokenizer))) {
+		return TOKEN_PARSE_MISSMATCH;
+	}
+	char *ptr = tokenizer_str(tokenizer);
+	size_t len = 1;	
+	while (char_is_ident(tokenizer_future_char(tokenizer))) {
+		tokenizer_next_char(tokenizer);
+		len++;
+	}
+	tokenizer->token.type = TOKEN_IDENT;
+	tokenizer->token.ident.ptr = ptr;
+	tokenizer->token.ident.size = len;
+	return TOKEN_PARSE_OK;
+}
+
+TokenParseErr tokenizer_parse_integer(Tokenizer *tokenizer) {
+	char c;
+	if (!char_is_digit(c = tokenizer_next_char(tokenizer))) {
+		return TOKEN_PARSE_MISSMATCH;
+	}
+	size_t result = c - '0';
+	while (char_is_digit(c = tokenizer_next_char(tokenizer))) {
+		result = result * 10 + c - '0';
+	}
+	tokenizer->token.type = TOKEN_INTEGER;
+	tokenizer->token.integer = result;
+	return TOKEN_PARSE_OK;
+}
+
+#define TOKEN_PARSE(expr) \
+	do { \
+		TokenParseErr err = (expr); \
+		if (!err) return TOKENIZE_OK; \
+		tokenizer_rollback(tokenizer); \
+		if (err == TOKEN_PARSE_ERR) return TOKENIZE_ERR; \
+	} while(0)
+
+#define SYMBOL(c, type) TOKEN_PARSE(tokenizer_parse_symbol(tokenizer, c, type));
+#define KEYWORD(s, type) TOKEN_PARSE(tokenizer_parse_keyword(tokenizer, s, type));
+#define SYMBOL_DUAL(c1, c2, t1, t2) TOKEN_PARSE(tokenizer_parse_symbol_with_next(tokenizer, c1, c2, t1, t2));
+
+TokenizeErr tokenizer_next(Tokenizer *tokenizer) {
+	tokenizer_skip_whitespace(tokenizer);
+	tokenizer_begin(tokenizer);
+	if (tokenizer_finished(tokenizer)) {
+		return TOKENIZE_FINISHED;
+	}
+	
+	SYMBOL('{', TOKEN_OPENING_FIGURE_BRACE);
+	SYMBOL('}', TOKEN_CLOSING_FIGURE_BRACE);
+	SYMBOL('(', TOKEN_OPENING_CIRCLE_BRACE);
+	SYMBOL(')', TOKEN_CLOSING_CIRCLE_BRACE);
+	SYMBOL('+', TOKEN_ADD);
+	SYMBOL('-', TOKEN_MINUS);
+	SYMBOL('*', TOKEN_MULTIPLY);
+	SYMBOL('/', TOKEN_DIVIDE);
+	SYMBOL(':', TOKEN_COLON);
+	SYMBOL(';', TOKEN_SEMICOLON);
+	SYMBOL(',', TOKEN_COMMA);
+	SYMBOL_DUAL('=', '=', TOKEN_ASSIGN, TOKEN_EQUALS);
+	SYMBOL_DUAL('>', '=', TOKEN_GREATER, TOKEN_GREATER_OR_EQUALS);
+	SYMBOL_DUAL('<', '=', TOKEN_LESS, TOKEN_LESS_OR_EQUALS);
+	KEYWORD("let", TOKEN_LET);
+	KEYWORD("fun", TOKEN_FUN);
+	KEYWORD("if", TOKEN_IF);
+	KEYWORD("else", TOKEN_ELSE);
+	TOKEN_PARSE(tokenizer_parse_ident(tokenizer));
+	TOKEN_PARSE(tokenizer_parse_integer(tokenizer));
+
+	printf("error: unknown token!\n");
+	tokenizer_print_line_at(tokenizer);
+	return TOKENIZE_ERR;
+}
+
+bool tokenize_all(Tokenizer *tokenizer, Tokens *to) {
+	assert(to->len == 0);
+	TokenizeErr err;
+	while ((err = tokenizer_next(tokenizer)) == TOKENIZE_OK) {
+		vec_push(to, &tokenizer->token);
+	}
+	if (err == TOKENIZE_ERR) {
+		vec_free(to);
+	}
+	return err == TOKENIZE_FINISHED;
 }

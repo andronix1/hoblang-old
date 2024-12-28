@@ -1,13 +1,20 @@
 #pragma once
 
-#include "core/ftx.h"
+#include "core/vec.h"
 #include "tokens.h"
+#include "chars.h"
+#include "base.h"
+#include "print.h"
 
-typedef struct {
-    FileTxReader *reader;
-    FileLocation location;
-    Token token;
-} Tokenizer;
+typedef Vec Tokens;
 
-Tokenizer tokenizer_new(FileTxReader *reader);
-bool token_next(Tokenizer *tokenizer);
+#define tokens_new() vec_new(Token)
+
+typedef enum {
+	TOKENIZE_OK = 0,
+	TOKENIZE_ERR,
+	TOKENIZE_FINISHED
+} TokenizeErr;
+
+TokenizeErr tokenizer_next(Tokenizer *tokenizer);
+bool tokenize_all(Tokenizer *tokenizer, Tokens *to);
