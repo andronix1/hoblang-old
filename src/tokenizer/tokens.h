@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <printf.h>
 #include <stdint.h>
 #include "core/fatptr.h"
 
@@ -9,8 +10,10 @@ typedef struct {
 	size_t column;
 } FileLocation;
 
-typedef enum {
-    TOKEN_FUN,
+#define TOKEN_EOF ((TokenType)-1)
+
+typedef enum { 
+	TOKEN_FUN,
     TOKEN_LET,
     
 	TOKEN_IF,
@@ -39,21 +42,27 @@ typedef enum {
     TOKEN_GREATER_OR_EQUALS,
 
     TOKEN_INTEGER,
-    TOKEN_IDENT,
-	
-	TOKENS_COUNT
+    TOKEN_IDENT,	
 } TokenType;
 
 typedef struct {
-    FatPtr file;
+    const char *file;
     FileLocation location;
 } TokenLocation;
 
 typedef struct {
     TokenType type;
-    TokenLocation location;
+    FileLocation location;
     union {
         FatPtr ident;
         uint64_t integer;
     };
 } Token;
+
+typedef struct {
+	const Token *tokens;
+	size_t len;
+} TokensSlice;
+
+TokenType token_type(Token *token);
+void token_register_printf();

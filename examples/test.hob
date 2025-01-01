@@ -1,5 +1,4 @@
-let() = fun * let;
-
-fun() {
-	let cool = 123;
+fun test(a: i32, b: i32): i32 {
+	let t = (a + b) / 2;
+	return t;
 }

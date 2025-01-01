@@ -8,6 +8,10 @@ FatPtr fatptr_empty() {
     return result;
 }
 
+size_t fatptr_print_to(const FatPtr *fatptr, FILE *stream) {
+	return fwrite(fatptr->ptr, 1, fatptr->size, stream);
+}
+
 void fatptr_append(FatPtr *ptr, FatPtr *other) {
 	size_t prev_size = ptr->size;
 	fatptr_alloc_more(ptr, other->size);

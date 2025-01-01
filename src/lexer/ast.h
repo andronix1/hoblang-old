@@ -5,7 +5,11 @@
 
 typedef struct {
 	Token *name;
-	Token *type;
+} AstType;
+
+typedef struct {
+	Token *name;
+	AstType type;
 	Expr *assign;
 } AstLet;
 
@@ -19,24 +23,24 @@ typedef struct {
 
 typedef enum {
 	AST_STAT_LET,
-} AstStatType;
+} AstStmtType;
 
 typedef struct {
-	AstStatType type;
+	AstStmtType type;
 	union {
 		AstLet let;
 		AstFuncCall func_call;
 	};
-} AstStat;
+} AstStmt;
 
-typedef Vec AstStats;
+typedef Vec AstStmts;
 
 typedef struct {
-	AstStats stats;
+	AstStmts stmts;
 } AstCodeBlock;
 
 typedef struct {
-	Token *type;
+	AstType type;
 	Token *name;
 } AstFuncArg;
 
@@ -44,19 +48,20 @@ typedef Vec AstFuncArgs;
 
 typedef struct {
 	Token *name;
-	Token *return_type;
+	bool returning;
+	AstType return_type;
 	AstFuncArgs args;
 } AstFuncDecl;
 
 typedef enum {
-	AST_NODE_FUNC,
-	AST_NODE_LET,
-} AstNodeType;
+	AST_MODULE_NODE_FUNC,
+	AST_MODULE_NODE_LET,
+} AstModuleNodeType;
 
 typedef struct {
-	AstNodeType type;
+	AstModuleNodeType type;
 	union {
 		AstFuncDecl func;		
 		AstLet let;		
 	};
-} AstNode;
+} AstModuleNode;

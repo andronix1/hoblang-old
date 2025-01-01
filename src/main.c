@@ -13,6 +13,7 @@ const char *args_shift(int *argc, const char ***argv) {
 }
 
 int main(int argc, const char **argv) {
+	token_register_printf();
     args_shift(&argc, &argv);
     const char *command = args_shift(&argc, &argv);
     if (!strcmp(command, "tokens")) {
@@ -31,13 +32,17 @@ int main(int argc, const char **argv) {
 		Tokens tokens = tokens_new();
 		if (!tokenize_all(&tokenizer , &tokens)) {
 			fclose(file);
-			return false;
+			return 1;
 		}
-		// Lexer lexer = lexer_new(&tokens);
-        printf("finished(found %ld tokens)!\n", tokens.len);
+		fclose(file);
+        printf("tokenized!\n");
+		Lexer lexer = lexer_new(&tokens, file_path);
+		if (!lexer_parse(&lexer)) {
+			return 1;
+		}
+        printf("lexed!\n");
 		fatptr_free(&content);
 		vec_free(&tokens);
-		fclose(file);
     } else {
         printf("unknown command!\n");
     }

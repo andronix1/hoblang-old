@@ -88,6 +88,7 @@ TokenizeErr tokenizer_next(Tokenizer *tokenizer) {
 	if (tokenizer_finished(tokenizer)) {
 		return TOKENIZE_FINISHED;
 	}
+	tokenizer->token.location = tokenizer->location;
 	
 	SYMBOL('{', TOKEN_OPENING_FIGURE_BRACE);
 	SYMBOL('}', TOKEN_CLOSING_FIGURE_BRACE);

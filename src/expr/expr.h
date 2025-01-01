@@ -31,11 +31,12 @@ typedef struct {
 } Binop;
 
 typedef struct _Expr {
-	BinopType type;
+	ExprType type;
 	union {
 		Binop binop;
 		FatPtr ident;
 		FatPtr str;
+		uint64_t integer;
 		bool boolean;
 	};
 } Expr;
