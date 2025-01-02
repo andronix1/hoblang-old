@@ -3,7 +3,7 @@
 #include <string.h>
 #include <errno.h>
 #include "lexer/lexer.h"
-#include "tokenizer/tokenizer.h"
+#include "parser/parser.h"
 
 const char *args_shift(int *argc, const char ***argv) {
     *argc -= 1;
@@ -13,38 +13,30 @@ const char *args_shift(int *argc, const char ***argv) {
 }
 
 int main(int argc, const char **argv) {
+	fatptr_register_printf();
 	token_register_printf();
     args_shift(&argc, &argv);
     const char *command = args_shift(&argc, &argv);
-    if (!strcmp(command, "tokens")) {
+    if (!strcmp(command, "lex")) {
 		const char *file_path = "../examples/test.hob";
-        FILE *file = fopen(file_path, "r");
-        if (!file) {
-			printf("failed to open file `%s`: %s\n", file_path, strerror(errno));
-            return 1;
-        }
-		FatPtr content;
-		if (!fatptr_read_all(&content, file)) {
-			fclose(file);
+        Lexer lexer;
+		if (!lexer_init(&lexer, file_path)) {
 			return 1;
 		}
-        Tokenizer tokenizer = tokenizer_new(content);
-		Tokens tokens = tokens_new();
-		if (!tokenize_all(&tokenizer , &tokens)) {
-			fclose(file);
+        hob_log(LOGI, "lexed!");
+		Parser parser;
+		if (!parser_init(&parser, &lexer)) {
 			return 1;
 		}
-		fclose(file);
-        printf("tokenized!\n");
-		Lexer lexer = lexer_new(&tokens, file_path);
-		if (!lexer_parse(&lexer)) {
+		AstModule module;
+		if (!parse_module(&parser, &module)) {
 			return 1;
 		}
-        printf("lexed!\n");
-		fatptr_free(&content);
-		vec_free(&tokens);
+        hob_log(LOGI, "parsed!");
+		ast_print_module(&module);
+		lexer_free(&lexer);
     } else {
-        printf("unknown command!\n");
+        hob_log(LOGE, "unknown command!");
     }
     return 0;
 }

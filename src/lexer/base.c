@@ -1,68 +1,77 @@
 #include "base.h"
 
-Lexer lexer_new(Tokens *tokens, const char *path) {
-	Lexer result = {
-		.path = path,
-		.tokens = tokens,
-		.state = {
-			.location = { 0, 0 },
-			.token = 0,
-		}
-	};
-	return result;
+bool lexer_init(Lexer *lexer, const char *path) {
+	FILE *file = fopen(path, "r");
+	if (!file) {
+		hob_log(LOGE, "failed to open file `%s`: %s\n", path, strerror(errno));
+		return false;
+	}
+	if (!fatptr_read_all(&lexer->full, file)) {
+		hob_log(LOGE, "failed to read file `%s`: %s\n", path, strerror(errno));
+		fclose(file);
+		return false;
+	}
+	lexer->remain = lexer->full;
+	lexer->file = path;
+	lexer->failed = false;
+	lexer->location = lexer->start_location = file_loc_new();
+	lexer->line_offset = 0;
+	lexer->delta = 0;
+    return true;
 }
 
-size_t lexer_find_scoped(Lexer *lexer, TokenType type) {
-	size_t len = 0;
-	size_t level = 0; // TODO: stack
-	while (true) {
-		LexerState state = lexer->state;
-		Token *token = lexer_next_token(lexer);
-		if (!token) {
-			lex_error("unexpected EOF");
-			return 0;
-		}
-		if (token_type(token) == type) {
-			if (level != 0) {
-				len++;
-				continue;
-			}
-			lexer->state = state;
-			return len;
-		}
-		switch (token_type(token)) {
-			case TOKEN_OPENING_CIRCLE_BRACE: case TOKEN_OPENING_FIGURE_BRACE:
-				len++;
-				level++;
-				break;
-			case TOKEN_CLOSING_FIGURE_BRACE: case TOKEN_CLOSING_CIRCLE_BRACE:
-				if (len == 0) {
-					lex_error("unexpected closing");
-					return 0;
-				}
-				level--;
-				len++;
-				break;
-			default:
-				len++;
-				break;
-		}
+char *lexer_str(Lexer *lexer) {
+	return lexer->remain.str - 1;
+}
+
+bool lexer_finished(Lexer *lexer) {
+	return lexer->remain.size == 0;
+}
+
+char lexer_next_char(Lexer *lexer) {
+	if (lexer_finished(lexer)) {
+		return EOF;
+	}
+	lexer->delta++;
+	lexer->remain.size--;
+	char c = *(lexer->remain.str++);
+	if (c == '\n') {
+		lexer->line_offset = 0;
+		lexer->location.line++;
+		lexer->location.column = 0;
+	} else {
+		lexer->line_offset++;
+		lexer->location.column++;
+	}
+	return c;
+}
+
+char lexer_future_char(Lexer *lexer) {
+	if (lexer_finished(lexer)) {
+		return EOF;
+	}
+	return *lexer->remain.str;
+}
+
+void lexer_begin(Lexer *lexer) {
+	lexer->delta = 0;
+	lexer->start_location = lexer->location;
+}
+
+void lexer_rollback(Lexer *lexer) {
+	lexer->remain.str -= lexer->delta;
+	lexer->remain.size += lexer->delta;
+	lexer->line_offset -= lexer->delta;
+	lexer->delta = 0;
+	lexer->location = lexer->start_location;
+}
+
+void lexer_skip_whitespace(Lexer *lexer) {
+	while (char_is_whitespace(lexer_future_char(lexer))) {
+		lexer_next_char(lexer);
 	}
 }
 
-Token *lexer_future_token(Lexer *lexer) {
-	if (lexer->tokens->len <= lexer->state.token + 1) {
-		return NULL;
-	}
-	Token *token = vec_at(lexer->tokens, lexer->state.token);
-	lexer->state.location = token->location;
-	return token;
-}
-
-Token *lexer_next_token(Lexer *lexer) {
-	Token *token = lexer_future_token(lexer);
-	if (token) {
-		lexer->state.token++;
-	}
-	return token;
+void lexer_free(Lexer *lexer) {
+	fatptr_free(&lexer->full);
 }

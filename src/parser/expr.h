@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdint.h>
 #include "core/fatptr.h"
 
 typedef enum {
@@ -8,7 +9,7 @@ typedef enum {
 	BINOP_MUL,
 	BINOP_DIV,
 	BINOP_EQ,
-	BUNOP_NEQ,
+	BINOP_NEQ,
 	BINOP_GT,
 	BINOP_GE,
 	BINOP_LT,
@@ -20,7 +21,8 @@ typedef enum {
 	EXPR_INTEGER,
 	EXPR_BOOL,
 	EXPR_STRING,
-	EXPR_BINOP
+	EXPR_BINOP,
+	EXPR_UNARY
 } ExprType;
 
 struct _Expr;
@@ -28,15 +30,28 @@ struct _Expr;
 typedef struct {
 	BinopType type;
 	struct _Expr *left, *right;
-} Binop;
+} ExprBinop;
+
+typedef enum {
+	UNARY_MINUS
+} UnaryType;
+
+typedef struct {
+	UnaryType type;
+	struct _Expr *expr;
+} ExprUnary;
 
 typedef struct _Expr {
 	ExprType type;
 	union {
-		Binop binop;
+		ExprBinop binop;
+		ExprUnary unary;
 		FatPtr ident;
 		FatPtr str;
 		uint64_t integer;
 		bool boolean;
 	};
+	struct _Expr *parent; // for parser
 } Expr;
+
+void expr_free(Expr *expr);

@@ -6,6 +6,8 @@
 #include <stdbool.h>
 #include <string.h>
 #include <errno.h>
+#include <printf.h>
+#include "log.h"
 
 typedef struct {
     size_t size;
@@ -22,3 +24,4 @@ size_t fatptr_print_to(const FatPtr *fatptr, FILE *stream);
 void fatptr_print(FatPtr *fatptr);
 bool fatptr_read_all(FatPtr *fatptr, FILE *file);
 void fatptr_free(FatPtr *fatptr);
+void fatptr_register_printf();

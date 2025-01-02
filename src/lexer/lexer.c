@@ -1,154 +1,118 @@
 #include "lexer.h"
 
-bool lexer_parse_type(Lexer *lexer, AstType *to) {
-	Token *type_token = lexer_next_token(lexer);
-	if (token_type(type_token) != TOKEN_IDENT) {
-		lex_error("expected type found `%T`", type_token);
-		return false;
-	}
-	to->name = type_token;
-	return true;
-}
-
 typedef enum {
-	LEX_STMT_OK = 0,
-	LEX_STMT_ERR,
-	LEX_STMT_MISSMATCH
-} LexStmtErr;
+	LEX_ONE_OK = 0,
+	LEX_ONE_ERR,
+	LEX_ONE_MISSMATCH
+} LexOneErr;
 
-LexStmtErr lex_stmt_let(Lexer *lexer, AstStmts *stmts) {
-	if (token_type(lexer_next_token(lexer)) != TOKEN_LET) return LEX_STMT_MISSMATCH;
-	Token *name = lexer_next_token(lexer);
-	if (token_type(name) != TOKEN_IDENT) {
-		lex_error("expected variable name found `%T`", name);
-		return LEX_STMT_ERR;
+LexOneErr lexer_parse_keyword(Lexer *lexer, const char *keyword, TokenType type) {
+	for (size_t i = 0; keyword[i] != '\0'; i++) {
+		if (lexer_next_char(lexer) != keyword[i]) {
+			return LEX_ONE_MISSMATCH;
+		}
 	}
-	if (token_type(lexer_future_token(lexer)) != TOKEN_ASSIGN) {
-		return LEX_STMT_OK;
+	lexer->token.type = type;
+	if (char_is_ident(lexer_future_char(lexer))) {
+		return LEX_ONE_MISSMATCH;
 	}
-	lexer_next_token(lexer);
-	Token *first_token = lexer_future_token(lexer);
-	size_t len = lexer_find_scoped(lexer, TOKEN_SEMICOLON);
-	if (len == 0) {
-		lex_error("expected expression");
-		return LEX_STMT_ERR;
-	}
-	TokensSlice expr_tokens = { first_token, len };
-	Expr expr;
-	if (!expr_parse(lexer, &expr, &expr_tokens)) {
-		return false;
-	}
-	return LEX_STMT_OK;
+	return LEX_ONE_OK;
 }
 
-#define LEX_STMT(parse) \
+LexOneErr lexer_parse_symbol_with_next(Lexer *lexer, char symbol, char next, TokenType type, TokenType next_type) {
+	if (symbol == lexer_next_char(lexer)) {
+		if (lexer_future_char(lexer) == next) {
+			lexer_next_char(lexer);
+			lexer->token.type = next_type;
+			return LEX_ONE_OK;
+		}
+		lexer->token.type = type;
+		return LEX_ONE_OK;
+	}
+	return LEX_ONE_MISSMATCH;
+}
+
+LexOneErr lexer_parse_symbol(Lexer *lexer, char symbol, TokenType type) {
+	if (symbol == lexer_next_char(lexer)) {
+		lexer->token.type = type;
+		return LEX_ONE_OK;
+	}
+	return LEX_ONE_MISSMATCH;
+}
+
+LexOneErr lexer_parse_ident(Lexer *lexer) {
+	if (!char_is_ident_start(lexer_next_char(lexer))) {
+		return LEX_ONE_MISSMATCH;
+	}
+	char *ptr = lexer_str(lexer);
+	size_t len = 1;	
+	while (char_is_ident(lexer_future_char(lexer))) {
+		lexer_next_char(lexer);
+		len++;
+	}
+	lexer->token.type = TOKEN_IDENT;
+	lexer->token.ident.ptr = ptr;
+	lexer->token.ident.size = len;
+	return LEX_ONE_OK;
+}
+
+LexOneErr lexer_parse_integer(Lexer *lexer) {
+	char c;
+	if (!char_is_digit(c = lexer_next_char(lexer))) {
+		return LEX_ONE_MISSMATCH;
+	}
+	size_t result = c - '0';
+	while (char_is_digit(c = lexer_future_char(lexer))) {
+		lexer_next_char(lexer);
+		result = result * 10 + c - '0';
+	}
+	lexer->token.type = TOKEN_INTEGER;
+	lexer->token.integer = result;
+	return LEX_ONE_OK;
+}
+
+#define TOKEN_PARSE(expr) \
 	do { \
-		if ((err = parse(lexer, &block->stmts)) == LEX_STMT_MISSMATCH) { \
-			lexer->state = state; \
-		} else { \
-			goto success; \
-		} \
+		LexOneErr err = (expr); \
+		if (!err) return true; \
+		lexer_rollback(lexer); \
+		if (err == LEX_ONE_ERR) return true; \
 	} while(0)
 
-bool lexer_parse_code_block(Lexer *lexer, AstCodeBlock *block) {
-	Token *token = lexer_future_token(lexer);
-	while (token_type(token) != TOKEN_CLOSING_FIGURE_BRACE && token_type(token) != TOKEN_EOF) {
-		LexStmtErr err;
-		LexerState state = lexer->state;
+#define SYMBOL(c, type) TOKEN_PARSE(lexer_parse_symbol(lexer, c, type));
+#define KEYWORD(s, type) TOKEN_PARSE(lexer_parse_keyword(lexer, s, type));
+#define SYMBOL_DUAL(c1, c2, t1, t2) TOKEN_PARSE(lexer_parse_symbol_with_next(lexer, c1, c2, t1, t2));
 
-		LEX_STMT(lex_stmt_let);
-
-		lex_error("unknown statement starts with `%T`!", token);
-		success:
-		token = lexer_next_token(lexer);
-		if (token_type(token) != TOKEN_SEMICOLON) {
-			if (!err) {
-				lex_error("expected semicolon found `%T`", token);
-			}
-			while (true) {
-				token = lexer_next_token(lexer);
-				if (token_type(token) == TOKEN_EOF) {
-					return false;
-				} else if (token_type(token) == TOKEN_SEMICOLON) {
-					break;
-				}
-			}
-		}
-		token = lexer_future_token(lexer);
+bool lex_next(Lexer *lexer) {
+	lexer_skip_whitespace(lexer);
+	lexer_begin(lexer);
+	if (lexer_finished(lexer)) {
+		return false;
 	}
+	lexer->token.location = lexer->location;
+	
+	SYMBOL('{', TOKEN_OPENING_FIGURE_BRACE);
+	SYMBOL('}', TOKEN_CLOSING_FIGURE_BRACE);
+	SYMBOL('(', TOKEN_OPENING_CIRCLE_BRACE);
+	SYMBOL(')', TOKEN_CLOSING_CIRCLE_BRACE);
+	SYMBOL('+', TOKEN_ADD);
+	SYMBOL('-', TOKEN_MINUS);
+	SYMBOL('*', TOKEN_MULTIPLY);
+	SYMBOL('/', TOKEN_DIVIDE);
+	SYMBOL(':', TOKEN_COLON);
+	SYMBOL(';', TOKEN_SEMICOLON);
+	SYMBOL(',', TOKEN_COMMA);
+	SYMBOL_DUAL('=', '=', TOKEN_ASSIGN, TOKEN_EQUALS);
+	SYMBOL_DUAL('>', '=', TOKEN_GREATER, TOKEN_GREATER_OR_EQUALS);
+	SYMBOL_DUAL('<', '=', TOKEN_LESS, TOKEN_LESS_OR_EQUALS);
+	KEYWORD("var", TOKEN_VAR);
+	KEYWORD("fun", TOKEN_FUN);
+	KEYWORD("if", TOKEN_IF);
+	KEYWORD("else", TOKEN_ELSE);
+	KEYWORD("return", TOKEN_RETURN);
+	TOKEN_PARSE(lexer_parse_ident(lexer));
+	TOKEN_PARSE(lexer_parse_integer(lexer));
+
+	lex_err("unknown token");
 	return true;
-}
-
-bool lexer_parse_fun(Lexer *lexer) {
-	Token *name = lexer_next_token(lexer);
-	if (token_type(name) != TOKEN_IDENT) {
-		lex_error("expected function name but found `%T`", name);
-		return false;
-	}
-	Token *opening_args_brace = lexer_next_token(lexer);
-	if (token_type(opening_args_brace) != TOKEN_OPENING_CIRCLE_BRACE) {
-		lex_error("expected args opening brace but found `%T`", opening_args_brace);
-		return false;
-	}
-	bool reading_args = true;
-	Token *next = lexer_next_token(lexer);
-	while (reading_args) {
-		switch (token_type(next)) {
-			case TOKEN_CLOSING_CIRCLE_BRACE:
-				reading_args = false;
-				break;
-			case TOKEN_IDENT: {
-				next = lexer_next_token(lexer);
-				if (token_type(next) != TOKEN_COLON) {
-					lex_error("expected arg separation colon but got `%T`", next);
-					return false;
-				}
-				AstType type;
-				if (!lexer_parse_type(lexer, &type)) {
-					return false;
-				}
-				next = lexer_next_token(lexer);
-				if (token_type(next) == TOKEN_COMMA) {
-					next = lexer_next_token(lexer);
-				} else if (token_type(next) != TOKEN_CLOSING_CIRCLE_BRACE) {
-					lex_error("expected arg break but got `%T`", next);
-					return false;
-				}
-				break;
-			}
-			default:
-				lex_error("expected arg or args closing brace but got `%T`", next);
-				return false;
-		}
-	}
-	Token *opening_body_brace = NULL;
-	Token *colon = opening_body_brace = lexer_next_token(lexer);
-	if (token_type(colon) == TOKEN_COLON) {
-		AstType type;
-		if (!lexer_parse_type(lexer, &type)) {
-			return false;
-		}
-		opening_body_brace = lexer_next_token(lexer);
-	} else {
-		// func_decl.returning = false;
-	}
-	if (token_type(opening_body_brace) != TOKEN_OPENING_FIGURE_BRACE) {
-		lex_error("expected body found %T", opening_body_brace);
-		return false;
-	}
-	AstCodeBlock block;
-	if (!lexer_parse_code_block(lexer, &block)) {
-		return false;
-	}
-	return true;
-}
-
-bool lexer_parse(Lexer *lexer) {
-	Token *token = lexer_next_token(lexer);
-	switch (token_type(token)) {
-		case TOKEN_FUN: return lexer_parse_fun(lexer);
-		default:
-			lex_error("unexpected token: `%T`!", token);
-			return false;
-	}
 }

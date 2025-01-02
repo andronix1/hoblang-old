@@ -1,4 +1,25 @@
-fun test(a: i32, b: i32): i32 {
-	let t = (a + b) / 2;
+fun test(a: i32, b: i32): void {
+	var t1 = (a + b) / 2;
+	var t2: i32 = (a + b) / 2;
 	return t;
+}
+
+fun main(): void {
+	if 1 + 2 {
+
+	}
+	
+	if 1 + 0 {
+
+	} else {
+
+	}
+
+	if a(x + 4) * 2 {
+		test(a, 1 + 2);
+	} else if b(y) {
+		b();
+	} else {
+		c();
+	}
 }

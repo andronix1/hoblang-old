@@ -4,17 +4,12 @@
 #include <printf.h>
 #include <stdint.h>
 #include "core/fatptr.h"
-
-typedef struct {
-	size_t line;
-	size_t column;
-} FileLocation;
-
-#define TOKEN_EOF ((TokenType)-1)
+#include "core/location.h"
 
 typedef enum { 
 	TOKEN_FUN,
-    TOKEN_LET,
+    TOKEN_VAR,
+    TOKEN_RETURN,
     
 	TOKEN_IF,
     TOKEN_ELSE,
@@ -42,13 +37,10 @@ typedef enum {
     TOKEN_GREATER_OR_EQUALS,
 
     TOKEN_INTEGER,
-    TOKEN_IDENT,	
+    TOKEN_IDENT,
+	
+	TOKEN_EOI 
 } TokenType;
-
-typedef struct {
-    const char *file;
-    FileLocation location;
-} TokenLocation;
 
 typedef struct {
     TokenType type;

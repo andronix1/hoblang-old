@@ -1,7 +1,7 @@
 #include "tokens.h"
 
 TokenType token_type(Token *token) {
-	return token == NULL ? TOKEN_EOF : token->type;
+	return token == NULL ? TOKEN_EOI : token->type;
 }
 
 int printf_arginfo_token(const struct printf_info *info __attribute__((unused)), size_t n, int *argtypes, int *size) {
@@ -14,12 +14,12 @@ int printf_arginfo_token(const struct printf_info *info __attribute__((unused)),
 
 int printf_output_token(FILE *stream, const struct printf_info *info __attribute__((unused)), const void *const *args) {	
 	const Token *token = *(Token**)*args;
-	if (token == NULL) {
+	if (token == NULL || token->type == TOKEN_EOI) {
 		return fprintf(stream, "<EOF>");
 	}
 	switch (token->type) {
     	case TOKEN_FUN: return fprintf(stream, "fun");
-    	case TOKEN_LET: return fprintf(stream, "let");
+    	case TOKEN_VAR: return fprintf(stream, "var");
 		case TOKEN_IF: return fprintf(stream, "if");
     	case TOKEN_ELSE: return fprintf(stream, "else");
 		case TOKEN_COLON: return fprintf(stream, ":");

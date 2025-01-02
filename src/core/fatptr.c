@@ -33,9 +33,13 @@ bool fatptr_read_all(FatPtr *fatptr, FILE *file) {
 	fseek(file, 0, SEEK_SET);
 	fatptr->size = size;
 	fatptr->ptr = malloc(size);
+	if (!fatptr->ptr) {
+		hob_log(LOGE, "failed to allocate memory to read");
+		return false;
+	}
 	if (fread(fatptr->ptr, 1, size, file) == (size_t)-1) {
 		free(fatptr->ptr);
-		printf("failed to read from file: %s\n", strerror(errno));
+		hob_log(LOGE, "failed to read from file: %s\n", strerror(errno));
 		return false;
 	}
 	return true;
@@ -51,4 +55,20 @@ void fatptr_free(FatPtr *fatptr) {
     if (fatptr->ptr != NULL) {
         free(fatptr->ptr);
     }
+}
+
+int printf_arginfo_fatptr(const struct printf_info *info __attribute__((unused)), size_t n, int *argtypes, int *size) {
+	if (n > 0) {
+		*argtypes = PA_POINTER;
+		*size = sizeof(FatPtr*);
+	}
+	return 1;
+}
+
+int printf_output_fatptr(FILE *stream, const struct printf_info *info __attribute__((unused)), const void *const *args) {	
+	return fatptr_print_to(*(FatPtr**)*args, stream);
+}
+
+void fatptr_register_printf() {
+	register_printf_specifier('P', printf_output_fatptr, printf_arginfo_fatptr);
 }

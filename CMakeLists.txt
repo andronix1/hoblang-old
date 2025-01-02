@@ -3,15 +3,16 @@ project(hoblang)
 
 set(SOURCE_FILES
     src/main.c
-	src/tokenizer/tokens.c
-	src/tokenizer/tokenizer.c
-	src/tokenizer/print.c
-	src/tokenizer/base.c
-	src/lexer/base.c
+	src/core/fatptr.c
+	src/core/vec.c
+	src/core/log.c
+	src/lexer/tokens.c
 	src/lexer/lexer.c
-    src/lexer/expr.c
-    src/core/fatptr.c
-    src/core/vec.c
+	src/lexer/base.c
+	src/parser/ast.c
+	src/parser/base.c
+	src/parser/parser.c
+	src/parser/expr.c
 )
 
 add_executable(hoblang ${SOURCE_FILES})

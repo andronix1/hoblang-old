@@ -1,24 +1,26 @@
 #pragma once
 
-#include "tokenizer/tokenizer.h"
-#include "expr/expr.h"
-
-#define lex_error(fmt, ...) printf("%s:%ld:%ld - error: " fmt "\n", lexer->path, lexer->state.location.line, lexer->state.location.column, ##__VA_ARGS__)
-#define lex_error_at(pos, fmt, ...) printf("%s:%ld:%ld - error: " fmt "\n", lexer->path, pos.line, pos.column, ##__VA_ARGS__)
-
-typedef struct {
-	FileLocation location;
-	size_t token;
-} LexerState;
+#include <stdbool.h>
+#include "core/fatptr.h"
+#include "core/log.h"
+#include "tokens.h"
+#include "chars.h"
 
 typedef struct {
-	const char *path;
-	Tokens *tokens;
-	LexerState state;
+	const char *file;
+    FatPtr full, remain;
+    FileLocation location, start_location;
+	size_t line_offset, delta;
+    Token token;
+	bool failed;
 } Lexer;
 
-Lexer lexer_new(Tokens *tokens, const char *path);
-size_t lexer_find_scoped(Lexer *lexer, TokenType type);
-Token *lexer_future_token(Lexer *lexer);
-Token *lexer_next_token(Lexer *lexer);
-Token *lexer_current_token(Lexer *lexer);
+bool lexer_init(Lexer *lexer, const char *path);
+char *lexer_str(Lexer *lexer);
+bool lexer_finished(Lexer *lexer);
+char lexer_next_char(Lexer *lexer);
+char lexer_future_char(Lexer *lexer);
+void lexer_begin(Lexer *lexer);
+void lexer_rollback(Lexer *lexer);
+void lexer_skip_whitespace(Lexer *lexer);
+void lexer_free(Lexer *lexer);
