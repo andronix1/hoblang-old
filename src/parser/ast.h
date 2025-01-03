@@ -4,8 +4,15 @@
 #include "core/vec.h"
 #include "expr.h"
 
+typedef enum {
+	AST_TYPE_IDENT
+} AstTypeKind;
+
 typedef struct {
-	FatPtr name;
+	AstTypeKind type;
+	union {
+		FatPtr ident;
+	};
 } AstType;
 
 typedef struct {
@@ -14,13 +21,6 @@ typedef struct {
 	Expr expr;
 	bool initializes, typed;
 } AstVar;
-
-typedef Vec AstFuncCallArgs;
-
-typedef struct {
-	FatPtr name;
-	AstFuncCallArgs args;
-} AstFunCall;
 
 typedef struct {
 	Expr expr;
@@ -59,7 +59,7 @@ typedef struct {
 	union {
 		AstVar var;
 		AstIf if_else;
-		AstFunCall funcall; // yup, kinda funny)))
+		Funcall funcall; // yup, kinda funny)))
 		AstReturn ret;
 	};
 } AstStmt;

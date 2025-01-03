@@ -32,7 +32,8 @@ bool parse_type(Parser *parser, AstType *type) {
 	parser_next_token(parser);
 	switch (token_type(parser->token)) {
 		case TOKEN_IDENT:
-			type->name = parser->token->ident;
+			type->type = AST_TYPE_IDENT;
+			type->ident = parser->token->ident;
 			return true;
 		default:
 			parse_err(EXPECTED("type"));
@@ -126,18 +127,41 @@ bool parse_expr_before(Parser *parser, Expr *expr, bool (*stop)(TokenType), bool
 		}
 		first = false;
 		switch (token_type(parser->token)) {
+			case TOKEN_TRUE: case TOKEN_FALSE:
+				current_expr->type = EXPR_BOOL;
+				current_expr->boolean = parser->token->type == TOKEN_TRUE;
+				break;
 			case TOKEN_INTEGER:
 				current_expr->type = EXPR_INTEGER;
 				current_expr->integer = parser->token->integer;
 				break;
-			case TOKEN_IDENT:
-				current_expr->type = EXPR_IDENT;
-				current_expr->ident = parser->token->ident;
+			case TOKEN_IDENT: {
+				FatPtr name = parser->token->ident;
+				parser_next_token(parser);
+				if (token_type(parser->token) != TOKEN_OPENING_CIRCLE_BRACE) {
+					current_expr->type = EXPR_IDENT;
+					current_expr->ident = name;
+					parser->skip_next = true;
+					break;
+				}
+				current_expr->type = EXPR_FUNCALL;
+				current_expr->funcall.name = name;
+				current_expr->funcall.args = vec_new(Expr);
+				while (token_type(parser->token) != TOKEN_CLOSING_CIRCLE_BRACE) {
+					Expr arg;
+					if (!parse_expr_before(parser, &arg, token_funcall_arg_stop, false)) {
+						vec_free(&current_expr->funcall.args);
+						return false;
+					}
+					vec_push(&current_expr->funcall.args, &arg);
+				}
 				break;
-			case TOKEN_ADD: PARSE_BINOP(BINOP_ADD, 0); break;
-			case TOKEN_MINUS: PARSE_BINOP(BINOP_SUB, 0); break;
-			case TOKEN_MULTIPLY: PARSE_BINOP(BINOP_MUL, 1); break;
-			case TOKEN_DIVIDE: PARSE_BINOP(BINOP_DIV, 1); break;
+			}
+			case TOKEN_ADD: PARSE_BINOP(BINOP_ADD, 1); break;
+			case TOKEN_MINUS: PARSE_BINOP(BINOP_SUB, 1); break;
+			case TOKEN_MULTIPLY: PARSE_BINOP(BINOP_MUL, 2); break;
+			case TOKEN_DIVIDE: PARSE_BINOP(BINOP_DIV, 2); break;
+			case TOKEN_EQUALS: PARSE_BINOP(BINOP_EQ, 0); break;
 			case TOKEN_OPENING_CIRCLE_BRACE:
 				if (!parse_expr_before(parser, current_expr, token_closing_circle_brace_stop, true)) {
 					EXPR_PARSE_FREE();
@@ -203,7 +227,7 @@ bool parse_var(Parser *parser, AstVar *var) {
 	}
 }
 
-bool parse_funcall_args(Parser *parser, AstFunCall *funcall) {
+bool parse_funcall_args(Parser *parser, Funcall *funcall) {
 	parser_next_token(parser);
 	funcall->args = vec_new(Expr);
 	bool first = true;

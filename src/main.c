@@ -4,6 +4,7 @@
 #include <errno.h>
 #include "lexer/lexer.h"
 #include "parser/parser.h"
+#include "sema/sema.h"
 
 const char *args_shift(int *argc, const char ***argv) {
     *argc -= 1;
@@ -32,8 +33,11 @@ int main(int argc, const char **argv) {
 		if (!parse_module(&parser, &module)) {
 			return 1;
 		}
-        hob_log(LOGI, "parsed!");
 		ast_print_module(&module);
+        hob_log(LOGI, "parsed!");
+		Sema sema = sema_new();
+		sema_module(&sema, &module);
+		hob_log(LOGI, "analyzed!");
 		lexer_free(&lexer);
     } else {
         hob_log(LOGE, "unknown command!");

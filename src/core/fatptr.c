@@ -8,6 +8,14 @@ FatPtr fatptr_empty() {
     return result;
 }
 
+FatPtr fatptr_from_cstr(const char *cstr) {
+    FatPtr result = {
+        .size = strlen(cstr),
+        .ptr = (char*)cstr
+    };
+    return result;
+}
+
 size_t fatptr_print_to(const FatPtr *fatptr, FILE *stream) {
 	return fwrite(fatptr->ptr, 1, fatptr->size, stream);
 }
@@ -16,6 +24,11 @@ void fatptr_append(FatPtr *ptr, FatPtr *other) {
 	size_t prev_size = ptr->size;
 	fatptr_alloc_more(ptr, other->size);
 	memcpy(ptr->str + prev_size, other->str, other->size);
+}
+
+bool fatptr_eq(FatPtr *ptr, FatPtr *other) {
+	if (ptr->size != other->size) return false;
+	return !memcmp(ptr->ptr, other->ptr, ptr->size);
 }
 
 void fatptr_alloc_more(FatPtr *fatptr, size_t size) {

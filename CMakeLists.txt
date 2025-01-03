@@ -13,6 +13,9 @@ set(SOURCE_FILES
 	src/parser/base.c
 	src/parser/parser.c
 	src/parser/expr.c
+	src/sema/base.c
+	src/sema/sema.c
+	src/sema/type.c
 )
 
 add_executable(hoblang ${SOURCE_FILES})

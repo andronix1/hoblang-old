@@ -1,25 +1,21 @@
-fun test(a: i32, b: i32): void {
-	var t1 = (a + b) / 2;
-	var t2: i32 = (a + b) / 2;
-	return t;
+fun say(success: bool): void {
+	if success {
+		
+	} else {
+
+	}
 }
+fun works(): void { say(true); }
+fun so_bad(): void { say(false); }
+
+fun sum(a: i64, b: i64): i64 { return a + b; }
 
 fun main(): void {
-	if 1 + 2 {
-
-	}
-	
-	if 1 + 0 {
-
+	var a = 3;
+	var b = 4;
+	if sum(a, b) == a + b {
+		so_bad();
 	} else {
-
-	}
-
-	if a(x + 4) * 2 {
-		test(a, 1 + 2);
-	} else if b(y) {
-		b();
-	} else {
-		c();
+		works();
 	}
 }

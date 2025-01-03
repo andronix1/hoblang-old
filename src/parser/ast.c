@@ -1,7 +1,11 @@
 #include "ast.h"
 
 void ast_print_type(AstType *type) {
-	printf("%P", &type->name);
+	switch (type->type) {
+		case AST_TYPE_IDENT:
+			printf("%P", &type->ident);
+			break;
+	}
 }
 
 void ast_print_expr(Expr *expr) {
@@ -12,7 +16,7 @@ void ast_print_expr(Expr *expr) {
 				[BINOP_SUB] = "-",
 				[BINOP_MUL] = "*",
 				[BINOP_DIV] = "/",
-				[BINOP_EQ]  = "=",
+				[BINOP_EQ]  = "==",
 				[BINOP_NEQ] = "!=",
 				[BINOP_GT]  = ">",
 				[BINOP_GE]  = ">=",
@@ -36,9 +40,20 @@ void ast_print_expr(Expr *expr) {
 			printf(")");
 			break;
 		}
-		case EXPR_STRING:
-			printf("\"%P\"", &expr->str);
+		case EXPR_FUNCALL: {
+			printf("%P(", &expr->funcall.name);
+			bool first = true;
+			foreach(&expr->funcall.args, Expr, arg) {
+				if (!first) {
+					printf(", ");
+				} else {
+					first = false;
+				}
+				ast_print_expr(arg);
+			}
+			printf(")");
 			break;
+		}
 		case EXPR_IDENT:
 			printf("%P", &expr->ident);
 			break;
@@ -77,7 +92,7 @@ void ast_print_stmt(AstStmt *stmt, size_t level) {
 			break;
 		}
 		case AST_STMT_FUNCALL: {
-			AstFunCall *funcall = &stmt->funcall;
+			Funcall *funcall = &stmt->funcall;
 			printf("%P(", &funcall->name);
 			bool first = true;
 			foreach(&funcall->args, Expr, expr) {
@@ -120,9 +135,12 @@ void ast_print_stmt(AstStmt *stmt, size_t level) {
 }
 
 void ast_print_body(AstBody *body, size_t level) {
-	printf("{\n");
-	foreach(&body->stmts, AstStmt, stmt) ast_print_stmt(stmt, level + 1);
-	for (size_t i = 0; i < level; i++) printf("\t");
+	printf("{");
+	if (body->stmts.len > 0) {
+		printf("\n");
+		foreach(&body->stmts, AstStmt, stmt) ast_print_stmt(stmt, level + 1);
+		for (size_t i = 0; i < level; i++) printf("\t");
+	}
 	printf("}");
 }
 

@@ -36,6 +36,9 @@ typedef enum {
     TOKEN_GREATER,
     TOKEN_GREATER_OR_EQUALS,
 
+    TOKEN_TRUE,
+    TOKEN_FALSE,
+
     TOKEN_INTEGER,
     TOKEN_IDENT,
 	

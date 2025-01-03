@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include "core/fatptr.h"
+#include "core/vec.h"
 
 typedef enum {
 	BINOP_ADD,
@@ -20,7 +21,8 @@ typedef enum {
 	EXPR_IDENT,
 	EXPR_INTEGER,
 	EXPR_BOOL,
-	EXPR_STRING,
+	EXPR_FUNCALL,
+//	EXPR_STRING,
 	EXPR_BINOP,
 	EXPR_UNARY
 } ExprType;
@@ -36,6 +38,13 @@ typedef enum {
 	UNARY_MINUS
 } UnaryType;
 
+typedef Vec FuncallArgs;
+
+typedef struct {
+	FatPtr name;
+	FuncallArgs args;
+} Funcall;
+
 typedef struct {
 	UnaryType type;
 	struct _Expr *expr;
@@ -45,6 +54,7 @@ typedef struct _Expr {
 	ExprType type;
 	union {
 		ExprBinop binop;
+		Funcall funcall;
 		ExprUnary unary;
 		FatPtr ident;
 		FatPtr str;

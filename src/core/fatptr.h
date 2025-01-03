@@ -18,7 +18,9 @@ typedef struct {
 } FatPtr;
 
 FatPtr fatptr_empty();
+FatPtr fatptr_from_cstr(const char *cstr);
 void fatptr_append(FatPtr *ptr, FatPtr *other);
+bool fatptr_eq(FatPtr *ptr, FatPtr *other);
 void fatptr_alloc_more(FatPtr *fatptr, size_t size);
 size_t fatptr_print_to(const FatPtr *fatptr, FILE *stream);
 void fatptr_print(FatPtr *fatptr);

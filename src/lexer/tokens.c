@@ -22,6 +22,8 @@ int printf_output_token(FILE *stream, const struct printf_info *info __attribute
     	case TOKEN_VAR: return fprintf(stream, "var");
 		case TOKEN_IF: return fprintf(stream, "if");
     	case TOKEN_ELSE: return fprintf(stream, "else");
+    	case TOKEN_TRUE: return fprintf(stream, "true");
+    	case TOKEN_FALSE: return fprintf(stream, "false");
 		case TOKEN_COLON: return fprintf(stream, ":");
     	case TOKEN_COMMA: return fprintf(stream, ",");
     	case TOKEN_SEMICOLON: return fprintf(stream, ";");

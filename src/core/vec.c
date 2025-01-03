@@ -25,6 +25,13 @@ void vec_push(Vec *vec, void *ptr) {
 	memcpy(vec_at(vec, vec->len - 1), ptr, vec->esize);
 }
 
+void *vec_pop(Vec *vec) {
+	assert(vec->len > 0 && "trying to pop empty array");
+	void *result = vec_at(vec, vec->len - 1);
+	vec->len--;
+	return result;
+}
+
 void vec_free(Vec *vec) {
 	fatptr_free(&vec->buffer);
 }
@@ -34,4 +41,8 @@ void *vec_at(Vec *vec, size_t idx) {
 		return NULL;
 	}
 	return &vec->buffer.str[idx * vec->esize];
+}
+
+void *vec_top(Vec *vec) {
+	return vec_at(vec, vec->len - 1);
 }
