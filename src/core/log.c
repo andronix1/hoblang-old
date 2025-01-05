@@ -5,8 +5,10 @@
 #define ANSI_RED ANSI(31)
 #define ANSI_YELLOW ANSI(33)
 #define ANSI_GREEN ANSI(32)
+#define ANSI_BLUE ANSI(34)
 
 const char *log_level_str[] = {
+	[LOGD] = ANSI_BLUE   "debug"   ANSI_RESET,
 	[LOGI] = ANSI_GREEN  "info"    ANSI_RESET,
 	[LOGW] = ANSI_YELLOW "warning" ANSI_RESET,
 	[LOGE] = ANSI_RED    "error"   ANSI_RESET

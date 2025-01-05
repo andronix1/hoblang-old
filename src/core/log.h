@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include "location.h"
 
-typedef enum { LOGE, LOGW, LOGI } LogLevel;
+typedef enum { LOGE, LOGW, LOGI, LOGD } LogLevel;
 
 void hob_log(LogLevel level, const char *fmt, ...);
 void hob_log_at(LogLevel level, const char *path, FileLocation location, const char *fmt, ...);

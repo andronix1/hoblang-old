@@ -30,7 +30,7 @@ void ast_print_expr(Expr *expr) {
 			printf(")");
 			break;
 		}
-		case EXPR_UNARY: {
+/*		case EXPR_UNARY: {
 			static char *unary_strs[] = {
 				[UNARY_MINUS] = "-"
 			};
@@ -39,7 +39,7 @@ void ast_print_expr(Expr *expr) {
 			ast_print_expr(expr->unary.expr);
 			printf(")");
 			break;
-		}
+		}*/
 		case EXPR_FUNCALL: {
 			printf("%P(", &expr->funcall.name);
 			bool first = true;

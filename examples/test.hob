@@ -1,10 +1,4 @@
-fun say(success: bool): void {
-	if success {
-		
-	} else {
-
-	}
-}
+fun say(success: bool): void {}
 fun works(): void { say(true); }
 fun so_bad(): void { say(false); }
 
@@ -14,8 +8,8 @@ fun main(): void {
 	var a = 3;
 	var b = 4;
 	if sum(a, b) == a + b {
-		so_bad();
-	} else {
 		works();
+	} else {
+		so_bad();
 	}
 }

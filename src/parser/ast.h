@@ -2,6 +2,7 @@
 
 #include "core/fatptr.h"
 #include "core/vec.h"
+#include "sema/type.h"
 #include "expr.h"
 
 typedef enum {
@@ -10,6 +11,7 @@ typedef enum {
 
 typedef struct {
 	AstTypeKind type;
+	Type sema;
 	union {
 		FatPtr ident;
 	};
@@ -94,6 +96,7 @@ typedef struct {
 typedef Vec AstModuleNodes;
 
 typedef struct {
+	FatPtr name;
 	AstModuleNodes nodes;
 } AstModule;
 

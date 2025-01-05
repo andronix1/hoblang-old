@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "sema/type.h"
 #include "core/fatptr.h"
 #include "core/vec.h"
 
@@ -24,7 +25,7 @@ typedef enum {
 	EXPR_FUNCALL,
 //	EXPR_STRING,
 	EXPR_BINOP,
-	EXPR_UNARY
+//	EXPR_UNARY
 } ExprType;
 
 struct _Expr;
@@ -52,6 +53,7 @@ typedef struct {
 
 typedef struct _Expr {
 	ExprType type;
+	Type sema_type;
 	union {
 		ExprBinop binop;
 		Funcall funcall;

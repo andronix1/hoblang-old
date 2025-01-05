@@ -18,6 +18,7 @@ typedef struct {
 } FatPtr;
 
 FatPtr fatptr_empty();
+const char *fatptr_to_cstr(FatPtr *fatptr);
 FatPtr fatptr_from_cstr(const char *cstr);
 void fatptr_append(FatPtr *ptr, FatPtr *other);
 bool fatptr_eq(FatPtr *ptr, FatPtr *other);

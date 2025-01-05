@@ -41,6 +41,7 @@ bool sema_ast_type(Sema *sema, Type *type, AstType *ast_type) {
 				sema_err("unknown type `%P`", &ast_type->ident);
 				return false;
 			}
+			ast_type->sema = *type;
 			return true;
 		default:
 			assert(0 && "unknown ast type kind");
@@ -91,6 +92,7 @@ Type *sema_resolve_funcall_type(Sema *sema, Funcall *funcall) {
 		sema_err("function `%P` takes %d arguments but %d were given", &funcall->name, decl->type.func.args.len, funcall->args.len);
 		return decl->type.func.returning;
 	}
+	Vec types = vec_new(AstFuncArg);
 	for (size_t i = 0; i < funcall->args.len; i++) {
 		Type *passed = sema_expr_resolve_type(sema, vec_at(&funcall->args, i));
 		if (!passed) {
@@ -112,13 +114,14 @@ Type *sema_expr_resolve_type(Sema *sema, Expr *expr) {
 				sema_err("symbol `%P` undeclared", &expr->ident);
 				return NULL;
 			}
-			return &decl->type;
+			expr->sema_type = decl->type;
+			return &expr->sema_type;
 		}
 		case EXPR_BINOP: {
 			Type *t1 = sema_expr_resolve_type(sema, expr->binop.left);
 			Type *t2 = sema_expr_resolve_type(sema, expr->binop.right);
 			if (!t1 || !t2) {
-				return false;
+				return NULL;
 			}
 			if (!types_equals(t1, t2)) {
 				sema_err("cannot use binop %d for exprs with different types", expr->binop.type);
@@ -135,19 +138,28 @@ Type *sema_expr_resolve_type(Sema *sema, Expr *expr) {
 			};
 			for (size_t i = 0; i < sizeof(comp_binops)/sizeof(BinopType); i++) {
 				if (expr->binop.type == comp_binops[i]) {
-					return &primitives[PRIMITIVE_BOOL];
+					expr->sema_type = primitives[PRIMITIVE_BOOL];
+					return &expr->sema_type;
 				}
 			}
-			return t1;
+			expr->sema_type = *t1;
+			return &expr->sema_type;
 		}
-		case EXPR_UNARY:
-			return sema_expr_resolve_type(sema, expr->unary.expr);
+/*		case EXPR_UNARY:
+			return sema_expr_resolve_type(sema, expr->unary.expr); */
 		case EXPR_INTEGER:
-			return &primitives[PRIMITIVE_I64];
+			expr->sema_type = primitives[PRIMITIVE_I64];
+			return &expr->sema_type;
 		case EXPR_BOOL:
-			return &primitives[PRIMITIVE_BOOL];
-		case EXPR_FUNCALL:
-			return sema_resolve_funcall_type(sema, &expr->funcall);
+			expr->sema_type = primitives[PRIMITIVE_BOOL];
+			return &expr->sema_type;
+		case EXPR_FUNCALL: {
+			Type *type = sema_resolve_funcall_type(sema, &expr->funcall);
+			if (type) {
+				expr->sema_type = *type;
+			}
+			return type;
+		}
 	}
 	assert(0 && "unknown expr type");
 	return NULL;
@@ -176,7 +188,8 @@ void sema_module_body(Sema *sema, AstBody *body, Type *returns) {
 					}
 				} else {
 					if (!var->typed) {
-						decl.type = *init_type;
+						var->typed = true;
+						var->type.sema = decl.type = *init_type;
 					}
 				}
 				sema_push_decl(sema, &decl);

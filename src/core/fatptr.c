@@ -8,6 +8,21 @@ FatPtr fatptr_empty() {
     return result;
 }
 
+const char *fatptr_to_cstr(FatPtr *fatptr) {
+	if (fatptr->str[fatptr->size - 1] == '\0') {
+		return fatptr->str;
+	}
+	FatPtr other = fatptr_empty();
+	fatptr_append(&other, fatptr);
+	char a = 0;
+	FatPtr c = {
+		.size = 1,
+		.ptr = &a
+	};
+	fatptr_append(&other, &c);
+	return other.str;
+}
+
 FatPtr fatptr_from_cstr(const char *cstr) {
     FatPtr result = {
         .size = strlen(cstr),
