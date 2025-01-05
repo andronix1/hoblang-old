@@ -77,19 +77,23 @@ typedef struct {
 	FatPtr name;
 	AstType returning;
 	AstFuncArgs args;
+} AstFuncInfo;
+
+typedef struct {
+	AstFuncInfo info;
 	AstBody body;
 } AstFuncDecl;
 
 typedef enum {
 	AST_MODULE_NODE_FUNC,
-	AST_MODULE_NODE_VAR,
+	AST_MODULE_NODE_EXTERNAL_FUNC,
 } AstModuleNodeType;
 
 typedef struct {
 	AstModuleNodeType type;
 	union {
 		AstFuncDecl func_decl;		
-		AstVar var;		
+		AstFuncInfo ext_func_decl;		
 	};
 } AstModuleNode;
 

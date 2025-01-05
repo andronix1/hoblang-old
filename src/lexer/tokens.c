@@ -18,6 +18,7 @@ int printf_output_token(FILE *stream, const struct printf_info *info __attribute
 		return fprintf(stream, "<EOF>");
 	}
 	switch (token->type) {
+    	case TOKEN_EXTERN: return fprintf(stream, "extern");
     	case TOKEN_FUN: return fprintf(stream, "fun");
     	case TOKEN_VAR: return fprintf(stream, "var");
 		case TOKEN_IF: return fprintf(stream, "if");

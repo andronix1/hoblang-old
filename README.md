@@ -10,11 +10,9 @@ cmake ../
 cmake --build ./
 ./hoblang compile <source> <output>
 ```
-## Examples
-At the moment, language doesn't supports asm inlines or external functions so you only can see that code works in the debugger
 ## Syntax
 ```
-fun say(success: bool): void {}
+extern fun say(success: bool): void
 
 fun works(): void { say(true); }
 fun so_bad(): void { say(false); }

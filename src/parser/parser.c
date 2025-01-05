@@ -346,14 +346,14 @@ bool parse_body(Parser *parser, AstBody *body) {
 	return false;
 }
 
-bool parse_func_decl(Parser *parser, AstFuncDecl *decl) {
+bool parse_func_info(Parser *parser, AstFuncInfo *info) {
 	parse_exp_next(TOKEN_IDENT, "function name");
-	decl->name = parser->token->ident;
+	info->name = parser->token->ident;
 
 	parse_exp_next(TOKEN_OPENING_CIRCLE_BRACE, "opening args brace");
 	bool parsing_args = true;
 	bool was_arg = false;
-	decl->args = vec_new(AstFuncArg);
+	info->args = vec_new(AstFuncArg);
 	while (parsing_args) {
 		parser_next_token(parser);
 		switch (token_type(parser->token)) {
@@ -374,7 +374,7 @@ bool parse_func_decl(Parser *parser, AstFuncDecl *decl) {
 				if (!parse_type(parser, &arg.type)) {
 					return false;
 				}
-				vec_push(&decl->args, &arg);
+				vec_push(&info->args, &arg);
 				was_arg = true;
 				break;
 			}
@@ -385,7 +385,22 @@ bool parse_func_decl(Parser *parser, AstFuncDecl *decl) {
 	}
 
 	parse_exp_next(TOKEN_COLON, "returning type");
-	parse_type(parser, &decl->returning);
+	parse_type(parser, &info->returning);
+	return true;
+}
+
+bool parse_external(Parser *parser, AstFuncInfo *info) {
+	parse_exp_next(TOKEN_FUN, "function");
+	if (!parse_func_info(parser, info)) {
+		return false;
+	}
+	return true;
+}
+
+bool parse_func_decl(Parser *parser, AstFuncDecl *decl) {
+	if (!parse_func_info(parser, &decl->info)) {
+		return false;
+	}
 	parse_body(parser, &decl->body);
 	return true;
 }
@@ -396,6 +411,9 @@ bool parse_module_node(Parser *parser, AstModuleNode *node) {
 		case TOKEN_FUN:
 			node->type = AST_MODULE_NODE_FUNC;
 			return parse_func_decl(parser, &node->func_decl);
+		case TOKEN_EXTERN:
+			node->type = AST_MODULE_NODE_EXTERNAL_FUNC;
+			return parse_external(parser, &node->ext_func_decl);
 		default:
 			parse_err("unexpected `%T` while parsing module node", parser->token);
 			return false;

@@ -144,29 +144,36 @@ void ast_print_body(AstBody *body, size_t level) {
 	printf("}");
 }
 
+void ast_print_func_info(AstFuncInfo *info) {
+	printf("fun %P(", &info->name);
+	bool first = true;
+	foreach(&info->args, AstFuncArg, arg) {
+		if (first) {
+			first = false;
+		} else {
+			printf(", ");
+		}
+		printf("%P: ", &arg->name);
+		ast_print_type(&arg->type);
+	}
+	printf("): ");
+	ast_print_type(&info->returning);
+}
+
 void ast_print_module_node(AstModuleNode *node) {
 	switch (node->type) {
 		case AST_MODULE_NODE_FUNC: {
 			AstFuncDecl *decl = &node->func_decl;
-			printf("fun %P(", &decl->name);
-			bool first = true;
-			foreach(&decl->args, AstFuncArg, arg) {
-				if (first) {
-					first = false;
-				} else {
-					printf(", ");
-				}
-				printf("%P: ", &arg->name);
-				ast_print_type(&arg->type);
-			}
-			printf("): ");
-			ast_print_type(&decl->returning);
+			ast_print_func_info(&decl->info);
 			printf(" ");
 			ast_print_body(&decl->body, 0);
 			break;
 		}
-		case AST_MODULE_NODE_VAR:
+		case AST_MODULE_NODE_EXTERNAL_FUNC: {
+			printf("extern ");
+			ast_print_func_info(&node->ext_func_decl);
 			break;
+		}
 	}
 	printf("\n");
 }

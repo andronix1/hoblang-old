@@ -110,6 +110,7 @@ bool lex_next(Lexer *lexer) {
 	KEYWORD("if", TOKEN_IF);
 	KEYWORD("else", TOKEN_ELSE);
 	KEYWORD("return", TOKEN_RETURN);
+	KEYWORD("extern", TOKEN_EXTERN);
 	KEYWORD("true", TOKEN_TRUE);
 	KEYWORD("false", TOKEN_FALSE);
 	TOKEN_PARSE(lexer_parse_ident(lexer));

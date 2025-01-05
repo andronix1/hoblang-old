@@ -249,17 +249,18 @@ bool sema_module_node(Sema *sema, AstModuleNode *node) {
 			Scope scope = scope_new();
 			vec_push(&sema->scopes, &scope);
 			AstFuncDecl *func = &node->func_decl;
-			foreach (&func->args, AstFuncArg, arg) {
+			foreach (&func->info.args, AstFuncArg, arg) {
 				Decl decl = { .name = arg->name };
 				if (sema_ast_type(sema, &decl.type, &arg->type)) {
 					sema_push_decl(sema, &decl);
 				}
 			}
 			Type returns;
-			sema_module_body(sema, &func->body, sema_ast_type(sema, &returns, &func->returning) ? &returns : NULL);
+			sema_module_body(sema, &func->body, sema_ast_type(sema, &returns, &func->info.returning) ? &returns : NULL);
 			vec_pop(&sema->scopes);
 			return true;
 		}
+		case AST_MODULE_NODE_EXTERNAL_FUNC: return true;
 		default: {
 			sema_err("TODO: other module nodes NIY");
 			return false;
@@ -267,32 +268,37 @@ bool sema_module_node(Sema *sema, AstModuleNode *node) {
 	}
 }
 
-bool sema_add_module_node(Sema *sema, AstModuleNode *node) {
+void sema_add_func(Sema *sema, AstFuncInfo *func) {
 	Decl decl;
+	decl.name = func->name;
+	decl.type.type = TYPE_FUNCTION;
+	decl.type.func.args = vec_new(TypeFuncArg);
+	foreach (&func->args, AstFuncArg, ast_arg) {
+		TypeFuncArg arg = {
+			.type = malloc(sizeof(Type)),
+			.name = ast_arg->name
+		};
+		sema_ast_type(sema, arg.type, &ast_arg->type);
+		vec_push(&decl.type.func.args, &arg);
+	}
+	decl.type.func.returning = malloc(sizeof(Type));
+	sema_ast_type(sema, decl.type.func.returning, &func->returning);
+	sema_push_decl(sema, &decl);
+}
+
+bool sema_add_module_node(Sema *sema, AstModuleNode *node) {
 	switch (node->type) {
 		case AST_MODULE_NODE_FUNC: {
-			AstFuncDecl *func = &node->func_decl;
-			decl.name = func->name;
-			decl.type.type = TYPE_FUNCTION;
-			decl.type.func.args = vec_new(TypeFuncArg);
-			foreach (&func->args, AstFuncArg, ast_arg) {
-				TypeFuncArg arg = {
-					.type = malloc(sizeof(Type)),
-					.name = ast_arg->name
-				};
-				sema_ast_type(sema, arg.type, &ast_arg->type);
-				vec_push(&decl.type.func.args, &arg);
-			}
-			decl.type.func.returning = malloc(sizeof(Type));
-			sema_ast_type(sema, decl.type.func.returning, &func->returning);
-			sema_push_decl(sema, &decl);
+			sema_add_func(sema, &node->func_decl.info);
 			return true;
 		}
-		default: {
-			sema_err("TODO: other module nodes NIY");
-			return false;
+		case AST_MODULE_NODE_EXTERNAL_FUNC: {
+			sema_add_func(sema, &node->ext_func_decl);
+			return true;
 		}
 	}
+	sema_err("invalid module node provided");
+	return false;
 }
 
 void sema_push_builtin_type(Scope *scope, const char *name, Primitive type) {

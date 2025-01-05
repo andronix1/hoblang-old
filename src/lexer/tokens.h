@@ -10,6 +10,7 @@ typedef enum {
 	TOKEN_FUN,
     TOKEN_VAR,
     TOKEN_RETURN,
+    TOKEN_EXTERN,
     
 	TOKEN_IF,
     TOKEN_ELSE,

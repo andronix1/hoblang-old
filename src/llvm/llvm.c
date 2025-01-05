@@ -171,27 +171,31 @@ void llvm_body(LlvmBackend *llvm, AstBody *body) {
 	vec_pop(&llvm->scopes);
 }
 
+void llvm_add_func(LlvmBackend *llvm, AstFuncInfo *func) {
+	LLVMTypeRef *params = malloc(sizeof(LLVMTypeRef) * func->args.len);
+	for (size_t i = 0; i < func->args.len; i++) {
+		AstFuncArg *arg = vec_at(&func->args, i);
+		params[i] = llvm_resolve_type(&arg->type.sema);
+	}
+	LLVMTypeRef type = LLVMFunctionType(llvm_resolve_type(&func->returning.sema), params, func->args.len, false);
+	LlvmScope **scope = vec_top(&llvm->scopes);
+	LLVMValueRef value = LLVMAddFunction(llvm->module, fatptr_to_cstr(&func->name), type);
+	LlvmValue val = {
+		.name = &func->name,
+		.type = type,
+		.value = value
+	};
+	vec_push(*scope, &val);
+}
+
 void llvm_add_module_node(LlvmBackend *llvm, AstModuleNode *node) {
 	switch (node->type) {
 		case AST_MODULE_NODE_FUNC: {
-			LLVMTypeRef *params = malloc(sizeof(LLVMTypeRef) * node->func_decl.args.len);
-			for (size_t i = 0; i < node->func_decl.args.len; i++) {
-				AstFuncArg *arg = vec_at(&node->func_decl.args, i);
-				params[i] = llvm_resolve_type(&arg->type.sema);
-			}
-			LLVMTypeRef type = LLVMFunctionType(llvm_resolve_type(&node->func_decl.returning.sema), params, node->func_decl.args.len, false);
-			LlvmScope **scope = vec_top(&llvm->scopes);
-			LLVMValueRef value = LLVMAddFunction(llvm->module, fatptr_to_cstr(&node->func_decl.name), type);
-			LlvmValue val = {
-				.name = &node->func_decl.name,
-				.type = type,
-				.value = value
-			};
-			vec_push(*scope, &val);
+			llvm_add_func(llvm, &node->func_decl.info);
 			break;
 		}
-		case AST_MODULE_NODE_VAR: {
-			hob_log(LOGE, "var nodes are not implemented yet!");
+		case AST_MODULE_NODE_EXTERNAL_FUNC: {
+			llvm_add_func(llvm, &node->ext_func_decl);
 			break;
 		}
 	}
@@ -203,10 +207,10 @@ void llvm_module_node(LlvmBackend *llvm, AstModuleNode *node) {
 			LlvmScope scope = vec_new(LlvmValue);
 			LlvmScope *scope_of = &scope;
 			vec_push(&llvm->scopes, &scope_of);
-			llvm->func = llvm_resolve_value(llvm, &node->func_decl.name);
+			llvm->func = llvm_resolve_value(llvm, &node->func_decl.info.name);
 			LLVMPositionBuilderAtEnd(llvm->builder, LLVMAppendBasicBlock(llvm->func, "entry"));
-			for (size_t i = 0; i < node->func_decl.args.len; i++) {
-				AstFuncArg *arg = vec_at(&node->func_decl.args, i);
+			for (size_t i = 0; i < node->func_decl.info.args.len; i++) {
+				AstFuncArg *arg = vec_at(&node->func_decl.info.args, i);
 				LlvmValue value = {
 					.type = llvm_resolve_type(&arg->type.sema),
 					.value = LLVMGetParam(llvm->func, i),
@@ -215,17 +219,13 @@ void llvm_module_node(LlvmBackend *llvm, AstModuleNode *node) {
 				vec_push(scope_of, &value);
 			}
 			llvm_body(llvm, &node->func_decl.body);
-			if (types_equals(&node->func_decl.returning.sema, &primitives[PRIMITIVE_VOID])) {
+			if (types_equals(&node->func_decl.info.returning.sema, &primitives[PRIMITIVE_VOID])) {
 				LLVMBuildRetVoid(llvm->builder);
 			}
 			vec_pop(&llvm->scopes);
 			break;
 		}
-		case AST_MODULE_NODE_VAR: {
-			hob_log(LOGE, "var nodes are not implemented yet!");
-			assert(0);
-			break;
-		}
+		case AST_MODULE_NODE_EXTERNAL_FUNC: break;
 	}
 }
 
