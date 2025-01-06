@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "ast_type.h"
 #include "sema/type.h"
 #include "core/fatptr.h"
 #include "core/vec.h"
@@ -21,8 +22,10 @@ typedef enum {
 typedef enum {
 	EXPR_IDENT,
 	EXPR_INTEGER,
+	EXPR_CHAR,
 	EXPR_BOOL,
 	EXPR_FUNCALL,
+	EXPR_AS,
 //	EXPR_STRING,
 	EXPR_BINOP,
 //	EXPR_UNARY
@@ -51,6 +54,11 @@ typedef struct {
 	struct _Expr *expr;
 } ExprUnary;
 
+typedef struct {
+	AstType type;
+	struct _Expr *expr;
+} ExprAs;
+
 typedef struct _Expr {
 	ExprType type;
 	Type sema_type;
@@ -58,6 +66,7 @@ typedef struct _Expr {
 		ExprBinop binop;
 		Funcall funcall;
 		ExprUnary unary;
+		ExprAs as;
 		FatPtr ident;
 		FatPtr str;
 		uint64_t integer;

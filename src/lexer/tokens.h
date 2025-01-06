@@ -11,6 +11,7 @@ typedef enum {
     TOKEN_VAR,
     TOKEN_RETURN,
     TOKEN_EXTERN,
+    TOKEN_AS,
     
 	TOKEN_IF,
     TOKEN_ELSE,
@@ -40,6 +41,7 @@ typedef enum {
     TOKEN_TRUE,
     TOKEN_FALSE,
 
+    TOKEN_CHAR,
     TOKEN_INTEGER,
     TOKEN_IDENT,
 	
@@ -52,6 +54,7 @@ typedef struct {
     union {
         FatPtr ident;
         uint64_t integer;
+		char character;
     };
 } Token;
 

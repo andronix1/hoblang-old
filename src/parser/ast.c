@@ -57,6 +57,16 @@ void ast_print_expr(Expr *expr) {
 		case EXPR_IDENT:
 			printf("%P", &expr->ident);
 			break;
+		case EXPR_CHAR:
+			printf("%x", (char)expr->integer);
+			break;
+		case EXPR_AS:
+			printf("(");
+			ast_print_expr(expr->as.expr);
+			printf(" as ", expr->integer);
+			ast_print_type(&expr->as.type);
+			printf(")");
+			break;
 		case EXPR_INTEGER:
 			printf("%ld", expr->integer);
 			break;

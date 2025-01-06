@@ -1,6 +1,0 @@
-extern fun call(success: bool): void
-
-fun main(): void {
-	call(true);
-	call(false);
-}

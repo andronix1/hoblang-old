@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lexer/lexer.h"
+#include "lexer/lex.h"
 
 typedef struct {
 	Lexer *lexer;

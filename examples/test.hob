@@ -1,8 +1,9 @@
-fun say(success: bool): void {}
-fun works(): void { say(true); }
-fun so_bad(): void { say(false); }
+extern fun putchar(c: u8): void
 
-fun sum(a: i64, b: i64): i64 { return a + b; }
+fun works(): void { putchar('w'); putchar('o'); putchar('r'); putchar('k'); putchar('s'); }
+fun so_bad(): void {  putchar('s'); putchar('o'); putchar('b'); putchar('a'); putchar('d'); }
+
+fun sum(a: i32, b: i32): i32 { return a + b; }
 
 fun main(): void {
 	var a = 3;
@@ -12,4 +13,9 @@ fun main(): void {
 	} else {
 		so_bad();
 	}
+	putchar(':');
+	putchar(' ');
+	var c = (a + b) as u8;
+	putchar('0' + c);
+	putchar('\n');
 }

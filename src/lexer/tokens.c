@@ -19,6 +19,7 @@ int printf_output_token(FILE *stream, const struct printf_info *info __attribute
 	}
 	switch (token->type) {
     	case TOKEN_EXTERN: return fprintf(stream, "extern");
+    	case TOKEN_AS: return fprintf(stream, "as");
     	case TOKEN_FUN: return fprintf(stream, "fun");
     	case TOKEN_VAR: return fprintf(stream, "var");
 		case TOKEN_IF: return fprintf(stream, "if");
@@ -44,6 +45,7 @@ int printf_output_token(FILE *stream, const struct printf_info *info __attribute
     	case TOKEN_GREATER: return fprintf(stream, ">");
     	case TOKEN_GREATER_OR_EQUALS: return fprintf(stream, ">=");
     	case TOKEN_INTEGER: return fprintf(stream, "%ld", token->integer);
+    	case TOKEN_CHAR: return fprintf(stream, "'%c'", token->character);
     	case TOKEN_IDENT: return fatptr_print_to(&token->ident, stream);
 		default: return fprintf(stream, "<unknown type = %lx>", token->type);
 	}

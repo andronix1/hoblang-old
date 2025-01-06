@@ -86,11 +86,22 @@ LLVMValueRef llvm_funcall(LlvmBackend *llvm, Funcall *funcall) {
 	return LLVMBuildCall2(llvm->builder, llvm_resolve_type_of(llvm, &funcall->name), llvm_resolve_value(llvm, &funcall->name), params, funcall->args.len, "");
 }
 
+bool llvm_is_signed(Type *type) {
+	return
+		type->primitive == PRIMITIVE_I8 || 
+		type->primitive == PRIMITIVE_I16 || 
+		type->primitive == PRIMITIVE_I32 || 
+		type->primitive == PRIMITIVE_I64;
+}
+
 LLVMValueRef llvm_expr(LlvmBackend *llvm, Expr *expr) {
 	switch (expr->type) {
 		case EXPR_IDENT: return llvm_resolve_value(llvm, &expr->ident);
 		case EXPR_INTEGER: return LLVMConstInt(LLVMInt32Type(), expr->integer, true);
 		case EXPR_BOOL: return LLVMConstInt(LLVMInt1Type(), expr->boolean, false);
+		case EXPR_CHAR: return LLVMConstInt(LLVMInt8Type(), expr->integer, false);
+		// case EXPR_AS: return LLVMBuildTrunc(llvm->builder, llvm_expr(llvm, expr->as.expr), llvm_resolve_type(&expr->as.type.sema)/*llvm_is_signed(&expr->as.type.sema) */, ""); // TODO: check possibility at sema 
+		case EXPR_AS: return llvm_expr(llvm, expr->as.expr);
 		case EXPR_BINOP: {
 			LLVMValueRef right = llvm_expr(llvm, expr->binop.right);
 			LLVMValueRef left = llvm_expr(llvm, expr->binop.left);

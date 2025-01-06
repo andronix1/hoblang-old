@@ -81,7 +81,7 @@ Type *sema_expr_resolve_type(Sema *sema, Expr *expr);
 Type *sema_resolve_funcall_type(Sema *sema, Funcall *funcall) {
 	Decl *decl = sema_resolve_decl(sema, &funcall->name);
 	if (!decl) {
-		sema_err("function `%P` is undefined");
+		sema_err("function `%P` is undefined", &funcall->name);
 		return NULL;
 	}
 	if (decl->type.type != TYPE_FUNCTION) {
@@ -92,7 +92,6 @@ Type *sema_resolve_funcall_type(Sema *sema, Funcall *funcall) {
 		sema_err("function `%P` takes %d arguments but %d were given", &funcall->name, decl->type.func.args.len, funcall->args.len);
 		return decl->type.func.returning;
 	}
-	Vec types = vec_new(AstFuncArg);
 	for (size_t i = 0; i < funcall->args.len; i++) {
 		Type *passed = sema_expr_resolve_type(sema, vec_at(&funcall->args, i));
 		if (!passed) {
@@ -115,6 +114,14 @@ Type *sema_expr_resolve_type(Sema *sema, Expr *expr) {
 				return NULL;
 			}
 			expr->sema_type = decl->type;
+			return &expr->sema_type;
+		}
+		case EXPR_AS: {
+			/*Type *src_type = */sema_expr_resolve_type(sema, expr->as.expr);
+			// TODO: check safety
+			if (!sema_ast_type(sema, &expr->sema_type, &expr->as.type)) {
+				return NULL;
+			}
 			return &expr->sema_type;
 		}
 		case EXPR_BINOP: {
@@ -147,8 +154,10 @@ Type *sema_expr_resolve_type(Sema *sema, Expr *expr) {
 		}
 /*		case EXPR_UNARY:
 			return sema_expr_resolve_type(sema, expr->unary.expr); */
+		case EXPR_CHAR:
+			return &primitives[PRIMITIVE_U8];
 		case EXPR_INTEGER:
-			expr->sema_type = primitives[PRIMITIVE_I64];
+			expr->sema_type = primitives[PRIMITIVE_I32];
 			return &expr->sema_type;
 		case EXPR_BOOL:
 			expr->sema_type = primitives[PRIMITIVE_BOOL];

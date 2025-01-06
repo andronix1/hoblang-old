@@ -64,6 +64,7 @@ void expr_push_up(Expr *expr) {
 	};
 	if (
 		!expr->parent || 
+		expr->type == EXPR_AS ||
 		expr->parent->type != EXPR_BINOP ||
 		priority[expr->parent->binop.type] < priority[expr->binop.type]
 	) {
@@ -131,10 +132,15 @@ bool parse_expr_before(Parser *parser, Expr *expr, bool (*stop)(TokenType), bool
 				current_expr->type = EXPR_BOOL;
 				current_expr->boolean = parser->token->type == TOKEN_TRUE;
 				break;
-			case TOKEN_INTEGER:
+			case TOKEN_CHAR:
+				current_expr->type = EXPR_CHAR;
+				current_expr->integer = parser->token->character;
+				break;
+			case TOKEN_INTEGER: {
 				current_expr->type = EXPR_INTEGER;
 				current_expr->integer = parser->token->integer;
 				break;
+			}
 			case TOKEN_IDENT: {
 				FatPtr name = parser->token->ident;
 				parser_next_token(parser);
@@ -167,7 +173,6 @@ bool parse_expr_before(Parser *parser, Expr *expr, bool (*stop)(TokenType), bool
 					EXPR_PARSE_FREE();
 					return false;
 				}
-				EXPR_PARSE_SKIP_NESTED();
 				break;
 			case TOKEN_EOI:
 				parse_err("EOI while parsing expression");
@@ -177,6 +182,18 @@ bool parse_expr_before(Parser *parser, Expr *expr, bool (*stop)(TokenType), bool
 				parse_err("unexpected token `%T` while parsing expression", parser->token);
 				EXPR_PARSE_FREE();
 				return false;
+		}
+		parser_next_token(parser);	
+		if (token_type(parser->token) != TOKEN_AS) {
+			parser->skip_next = true;
+			continue;
+		}
+		Expr *expr = malloc(sizeof(Expr));
+		memcpy(expr, current_expr, sizeof(Expr));
+		current_expr->type = EXPR_AS;
+		current_expr->as.expr = expr;
+		if (!parse_type(parser, &current_expr->as.type)) {
+			return false;
 		}
 	}
 }

@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <string.h>
 #include <errno.h>
-#include "lexer/lexer.h"
+#include "lexer/lex.h"
 #include "parser/parser.h"
 #include "sema/sema.h"
 #include "llvm/llvm.h"
@@ -43,10 +43,10 @@ int main(int argc, char **argv) {
 		AstModule module = {
 			.name = fatptr_from_cstr("main") // todo: module keyword
 		};
-		if (!parse_module(&parser, &module)) {
+		if (!parse_module(&parser, &module) || lexer.failed) {
 			return 1;
 		}
-		// ast_print_module(&module);
+		ast_print_module(&module);
         hob_log(LOGI, "parsed!");
 		Sema sema = sema_new();
 		sema_module(&sema, &module);

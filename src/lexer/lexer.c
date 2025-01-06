@@ -1,121 +1,77 @@
 #include "lexer.h"
 
-typedef enum {
-	LEX_ONE_OK = 0,
-	LEX_ONE_ERR,
-	LEX_ONE_MISSMATCH
-} LexOneErr;
-
-LexOneErr lexer_parse_keyword(Lexer *lexer, const char *keyword, TokenType type) {
-	for (size_t i = 0; keyword[i] != '\0'; i++) {
-		if (lexer_next_char(lexer) != keyword[i]) {
-			return LEX_ONE_MISSMATCH;
-		}
-	}
-	lexer->token.type = type;
-	if (char_is_ident(lexer_future_char(lexer))) {
-		return LEX_ONE_MISSMATCH;
-	}
-	return LEX_ONE_OK;
-}
-
-LexOneErr lexer_parse_symbol_with_next(Lexer *lexer, char symbol, char next, TokenType type, TokenType next_type) {
-	if (symbol == lexer_next_char(lexer)) {
-		if (lexer_future_char(lexer) == next) {
-			lexer_next_char(lexer);
-			lexer->token.type = next_type;
-			return LEX_ONE_OK;
-		}
-		lexer->token.type = type;
-		return LEX_ONE_OK;
-	}
-	return LEX_ONE_MISSMATCH;
-}
-
-LexOneErr lexer_parse_symbol(Lexer *lexer, char symbol, TokenType type) {
-	if (symbol == lexer_next_char(lexer)) {
-		lexer->token.type = type;
-		return LEX_ONE_OK;
-	}
-	return LEX_ONE_MISSMATCH;
-}
-
-LexOneErr lexer_parse_ident(Lexer *lexer) {
-	if (!char_is_ident_start(lexer_next_char(lexer))) {
-		return LEX_ONE_MISSMATCH;
-	}
-	char *ptr = lexer_str(lexer);
-	size_t len = 1;	
-	while (char_is_ident(lexer_future_char(lexer))) {
-		lexer_next_char(lexer);
-		len++;
-	}
-	lexer->token.type = TOKEN_IDENT;
-	lexer->token.ident.ptr = ptr;
-	lexer->token.ident.size = len;
-	return LEX_ONE_OK;
-}
-
-LexOneErr lexer_parse_integer(Lexer *lexer) {
-	char c;
-	if (!char_is_digit(c = lexer_next_char(lexer))) {
-		return LEX_ONE_MISSMATCH;
-	}
-	size_t result = c - '0';
-	while (char_is_digit(c = lexer_future_char(lexer))) {
-		lexer_next_char(lexer);
-		result = result * 10 + c - '0';
-	}
-	lexer->token.type = TOKEN_INTEGER;
-	lexer->token.integer = result;
-	return LEX_ONE_OK;
-}
-
-#define TOKEN_PARSE(expr) \
-	do { \
-		LexOneErr err = (expr); \
-		if (!err) return true; \
-		lexer_rollback(lexer); \
-		if (err == LEX_ONE_ERR) return true; \
-	} while(0)
-
-#define SYMBOL(c, type) TOKEN_PARSE(lexer_parse_symbol(lexer, c, type));
-#define KEYWORD(s, type) TOKEN_PARSE(lexer_parse_keyword(lexer, s, type));
-#define SYMBOL_DUAL(c1, c2, t1, t2) TOKEN_PARSE(lexer_parse_symbol_with_next(lexer, c1, c2, t1, t2));
-
-bool lex_next(Lexer *lexer) {
-	lexer_skip_whitespace(lexer);
-	lexer_begin(lexer);
-	if (lexer_finished(lexer)) {
+bool lexer_init(Lexer *lexer, const char *path) {
+	FILE *file = fopen(path, "r");
+	if (!file) {
+		hob_log(LOGE, "failed to open file `%s`: %s\n", path, strerror(errno));
 		return false;
 	}
-	lexer->token.location = lexer->location;
-	
-	SYMBOL('{', TOKEN_OPENING_FIGURE_BRACE);
-	SYMBOL('}', TOKEN_CLOSING_FIGURE_BRACE);
-	SYMBOL('(', TOKEN_OPENING_CIRCLE_BRACE);
-	SYMBOL(')', TOKEN_CLOSING_CIRCLE_BRACE);
-	SYMBOL('+', TOKEN_ADD);
-	SYMBOL('-', TOKEN_MINUS);
-	SYMBOL('*', TOKEN_MULTIPLY);
-	SYMBOL('/', TOKEN_DIVIDE);
-	SYMBOL(':', TOKEN_COLON);
-	SYMBOL(';', TOKEN_SEMICOLON);
-	SYMBOL(',', TOKEN_COMMA);
-	SYMBOL_DUAL('=', '=', TOKEN_ASSIGN, TOKEN_EQUALS);
-	SYMBOL_DUAL('>', '=', TOKEN_GREATER, TOKEN_GREATER_OR_EQUALS);
-	SYMBOL_DUAL('<', '=', TOKEN_LESS, TOKEN_LESS_OR_EQUALS);
-	KEYWORD("var", TOKEN_VAR);
-	KEYWORD("fun", TOKEN_FUN);
-	KEYWORD("if", TOKEN_IF);
-	KEYWORD("else", TOKEN_ELSE);
-	KEYWORD("return", TOKEN_RETURN);
-	KEYWORD("extern", TOKEN_EXTERN);
-	KEYWORD("true", TOKEN_TRUE);
-	KEYWORD("false", TOKEN_FALSE);
-	TOKEN_PARSE(lexer_parse_ident(lexer));
-	TOKEN_PARSE(lexer_parse_integer(lexer));
+	if (!fatptr_read_all(&lexer->full, file)) {
+		hob_log(LOGE, "failed to read file `%s`: %s\n", path, strerror(errno));
+		fclose(file);
+		return false;
+	}
+	lexer->remain = lexer->full;
+	lexer->file = path;
+	lexer->failed = false;
+	lexer->location = lexer->start_location = file_loc_new();
+	lexer->line_offset = 0;
+	lexer->delta = 0;
+    return true;
+}
 
-	lex_err("unknown token");
-	return true;
+char *lexer_str(Lexer *lexer) {
+	return lexer->remain.str - 1;
+}
+
+bool lexer_finished(Lexer *lexer) {
+	return lexer->remain.size == 0;
+}
+
+char lexer_next_char(Lexer *lexer) {
+	if (lexer_finished(lexer)) {
+		return EOF;
+	}
+	lexer->delta++;
+	lexer->remain.size--;
+	char c = *(lexer->remain.str++);
+	if (c == '\n') {
+		lexer->line_offset = 0;
+		lexer->location.line++;
+		lexer->location.column = 0;
+	} else {
+		lexer->line_offset++;
+		lexer->location.column++;
+	}
+	return c;
+}
+
+char lexer_future_char(Lexer *lexer) {
+	if (lexer_finished(lexer)) {
+		return EOF;
+	}
+	return *lexer->remain.str;
+}
+
+void lexer_begin(Lexer *lexer) {
+	lexer->delta = 0;
+	lexer->start_location = lexer->location;
+}
+
+void lexer_rollback(Lexer *lexer) {
+	lexer->remain.str -= lexer->delta;
+	lexer->remain.size += lexer->delta;
+	lexer->line_offset -= lexer->delta;
+	lexer->delta = 0;
+	lexer->location = lexer->start_location;
+}
+
+void lexer_skip_whitespace(Lexer *lexer) {
+	while (char_is_whitespace(lexer_future_char(lexer))) {
+		lexer_next_char(lexer);
+	}
+}
+
+void lexer_free(Lexer *lexer) {
+	fatptr_free(&lexer->full);
 }

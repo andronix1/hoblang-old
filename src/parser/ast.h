@@ -2,20 +2,8 @@
 
 #include "core/fatptr.h"
 #include "core/vec.h"
-#include "sema/type.h"
+#include "ast_type.h"
 #include "expr.h"
-
-typedef enum {
-	AST_TYPE_IDENT
-} AstTypeKind;
-
-typedef struct {
-	AstTypeKind type;
-	Type sema;
-	union {
-		FatPtr ident;
-	};
-} AstType;
 
 typedef struct {
 	FatPtr name;

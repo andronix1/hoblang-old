@@ -11,9 +11,16 @@ set(SOURCE_FILES
 	src/core/fatptr.c
 	src/core/vec.c
 	src/core/log.c
+
 	src/lexer/tokens.c
 	src/lexer/lexer.c
-	src/lexer/base.c
+	src/lexer/lex.c
+	src/lexer/parsers/char.c
+	src/lexer/parsers/ident.c
+	src/lexer/parsers/integer.c
+	src/lexer/parsers/keyword.c
+	src/lexer/parsers/symbol.c
+
 	src/parser/ast.c
 	src/parser/base.c
 	src/parser/parser.c
