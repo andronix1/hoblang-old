@@ -8,6 +8,7 @@
 
 typedef enum { 
 	TOKEN_FUN,
+	TOKEN_MODULE,
     TOKEN_VAR,
     TOKEN_RETURN,
     TOKEN_EXTERN,

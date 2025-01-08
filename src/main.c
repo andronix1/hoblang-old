@@ -15,7 +15,6 @@ char *args_shift(int *argc, char ***argv) {
 
 void usage() {
 	printf("hoblang compile <source> <output> - compile source file to machine code\n");
-	printf("hoblang help                      - print this\n");
 }
 
 int main(int argc, char **argv) {
@@ -41,6 +40,7 @@ int main(int argc, char **argv) {
 		if (!parse_module(&parser, &module) || lexer.failed) {
 			return 1;
 		}
+		hob_log(LOGD, "parsed successfully!");
 		/*
 		// ast_print_module(&module);
         hob_log(LOGI, "parsed!");

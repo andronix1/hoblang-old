@@ -16,7 +16,7 @@ bool parse_stmt(Parser *parser, AstStmt *stmt) {
 					stmt->func_call.name = name;
 					return parse_func_call_args(parser, &stmt->func_call);
 				default:
-					parse_err("unexpected token `%T` after ident in statement");
+					parse_err("unexpected token `{tok}` after ident in statement");
 					return false;
 			}
 		}
@@ -30,7 +30,7 @@ bool parse_stmt(Parser *parser, AstStmt *stmt) {
 			stmt->type = AST_STMT_VAR;
 			return parse_var(parser, &stmt->var);
 		default:
-			parse_err("unexpected `%T` while parsing statement", parser->token);
+			parse_err("unexpected `{tok}` while parsing statement", parser->token);
 			return false;
 	}
 }

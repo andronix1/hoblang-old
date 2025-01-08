@@ -9,7 +9,7 @@
 		parser->failed = true; \
 	} while (0)
 	
-#define EXPECTED(what) "expected " what " found `%T`", parser->token
+#define EXPECTED(what) "expected " what " found `{tok}`", parser->token
 
 #define parse_exp(type, what) \
 	do { \

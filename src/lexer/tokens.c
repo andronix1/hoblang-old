@@ -12,6 +12,7 @@ void print_token(FILE *stream, va_list *list) {
 	}
 	switch (token->type) {
     	case TOKEN_EXTERN: fprintf(stream, "extern"); break;
+    	case TOKEN_MODULE: fprintf(stream, "module"); break;
     	case TOKEN_AS: fprintf(stream, "as"); break;
     	case TOKEN_FUN: fprintf(stream, "fun"); break;
     	case TOKEN_VAR: fprintf(stream, "var"); break;

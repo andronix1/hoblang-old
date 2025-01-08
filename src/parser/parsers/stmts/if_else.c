@@ -34,7 +34,7 @@ bool parse_if_else(Parser *parser, AstIfElse *if_else) {
 				if_else->has_else = true;
 				return true;
 			default:
-				parse_err("expected else if or else body but got `%T`", parser->token);
+				parse_err("expected else if or else body but got `{tok}`", parser->token);
 				return false;
 		}
 		parser_next_token(parser);

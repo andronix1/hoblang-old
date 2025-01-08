@@ -40,6 +40,7 @@ bool lex_next(Lexer *lexer) {
 	KEYWORD("else", TOKEN_ELSE);
 	KEYWORD("return", TOKEN_RETURN);
 	KEYWORD("extern", TOKEN_EXTERN);
+	KEYWORD("module", TOKEN_MODULE);
 	KEYWORD("as", TOKEN_AS);
 	KEYWORD("true", TOKEN_TRUE);
 	KEYWORD("false", TOKEN_FALSE);

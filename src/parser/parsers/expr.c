@@ -121,7 +121,7 @@ bool parse_expr_before(Parser *parser, AstExpr *expr, bool (*stop)(TokenType), b
 				parse_err("EOI while parsing expression");
 				return false;
 			default:
-				parse_err("unexpected token `%T` while parsing expression", parser->token);
+				parse_err("unexpected token `{tok}` while parsing expression", parser->token);
 				return false;
 		}
 		parser_next_token(parser);	

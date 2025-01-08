@@ -18,7 +18,7 @@ bool parse_var(Parser *parser, AstVar *var) {
 			}
 			break;
 		default:
-			parse_err("expected type or assign but got `%T`", parser->token);
+			parse_err("expected type or assign but got `{tok}`", parser->token);
 			return false;
 	}
 	parser_next_token(parser);
@@ -30,7 +30,7 @@ bool parse_var(Parser *parser, AstVar *var) {
 			var->initializes = false;
 			return true;
 		default:
-			parse_err("expected initilizer or end but got `%T`", parser->token);
+			parse_err("expected initilizer or end but got `{tok}`", parser->token);
 			return false;
 	}
 }

@@ -1,3 +1,5 @@
+module main;
+
 extern fun putchar(c: u8): void
 
 fun works(): void { putchar('w'); putchar('o'); putchar('r'); putchar('k'); putchar('s'); }

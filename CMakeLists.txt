@@ -32,9 +32,8 @@ set(SOURCE_FILES
 	src/parser/parsers/expr.c
 	src/parser/parsers/body.c
 
-	#	src/sema/base.c
-	#	src/sema/sema.c
-	#	src/sema/type.c	
+	src/sema/sema.c
+	src/sema/type.c
 
 	#	src/llvm/llvm.c
 )
