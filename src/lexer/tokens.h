@@ -3,8 +3,8 @@
 #include <stdbool.h>
 #include <printf.h>
 #include <stdint.h>
-#include "core/fatptr.h"
 #include "core/location.h"
+#include "core/slice.h"
 
 typedef enum { 
 	TOKEN_FUN,
@@ -52,7 +52,7 @@ typedef struct {
     TokenType type;
     FileLocation location;
     union {
-        FatPtr ident;
+        Slice ident;
         uint64_t integer;
 		char character;
     };
@@ -64,4 +64,4 @@ typedef struct {
 } TokensSlice;
 
 TokenType token_type(Token *token);
-void token_register_printf();
+void print_token(FILE *stream, va_list *list);

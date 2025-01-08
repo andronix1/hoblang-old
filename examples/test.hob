@@ -13,9 +13,5 @@ fun main(): void {
 	} else {
 		so_bad();
 	}
-	putchar(':');
-	putchar(' ');
-	var c = (a + b) as u8;
-	putchar('0' + c);
 	putchar('\n');
 }

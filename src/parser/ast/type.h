@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sema/type.h"
+#include "core/slice.h"
 
 typedef enum {
 	AST_TYPE_IDENT
@@ -8,8 +8,9 @@ typedef enum {
 
 typedef struct {
 	AstTypeKind type;
-	Type sema;
 	union {
-		FatPtr ident;
+		Slice ident;
 	};
 } AstType;
+
+void print_ast_type(FILE *stream, va_list *list);

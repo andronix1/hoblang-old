@@ -4,53 +4,46 @@ TokenType token_type(Token *token) {
 	return token == NULL ? TOKEN_EOI : token->type;
 }
 
-int printf_arginfo_token(const struct printf_info *info __attribute__((unused)), size_t n, int *argtypes, int *size) {
-	if (n > 0) {
-		*argtypes = PA_POINTER;
-		*size = sizeof(Token*);
-	}
-	return 1;
-}
-
-int printf_output_token(FILE *stream, const struct printf_info *info __attribute__((unused)), const void *const *args) {	
-	const Token *token = *(Token**)*args;
+void print_token(FILE *stream, va_list *list) {	
+	const Token *token = va_arg(*list, Token*);
 	if (token == NULL || token->type == TOKEN_EOI) {
-		return fprintf(stream, "<EOF>");
+		fprintf(stream, "<EOF>");
+		return;
 	}
 	switch (token->type) {
-    	case TOKEN_EXTERN: return fprintf(stream, "extern");
-    	case TOKEN_AS: return fprintf(stream, "as");
-    	case TOKEN_FUN: return fprintf(stream, "fun");
-    	case TOKEN_VAR: return fprintf(stream, "var");
-		case TOKEN_IF: return fprintf(stream, "if");
-    	case TOKEN_ELSE: return fprintf(stream, "else");
-    	case TOKEN_TRUE: return fprintf(stream, "true");
-    	case TOKEN_FALSE: return fprintf(stream, "false");
-		case TOKEN_COLON: return fprintf(stream, ":");
-    	case TOKEN_COMMA: return fprintf(stream, ",");
-    	case TOKEN_SEMICOLON: return fprintf(stream, ";");
-    	case TOKEN_ASSIGN: return fprintf(stream, "=");
-		case TOKEN_OPENING_CIRCLE_BRACE: return fprintf(stream, "(");
-		case TOKEN_CLOSING_CIRCLE_BRACE: return fprintf(stream, ")");
-		case TOKEN_OPENING_FIGURE_BRACE: return fprintf(stream, "{");
-		case TOKEN_CLOSING_FIGURE_BRACE: return fprintf(stream, "}");
-		case TOKEN_ADD: return fprintf(stream, "+");
-    	case TOKEN_MINUS: return fprintf(stream, "-");
-    	case TOKEN_MULTIPLY: return fprintf(stream, "*");
-    	case TOKEN_DIVIDE: return fprintf(stream, "/");
-    	case TOKEN_EQUALS: return fprintf(stream, "==");
-    	case TOKEN_NOT_EQUALS: return fprintf(stream, "!=");
-    	case TOKEN_LESS: return fprintf(stream, "<");
-    	case TOKEN_LESS_OR_EQUALS: return fprintf(stream, "<=");
-    	case TOKEN_GREATER: return fprintf(stream, ">");
-    	case TOKEN_GREATER_OR_EQUALS: return fprintf(stream, ">=");
-    	case TOKEN_INTEGER: return fprintf(stream, "%ld", token->integer);
-    	case TOKEN_CHAR: return fprintf(stream, "'%c'", token->character);
-    	case TOKEN_IDENT: return fatptr_print_to(&token->ident, stream);
-		default: return fprintf(stream, "<unknown type = %lx>", token->type);
+    	case TOKEN_EXTERN: fprintf(stream, "extern"); break;
+    	case TOKEN_AS: fprintf(stream, "as"); break;
+    	case TOKEN_FUN: fprintf(stream, "fun"); break;
+    	case TOKEN_VAR: fprintf(stream, "var"); break;
+		case TOKEN_IF: fprintf(stream, "if"); break;
+    	case TOKEN_ELSE: fprintf(stream, "else"); break;
+    	case TOKEN_TRUE: fprintf(stream, "true"); break;
+    	case TOKEN_FALSE: fprintf(stream, "false"); break;
+		case TOKEN_COLON: fprintf(stream, ":"); break;
+    	case TOKEN_COMMA: fprintf(stream, ","); break;
+    	case TOKEN_SEMICOLON: fprintf(stream, ";"); break;
+    	case TOKEN_ASSIGN: fprintf(stream, "="); break;
+		case TOKEN_OPENING_CIRCLE_BRACE: fprintf(stream, "("); break;
+		case TOKEN_CLOSING_CIRCLE_BRACE: fprintf(stream, ")"); break;
+		case TOKEN_OPENING_FIGURE_BRACE: fprintf(stream, "{"); break;
+		case TOKEN_CLOSING_FIGURE_BRACE: fprintf(stream, "}"); break;
+		case TOKEN_ADD: fprintf(stream, "+"); break;
+    	case TOKEN_MINUS: fprintf(stream, "-"); break;
+    	case TOKEN_MULTIPLY: fprintf(stream, "*"); break;
+    	case TOKEN_DIVIDE: fprintf(stream, "/"); break;
+    	case TOKEN_EQUALS: fprintf(stream, "=="); break;
+    	case TOKEN_NOT_EQUALS: fprintf(stream, "!="); break;
+    	case TOKEN_LESS: fprintf(stream, "<"); break;
+    	case TOKEN_LESS_OR_EQUALS: fprintf(stream, "<="); break;
+    	case TOKEN_GREATER: fprintf(stream, ">"); break;
+    	case TOKEN_GREATER_OR_EQUALS: fprintf(stream, ">="); break;
+    	case TOKEN_INTEGER: fprintf(stream, "integer %ld", token->integer); break;
+    	case TOKEN_CHAR: fprintf(stream, "char '%c'", token->character); break;
+    	case TOKEN_IDENT: 
+			fprintf(stream, "ident `");
+			slice_write_to(&token->ident, stream);
+			fprintf(stream, "`");
+			break;
+		default: fprintf(stream, "<unknown token id %lx>", token->type); break;
 	}
-}
-
-void token_register_printf() {
-	register_printf_specifier('T', printf_output_token, printf_arginfo_token);
 }

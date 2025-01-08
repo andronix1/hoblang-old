@@ -1,48 +1,42 @@
 #include "vec.h"
 
-Vec vec_new_sized(size_t esize) {
-	Vec vec = {
-		.buffer = fatptr_empty(),
-		.len = 0, 
-		.esize = esize
-	};
+VecHeader *vec_header(void *vec) {
+	return &((VecHeader*)vec)[-1];
+}
+
+void *vec_new_sized(size_t esize) {
+	VecHeader *header = malloc(sizeof(VecHeader));
+	header->esize = esize;
+	header->len = 0;
+	header->cap = 0;
+	return &header[1];
+}
+
+void *vec_reserve(void *vec, size_t cap) {
+	VecHeader *header = vec_header(vec);
+	if (header->cap >= cap) {
+		return vec;
+	}
+	header = realloc(header, sizeof(VecHeader) + cap * header->esize);
+	header->cap = cap;
+	return &header[1];
+}
+
+void *vec_push(void *vec, void *element) {
+	VecHeader *header = vec_header(vec);
+	if (header->cap <= header->len) {
+		vec = vec_reserve(vec, header->cap == 0 ? 1 : header->cap * 2);
+		header = vec_header(vec);
+	}
+	memcpy((char*)vec + header->esize * header->len, element, header->esize);
+	header->len++;
 	return vec;
 }
 
-#define VEC_MUL_FROM 10 
-size_t vec_multiplier(size_t len) {
-	if (len >= VEC_MUL_FROM) {
-		return 1;
-	}
-	return VEC_MUL_FROM - len;
+size_t vec_len(void *vec) {
+	return vec_header(vec)->len;
 }
 
-void vec_push(Vec *vec, void *ptr) {
-	vec->len++;
-	if (vec->buffer.size < vec->esize * vec->len) {
-		fatptr_alloc_more(&vec->buffer, vec->esize * vec->len * vec_multiplier(vec->len));
-	}
-	memcpy(vec_at(vec, vec->len - 1), ptr, vec->esize);
-}
-
-void *vec_pop(Vec *vec) {
-	assert(vec->len > 0 && "trying to pop empty array");
-	void *result = vec_at(vec, vec->len - 1);
-	vec->len--;
-	return result;
-}
-
-void vec_free(Vec *vec) {
-	fatptr_free(&vec->buffer);
-}
-
-void *vec_at(Vec *vec, size_t idx) {
-	if (idx >= vec->len) {
-		return NULL;
-	}
-	return &vec->buffer.str[idx * vec->esize];
-}
-
-void *vec_top(Vec *vec) {
-	return vec_at(vec, vec->len - 1);
+void vec_free(void *vec) {
+	free(vec_header(vec));
 }

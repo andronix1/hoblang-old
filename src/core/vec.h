@@ -1,18 +1,17 @@
 #pragma once
 
-#include "fatptr.h"
+#include <string.h>
+#include <malloc.h>
 
 typedef struct {
-	FatPtr buffer;
-	size_t len, esize;
-} Vec;
+	size_t len, cap, esize;
+} VecHeader;
 
-Vec vec_new_sized(size_t esize);
-void vec_push(Vec *vec, void *ptr);
-void *vec_pop(Vec *vec);
-void vec_free(Vec *vec);
-void *vec_at(Vec *vec, size_t idx);
-void *vec_top(Vec *vec);
+VecHeader *vec_header(void *vec);
+void *vec_new_sized(size_t esize);
+void *vec_reserve(void *vec, size_t cap);
+void *vec_push(void *vec, void *element);
+size_t vec_len(void *vec);
+void vec_free(void *vec);
 
-#define foreach(vec, type, name) for (type *name = (vec)->buffer.ptr; (size_t)name < ((size_t)(vec)->buffer.ptr + (size_t)((vec)->len * (vec)->esize)); name = &name[1])
-#define vec_new(type) vec_new_sized(sizeof(type))
+#define vec_new(type) ((type*)vec_new_sized(sizeof(type)))

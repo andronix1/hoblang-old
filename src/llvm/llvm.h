@@ -2,6 +2,7 @@
 
 #include <llvm-c/Core.h>
 #include <llvm-c/TargetMachine.h>
+#include "core/log.h"
 #include "parser/ast.h"
 
 typedef struct {

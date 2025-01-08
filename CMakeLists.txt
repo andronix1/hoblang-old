@@ -8,8 +8,10 @@ message(STATUS "LLVM id: ${LLVM_LIBRARIES}")
 
 set(SOURCE_FILES
     src/main.c
-	src/core/fatptr.c
+
 	src/core/vec.c
+	src/core/slice.c
+	src/core/print.c
 	src/core/log.c
 
 	src/lexer/tokens.c
@@ -21,14 +23,20 @@ set(SOURCE_FILES
 	src/lexer/parsers/keyword.c
 	src/lexer/parsers/symbol.c
 
-	src/parser/ast.c
-	src/parser/base.c
 	src/parser/parser.c
-	src/parser/expr.c
-	src/sema/base.c
-	src/sema/sema.c
-	src/sema/type.c	
-	src/llvm/llvm.c
+	src/parser/parsers/module.c
+	src/parser/parsers/module_node.c
+	src/parser/parsers/type.c
+	src/parser/parsers/func_info.c
+	src/parser/parsers/func_call.c
+	src/parser/parsers/expr.c
+	src/parser/parsers/body.c
+
+	#	src/sema/base.c
+	#	src/sema/sema.c
+	#	src/sema/type.c	
+
+	#	src/llvm/llvm.c
 )
 
 include_directories(${LLVM_INCLUDE_DIRS})
