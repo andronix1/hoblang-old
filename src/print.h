@@ -3,15 +3,7 @@
 #include "parser/ast.h"
 #include "lexer/tokens.h"
 #include "core/print.h"
-/*
-void print_ast_type(FILE *stream, va_list *list) {
-	ast_print_type(va_arg(*list, AstType*));
-}
-
-void print_ast_expr(FILE *stream, va_list *list) {
-	ast_print_expr(va_arg(*list, Expr*));
-}
-*/
+#include "sema/type.h"
 
 void print_slice(FILE *stream, va_list *list) {
 	slice_write_to(va_arg(*list, Slice*), stream);
@@ -46,4 +38,6 @@ void print_setup() {
 	print_register(slice_from_cstr("size"), print_size);
 	print_register(slice_from_cstr("errno"), print_errno);
 	print_register(slice_from_cstr("tok"), print_token);
+	print_register(slice_from_cstr("slice"), print_slice);
+	print_register(slice_from_cstr("sema::type"), print_sema_type);
 }

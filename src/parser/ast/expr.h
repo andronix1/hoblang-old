@@ -15,6 +15,8 @@ typedef enum {
 	AST_EXPR_BINOP,
 } AstExprType;
 
+struct _SemaType;
+
 typedef struct _AstExpr {
 	AstExprType type;
 	union {
@@ -27,6 +29,7 @@ typedef struct _AstExpr {
 		bool boolean;
 	};
 	struct _AstExpr *parent; // for parser
+	struct _SemaType *sema_type; // for sema
 } AstExpr;
 
 void print_ast_expr(FILE *stream, va_list *list);

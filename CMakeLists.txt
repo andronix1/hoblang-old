@@ -27,13 +27,16 @@ set(SOURCE_FILES
 	src/parser/parsers/module.c
 	src/parser/parsers/module_node.c
 	src/parser/parsers/type.c
-	src/parser/parsers/func_info.c
 	src/parser/parsers/func_call.c
 	src/parser/parsers/expr.c
 	src/parser/parsers/body.c
 
 	src/sema/sema.c
 	src/sema/type.c
+	src/sema/parts/module.c
+	src/sema/parts/type.c
+	src/sema/parts/body.c
+	src/sema/parts/expr.c
 
 	#	src/llvm/llvm.c
 )

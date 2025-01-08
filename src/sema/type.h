@@ -1,21 +1,14 @@
 #pragma once
 
-#include "core/fatptr.h"
+#include <stdarg.h>
+#include "core/slice.h"
 #include "core/vec.h"
-
-struct _Type;
-
-typedef struct {
-	FatPtr name;
-	struct _Type *type;
-} TypeFuncArg;
-
-typedef Vec TypeFuncArgs;
+#include "parser/ast.h"
 
 typedef struct {
-	TypeFuncArgs args;
-	struct _Type *returning; // may be NULL
-} TypeFunction;
+	AstFuncArg *args;
+	struct _SemaType *returning;
+} SemaFunction;
 
 typedef enum {
 	PRIMITIVE_I8, PRIMITIVE_I16, PRIMITIVE_I32, PRIMITIVE_I64,
@@ -25,20 +18,19 @@ typedef enum {
 } Primitive;
 
 typedef enum {
-	TYPE_PRIMITIVE,
-	TYPE_FUNCTION,
-} TypeKind;
+	SEMA_TYPE_PRIMITIVE,
+	SEMA_TYPE_FUNCTION,
+} SemaTypeKind;
 
-typedef struct _Type {
-	TypeKind type;
+typedef struct _SemaType {
+	SemaTypeKind type;
 	union {
 		Primitive primitive;
-		TypeFunction func;
+		SemaFunction func;
 	};
-} Type;
+} SemaType;
 
-#define TYPE_PRIMITIVE(kind) [kind] = { .type = TYPE_PRIMITIVE, .primitive = kind }
+extern SemaType primitives[];
 
-extern Type primitives[];
-
-bool types_equals(Type *type, Type *other);
+bool sema_types_equals(SemaType *type, SemaType *other);
+void print_sema_type(FILE* stream, va_list *list);

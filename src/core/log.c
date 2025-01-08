@@ -18,7 +18,7 @@ void hob_log(LogLevel level, const char *fmt, ...) {
 	va_list args;
 	va_start(args, fmt);
 	print("{cstr}: ", log_level_str[level]);
-	vprintf(fmt, args);
+	print_va_list(fmt, args);
 	putchar('\n');
 	va_end(args);
 }

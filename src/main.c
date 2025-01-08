@@ -5,6 +5,7 @@
 #include "print.h"
 #include "lexer/lex.h"
 #include "parser/parsers.h"
+#include "sema/parts.h"
 
 char *args_shift(int *argc, char ***argv) {
     *argc -= 1;
@@ -41,15 +42,13 @@ int main(int argc, char **argv) {
 			return 1;
 		}
 		hob_log(LOGD, "parsed successfully!");
-		/*
-		// ast_print_module(&module);
-        hob_log(LOGI, "parsed!");
 		Sema sema = sema_new();
-		sema_module(&sema, &module);
+		sema_ast_module(&sema, &module);
 		if (sema.failed) {
 			return 1;
 		}
-		hob_log(LOGI, "analyzed!");
+		hob_log(LOGD, "analyzed successfully!");
+		/*
 		LlvmBackend llvm;
 		if (!llvm_init(&llvm)) {
 			return 1;

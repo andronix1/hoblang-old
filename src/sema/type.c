@@ -1,6 +1,8 @@
 #include "type.h"
 
-Type primitives[] = {
+#define TYPE_PRIMITIVE(kind) [kind] = { .type = SEMA_TYPE_PRIMITIVE, .primitive = kind }
+
+SemaType primitives[] = {
 	TYPE_PRIMITIVE(PRIMITIVE_U8),
 	TYPE_PRIMITIVE(PRIMITIVE_U16),
 	TYPE_PRIMITIVE(PRIMITIVE_U32),
@@ -13,26 +15,59 @@ Type primitives[] = {
 	TYPE_PRIMITIVE(PRIMITIVE_VOID),
 };
 
-bool types_equals(Type *type, Type *other) {
+bool sema_types_equals(SemaType *type, SemaType *other) {
 	if (type->type != other->type) {
 		return false;
 	}
 	switch (type->type) {
-		case TYPE_PRIMITIVE:
+		case SEMA_TYPE_PRIMITIVE:
 			return type->primitive == other->primitive;
-		case TYPE_FUNCTION:
-			if (type->func.args.len != other->func.args.len) {
+		case SEMA_TYPE_FUNCTION:
+			if (vec_len(type->func.args) != vec_len(other->func.args)) {
 				return false;
 			}
-			for (size_t i = 0; i < type->func.args.len; i++) {
-				TypeFuncArg *targ = vec_at(&type->func.args, i);
-				TypeFuncArg *oarg = vec_at(&other->func.args, i);
-				if (!types_equals(targ->type, oarg->type)) {
+			if (!sema_types_equals(type->func.returning, other->func.returning)) {
+				return false;
+			}
+			for (size_t i = 0; i < vec_len(type->func.args); i++) {	
+				if (!sema_types_equals(type->func.args[i].type.sema, other->func.args[i].type.sema)) {
 					return false;
 				}
 			}
-			return types_equals(type->func.returning, other->func.returning);
+			return true;
 	}
-	assert(0 && "unknown type kind");
-	return false;
+	assert(0, "invalid sema type kind {int}", type->type);
+}
+
+void print_sema_type(FILE* stream, va_list *list) {
+	const char *strs[] = {
+		[PRIMITIVE_I8] = "i8",
+		[PRIMITIVE_I16] = "i16",
+		[PRIMITIVE_I32] = "i32",
+		[PRIMITIVE_I64] = "i64",
+		[PRIMITIVE_U8] = "u8",
+		[PRIMITIVE_U16] = "u16",
+		[PRIMITIVE_U32] = "u32",
+		[PRIMITIVE_U64] = "u64",
+		[PRIMITIVE_BOOL] = "bool",
+		[PRIMITIVE_VOID] = "void",
+	};
+	SemaType *type = va_arg(*list, SemaType*);
+	switch (type->type) {
+		case SEMA_TYPE_PRIMITIVE:
+			if (type->primitive >= (sizeof(strs) / sizeof(strs[0]))) {
+				print_to(stream, "<unknown {int}>", type->primitive);
+			} else {
+				print_to(stream, strs[type->primitive]);
+			}
+			break;
+		case SEMA_TYPE_FUNCTION:
+			print_to(stream, "fun (");
+			for (size_t i = 0; i < vec_len(type->func.args); i++) {
+				if (i != 0) print_to(stream, ", ");
+				print_to(stream, "{sema::type}", type->func.args[i].type.sema);
+			}
+			print_to(stream, "): {sema::type}", type->func.returning);
+			break;
+	}
 }

@@ -1,19 +1,19 @@
 module main;
 
-extern fun putchar(c: u8): void
+extern(putchar) fun put_char(c: u8): void
 
-fun works(): void { putchar('w'); putchar('o'); putchar('r'); putchar('k'); putchar('s'); }
-fun so_bad(): void {  putchar('s'); putchar('o'); putchar('b'); putchar('a'); putchar('d'); }
+fun works(): void { put_char('w'); put_char('o'); put_char('r'); put_char('k'); put_char('s'); }
+fun so_bad(): void { put_char('s'); put_char('o'); put_char('b'); put_char('a'); put_char('d'); }
 
 fun sum(a: i32, b: i32): i32 { return a + b; }
 
 fun main(): void {
-	var a = 3;
-	var b = 4;
+	var a: i32 = 3;
+	var b: i32 = 4;
 	if sum(a, b) == a + b {
 		works();
 	} else {
 		so_bad();
 	}
-	putchar('\n');
+	put_char('\n');
 }

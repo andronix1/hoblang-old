@@ -2,12 +2,15 @@
 
 #include "core/slice.h"
 
+struct _SemaType;
+
 typedef enum {
 	AST_TYPE_IDENT
 } AstTypeKind;
 
 typedef struct {
 	AstTypeKind type;
+	struct _SemaType *sema;
 	union {
 		Slice ident;
 	};

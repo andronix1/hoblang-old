@@ -6,7 +6,7 @@
 #undef assert
 #define assert(ok, fmt, ...) \
 	do { \
-		if (!ok) { \
+		if (!(ok)) { \
 			hob_log(LOGE, fmt, ##__VA_ARGS__); \
 			exit(1); \
 		} \

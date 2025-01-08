@@ -22,6 +22,19 @@ void *vec_reserve(void *vec, size_t cap) {
 	return &header[1];
 }
 
+void *vec_top(void *vec) {
+	VecHeader *header = vec_header(vec);
+	return (char*)vec + header->esize * (header->len - 1);
+}
+
+void *vec_pop(void *vec) {	
+	VecHeader *header = vec_header(vec);
+	assert(header->len > 0, "trying to pop empty vec");
+	void *result = vec_top(vec);
+	header->len--;
+	return result;
+}
+
 void *vec_push(void *vec, void *element) {
 	VecHeader *header = vec_header(vec);
 	if (header->cap <= header->len) {

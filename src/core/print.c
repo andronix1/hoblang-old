@@ -22,12 +22,19 @@ void print_va_list_to(FILE *stream, const char *fmt, va_list args) {
 		if (is_arg) {
 			if (c == '}') {
 				is_arg = false;
+				bool found = false;
 				for (size_t i = 0; i < vec_len(print_infos); i++) {
 					PrintInfo *info = &print_infos[i];
 					if (slice_eq(&info->name, &arg)) {
 						info->func(stream, &args);
+						found = true;
 						break;
 					}
+				}
+				if (!found) {
+					fprintf(stream, "?");
+					slice_write_to(&arg, stream);
+					fprintf(stream, "?");
 				}
 			} else {
 				arg.len++;
