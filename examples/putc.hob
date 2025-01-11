@@ -1,0 +1,10 @@
+module main;
+
+extern(putchar) fun put_char(c: i32): i32
+
+fun main(): void {
+	var a: i32 = 3;
+	put_char('b' as i32);
+	put_char(('0' + 1) as i32 + a);
+	put_char('\n' as i32);
+}

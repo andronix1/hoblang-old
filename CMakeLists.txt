@@ -4,7 +4,6 @@ project(hoblang)
 find_package(LLVM REQUIRED)
 
 message(STATUS "LLVM version: ${LLVM_PACKAGE_VERSION}")
-message(STATUS "LLVM id: ${LLVM_LIBRARIES}")
 
 set(SOURCE_FILES
     src/main.c
@@ -38,7 +37,10 @@ set(SOURCE_FILES
 	src/sema/parts/body.c
 	src/sema/parts/expr.c
 
-	#	src/llvm/llvm.c
+	src/llvm/llvm.c
+	src/llvm/parts/module.c
+	src/llvm/parts/body.c
+	src/llvm/parts/expr.c
 )
 
 include_directories(${LLVM_INCLUDE_DIRS})

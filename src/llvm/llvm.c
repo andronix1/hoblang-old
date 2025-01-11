@@ -14,23 +14,23 @@ bool llvm_init(LlvmBackend *llvm) {
 	const char *features = LLVMGetHostCPUFeatures();
 	const char *cpu = LLVMGetHostCPUName();
 	const char *triple = LLVMGetDefaultTargetTriple();
-	hob_log(LOGD, "target: %s - %s", LLVMGetTargetName(target), LLVMGetTargetDescription(target));
-	hob_log(LOGD, "triple: %s", triple);
-	hob_log(LOGD, "with features %s", features);
-	hob_log(LOGD, "cpu: %s", cpu);
+	hob_log(LOGD, "target: {cstr} - {cstr}", LLVMGetTargetName(target), LLVMGetTargetDescription(target));
+	hob_log(LOGD, "triple: {cstr}", triple);
+	hob_log(LOGD, "with features {cstr}", features);
+	hob_log(LOGD, "cpu: {cstr}", cpu);
 	llvm->machine = LLVMCreateTargetMachine(target, triple, cpu, features, LLVMCodeGenLevelNone, LLVMRelocDefault, LLVMCodeModelDefault);
 	if (!llvm->machine) {
 		hob_log(LOGE, "failed to create target machine");
 		return false;
 	}
 	llvm->builder = LLVMCreateBuilder();
-	llvm->scopes = vec_new(LlvmScope*);
+	llvm->scopes = vec_new(LlvmScope);
 	return true;	
 }
 
-LLVMTypeRef llvm_resolve_type(Type *type) {
+LLVMTypeRef llvm_resolve_type(SemaType *type) {
 	switch (type->type) {
-		case TYPE_PRIMITIVE:
+		case SEMA_TYPE_PRIMITIVE:
 			switch (type->primitive) {
 				case PRIMITIVE_I8: case PRIMITIVE_U8: return LLVMInt8Type();
 				case PRIMITIVE_I16: case PRIMITIVE_U16: return LLVMInt16Type();
@@ -39,222 +39,58 @@ LLVMTypeRef llvm_resolve_type(Type *type) {
 				case PRIMITIVE_BOOL: return LLVMInt1Type();
 				case PRIMITIVE_VOID: return LLVMVoidType();
 			}
-			assert(0 && "invalid primitive");
+			assert(0, "invalid primitive {int}", type->primitive);
 			return NULL;
-		case TYPE_FUNCTION: {
-			LLVMTypeRef *params = malloc(sizeof(LLVMTypeRef) * type->func.args.len);
-			for (size_t i = 0; i < type->func.args.len; i++) {
-				AstFuncArg *arg = vec_at(&type->func.args, i);
-				params[i] = llvm_resolve_type(&arg->type.sema);
+		case SEMA_TYPE_FUNCTION: {
+			LLVMTypeRef *params = malloc(sizeof(LLVMTypeRef) * vec_len(type->func.args));
+			for (size_t i = 0; i < vec_len(type->func.args); i++) {
+				params[i] = llvm_resolve_type(type->func.args[i].type.sema);
 			}
-			return LLVMFunctionType(llvm_resolve_type(type->func.returning), params, type->func.args.len, false /* IsVarArg */);
+			return LLVMFunctionType(llvm_resolve_type(type->func.returning), params, vec_len(type->func.args), false /* IsVarArg */);
 		}
 	}
-	hob_log(LOGE, "invalid type' type - %d", type->type);
-	assert(0);
-	return NULL;
+	assert(0, "invalid type {int}", type->type);
 }
 
-LlvmValue *llvm_resolve(LlvmBackend *llvm, FatPtr *name) {
-	foreach (&llvm->scopes, LlvmScope*, scope) {
-		foreach(*scope, LlvmValue, value) {
-			if (fatptr_eq(name, value->name)) {
-				return value;
+LlvmValue *llvm_resolve(LlvmBackend *llvm, Slice *name) {
+	for (size_t i = 0; i < vec_len(llvm->scopes); i++) {
+		for (size_t j = 0; j < vec_len(llvm->scopes[i]); j++) {
+			if (slice_eq(name, llvm->scopes[i][j].name)) {
+				return &llvm->scopes[i][j];
 			}
 		}
 	}
-	hob_log(LOGE, "value `%P` wasn't registered", name);
-	assert(0);
-	return NULL;
+	assert(0, "value `{slice}` wasn't registered", name);
 }
 
-LLVMTypeRef llvm_resolve_type_of(LlvmBackend *llvm, FatPtr *name) {
+LLVMTypeRef llvm_resolve_type_of(LlvmBackend *llvm, Slice *name) {
 	return llvm_resolve(llvm, name)->type;
 }
 
-LLVMValueRef llvm_resolve_value(LlvmBackend *llvm, FatPtr *name) {
+LLVMValueRef llvm_resolve_value(LlvmBackend *llvm, Slice *name) {
 	return llvm_resolve(llvm, name)->value;
 }
 
-LLVMValueRef llvm_expr(LlvmBackend *llvm, Expr *expr);
-
-LLVMValueRef llvm_funcall(LlvmBackend *llvm, Funcall *funcall) {
-	LLVMValueRef *params = malloc(sizeof(LLVMValueRef) * funcall->args.len);
-	for (size_t i = 0; i < funcall->args.len; i++) {
-		params[i] = llvm_expr(llvm, vec_at(&funcall->args, i));
-	}
-	return LLVMBuildCall2(llvm->builder, llvm_resolve_type_of(llvm, &funcall->name), llvm_resolve_value(llvm, &funcall->name), params, funcall->args.len, "");
-}
-
-bool llvm_is_signed(Type *type) {
-	return
-		type->primitive == PRIMITIVE_I8 || 
-		type->primitive == PRIMITIVE_I16 || 
-		type->primitive == PRIMITIVE_I32 || 
-		type->primitive == PRIMITIVE_I64;
-}
-
-LLVMValueRef llvm_expr(LlvmBackend *llvm, Expr *expr) {
-	switch (expr->type) {
-		case EXPR_IDENT: return llvm_resolve_value(llvm, &expr->ident);
-		case EXPR_INTEGER: return LLVMConstInt(LLVMInt32Type(), expr->integer, true);
-		case EXPR_BOOL: return LLVMConstInt(LLVMInt1Type(), expr->boolean, false);
-		case EXPR_CHAR: return LLVMConstInt(LLVMInt8Type(), expr->integer, false);
-		// case EXPR_AS: return LLVMBuildTrunc(llvm->builder, llvm_expr(llvm, expr->as.expr), llvm_resolve_type(&expr->as.type.sema)/*llvm_is_signed(&expr->as.type.sema) */, ""); // TODO: check possibility at sema 
-		case EXPR_AS: return llvm_expr(llvm, expr->as.expr);
-		case EXPR_BINOP: {
-			LLVMValueRef right = llvm_expr(llvm, expr->binop.right);
-			LLVMValueRef left = llvm_expr(llvm, expr->binop.left);
-			switch (expr->binop.type) {
-				case BINOP_ADD: return LLVMBuildAdd(llvm->builder, left, right, "");
-				case BINOP_SUB: return LLVMBuildSub(llvm->builder, left, right, "");
-				case BINOP_MUL: return LLVMBuildMul(llvm->builder, left, right, "");
-				case BINOP_DIV: return LLVMBuildSDiv(llvm->builder, left, right, "");
-				case BINOP_EQ: return LLVMBuildICmp(llvm->builder, LLVMIntEQ, left, right, "");
-				case BINOP_NEQ: return LLVMBuildICmp(llvm->builder, LLVMIntNE, left, right, "");
-				case BINOP_GT: return LLVMBuildICmp(llvm->builder, LLVMIntSGT, left, right, "");
-				case BINOP_GE: return LLVMBuildICmp(llvm->builder, LLVMIntSGE, left, right, "");
-				case BINOP_LT: return LLVMBuildICmp(llvm->builder, LLVMIntSLT, left, right, "");
-				case BINOP_LE: return LLVMBuildICmp(llvm->builder, LLVMIntSLE, left, right, "");
-			}
-			assert(0 && "invalid binop");
-			return NULL;
-		}
-		case EXPR_FUNCALL: return llvm_funcall(llvm, &expr->funcall);
-	}
-	assert(0 && "invalid expr");
-	return NULL;
-}
-
-void llvm_body(LlvmBackend *llvm, AstBody *body) {
-	LlvmScope scope = vec_new(LlvmValue);
-	LlvmScope *scope_of = &scope;
-	vec_push(&llvm->scopes, &scope_of);
-	foreach (&body->stmts, AstStmt, stmt) {
-		switch (stmt->type) {
-			case AST_STMT_VAR: {
-				assert(stmt->var.typed);
-				LLVMTypeRef type = llvm_resolve_type(&stmt->var.type.sema);
-				LLVMValueRef var = LLVMBuildAlloca(llvm->builder, type, fatptr_to_cstr(&stmt->var.name));
-				LlvmValue value = {
-					.type = type,
-					.value = var,
-					.name = &stmt->var.name
-				};
-				vec_push(scope_of, &value);
-				if (stmt->var.initializes) {
-					LLVMSetInitializer(var, llvm_expr(llvm, &stmt->var.expr));
-				}
-				break;
-			}
-			case AST_STMT_RETURN: {
-				if (stmt->ret.has_value) {
-					LLVMBuildRet(llvm->builder, llvm_expr(llvm, &stmt->ret.expr));
-				} else {
-					LLVMBuildRetVoid(llvm->builder);
-				}
-				break;
-			}
-			case AST_STMT_FUNCALL: {
-				llvm_funcall(llvm, &stmt->funcall);
-				break;
-			}
-			case AST_STMT_IF: {
-				LLVMBasicBlockRef if_block = LLVMAppendBasicBlock(llvm->func, "");
-				LLVMBasicBlockRef else_block = LLVMAppendBasicBlock(llvm->func, "");
-				LLVMBasicBlockRef end_block = LLVMAppendBasicBlock(llvm->func, "");
-				LLVMValueRef expr = llvm_expr(llvm, &stmt->if_else.main.expr);
-				LLVMBuildCondBr(llvm->builder, expr, if_block, else_block);
-				LLVMPositionBuilderAtEnd(llvm->builder, if_block);
-				llvm_body(llvm, &stmt->if_else.main.body);
-				LLVMBuildBr(llvm->builder, end_block);
-				assert(stmt->if_else.else_ifs.len == 0 && "if else NYI");
-				LLVMPositionBuilderAtEnd(llvm->builder, else_block);
-				if (stmt->if_else.has_else) {
-					llvm_body(llvm, &stmt->if_else.else_body);
-				}
-				LLVMBuildBr(llvm->builder, end_block);
-				LLVMPositionBuilderAtEnd(llvm->builder, end_block);
-				break;
-			}
-		}
-	}
-	vec_pop(&llvm->scopes);
-}
-
-void llvm_add_func(LlvmBackend *llvm, AstFuncInfo *func) {
-	LLVMTypeRef *params = malloc(sizeof(LLVMTypeRef) * func->args.len);
-	for (size_t i = 0; i < func->args.len; i++) {
-		AstFuncArg *arg = vec_at(&func->args, i);
-		params[i] = llvm_resolve_type(&arg->type.sema);
-	}
-	LLVMTypeRef type = LLVMFunctionType(llvm_resolve_type(&func->returning.sema), params, func->args.len, false);
-	LlvmScope **scope = vec_top(&llvm->scopes);
-	LLVMValueRef value = LLVMAddFunction(llvm->module, fatptr_to_cstr(&func->name), type);
-	LlvmValue val = {
-		.name = &func->name,
-		.type = type,
-		.value = value
-	};
-	vec_push(*scope, &val);
-}
-
-void llvm_add_module_node(LlvmBackend *llvm, AstModuleNode *node) {
-	switch (node->type) {
-		case AST_MODULE_NODE_FUNC: {
-			llvm_add_func(llvm, &node->func_decl.info);
-			break;
-		}
-		case AST_MODULE_NODE_EXTERNAL_FUNC: {
-			llvm_add_func(llvm, &node->ext_func_decl);
-			break;
-		}
-	}
-}
-
-void llvm_module_node(LlvmBackend *llvm, AstModuleNode *node) {
-	switch (node->type) {
-		case AST_MODULE_NODE_FUNC: {
-			LlvmScope scope = vec_new(LlvmValue);
-			LlvmScope *scope_of = &scope;
-			vec_push(&llvm->scopes, &scope_of);
-			llvm->func = llvm_resolve_value(llvm, &node->func_decl.info.name);
-			LLVMPositionBuilderAtEnd(llvm->builder, LLVMAppendBasicBlock(llvm->func, "entry"));
-			for (size_t i = 0; i < node->func_decl.info.args.len; i++) {
-				AstFuncArg *arg = vec_at(&node->func_decl.info.args, i);
-				LlvmValue value = {
-					.type = llvm_resolve_type(&arg->type.sema),
-					.value = LLVMGetParam(llvm->func, i),
-					.name = &arg->name
-				};
-				vec_push(scope_of, &value);
-			}
-			llvm_body(llvm, &node->func_decl.body);
-			if (types_equals(&node->func_decl.info.returning.sema, &primitives[PRIMITIVE_VOID])) {
-				LLVMBuildRetVoid(llvm->builder);
-			}
-			vec_pop(&llvm->scopes);
-			break;
-		}
-		case AST_MODULE_NODE_EXTERNAL_FUNC: break;
-	}
-}
-
-void llvm_module(LlvmBackend *llvm, AstModule *module, char *output_path) {
-	LlvmScope scope = vec_new(LlvmValue);
-	LlvmScope *scope_of = &scope;
-	vec_push(&llvm->scopes, &scope_of);
-	llvm->module = LLVMModuleCreateWithName(module->name.ptr);
-	foreach (&module->nodes, AstModuleNode, node) {
-		llvm_add_module_node(llvm, node);
-	}
-	foreach (&module->nodes, AstModuleNode, node) {
-		llvm_module_node(llvm, node);
-	}
-	// LLVMDumpModule(llvm->module);
+bool llvm_write_module(LlvmBackend *llvm, char *output_path) {
+	LLVMDumpModule(llvm->module);
 	char *error;
 	if (LLVMTargetMachineEmitToFile(llvm->machine, llvm->module, output_path, LLVMObjectFile, &error) == 1) {
 		hob_log(LOGE, "failed to emit to file: %s", error);
-		return;
+		return false;
 	}
+	return true;
+}
+
+void llvm_push_value(LlvmBackend *llvm, LlvmValue *value) {
+	LlvmScope *scope = vec_top(llvm->scopes);
+	*scope = vec_push(*scope, value);
+}
+
+void llvm_pop_scope(LlvmBackend *llvm) {
+	vec_pop(llvm->scopes);
+}
+
+void llvm_push_scope(LlvmBackend *llvm) {
+	LlvmScope scope = vec_new(LlvmValue);
+	llvm->scopes = vec_push(llvm->scopes, &scope);
 }

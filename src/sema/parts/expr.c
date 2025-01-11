@@ -113,7 +113,7 @@ bool sema_ast_expr_type(Sema *sema, SemaType *type, AstExpr *expr, SemaType *exp
 				return false;
 			}
 			if (!sema_types_equals(expr->sema_type, &right_type)) {
-				sema_err("cannot use binop for types {sema::type} and {sema::type}", expr->sema_type, &type);
+				sema_err("cannot use binop for types {sema::type} and {sema::type}", expr->sema_type, &right_type);
 				return false;
 			}
 			if (binary_binop) {
@@ -123,8 +123,15 @@ bool sema_ast_expr_type(Sema *sema, SemaType *type, AstExpr *expr, SemaType *exp
 			return true;
 		}
 		case AST_EXPR_AS: {
-			// TODO: check is it allowed???????
 			if (!sema_ast_type(sema, expr->sema_type = malloc(sizeof(SemaType)), &expr->as.type)) {
+				return false;
+			}
+			SemaType expr_type;
+			if (!sema_ast_expr_type(sema, &expr_type, expr->as.expr, NULL)) {
+				return false;
+			}
+			if (expr_type.type != SEMA_TYPE_PRIMITIVE || expr->sema_type->type != SEMA_TYPE_PRIMITIVE || expr_type.primitive == PRIMITIVE_VOID || expr->sema_type->primitive == PRIMITIVE_VOID) {
+				sema_err("only primitives can be casted");
 				return false;
 			}
 			*type = *expr->sema_type;
