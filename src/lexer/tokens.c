@@ -18,6 +18,7 @@ void print_token(FILE *stream, va_list *list) {
     	case TOKEN_VAR: fprintf(stream, "var"); break;
 		case TOKEN_IF: fprintf(stream, "if"); break;
     	case TOKEN_ELSE: fprintf(stream, "else"); break;
+    	case TOKEN_WHILE: fprintf(stream, "while"); break;
     	case TOKEN_TRUE: fprintf(stream, "true"); break;
     	case TOKEN_FALSE: fprintf(stream, "false"); break;
 		case TOKEN_COLON: fprintf(stream, ":"); break;

@@ -5,6 +5,13 @@ extern(getchar) fun get_char(): u8
 extern(fflush) fun fflush(stream: u32): void
 
 fun main(): void {
+	var e: u8 = 0;
+	while e < 10 {
+		put_char('0' + e);
+		e = e + 1;
+	}
+	put_char('\n');
+
 	var a = get_char() - '0';
 	get_char();
 	var b = get_char() - '0';

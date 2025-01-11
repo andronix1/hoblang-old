@@ -3,6 +3,7 @@
 #include "stmts/if_else.c"
 #include "stmts/var.c"
 #include "stmts/return.c"
+#include "stmts/while.c"
 
 bool parse_stmt(Parser *parser, AstStmt *stmt) {
 	parser_next_token(parser);
@@ -30,6 +31,9 @@ bool parse_stmt(Parser *parser, AstStmt *stmt) {
 		case TOKEN_RETURN:
 			stmt->type = AST_STMT_RETURN;
 			return parse_return(parser, &stmt->ret);
+		case TOKEN_WHILE:
+			stmt->type = AST_STMT_WHILE;
+			return parse_while(parser, &stmt->while_loop);
 		case TOKEN_VAR:
 			stmt->type = AST_STMT_VAR;
 			return parse_var(parser, &stmt->var);

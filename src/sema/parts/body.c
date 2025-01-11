@@ -65,6 +65,16 @@ void sema_ast_body(Sema *sema, AstBody *body, SemaType *returning) {
 				}
 				break;
 			}
+			case AST_STMT_WHILE: {
+				SemaType type;
+				if (sema_ast_expr_type(sema, &type, &stmt->while_loop.expr, &primitives[PRIMITIVE_BOOL])) {
+					if (!sema_types_equals(&type, &primitives[PRIMITIVE_BOOL])) {
+						sema_err("while loop condition expression must be boolean, not {sema::type}", &type);
+					}
+				}
+				sema_ast_body(sema, stmt->while_loop.body, returning);
+				break;
+			}
 			case AST_STMT_IF: {	
 				sema_check_if_else_body(sema, &stmt->if_else.main, returning);
 				for (size_t i = 0; i < vec_len(stmt->if_else.else_ifs); i++) {

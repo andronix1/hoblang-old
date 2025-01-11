@@ -5,12 +5,14 @@
 #include "stmts/if_else.h"
 #include "stmts/return.h"
 #include "stmts/assign.h"
+#include "stmts/while.h"
 
 typedef enum {
 	AST_STMT_IF,
 	AST_STMT_VAR,
 	AST_STMT_FUNC_CALL,
 	AST_STMT_RETURN,
+	AST_STMT_WHILE,
 	AST_STMT_ASSIGN
 } AstStmtType;
 
@@ -21,6 +23,7 @@ typedef struct {
 		AstIfElse if_else;
 		AstFuncCall func_call;
 		AstReturn ret;
+		AstWhile while_loop;
 		AstAssign assign;
 	};
 } AstStmt;

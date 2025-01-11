@@ -44,6 +44,7 @@ bool lex_next(Lexer *lexer) {
 	KEYWORD("as", TOKEN_AS);
 	KEYWORD("true", TOKEN_TRUE);
 	KEYWORD("false", TOKEN_FALSE);
+	KEYWORD("while", TOKEN_WHILE);
 	TOKEN_PARSE(lex_char(lexer));
 	TOKEN_PARSE(lex_ident(lexer));
 	TOKEN_PARSE(lex_integer(lexer));

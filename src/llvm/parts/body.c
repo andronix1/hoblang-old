@@ -33,6 +33,19 @@ void llvm_body(LlvmBackend *llvm, AstBody *body) {
 				llvm_func_call(llvm, &stmt->func_call);
 				break;
 			}
+			case AST_STMT_WHILE: {
+				LLVMBasicBlockRef cond_block = LLVMAppendBasicBlock(llvm->func, "");
+				LLVMBasicBlockRef body_block = LLVMAppendBasicBlock(llvm->func, "");
+				LLVMBasicBlockRef end_block = LLVMAppendBasicBlock(llvm->func, "");
+				LLVMBuildBr(llvm->builder, cond_block);
+				LLVMPositionBuilderAtEnd(llvm->builder, cond_block);
+				LLVMBuildCondBr(llvm->builder, llvm_expr(llvm, &stmt->while_loop.expr), body_block, end_block);
+				LLVMPositionBuilderAtEnd(llvm->builder, body_block);
+				llvm_body(llvm, stmt->while_loop.body);
+				LLVMBuildBr(llvm->builder, cond_block);
+				LLVMPositionBuilderAtEnd(llvm->builder, end_block);
+				break;
+			}
 			case AST_STMT_IF: {
 				LLVMBasicBlockRef if_block = LLVMAppendBasicBlock(llvm->func, "");
 				LLVMBasicBlockRef else_block = LLVMAppendBasicBlock(llvm->func, "");
