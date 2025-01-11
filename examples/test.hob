@@ -33,7 +33,12 @@ fun int_at(val: i32, at: i32): u8 {
 	return (val - val / 10 as i32 * 10 as i32) as u8;
 }
 
+# TODO: arrays
 fun put_int(val: i32): void {
+	if (val < 0) {
+		val = 0 - val; # TODO: unary
+		put_char('-');
+	}
 	var len: i32 = int_len(val) - 1;
 	while len >= 0 {
 		put_char('0' + int_at(val, len));

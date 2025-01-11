@@ -12,8 +12,18 @@
 #define KEYWORD(s, type) TOKEN_PARSE(lex_keyword(lexer, s, type));
 #define SYMBOL_DUAL(c1, c2, t1, t2) TOKEN_PARSE(lex_symbol_dual(lexer, c1, c2, t1, t2));
 
+bool lexer_skip_comment(Lexer *lexer) {
+	if (lexer_future_char(lexer) != '#') {
+		return false;
+	}
+	while (lexer_next_char(lexer) != '\n');
+	return true;
+}
+
 bool lex_next(Lexer *lexer) {
-	lexer_skip_whitespace(lexer);
+	do {
+		lexer_skip_whitespace(lexer);
+	} while (lexer_skip_comment(lexer));
 	lexer_begin(lexer);
 	if (lexer_finished(lexer)) {
 		return false;
