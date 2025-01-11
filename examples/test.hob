@@ -2,24 +2,53 @@ module main;
 
 extern(putchar) fun put_char(c: u8): void
 extern(getchar) fun get_char(): u8
-extern(fflush) fun fflush(stream: u32): void
+
+fun get_int(): i32 {
+	var res: i32 = 0;
+	var c: u8 = get_char();
+	while c != '\n' {
+		res = res * 10 + (c - '0') as i32;
+		c = get_char();
+	}
+	return res;
+}
+
+fun int_len(val: i32): i32 {
+	if val == 0 {
+		return 1;
+	}
+	var len: i32 = 0;
+	while val > 0 {
+		len = len + 1;
+		val = val / 10;
+	}
+	return len;
+}
+
+fun int_at(val: i32, at: i32): u8 {
+	while at > 0 {
+		at = at - 1;
+		val = val / 10;
+	}
+	return (val - val / 10 as i32 * 10 as i32) as u8;
+}
+
+fun put_int(val: i32): void {
+	var len: i32 = int_len(val) - 1;
+	while len >= 0 {
+		put_char('0' + int_at(val, len));
+		len = len - 1;
+	}
+}
 
 fun main(): void {
-	var e: u8 = 0;
-	while e < 10 {
-		put_char('0' + e);
-		e = e + 1;
+	var sum: i32 = 0;
+	while true {
+		put_char('>');
+		put_char(' ');
+		var a = get_int();
+		sum = sum + a;
+		put_int(sum);
+		put_char('\n');
 	}
-	put_char('\n');
-
-	var a = get_char() - '0';
-	get_char();
-	var b = get_char() - '0';
-	var s = a + b;
-	if a + b > 10 {
-		put_char('1');
-		s = s - 10;
-	}
-	put_char('0' + s);
-	put_char('\n');
 }

@@ -39,26 +39,16 @@ void expr_push_down(AstExpr *expr) {
 	expr_push_down(pl);
 }
 
-int l = 0;
-
 bool expr_make_binop(Parser *parser, AstBinopType type, AstExpr **current_expr, bool(*stop)(TokenType)) {
-	if (l == 0)
-	print("[{ast::expr}] {ast::binop}", *current_expr, type);
 	AstExpr *result = malloc(sizeof(AstExpr));				
 	result->type = AST_EXPR_BINOP;
 	result->binop.type = type;
 	result->binop.left = *current_expr;
-	l++;
 	if (!(result->binop.right = parse_expr_before(parser, stop))) {
 		return false;
 	}
-	l--;
-	if (l == 0)
-	print(" [{ast::expr}] -> ", result->binop.right);
 	expr_push_down(result);
 	*current_expr = result;
-	if (l == 0)
-	print("{ast::expr}\n", *current_expr);
 	return true;
 }
 

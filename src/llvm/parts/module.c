@@ -11,7 +11,6 @@ void llvm_add_func(LlvmBackend *llvm, AstFuncInfo *func, Slice *override_name) {
 		.name = &func->name,
 		.type = type,
 		.value = value,
-		.ptr = false
 	};
 	llvm_push_value(llvm, &val);
 }
@@ -39,9 +38,11 @@ void llvm_module_node(LlvmBackend *llvm, AstModuleNode *node) {
 				AstFuncArg *arg = &node->func_decl.info.args[i];
 				LlvmValue value = {
 					.type = llvm_resolve_type(arg->type.sema),
-					.value = LLVMGetParam(llvm->func, i),
-					.name = &arg->name
+					.name = &arg->name,
+					.ptr = true
 				};
+				value.value = LLVMBuildAlloca(llvm->builder, value.type, "");
+				LLVMBuildStore(llvm->builder, LLVMGetParam(llvm->func, i), value.value);
 				llvm_push_value(llvm, &value);
 			}
 			llvm_body(llvm, &node->func_decl.body);

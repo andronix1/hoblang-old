@@ -113,7 +113,7 @@ bool sema_ast_expr_type(Sema *sema, SemaType *type, AstExpr *expr, SemaType *exp
 				return false;
 			}
 			if (!sema_types_equals(expr->sema_type, &right_type)) {
-				sema_err("cannot use binop for types {sema::type} and {sema::type}", expr->sema_type, &right_type);
+				sema_err("cannot use binop {ast::binop} for types {sema::type} and {sema::type}", expr->binop.type, expr->sema_type, &right_type);
 				return false;
 			}
 			if (binary_binop) {
