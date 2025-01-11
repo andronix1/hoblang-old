@@ -11,7 +11,7 @@ bool sema_ast_func_call(Sema *sema, SemaType *output_type, AstFuncCall *func_cal
 		return false;
 	}	
 	if (vec_len(func_call->args) != vec_len(type->func.args)) {
-		sema_err("expected {long} args but {long} was passed", vec_len(func_call->args), vec_len(type->func.args));
+		sema_err("expected {long} args to function {slice} but {long} was passed", vec_len(type->func.args), &func_call->name, vec_len(func_call->args));
 		return false;
 	}
 	for (size_t i = 0; i < vec_len(func_call->args); i++) {

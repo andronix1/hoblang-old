@@ -23,6 +23,8 @@ set(SOURCE_FILES
 	src/lexer/parsers/symbol.c
 
 	src/parser/parser.c
+	src/parser/print/expr.c
+	src/parser/print/type.c
 	src/parser/parsers/module.c
 	src/parser/parsers/module_node.c
 	src/parser/parsers/type.c

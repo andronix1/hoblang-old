@@ -28,7 +28,6 @@ typedef struct _AstExpr {
 		char character;
 		bool boolean;
 	};
-	struct _AstExpr *parent; // for parser
 	struct _SemaType *sema_type; // for sema
 } AstExpr;
 

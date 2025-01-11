@@ -37,6 +37,8 @@ void sema_ast_body(Sema *sema, AstBody *body, SemaType *returning) {
 						if (!sema_ast_expr_type(sema, &decl.type, &stmt->var.expr, NULL)) {
 							break;
 						}
+						stmt->var.typed = true;
+						stmt->var.type.sema = stmt->var.expr.sema_type; 
 					} else {
 						sema_err("variable type must be specified or initializer must present");
 						break;

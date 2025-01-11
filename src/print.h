@@ -1,6 +1,7 @@
 #include <string.h>
 #include <errno.h>
 #include "parser/ast.h"
+#include "parser/print.h"
 #include "lexer/tokens.h"
 #include "core/print.h"
 #include "sema/type.h"
@@ -40,4 +41,7 @@ void print_setup() {
 	print_register(slice_from_cstr("tok"), print_token);
 	print_register(slice_from_cstr("slice"), print_slice);
 	print_register(slice_from_cstr("sema::type"), print_sema_type);
+	print_register(slice_from_cstr("ast::expr"), print_ast_expr);
+	print_register(slice_from_cstr("ast::binop"), print_ast_binop_type);
+	print_register(slice_from_cstr("ast::type"), print_ast_type);
 }
