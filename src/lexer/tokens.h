@@ -32,6 +32,7 @@ typedef enum {
     TOKEN_MINUS,
     TOKEN_MULTIPLY,
     TOKEN_DIVIDE,
+    TOKEN_NOT,
 
     TOKEN_EQUALS,
     TOKEN_NOT_EQUALS,
