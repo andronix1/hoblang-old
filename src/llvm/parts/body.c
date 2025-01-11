@@ -51,6 +51,10 @@ void llvm_body(LlvmBackend *llvm, AstBody *body) {
 				LLVMPositionBuilderAtEnd(llvm->builder, end_block);
 				break;
 			}
+			case AST_STMT_ASSIGN: {
+				LLVMBuildStore(llvm->builder, llvm_expr(llvm, &stmt->assign.expr), llvm_resolve_value(llvm, &stmt->assign.name));
+				break;
+			}
 		}
 	}
 	llvm_pop_scope(llvm);

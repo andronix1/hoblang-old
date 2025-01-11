@@ -75,6 +75,22 @@ void sema_ast_body(Sema *sema, AstBody *body, SemaType *returning) {
 				}
 				break;
 			}
+			case AST_STMT_ASSIGN: {
+				SemaType *decl_type = sema_resolve_decl_type(sema, &stmt->assign.name);
+				if (!decl_type) {
+					sema_err("{slice} is undefined", &stmt->assign.name);
+					break;
+				}
+				SemaType expr_type;
+				if (!sema_ast_expr_type(sema, &expr_type, &stmt->assign.expr, decl_type)) {
+					break;
+				}
+				if (!sema_types_equals(decl_type, &expr_type)) {
+					sema_err("cannot assign expression with type `{sema::type}` to variable of type `{sema::type}`", &expr_type, decl_type);
+					break;
+				}
+				break;
+			}
 			case AST_STMT_FUNC_CALL: {		
 				sema_ast_func_call(sema, NULL, &stmt->func_call);
 				break;

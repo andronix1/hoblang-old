@@ -4,12 +4,14 @@
 #include "stmts/var.h"
 #include "stmts/if_else.h"
 #include "stmts/return.h"
+#include "stmts/assign.h"
 
 typedef enum {
 	AST_STMT_IF,
 	AST_STMT_VAR,
 	AST_STMT_FUNC_CALL,
-	AST_STMT_RETURN
+	AST_STMT_RETURN,
+	AST_STMT_ASSIGN
 } AstStmtType;
 
 typedef struct {
@@ -19,6 +21,7 @@ typedef struct {
 		AstIfElse if_else;
 		AstFuncCall func_call;
 		AstReturn ret;
+		AstAssign assign;
 	};
 } AstStmt;
 

@@ -8,11 +8,11 @@ fun main(): void {
 	var a = get_char() - '0';
 	get_char();
 	var b = get_char() - '0';
-	if a + b < 10 {
-		put_char('0' + a + b);
-	} else {
+	var s = a + b;
+	if a + b > 10 {
 		put_char('1');
-		put_char('0' - 10 + a + b);
+		s = s - 10;
 	}
+	put_char('0' + s);
 	put_char('\n');
 }
