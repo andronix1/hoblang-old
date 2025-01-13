@@ -48,6 +48,9 @@ LLVMTypeRef llvm_resolve_type(SemaType *type) {
 			}
 			return LLVMFunctionType(llvm_resolve_type(type->func.returning), params, vec_len(type->func.args), false /* IsVarArg */);
 		}
+		case SEMA_TYPE_POINTER: {
+			return LLVMPointerType(llvm_resolve_type(type->ptr_to), 0);
+		}
 	}
 	assert(0, "invalid type {int}", type->type);
 }
@@ -72,7 +75,7 @@ LLVMValueRef llvm_resolve_value(LlvmBackend *llvm, Slice *name) {
 }
 
 bool llvm_write_module(LlvmBackend *llvm, char *output_path) {
-	// LLVMDumpModule(llvm->module);
+	LLVMDumpModule(llvm->module);
 	char *error;
 	if (LLVMTargetMachineEmitToFile(llvm->machine, llvm->module, output_path, LLVMObjectFile, &error) == 1) {
 		hob_log(LOGE, "failed to emit to file: %s", error);

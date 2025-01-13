@@ -30,15 +30,15 @@ fun int_at(val: i32, at: i32): u8 {
 		at = at - 1;
 		val = val / 10;
 	}
-	return (val - val / 10 as i32 * 10 as i32) as u8;
+	return (val - (val / (10 as i32) * 10 as i32)) as u8;
 }
 
-# TODO: arrays
 fun put_int(val: i32): void {
 	if (val < 0) {
 		val = 0 - val; # TODO: unary
 		put_char('-');
 	}
+	
 	var len: i32 = int_len(val) - 1;
 	while len >= 0 {
 		put_char('0' + int_at(val, len));
@@ -46,7 +46,24 @@ fun put_int(val: i32): void {
 	}
 }
 
+fun test_arrs(): void {
+	var test: i32* = [23, 34, 45, 56, 12];
+	put_char('[');
+	var i = 0;
+	while i < 5 {
+		if i != 0 {
+			put_char(',');
+			put_char(' ');
+		}
+		put_int(test[i]);
+		i = i + 1;
+	}
+	put_char(']');
+	put_char('\n');
+}
+
 fun main(): void {
+	test_arrs();
 	var sum: i32 = 0;
 	while true {
 		put_char('>');

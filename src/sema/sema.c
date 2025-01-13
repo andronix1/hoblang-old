@@ -25,7 +25,7 @@ SemaType *sema_resolve_decl_type(Sema *sema, Slice *name) {
 		for (size_t j = 0; j < vec_len(sema->scopes[i].decls); j++) {
 			SemaRecord *record = &sema->scopes[i].decls[j];
 			if (slice_eq(name, &record->name)) {
-				return &record->type;
+				return record->type;
 			}
 		}
 	}
@@ -37,7 +37,7 @@ SemaType *sema_resolve_ident_type(Sema *sema, Slice *name) {
 		for (size_t j = 0; j < vec_len(sema->scopes[i].types); j++) {
 			SemaRecord *record = &sema->scopes[i].types[j];
 			if (slice_eq(name, &record->name)) {
-				return &record->type;
+				return record->type;
 			}
 		}
 	}
@@ -65,7 +65,7 @@ void sema_push_decl(Sema *sema, SemaRecord *decl) {
 void sema_push_primitive(Sema *sema, const char *name, Primitive primitive) {
 	SemaRecord record = {
 		.name = slice_from_cstr(name),
-		.type = { .type = SEMA_TYPE_PRIMITIVE, .primitive = primitive }
+		.type = &primitives[primitive]
 	};
 	sema_push_type(sema, &record);
 }

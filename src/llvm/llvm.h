@@ -10,7 +10,6 @@
 typedef struct {
 	LLVMValueRef value;
 	LLVMTypeRef type;
-	bool ptr;
 	Slice *name;
 } LlvmValue;
 

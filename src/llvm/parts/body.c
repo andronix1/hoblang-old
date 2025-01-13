@@ -13,7 +13,6 @@ void llvm_body(LlvmBackend *llvm, AstBody *body) {
 					.type = type,
 					.value = var,
 					.name = &stmt->var.name,
-					.ptr = true
 				};
 				llvm_push_value(llvm, &value);
 				if (stmt->var.initializes) {

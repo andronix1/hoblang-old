@@ -39,7 +39,6 @@ void llvm_module_node(LlvmBackend *llvm, AstModuleNode *node) {
 				LlvmValue value = {
 					.type = llvm_resolve_type(arg->type.sema),
 					.name = &arg->name,
-					.ptr = true
 				};
 				value.value = LLVMBuildAlloca(llvm->builder, value.type, "");
 				LLVMBuildStore(llvm->builder, LLVMGetParam(llvm->func, i), value.value);

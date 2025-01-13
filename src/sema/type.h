@@ -19,6 +19,7 @@ typedef enum {
 
 typedef enum {
 	SEMA_TYPE_PRIMITIVE,
+	SEMA_TYPE_POINTER,
 	SEMA_TYPE_FUNCTION,
 } SemaTypeKind;
 
@@ -27,10 +28,14 @@ typedef struct _SemaType {
 	union {
 		Primitive primitive;
 		SemaFunction func;
+		struct _SemaType *ptr_to;
 	};
 } SemaType;
 
 extern SemaType primitives[];
+
+SemaType *sema_type_new_func(SemaType *returning, AstFuncArg *args);
+SemaType *sema_type_new_pointer(SemaType *to);
 
 bool sema_types_equals(SemaType *type, SemaType *other);
 void print_sema_type(FILE* stream, va_list *list);

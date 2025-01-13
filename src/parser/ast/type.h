@@ -5,14 +5,16 @@
 struct _SemaType;
 
 typedef enum {
-	AST_TYPE_IDENT
+	AST_TYPE_IDENT,
+	AST_TYPE_POINTER
 } AstTypeKind;
 
-typedef struct {
+typedef struct _AstType {
 	AstTypeKind type;
 	struct _SemaType *sema;
 	union {
 		Slice ident;
+		struct _AstType *ptr_to;
 	};
 } AstType;
 

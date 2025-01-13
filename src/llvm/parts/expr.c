@@ -9,7 +9,7 @@ bool llvm_is_signed(SemaType *type) {
 }
 
 LLVMValueRef llvm_func_call(LlvmBackend *llvm, AstFuncCall *func_call) {
-	LLVMValueRef *params = malloc(sizeof(LLVMValueRef) * vec_len(func_call->args));
+	LLVMValueRef *params = alloca(sizeof(LLVMValueRef) * vec_len(func_call->args));
 	for (size_t i = 0; i < vec_len(func_call->args); i++) {
 		params[i] = llvm_expr(llvm, &func_call->args[i]);
 	}
@@ -20,14 +20,11 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 	switch (expr->type) {
 		case AST_EXPR_VALUE: {
 			LlvmValue *value = llvm_resolve(llvm, &expr->value);
-			if (!value->ptr) {
-				return value->value;
-			}
 			return LLVMBuildLoad2(llvm->builder, value->type, value->value, "");
 		}
-		case AST_EXPR_INTEGER: return LLVMConstInt(LLVMInt32Type(), expr->integer, true);
-		case AST_EXPR_BOOL: return LLVMConstInt(LLVMInt1Type(), expr->integer, false);
-		case AST_EXPR_CHAR: return LLVMConstInt(LLVMInt8Type(), expr->integer, false);
+		case AST_EXPR_INTEGER: return LLVMConstInt(LLVMInt32Type(), expr->integer, false);
+		case AST_EXPR_BOOL: return LLVMConstInt(LLVMInt1Type(), expr->boolean, false);
+		case AST_EXPR_CHAR: return LLVMConstInt(LLVMInt8Type(), expr->character, false);
 		case AST_EXPR_AS: {
 			LLVMTypeRef to_type = llvm_resolve_type(expr->as.type.sema);
 			return LLVMBuildZExt(llvm->builder, LLVMBuildTrunc(llvm->builder, llvm_expr(llvm, expr->as.expr), to_type, ""), to_type, ""); // TODO: check possibility at sema 
@@ -52,6 +49,33 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 			return NULL;
 		}
 		case AST_EXPR_FUNCALL: return llvm_func_call(llvm, &expr->func_call);
+		case AST_EXPR_IDX: {
+			LLVMValueRef indices[] = {
+				llvm_expr(llvm, expr->idx.idx),
+			};
+			return LLVMBuildLoad2(
+				llvm->builder,
+				llvm_resolve_type(expr->sema_type),
+				LLVMBuildGEP2(
+					llvm->builder,
+					llvm_resolve_type(expr->sema_type),
+					llvm_expr(llvm, expr->idx.expr),
+					indices, 1,
+					""
+				), 
+				""
+			);
+		}
+		case AST_EXPR_ARRAY: {
+			LLVMTypeRef ptr_to = llvm_resolve_type(expr->sema_type->ptr_to);
+			LLVMValueRef value = LLVMBuildAlloca(llvm->builder, LLVMArrayType(ptr_to, vec_len(expr->array)), "");
+			LLVMValueRef *vals = alloca(sizeof(LLVMValueRef) * vec_len(expr->array));
+			for (size_t i = 0; i < vec_len(expr->array); i++) {
+				vals[i] = llvm_expr(llvm, &expr->array[i]);
+			}
+			LLVMBuildStore(llvm->builder, LLVMConstArray(ptr_to, vals, vec_len(expr->array)), value);
+			return value;
+		}
 	}
 	assert(0, "invalid expr {int}", expr->type);
 	return NULL;

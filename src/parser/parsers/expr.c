@@ -113,6 +113,17 @@ AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType)) {
 					return NULL;
 				}
 				break;
+			case TOKEN_OPENING_SQUARE_BRACE:
+				current_expr->type = AST_EXPR_ARRAY;
+				current_expr->array = vec_new(AstExpr);
+				while (token_type(parser->token) != TOKEN_CLOSING_SQUARE_BRACE) {
+					AstExpr *expr = parse_expr_before(parser, token_array_arg_stop);
+					if (!expr) {
+						return false;
+					}
+					current_expr->array = vec_push(current_expr->array, expr);
+				}
+				break;
 			case TOKEN_EOI:
 				parse_err("EOI while parsing expression");
 				return NULL;
@@ -121,16 +132,30 @@ AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType)) {
 				return NULL;
 		}
 		parser_next_token(parser);	
-		if (token_type(parser->token) != TOKEN_AS) {
-			parser->skip_next = true;
-			continue;
-		}
-		AstExpr *expr = malloc(sizeof(AstExpr));
-		expr->type = AST_EXPR_AS;
-		expr->as.expr = current_expr;
-		current_expr = expr;
-		if (!parse_type(parser, &current_expr->as.type)) {
-			return NULL;
+		switch (token_type(parser->token)) {
+			case TOKEN_AS: {
+				AstExpr *expr = malloc(sizeof(AstExpr));
+				expr->type = AST_EXPR_AS;
+				expr->as.expr = current_expr;
+				current_expr = expr;
+				if (!parse_type(parser, &current_expr->as.type)) {
+					return NULL;
+				}
+				break;
+			}
+			case TOKEN_OPENING_SQUARE_BRACE: {
+				AstExpr *expr = malloc(sizeof(AstExpr));
+				expr->type = AST_EXPR_IDX;
+				expr->idx.expr = current_expr;
+				if (!(expr->idx.idx = parse_expr_before(parser, token_slice_at_stop))) {
+					return NULL;
+				}
+				current_expr = expr;
+				break;
+			}
+			default:
+				parser->skip_next = true;
+				break;
 		}
 	}
 }

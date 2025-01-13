@@ -4,7 +4,7 @@
 #include "type.h"
 
 typedef struct {
-	SemaType type;
+	SemaType *type;
 	Slice name;
 } SemaRecord;
 
@@ -15,6 +15,7 @@ typedef struct {
 
 typedef struct {
 	SemaScope *scopes;
+	SemaType *returning;
 	bool failed;
 } Sema;
 

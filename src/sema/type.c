@@ -16,6 +16,9 @@ SemaType primitives[] = {
 };
 
 bool sema_types_equals(SemaType *type, SemaType *other) {
+	if (type == other) {
+		return true;
+	}
 	if (type->type != other->type) {
 		return false;
 	}
@@ -35,6 +38,8 @@ bool sema_types_equals(SemaType *type, SemaType *other) {
 				}
 			}
 			return true;
+		case SEMA_TYPE_POINTER:
+			return sema_types_equals(type->ptr_to, other->ptr_to);
 	}
 	assert(0, "invalid sema type kind {int}", type->type);
 }
@@ -69,5 +74,23 @@ void print_sema_type(FILE* stream, va_list *list) {
 			}
 			print_to(stream, "): {sema::type}", type->func.returning);
 			break;
+		case SEMA_TYPE_POINTER:
+			print_to(stream, "{sema::type}*", type->ptr_to);
+			break;
 	}
+}
+
+SemaType *sema_type_new_pointer(SemaType *to) {
+	SemaType *result = malloc(sizeof(SemaType));
+	result->type = SEMA_TYPE_POINTER;
+	result->ptr_to = to;
+	return result;
+}
+
+SemaType *sema_type_new_func(SemaType *returning, AstFuncArg *args) {
+	SemaType *result = malloc(sizeof(SemaType));
+	result->type = SEMA_TYPE_FUNCTION;
+	result->func.returning = returning;
+	result->func.args = args;
+	return result;
 }
