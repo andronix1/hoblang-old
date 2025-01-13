@@ -2,7 +2,7 @@ module main;
 
 extern(putchar) fun put_char(c: u8): void
 extern(getchar) fun get_char(): u8
-extern(puts) fun put_str(str: u8*): void
+extern(puts) fun put_str(str: *u8): void
 
 fun get_int(): i32 {
 	var res: i32 = 0;
@@ -48,7 +48,7 @@ fun put_int(val: i32): void {
 }
 
 fun test_arr1(): void {
-	var test: i32* = [23, 34, 45, 56, 12];
+	var test: *i32 = [23, 34, 45, 56, 12];
 	put_char('[');
 	var i = 0;
 	while i < 5 {

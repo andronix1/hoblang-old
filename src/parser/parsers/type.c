@@ -7,24 +7,14 @@ bool parse_type(Parser *parser, AstType *type) {
 		case TOKEN_IDENT:
 			type->type = AST_TYPE_IDENT;
 			type->ident = parser->token->ident;
-			break;
+			return true;
+		case TOKEN_MULTIPLY: {
+			type->type = AST_TYPE_POINTER;
+			type->ptr_to = malloc(sizeof(AstType));
+			return parse_type(parser, type->ptr_to);
+		}
 		default:
 			parse_err(EXPECTED("type"));
 			return false;
-	}
-	while (true) {
-		parser_next_token(parser);
-		switch (parser->token->type) {
-			case TOKEN_MULTIPLY: {
-				AstType *cloned = malloc(sizeof(AstType));
-				memcpy(cloned, type, sizeof(AstType));
-				type->type = AST_TYPE_POINTER;
-				type->ptr_to = cloned;
-				break;
-			}
-			default:
-				parser->skip_next = true;
-				return true;
-		}
 	}
 }
