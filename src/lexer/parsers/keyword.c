@@ -1,4 +1,4 @@
-#include "keyword.h"
+#include "../parsers.h"
 
 LexOneErr lex_keyword(Lexer *lexer, const char *keyword, TokenType type) {
 	for (size_t i = 0; keyword[i] != '\0'; i++) {

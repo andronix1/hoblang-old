@@ -1,4 +1,4 @@
-#include "symbol.h"
+#include "../parsers.h"
 
 LexOneErr lex_symbol_dual(Lexer *lexer, char symbol, char next, TokenType type, TokenType next_type) {
 	if (symbol == lexer_next_char(lexer)) {

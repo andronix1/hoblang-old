@@ -1,4 +1,4 @@
-#include "integer.h"
+#include "../parsers.h"
 
 LexOneErr lex_integer(Lexer *lexer) {
 	char c;

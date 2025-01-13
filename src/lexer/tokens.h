@@ -49,6 +49,7 @@ typedef enum {
     TOKEN_CHAR,
     TOKEN_INTEGER,
     TOKEN_IDENT,
+    TOKEN_STR,
 	
 	TOKEN_EOI 
 } TokenType;
@@ -60,6 +61,7 @@ typedef struct {
         Slice ident;
         uint64_t integer;
 		char character;
+        char *str;
     };
 } Token;
 

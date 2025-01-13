@@ -10,6 +10,7 @@ typedef enum {
 	AST_EXPR_VALUE,
 	AST_EXPR_INTEGER,
 	AST_EXPR_CHAR,
+	AST_EXPR_STR,
 	AST_EXPR_BOOL,
 	AST_EXPR_FUNCALL,
 	AST_EXPR_AS,
@@ -29,6 +30,7 @@ typedef struct _AstExpr {
 		struct _AstExpr *array;
 		AstIdx idx;
 		Slice value;
+		Slice str;
 		uint64_t integer;
 		char character;
 		bool boolean;

@@ -25,6 +25,11 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 		case AST_EXPR_INTEGER: return LLVMConstInt(LLVMInt32Type(), expr->integer, false);
 		case AST_EXPR_BOOL: return LLVMConstInt(LLVMInt1Type(), expr->boolean, false);
 		case AST_EXPR_CHAR: return LLVMConstInt(LLVMInt8Type(), expr->character, false);
+		case AST_EXPR_STR: {
+			LLVMValueRef value = LLVMBuildAlloca(llvm->builder, LLVMArrayType(LLVMInt8Type(), expr->str.len), "");
+			LLVMBuildStore(llvm->builder, LLVMConstString(expr->str.str, expr->str.len, true), value);
+			return value;
+		}
 		case AST_EXPR_AS: {
 			LLVMTypeRef to_type = llvm_resolve_type(expr->as.type.sema);
 			return LLVMBuildZExt(llvm->builder, LLVMBuildTrunc(llvm->builder, llvm_expr(llvm, expr->as.expr), to_type, ""), to_type, ""); // TODO: check possibility at sema 

@@ -21,6 +21,7 @@ set(SOURCE_FILES
 	src/lexer/parsers/integer.c
 	src/lexer/parsers/keyword.c
 	src/lexer/parsers/symbol.c
+	src/lexer/parsers/str.c
 
 	src/parser/parser.c
 	src/parser/print/expr.c

@@ -77,6 +77,12 @@ AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType)) {
 				current_expr->type = AST_EXPR_CHAR;
 				current_expr->integer = parser->token->character;
 				break;
+			case TOKEN_STR: {
+				current_expr->type = AST_EXPR_STR;
+				current_expr->str.len = vec_len(parser->token->str);
+				current_expr->str.str= parser->token->str;
+				break;
+			}
 			case TOKEN_INTEGER: {
 				current_expr->type = AST_EXPR_INTEGER;
 				current_expr->integer = parser->token->integer;

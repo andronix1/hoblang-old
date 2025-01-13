@@ -1,4 +1,4 @@
-#include "symbol.h"
+#include "../parsers.h"
 
 LexOneErr lex_ident(Lexer *lexer) {
 	if (!char_is_ident_start(lexer_next_char(lexer))) {

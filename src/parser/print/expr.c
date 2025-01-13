@@ -33,6 +33,9 @@ void print_ast_expr(FILE *stream, va_list *list) {
 			}
 			print_to(stream, "]");
 			break;
+		case AST_EXPR_STR:
+			print_to(stream, "\"{slice}\"", &expr->str);
+			break;
 		case AST_EXPR_FUNCALL:
 			print_to(stream, "{slice}(", &expr->func_call.name);
 			for (size_t i = 0; i < vec_len(expr->func_call.args); i++) {

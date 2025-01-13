@@ -1,4 +1,4 @@
-#include "char.h"
+#include "../parsers.h"
 
 bool lexer_next_escaped(Lexer *lexer, char stop, char *output) {
 	char c;
@@ -8,6 +8,9 @@ bool lexer_next_escaped(Lexer *lexer, char stop, char *output) {
 	}
 	if (c == '\\') {
 		switch (c = lexer_next_char(lexer)){
+			case '0':
+				*output = '\0';
+				return true;
 			case 'n':
 				*output = '\n';
 				return true;

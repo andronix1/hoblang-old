@@ -61,6 +61,7 @@ bool lex_next(Lexer *lexer) {
 	TOKEN_PARSE(lex_char(lexer));
 	TOKEN_PARSE(lex_ident(lexer));
 	TOKEN_PARSE(lex_integer(lexer));
+	TOKEN_PARSE(lex_str(lexer));
 
 	lex_err("unknown token");
 	return true;
