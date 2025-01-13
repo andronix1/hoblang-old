@@ -1,6 +1,8 @@
 #pragma once
 
+#include "../value.h"
+
 typedef struct {
-	Slice name;
+	AstValue value;
 	AstExpr expr;
 } AstAssign;

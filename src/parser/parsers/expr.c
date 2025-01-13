@@ -89,16 +89,20 @@ AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType)) {
 				break;
 			}
 			case TOKEN_IDENT: {
-				Slice name = parser->token->ident;
+				AstValue value;
+				parser->skip_next = true;
+				if (!parse_value(parser, &value)) {
+					return false;
+				}
 				parser_next_token(parser);
 				if (token_type(parser->token) != TOKEN_OPENING_CIRCLE_BRACE) {
 					current_expr->type = AST_EXPR_VALUE;
-					current_expr->value = name;
+					current_expr->value = value;
 					parser->skip_next = true;
 					break;
 				}
 				current_expr->type = AST_EXPR_FUNCALL;
-				current_expr->func_call.name = name;
+				current_expr->func_call.value = value;
 				if (!parse_func_call_args(parser, &current_expr->func_call)) {
 					return false;
 				}

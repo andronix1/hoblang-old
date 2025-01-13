@@ -35,6 +35,8 @@ typedef enum {
     TOKEN_MULTIPLY,
     TOKEN_DIVIDE,
     TOKEN_NOT,
+    TOKEN_REF,
+    TOKEN_DOT,
 
     TOKEN_EQUALS,
     TOKEN_NOT_EQUALS,

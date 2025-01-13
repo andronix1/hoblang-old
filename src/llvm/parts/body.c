@@ -64,7 +64,7 @@ void llvm_body(LlvmBackend *llvm, AstBody *body) {
 				break;
 			}
 			case AST_STMT_ASSIGN: {
-				LLVMBuildStore(llvm->builder, llvm_expr(llvm, &stmt->assign.expr), llvm_resolve_value(llvm, &stmt->assign.name));
+				LLVMBuildStore(llvm->builder, llvm_expr(llvm, &stmt->assign.expr), llvm_value(llvm, &stmt->assign.value));
 				break;
 			}
 		}

@@ -1,7 +1,6 @@
 void sema_stmt_assign(Sema *sema, AstAssign *assign) {
-	SemaType *decl_type = sema_resolve_decl_type(sema, &assign->name);
+	SemaType *decl_type = sema_ast_value(sema, &assign->value);
 	if (!decl_type) {
-		sema_err("{slice} is undefined", &assign->name);
 		return;
 	}
 	SemaType *expr_type = sema_ast_expr_type(sema, &assign->expr, decl_type);

@@ -29,6 +29,7 @@ set(SOURCE_FILES
 	src/parser/parsers/module.c
 	src/parser/parsers/module_node.c
 	src/parser/parsers/type.c
+	src/parser/parsers/value.c
 	src/parser/parsers/func_call.c
 	src/parser/parsers/expr.c
 	src/parser/parsers/body.c
@@ -39,11 +40,13 @@ set(SOURCE_FILES
 	src/sema/parts/type.c
 	src/sema/parts/body.c
 	src/sema/parts/expr.c
+	src/sema/parts/value.c
 
 	src/llvm/llvm.c
 	src/llvm/parts/module.c
 	src/llvm/parts/body.c
 	src/llvm/parts/expr.c
+	src/llvm/parts/value.c
 )
 
 include_directories(${LLVM_INCLUDE_DIRS})

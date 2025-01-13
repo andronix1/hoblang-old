@@ -8,7 +8,6 @@ LexOneErr lex_str(Lexer *lexer) {
 	char *result = vec_new(char);
 	char c;
 	while ((c = lexer_future_char(lexer)) != '"' && c != (char)EOF) {
-		printf("%c", c);
 		if (!lexer_next_escaped(lexer, '"', &c)) {
 			return LEX_ONE_ERR;
 		}

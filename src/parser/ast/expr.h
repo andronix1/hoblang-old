@@ -29,7 +29,7 @@ typedef struct _AstExpr {
 		AstExprAs as;
 		struct _AstExpr *array;
 		AstIdx idx;
-		Slice value;
+		AstValue value;
 		Slice str;
 		uint64_t integer;
 		char character;

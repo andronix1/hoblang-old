@@ -13,14 +13,14 @@ LLVMValueRef llvm_func_call(LlvmBackend *llvm, AstFuncCall *func_call) {
 	for (size_t i = 0; i < vec_len(func_call->args); i++) {
 		params[i] = llvm_expr(llvm, &func_call->args[i]);
 	}
-	return LLVMBuildCall2(llvm->builder, llvm_resolve_type_of(llvm, &func_call->name), llvm_resolve_value(llvm, &func_call->name), params, vec_len(func_call->args), "");
+	return LLVMBuildCall2(llvm->builder, llvm_resolve_type(func_call->value.sema_type), llvm_value(llvm, &func_call->value), params, vec_len(func_call->args), "");
 }
 
 LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 	switch (expr->type) {
 		case AST_EXPR_VALUE: {
-			LlvmValue *value = llvm_resolve(llvm, &expr->value);
-			return LLVMBuildLoad2(llvm->builder, value->type, value->value, "");
+			LLVMValueRef value = llvm_value(llvm, &expr->value);
+			return LLVMBuildLoad2(llvm->builder, llvm_resolve_type(expr->sema_type), value, "");
 		}
 		case AST_EXPR_INTEGER: return LLVMConstInt(LLVMInt32Type(), expr->integer, false);
 		case AST_EXPR_BOOL: return LLVMConstInt(LLVMInt1Type(), expr->boolean, false);

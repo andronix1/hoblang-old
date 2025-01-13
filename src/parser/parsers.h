@@ -13,3 +13,4 @@ bool parse_func_call_args(Parser *parser, AstFuncCall *func_call);
 AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType));
 bool parse_expr(Parser *parser, AstExpr *expr, bool (*stop)(TokenType));
 bool parse_type(Parser *parser, AstType *type);
+bool parse_value(Parser *parser, AstValue *value);

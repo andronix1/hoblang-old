@@ -5,11 +5,10 @@
 #include "exprs/int.c"
 #include "exprs/array.c"
 #include "exprs/idx.c"
-#include "exprs/value.c"
 
 SemaType *sema_ast_expr_type(Sema *sema, AstExpr *expr, SemaType *expectation) {
 	switch (expr->type) {
-		case AST_EXPR_VALUE: return expr->sema_type = sema_ast_expr_value(sema, &expr->value);
+		case AST_EXPR_VALUE: return expr->sema_type = sema_ast_value(sema, &expr->value);
 		case AST_EXPR_STR: return expr->sema_type = sema_type_new_pointer(&primitives[PRIMITIVE_U8]);
 		case AST_EXPR_CHAR: return expr->sema_type = &primitives[PRIMITIVE_U8];
 		case AST_EXPR_BOOL: return expr->sema_type = &primitives[PRIMITIVE_BOOL];

@@ -18,6 +18,18 @@ void print_ast_binop_type(FILE *stream, va_list *list) {
 	print_to(stream, strs[binop]);
 }
 
+void print_ast_value(FILE *stream, va_list *list) {
+	AstValue *value = va_arg(*list, AstValue*);
+	for (size_t i = 0; i < vec_len(value->segments); i++) {
+		AstValueSegment *seg = &value->segments[i];
+		switch (seg->type) {
+			case AST_VALUE_IDENT: print_to(stream, i == 0 ? "{slice}" : ".{slice}", &seg->ident); break;
+			case AST_VALUE_DEREF: print_to(stream, ".*"); break;
+			case AST_VALUE_REF: print_to(stream, ".&"); break;
+		}
+	}
+}
+
 void print_ast_expr(FILE *stream, va_list *list) {
 	AstExpr *expr = va_arg(*list, AstExpr*);
 	switch (expr->type) {
@@ -37,7 +49,7 @@ void print_ast_expr(FILE *stream, va_list *list) {
 			print_to(stream, "\"{slice}\"", &expr->str);
 			break;
 		case AST_EXPR_FUNCALL:
-			print_to(stream, "{slice}(", &expr->func_call.name);
+			print_to(stream, "{ast::val}(", &expr->func_call.value);
 			for (size_t i = 0; i < vec_len(expr->func_call.args); i++) {
 				if (i != 0) print_to(stream, ", ");
 				print_to(stream, "{ast::expr}", &expr->func_call.args[i]);
