@@ -12,7 +12,9 @@ typedef enum {
 	AST_BINOP_GT,
 	AST_BINOP_GE,
 	AST_BINOP_LT,
-	AST_BINOP_LE
+	AST_BINOP_LE,
+	AST_BINOP_AND,
+	AST_BINOP_OR,
 } AstBinopType;
 
 typedef struct {

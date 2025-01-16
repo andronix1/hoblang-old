@@ -65,6 +65,8 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 				case AST_BINOP_GE: return LLVMBuildICmp(llvm->builder, LLVMIntSGE, left, right, "");
 				case AST_BINOP_LT: return LLVMBuildICmp(llvm->builder, LLVMIntSLT, left, right, "");
 				case AST_BINOP_LE: return LLVMBuildICmp(llvm->builder, LLVMIntSLE, left, right, "");
+				case AST_BINOP_AND: return LLVMBuildAnd(llvm->builder, left, right, "");
+				case AST_BINOP_OR: return LLVMBuildOr(llvm->builder, left, right, "");
 			}
 			assert(0, "invalid binop {int}", expr->binop.type);
 			return NULL;

@@ -10,11 +10,7 @@ fun get_int(): i32 {
 	var res: i32 = 0;
 	var c: u8 = get_char();
 	while c != '\n' {
-		if c < '0' {
-			put_str("invalid character!\0");
-			exit(1);
-		}
-		if c > '9' {
+		if c < '0' || c > '9' {
 			put_str("invalid character!\0");
 			exit(1);
 		}
@@ -33,16 +29,15 @@ fun put_int(val: i32): void {
 		put_char('0');
 		return;
 	}
-	
 	var buf: *u8 = "\0\0\0\0\0\0\0\0\0\0\0\0";
-	var len = 12;
+	var len = 13;
 	var i = 0;
 	while val > 0 {
-		buf[len - i] = '0' + (val - (val / 10 * 10)) as u8;
+		buf[len - i - 1] = '0' + (val - (val / 10 * 10)) as u8;
 		i = i + 1;
 		val = val / 10;
 	}
-	printf(&buf[len - i + 1]);
+	printf(@buf[len - i]);
 }
 
 fun test_arr1(): void {
@@ -64,6 +59,7 @@ fun test_arr1(): void {
 fun main(): void {
 	put_str(['H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\0']);
 	put_str("Hello, world using strs!\0");
+	test_arr1();
 	test_arr1();
 	var sum: i32 = 0;
 	while true {

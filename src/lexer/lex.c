@@ -39,12 +39,14 @@ bool lex_next(Lexer *lexer) {
 	SYMBOL('+', TOKEN_ADD);
 	SYMBOL('-', TOKEN_MINUS);
 	SYMBOL('*', TOKEN_MULTIPLY);
-	SYMBOL('&', TOKEN_REF);
+	SYMBOL('@', TOKEN_REF);
 	SYMBOL('/', TOKEN_DIVIDE);
 	SYMBOL(':', TOKEN_COLON);
 	SYMBOL(';', TOKEN_SEMICOLON);
 	SYMBOL(',', TOKEN_COMMA);
 	SYMBOL('.', TOKEN_DOT);
+	SYMBOL_DUAL('|', '|', TOKEN_BITOR, TOKEN_OR);
+	SYMBOL_DUAL('&', '&', TOKEN_BITAND, TOKEN_AND);
 	SYMBOL_DUAL('=', '=', TOKEN_ASSIGN, TOKEN_EQUALS);
 	SYMBOL_DUAL('>', '=', TOKEN_GREATER, TOKEN_GREATER_OR_EQUALS);
 	SYMBOL_DUAL('<', '=', TOKEN_LESS, TOKEN_LESS_OR_EQUALS);
@@ -66,5 +68,6 @@ bool lex_next(Lexer *lexer) {
 	TOKEN_PARSE(lex_str(lexer));
 
 	lex_err("unknown token");
+	lexer_next_char(lexer);
 	return true;
 }

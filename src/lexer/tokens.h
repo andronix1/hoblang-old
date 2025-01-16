@@ -37,6 +37,11 @@ typedef enum {
     TOKEN_NOT,
     TOKEN_REF,
     TOKEN_DOT,
+    TOKEN_BITOR,
+    TOKEN_BITAND,
+
+    TOKEN_AND,
+    TOKEN_OR,
 
     TOKEN_EQUALS,
     TOKEN_NOT_EQUALS,

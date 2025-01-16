@@ -26,6 +26,10 @@ void print_int(FILE *stream, va_list *list) {
 	fprintf(stream, "%d", va_arg(*list, int));
 }
 
+void print_char(FILE *stream, va_list *list) {
+	fputc(va_arg(*list, int), stream);
+}
+
 void print_cstr(FILE *stream, va_list *list) {
 	fputs(va_arg(*list, const char*), stream);
 }
@@ -33,6 +37,7 @@ void print_cstr(FILE *stream, va_list *list) {
 void print_setup() {
 	print_init();
 	print_register(slice_from_cstr("cstr"), print_cstr);
+	print_register(slice_from_cstr("char"), print_char);
 	print_register(slice_from_cstr("int"), print_int);
 	print_register(slice_from_cstr("bool"), print_bool);
 	print_register(slice_from_cstr("long"), print_size);

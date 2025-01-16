@@ -12,6 +12,8 @@ void expr_push_down(AstExpr *expr) {
 		[AST_BINOP_GE]  = 0,
 		[AST_BINOP_LT]  = 0,
 		[AST_BINOP_LE]  = 0,
+		[AST_BINOP_OR]  = -1,
+		[AST_BINOP_AND] = -1,
 	};
 	
 	AstExpr *pr = expr->binop.left,
@@ -125,6 +127,8 @@ AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType)) {
 			case TOKEN_LESS_OR_EQUALS: PARSE_BINOP(AST_BINOP_LE); break;
 			case TOKEN_GREATER: PARSE_BINOP(AST_BINOP_GT); break;
 			case TOKEN_GREATER_OR_EQUALS: PARSE_BINOP(AST_BINOP_GE); break;
+			case TOKEN_OR: PARSE_BINOP(AST_BINOP_OR); break;
+			case TOKEN_AND: PARSE_BINOP(AST_BINOP_AND); break;
 			case TOKEN_OPENING_CIRCLE_BRACE:
 				if (!(current_expr = parse_expr_before(parser, token_closing_circle_brace_stop))) {
 					return NULL;
