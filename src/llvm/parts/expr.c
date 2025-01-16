@@ -44,7 +44,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 				[PRIMITIVE_BOOL] = 0,
 			};
 			if (level[expr->as.expr->sema_type->primitive] == level[expr->sema_type->primitive]) {
-				return value;
+				return LLVMBuildBitCast(llvm->builder, value, to_type, "");
 			}
 			if (level[expr->as.expr->sema_type->primitive] < level[expr->sema_type->primitive]) {
 				return LLVMBuildZExt(llvm->builder, value, to_type, "");
