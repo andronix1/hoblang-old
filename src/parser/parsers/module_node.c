@@ -48,6 +48,20 @@ bool parse_func_info(Parser *parser, AstFuncInfo *info) {
 bool parse_module_node(Parser *parser, AstModuleNode *node) {
 	parser_next_token(parser);
 	switch (token_type(parser->token)) {
+		case TOKEN_IMPORT:
+			parse_exp_next(TOKEN_STR, "file path");
+			node->type = AST_MODULE_NODE_IMPORT;
+			node->import.path.str = parser->token->str;
+			node->import.path.len = vec_len(parser->token->str);
+			parse_exp_next(TOKEN_SEMICOLON, "semicolon");
+			return true;
+		case TOKEN_USE:
+			node->type = AST_MODULE_NODE_IMPORT;
+			if (!parse_mod_path(parser, &node->use.path)) {
+				return false;
+			}
+			parse_exp_next(TOKEN_SEMICOLON, "semicolon");
+			return true;
 		case TOKEN_FUN:
 			node->type = AST_MODULE_NODE_FUNC;
 			return parse_func_decl(parser, &node->func_decl);

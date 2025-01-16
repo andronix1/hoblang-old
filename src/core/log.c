@@ -11,7 +11,8 @@ const char *log_level_str[] = {
 	[LOGD] = ANSI_BLUE   "debug"   ANSI_RESET,
 	[LOGI] = ANSI_GREEN  "info"    ANSI_RESET,
 	[LOGW] = ANSI_YELLOW "warning" ANSI_RESET,
-	[LOGE] = ANSI_RED    "error"   ANSI_RESET
+	[LOGE] = ANSI_RED    "error"   ANSI_RESET,
+	[LOGF] = ANSI_RED    "fatal"   ANSI_RESET,
 };
 
 void hob_log(LogLevel level, const char *fmt, ...) {

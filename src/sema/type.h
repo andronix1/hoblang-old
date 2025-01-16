@@ -1,5 +1,6 @@
 #pragma once
 
+#include <llvm-c/Core.h>
 #include <stdarg.h>
 #include "core/slice.h"
 #include "core/vec.h"
@@ -25,6 +26,9 @@ typedef enum {
 
 typedef struct _SemaType {
 	SemaTypeKind type;
+	union {
+		LLVMTypeRef llvm_type;
+	};
 	union {
 		Primitive primitive;
 		SemaFunction func;

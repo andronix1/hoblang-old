@@ -1,24 +1,22 @@
-void sema_stmt_var(Sema *sema, AstVar *var) {
-	SemaRecord decl = {
-		.name = var->name,
-	};
+void sema_stmt_var(SemaModule *sema, AstVar *var) {
+	SemaType *var_type;
 	if (var->typed) {
-		if (!(decl.type = sema_ast_type(sema, &var->type))) {
+		if (!(var_type = sema_ast_type(sema, &var->type))) {
 			return;
 		}
 		if (var->initializes) {
-			SemaType *type = sema_ast_expr_type(sema, &var->expr, decl.type);
+			SemaType *type = sema_ast_expr_type(sema, &var->expr, var_type);
 			if (!type) {
 				return;
 			}
-			if (!sema_types_equals(type, decl.type)) {
-				sema_err("cannot put {sema::type} in {sema::type} variable", type, &decl.type);
+			if (!sema_types_equals(type, var_type)) {
+				sema_err("cannot put {sema::type} in {sema::type} variable", type, &var_type);
 				return;
 			}
 		}
 	} else {
 		if (var->initializes) {
-			if (!(decl.type = sema_ast_expr_type(sema, &var->expr, NULL))) {
+			if (!(var_type = sema_ast_expr_type(sema, &var->expr, NULL))) {
 				return;
 			}
 			var->typed = true;
@@ -28,5 +26,5 @@ void sema_stmt_var(Sema *sema, AstVar *var) {
 			return;
 		}
 	}
-	sema_push_decl(sema, &decl);
+	var->decl = sema_push_decl(sema, var->name, var_type);
 }

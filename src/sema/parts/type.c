@@ -1,6 +1,6 @@
 #include "../parts.h"
 
-SemaType *sema_ast_type(Sema *sema, AstType *type) {
+SemaType *sema_ast_type(SemaModule *sema, AstType *type) {
 	if (type->sema) {
 		return type->sema;
 	}

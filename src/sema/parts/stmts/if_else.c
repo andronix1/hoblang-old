@@ -1,4 +1,4 @@
-void sema_if_else_body(Sema *sema, AstIfBody *if_body) {
+void sema_if_else_body(SemaModule *sema, AstIfBody *if_body) {
 	SemaType *type = sema_ast_expr_type(sema, &if_body->expr, &primitives[PRIMITIVE_BOOL]);
 	if (!type) {
 		return;
@@ -9,7 +9,7 @@ void sema_if_else_body(Sema *sema, AstIfBody *if_body) {
 	sema_ast_body(sema, if_body->body);
 }
 
-void sema_stmt_if_else(Sema *sema, AstIfElse *if_else) {
+void sema_stmt_if_else(SemaModule *sema, AstIfElse *if_else) {
 	sema_if_else_body(sema, &if_else->main);
 	for (size_t i = 0; i < vec_len(if_else->else_ifs); i++) {
 		sema_if_else_body(sema, &if_else->else_ifs[i]);

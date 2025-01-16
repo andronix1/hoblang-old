@@ -44,8 +44,9 @@ int main(int argc, char **argv) {
 			return 1;
 		}
 		hob_log(LOGD, "parsed successfully!");
-		Sema sema = sema_new();
-		sema_ast_module(&sema, &module);
+		SemaModule sema = sema_new_module(&module);
+		sema_module_read(&sema);
+		sema_module(&sema);
 		if (sema.failed) {
 			return 1;
 		}

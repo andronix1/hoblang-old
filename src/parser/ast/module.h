@@ -3,7 +3,7 @@
 #include "core/vec.h"
 #include "module_node.h"
 
-typedef struct {
+typedef struct _AstModule {
 	Slice name;
 	AstModuleNode *nodes;
 } AstModule;

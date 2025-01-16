@@ -1,4 +1,4 @@
-void sema_stmt_return(Sema *sema, AstReturn *ret) {
+void sema_stmt_return(SemaModule *sema, AstReturn *ret) {
 	if (ret->has_value) {
 		SemaType *type = sema_ast_expr_type(sema, &ret->expr, sema->returning);
 		if (!type) {

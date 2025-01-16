@@ -2,7 +2,6 @@
 
 bool llvm_init(LlvmBackend *llvm) {
 	llvm->builder = LLVMCreateBuilder();
-	llvm->scopes = vec_new(LlvmScope);
 	return true;	
 }
 
@@ -31,25 +30,6 @@ LLVMTypeRef llvm_resolve_type(SemaType *type) {
 		}
 	}
 	assert(0, "invalid type {int}", type->type);
-}
-
-LlvmValue *llvm_resolve(LlvmBackend *llvm, Slice *name) {
-	for (size_t i = 0; i < vec_len(llvm->scopes); i++) {
-		for (size_t j = 0; j < vec_len(llvm->scopes[i]); j++) {
-			if (slice_eq(name, llvm->scopes[i][j].name)) {
-				return &llvm->scopes[i][j];
-			}
-		}
-	}
-	assert(0, "value `{slice}` wasn't registered", name);
-}
-
-LLVMTypeRef llvm_resolve_type_of(LlvmBackend *llvm, Slice *name) {
-	return llvm_resolve(llvm, name)->type;
-}
-
-LLVMValueRef llvm_resolve_value(LlvmBackend *llvm, Slice *name) {
-	return llvm_resolve(llvm, name)->value;
 }
 
 bool llvm_write_module_ir(LlvmBackend *llvm, char *output_path) {
@@ -95,18 +75,4 @@ bool llvm_write_module(LlvmBackend *llvm, char *output_path) {
 		return false;
 	}
 	return true;
-}
-
-void llvm_push_value(LlvmBackend *llvm, LlvmValue *value) {
-	LlvmScope *scope = vec_top(llvm->scopes);
-	*scope = vec_push(*scope, value);
-}
-
-void llvm_pop_scope(LlvmBackend *llvm) {
-	vec_pop(llvm->scopes);
-}
-
-void llvm_push_scope(LlvmBackend *llvm) {
-	LlvmScope scope = vec_new(LlvmValue);
-	llvm->scopes = vec_push(llvm->scopes, &scope);
 }

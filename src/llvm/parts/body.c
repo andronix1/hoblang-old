@@ -7,7 +7,6 @@ void llvm_stmt_var(LlvmBackend *llvm, AstVar *var);
 void llvm_stmt_while(LlvmBackend *llvm, AstWhile *while_loop);
 
 bool llvm_body(LlvmBackend *llvm, AstBody *body) {
-	llvm_push_scope(llvm);
 	for (size_t i = 0; i < vec_len(body->stmts); i++) {
 		AstStmt *stmt = &body->stmts[i];
 		switch (stmt->type) {
@@ -19,6 +18,5 @@ bool llvm_body(LlvmBackend *llvm, AstBody *body) {
 			case AST_STMT_ASSIGN: llvm_stmt_assign(llvm, &stmt->assign); break;
 		}
 	}
-	llvm_pop_scope(llvm);
 	return true;
 }

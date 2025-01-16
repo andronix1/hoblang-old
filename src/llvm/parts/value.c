@@ -2,7 +2,7 @@
 
 LLVMValueRef llvm_value(LlvmBackend *llvm, AstValue *value) {
 	assert(value->segments[0].type == AST_VALUE_IDENT, "value must be started from ident segment");
-	LLVMValueRef val = llvm_resolve_value(llvm, &value->segments[0].ident);
+	LLVMValueRef val = value->decl->llvm_value;
 	for (size_t i = 1; i < vec_len(value->segments); i++) {
 		AstValueSegment *seg = &value->segments[i];
 		switch (seg->type) {

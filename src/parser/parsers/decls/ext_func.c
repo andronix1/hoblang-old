@@ -9,5 +9,6 @@ bool parse_ext_func_decl(Parser *parser, AstExtFuncDecl *info) {
 	if (!parse_func_info(parser, &info->info)) {
 		return false;
 	}
+	info->info.public_name = info->ext_name;
 	return true;
 }

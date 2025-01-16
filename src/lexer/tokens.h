@@ -9,6 +9,8 @@
 typedef enum { 
 	TOKEN_FUN,
 	TOKEN_MODULE,
+	TOKEN_IMPORT,
+	TOKEN_USE,
 	TOKEN_WHILE,
     TOKEN_VAR,
     TOKEN_RETURN,
@@ -19,6 +21,7 @@ typedef enum {
     TOKEN_ELSE,
 
     TOKEN_COLON,
+    TOKEN_DOUBLE_COLON,
     TOKEN_COMMA,
     TOKEN_SEMICOLON,
     TOKEN_ASSIGN,

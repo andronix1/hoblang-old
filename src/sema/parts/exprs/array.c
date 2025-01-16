@@ -1,4 +1,4 @@
-SemaType *sema_ast_expr_array(Sema *sema, AstExpr *array, SemaType *expectation) {
+SemaType *sema_ast_expr_array(SemaModule *sema, AstExpr *array, SemaType *expectation) {
 	SemaType *expect;
 	if (vec_len(array) > 0) {
 		if (!(expect = sema_ast_expr_type(sema, &array[0], expectation))) {

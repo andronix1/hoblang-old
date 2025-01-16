@@ -1,4 +1,4 @@
-void sema_stmt_while_loop(Sema *sema, AstWhile *while_loop) {
+void sema_stmt_while_loop(SemaModule *sema, AstWhile *while_loop) {
 	SemaType *type = sema_ast_expr_type(sema, &while_loop->expr, &primitives[PRIMITIVE_BOOL]);
 	if (!type) {
 		return;

@@ -15,6 +15,8 @@ void print_token(FILE *stream, va_list *list) {
     	case TOKEN_EXTERN: fprintf(stream, "extern"); return;
     	case TOKEN_RETURN: fprintf(stream, "return"); return;
     	case TOKEN_MODULE: fprintf(stream, "module"); return;
+    	case TOKEN_IMPORT: fprintf(stream, "import"); return;
+    	case TOKEN_USE: fprintf(stream, "use"); return;
     	case TOKEN_AS: fprintf(stream, "as"); return;
     	case TOKEN_FUN: fprintf(stream, "fun"); return;
     	case TOKEN_VAR: fprintf(stream, "var"); return;
@@ -24,6 +26,7 @@ void print_token(FILE *stream, va_list *list) {
     	case TOKEN_TRUE: fprintf(stream, "true"); return;
     	case TOKEN_FALSE: fprintf(stream, "false"); return;
 		case TOKEN_COLON: fprintf(stream, ":"); return;
+		case TOKEN_DOUBLE_COLON: fprintf(stream, "::"); return;
     	case TOKEN_COMMA: fprintf(stream, ","); return;
     	case TOKEN_SEMICOLON: fprintf(stream, ";"); return;
     	case TOKEN_ASSIGN: fprintf(stream, "="); return;

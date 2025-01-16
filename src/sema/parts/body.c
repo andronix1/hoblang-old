@@ -5,7 +5,7 @@
 #include "stmts/var.c"
 #include "stmts/while.c"
 
-void sema_ast_body(Sema *sema, AstBody *body) {
+void sema_ast_body(SemaModule *sema, AstBody *body) {
 	for (size_t i = 0; i < vec_len(body->stmts); i++) {
 		AstStmt *stmt = &body->stmts[i];
 		switch (stmt->type) {

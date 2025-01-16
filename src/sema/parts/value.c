@@ -1,12 +1,13 @@
 #include "../parts.h"
 
-SemaType *sema_ast_value(Sema *sema, AstValue *value) {
+SemaType *sema_ast_value(SemaModule *sema, AstValue *value) {
 	assert(vec_len(value->segments) > 0, "no segments in value");
-	SemaType *type = sema_resolve_decl_type(sema, &value->segments[0].ident);
-	if (!type) {
+	value->decl = sema_resolve_value_decl(sema, &value->segments[0].ident);
+	if (!value->decl) {
 		sema_err("{slice} is undeclared!", &value->segments[0].ident);
 		return NULL;
-	}
+	}	
+	SemaType *type = value->decl->type;
 	value->sema_type = value->segments[0].sema_type = type;
 	for (size_t i = 1; i < vec_len(value->segments); i++) {
 		AstValueSegment *seg = &value->segments[i];

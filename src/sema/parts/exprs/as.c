@@ -1,4 +1,4 @@
-SemaType *sema_ast_expr_as(Sema *sema, AstExprAs *as) {
+SemaType *sema_ast_expr_as(SemaModule *sema, AstExprAs *as) {
 	SemaType *as_type = sema_ast_type(sema, &as->type);
 	if (!as_type) {
 		return NULL;

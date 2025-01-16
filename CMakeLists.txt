@@ -32,6 +32,7 @@ set(SOURCE_FILES
 	src/parser/parsers/value.c
 	src/parser/parsers/func_call.c
 	src/parser/parsers/expr.c
+	src/parser/parsers/mod_path.c
 	src/parser/parsers/body.c
 
 	src/sema/sema.c

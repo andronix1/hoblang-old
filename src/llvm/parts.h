@@ -2,6 +2,7 @@
 
 #include "llvm.h"
 #include "sema/type.h"
+#include "sema/sema.h"
 
 void llvm_module(LlvmBackend *llvm, AstModule *module);
 bool llvm_body(LlvmBackend *llvm, AstBody *body);

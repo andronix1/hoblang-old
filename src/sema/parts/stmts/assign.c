@@ -1,4 +1,4 @@
-void sema_stmt_assign(Sema *sema, AstAssign *assign) {
+void sema_stmt_assign(SemaModule *sema, AstAssign *assign) {
 	SemaType *decl_type = sema_ast_value(sema, &assign->value);
 	if (!decl_type) {
 		return;

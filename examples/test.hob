@@ -1,5 +1,8 @@
 module main;
 
+# import "std.hob";
+# use std::hob;
+
 extern(exit) fun exit(status: i32): void
 extern(putchar) fun put_char(c: u8): void
 extern(getchar) fun get_char(): u8

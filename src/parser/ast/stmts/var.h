@@ -8,4 +8,6 @@ typedef struct {
 	AstType type;
 	AstExpr expr;
 	bool initializes, typed;
+	
+	struct _SemaValueDecl *decl;
 } AstVar;

@@ -5,7 +5,7 @@
 #include "exprs/int.c"
 #include "exprs/array.c"
 
-SemaType *sema_ast_expr_type(Sema *sema, AstExpr *expr, SemaType *expectation) {
+SemaType *sema_ast_expr_type(SemaModule *sema, AstExpr *expr, SemaType *expectation) {
 	switch (expr->type) {
 		case AST_EXPR_VALUE: return expr->sema_type = sema_ast_value(sema, &expr->value);
 		case AST_EXPR_REF: {

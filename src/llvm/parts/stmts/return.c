@@ -6,5 +6,4 @@ void llvm_stmt_return(LlvmBackend *llvm, AstReturn *ret) {
 	} else {
 		LLVMBuildRetVoid(llvm->builder);
 	}
-	llvm_pop_scope(llvm);
 }
