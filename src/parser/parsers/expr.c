@@ -117,6 +117,14 @@ AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType)) {
 				}
 				break;
 			}
+			case TOKEN_NOT: {
+				current_expr->type = AST_EXPR_NOT;
+				if (!(current_expr->not_expr = parse_expr_before(parser, stop))) {
+					return NULL;
+				}
+				parser->skip_next = true;
+				break;
+			}
 			case TOKEN_ADD: PARSE_BINOP(AST_BINOP_ADD); break;
 			case TOKEN_MINUS: PARSE_BINOP(AST_BINOP_SUB); break;
 			case TOKEN_MULTIPLY: PARSE_BINOP(AST_BINOP_MUL); break;

@@ -60,11 +60,7 @@ fun test_arr1(): void {
 }
 
 fun toggle(what: *bool): void {
-	if what.* { # TODO: not operator
-		what.* = false;
-	} else {
-		what.* = true;
-	}
+	what.* = !what.*;
 }
 
 fun main(): void {
@@ -72,6 +68,13 @@ fun main(): void {
 	put_str("Hello, world using strs!\0");
 	test_arr1();
 	var ball: bool = true;
+	toggle(@ball);
+	if ball {
+		put_str("oops! was not toggled!\0");
+		return;
+	} else {
+		put_str("wow! boolean was toggled by reference!\0");
+	}
 	var sum: i32 = 0;
 	while true {
 		put_char('>');

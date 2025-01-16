@@ -18,6 +18,7 @@ LLVMValueRef llvm_func_call(LlvmBackend *llvm, AstFuncCall *func_call) {
 
 LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 	switch (expr->type) {
+		case AST_EXPR_NOT: return LLVMBuildNot(llvm->builder, llvm_expr(llvm, expr->not_expr), "");
 		case AST_EXPR_VALUE: return LLVMBuildLoad2(llvm->builder, llvm_resolve_type(expr->sema_type), llvm_value(llvm, &expr->value), "");
 		case AST_EXPR_REF: return llvm_value(llvm, &expr->value);
 		case AST_EXPR_INTEGER: return LLVMConstInt(LLVMInt32Type(), expr->integer, false);

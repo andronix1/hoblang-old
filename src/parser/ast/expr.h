@@ -12,6 +12,7 @@ typedef enum {
 	AST_EXPR_STR,
 	AST_EXPR_BOOL,
 	AST_EXPR_FUNCALL,
+	AST_EXPR_NOT,
 	AST_EXPR_REF,
 	AST_EXPR_AS,
 	AST_EXPR_BINOP,
@@ -27,6 +28,7 @@ typedef struct _AstExpr {
 		AstFuncCall func_call;
 		AstExprAs as;
 		struct _AstExpr *array;
+		struct _AstExpr *not_expr;
 		AstValue value;
 		Slice str;
 		uint64_t integer;
