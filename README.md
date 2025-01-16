@@ -11,4 +11,4 @@ cmake --build ./
 ./hoblang compile <source> <output>
 ```
 ## Syntax
-look in examples :P
+look examples :P
