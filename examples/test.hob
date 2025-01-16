@@ -1,37 +1,27 @@
 module main;
 
+extern(exit) fun exit(status: i32): void
 extern(putchar) fun put_char(c: u8): void
 extern(getchar) fun get_char(): u8
 extern(puts) fun put_str(str: *u8): void
+extern(printf) fun printf(str: *u8): void
 
 fun get_int(): i32 {
 	var res: i32 = 0;
 	var c: u8 = get_char();
 	while c != '\n' {
+		if c < '0' {
+			put_str("invalid character!\0");
+			exit(1);
+		}
+		if c > '9' {
+			put_str("invalid character!\0");
+			exit(1);
+		}
 		res = res * 10 + (c - '0') as i32;
 		c = get_char();
 	}
 	return res;
-}
-
-fun int_len(val: i32): i32 {
-	if val == 0 {
-		return 1;
-	}
-	var len: i32 = 0;
-	while val > 0 {
-		len = len + 1;
-		val = val / 10;
-	}
-	return len;
-}
-
-fun int_at(val: i32, at: i32): u8 {
-	while at > 0 {
-		at = at - 1;
-		val = val / 10;
-	}
-	return (val - (val / (10 as i32) * 10 as i32)) as u8;
 }
 
 fun put_int(val: i32): void {
@@ -39,12 +29,20 @@ fun put_int(val: i32): void {
 		val = 0 - val; # TODO: unary
 		put_char('-');
 	}
-	
-	var len: i32 = int_len(val) - 1;
-	while len >= 0 {
-		put_char('0' + int_at(val, len));
-		len = len - 1;
+	if (val == 0) {
+		put_char('0');
+		return;
 	}
+	
+	var buf: *u8 = "\0\0\0\0\0\0\0\0\0\0\0\0";
+	var len = 12;
+	var i = 0;
+	while val > 0 {
+		buf[len - i] = '0' + (val - (val / 10 * 10)) as u8;
+		i = i + 1;
+		val = val / 10;
+	}
+	printf(&buf[len - i + 1]);
 }
 
 fun test_arr1(): void {

@@ -92,7 +92,7 @@ AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType)) {
 				AstValue value;
 				parser->skip_next = true;
 				if (!parse_value(parser, &value)) {
-					return false;
+					return NULL;
 				}
 				parser_next_token(parser);
 				if (token_type(parser->token) != TOKEN_OPENING_CIRCLE_BRACE) {
@@ -104,7 +104,14 @@ AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType)) {
 				current_expr->type = AST_EXPR_FUNCALL;
 				current_expr->func_call.value = value;
 				if (!parse_func_call_args(parser, &current_expr->func_call)) {
-					return false;
+					return NULL;
+				}
+				break;
+			}
+			case TOKEN_REF: {
+				current_expr->type = AST_EXPR_REF;
+				if (!parse_value(parser, &current_expr->value)) {
+					return NULL;
 				}
 				break;
 			}
@@ -129,7 +136,7 @@ AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType)) {
 				while (token_type(parser->token) != TOKEN_CLOSING_SQUARE_BRACE) {
 					AstExpr *expr = parse_expr_before(parser, token_array_arg_stop);
 					if (!expr) {
-						return false;
+						return NULL;
 					}
 					current_expr->array = vec_push(current_expr->array, expr);
 				}
@@ -151,16 +158,6 @@ AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType)) {
 				if (!parse_type(parser, &current_expr->as.type)) {
 					return NULL;
 				}
-				break;
-			}
-			case TOKEN_OPENING_SQUARE_BRACE: {
-				AstExpr *expr = malloc(sizeof(AstExpr));
-				expr->type = AST_EXPR_IDX;
-				expr->idx.expr = current_expr;
-				if (!(expr->idx.idx = parse_expr_before(parser, token_slice_at_stop))) {
-					return NULL;
-				}
-				current_expr = expr;
 				break;
 			}
 			default:

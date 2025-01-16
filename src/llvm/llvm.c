@@ -1,28 +1,6 @@
 #include "llvm.h"
 
 bool llvm_init(LlvmBackend *llvm) {
-	LLVMInitializeNativeTarget();
-	LLVMInitializeNativeAsmPrinter();
-
-	LLVMTargetRef target = LLVMGetFirstTarget();
-	// const char *target_name = "aarch64";
-	//LLVMTargetRef target = LLVMGetTargetFromName(target_name);
-	if (!target) {
-		hob_log(LOGE, "failed to initialize target");
-		return false;
-	}
-	const char *features = LLVMGetHostCPUFeatures();
-	const char *cpu = LLVMGetHostCPUName();
-	const char *triple = LLVMGetDefaultTargetTriple();
-	hob_log(LOGD, "target: {cstr} - {cstr}", LLVMGetTargetName(target), LLVMGetTargetDescription(target));
-	hob_log(LOGD, "triple: {cstr}", triple);
-	hob_log(LOGD, "with features {cstr}", features);
-	hob_log(LOGD, "cpu: {cstr}", cpu);
-	llvm->machine = LLVMCreateTargetMachine(target, triple, cpu, features, LLVMCodeGenLevelNone, LLVMRelocDefault, LLVMCodeModelDefault);
-	if (!llvm->machine) {
-		hob_log(LOGE, "failed to create target machine");
-		return false;
-	}
 	llvm->builder = LLVMCreateBuilder();
 	llvm->scopes = vec_new(LlvmScope);
 	return true;	
@@ -74,8 +52,43 @@ LLVMValueRef llvm_resolve_value(LlvmBackend *llvm, Slice *name) {
 	return llvm_resolve(llvm, name)->value;
 }
 
+bool llvm_write_module_ir(LlvmBackend *llvm, char *output_path) {
+	char *error;	
+	if (LLVMPrintModuleToFile(llvm->module, output_path, &error) == 1) {
+		hob_log(LOGE, "failed to emit to file: %s", error);
+		return false;
+	}
+	return true;
+}
+
 bool llvm_write_module(LlvmBackend *llvm, char *output_path) {
-	// LLVMDumpModule(llvm->module);
+	if (LLVMVerifyModule(llvm->module, LLVMAbortProcessAction | LLVMPrintMessageAction | LLVMReturnStatusAction, NULL)) {
+		llvm_write_module_ir(llvm, "dump.ll");
+		exit(1);
+	}
+
+	LLVMInitializeNativeTarget();
+	LLVMInitializeNativeAsmPrinter();
+
+	LLVMTargetRef target = LLVMGetFirstTarget();
+	// const char *target_name = "aarch64";
+	//LLVMTargetRef target = LLVMGetTargetFromName(target_name);
+	if (!target) {
+		hob_log(LOGE, "failed to initialize target");
+		return false;
+	}
+	const char *features = LLVMGetHostCPUFeatures();
+	const char *cpu = LLVMGetHostCPUName();
+	const char *triple = LLVMGetDefaultTargetTriple();
+	hob_log(LOGD, "target: {cstr} - {cstr}", LLVMGetTargetName(target), LLVMGetTargetDescription(target));
+	hob_log(LOGD, "triple: {cstr}", triple);
+	hob_log(LOGD, "with features {cstr}", features);
+	hob_log(LOGD, "cpu: {cstr}", cpu);
+	llvm->machine = LLVMCreateTargetMachine(target, triple, cpu, features, LLVMCodeGenLevelNone, LLVMRelocDefault, LLVMCodeModelDefault);
+	if (!llvm->machine) {
+		hob_log(LOGE, "failed to create target machine");
+		return false;
+	}
 	char *error;
 	if (LLVMTargetMachineEmitToFile(llvm->machine, llvm->module, output_path, LLVMObjectFile, &error) == 1) {
 		hob_log(LOGE, "failed to emit to file: %s", error);

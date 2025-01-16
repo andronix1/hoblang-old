@@ -2,6 +2,7 @@
 
 #include <llvm-c/Core.h>
 #include <llvm-c/TargetMachine.h>
+#include <llvm-c/Analysis.h>
 #include "core/log.h"
 #include "core/assert.h"
 #include "parser/ast.h"
@@ -29,6 +30,7 @@ LLVMTypeRef llvm_resolve_type_of(LlvmBackend *llvm, Slice *name);
 LLVMValueRef llvm_resolve_value(LlvmBackend *llvm, Slice *name);
 LLVMTypeRef llvm_resolve_type(SemaType *type);
 bool llvm_write_module(LlvmBackend *llvm, char *output_path);
+bool llvm_write_module_ir(LlvmBackend *llvm, char *output_path);
 void llvm_push_value(LlvmBackend *llvm, LlvmValue *value);
 void llvm_pop_scope(LlvmBackend *llvm);
 void llvm_push_scope(LlvmBackend *llvm);

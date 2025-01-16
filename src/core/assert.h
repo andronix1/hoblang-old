@@ -7,7 +7,7 @@
 #define assert(ok, fmt, ...) \
 	do { \
 		if (!(ok)) { \
-			hob_log(LOGE, fmt, ##__VA_ARGS__); \
+			hob_log(LOGE, "assertion error(" __FILE__ "): " fmt, ##__VA_ARGS__); \
 			exit(1); \
 		} \
 	} while (0)

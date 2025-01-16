@@ -2,7 +2,7 @@
 
 typedef enum {
 	AST_VALUE_IDENT,
-	AST_VALUE_REF,
+	AST_VALUE_IDX,
 	AST_VALUE_DEREF
 } AstValueType;
 
@@ -13,6 +13,7 @@ typedef struct {
 	AstValueType type;
 	union {
 		Slice ident;
+		struct _AstExpr *idx;
 	};
 } AstValueSegment;
 

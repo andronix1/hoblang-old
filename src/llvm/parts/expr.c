@@ -18,23 +18,39 @@ LLVMValueRef llvm_func_call(LlvmBackend *llvm, AstFuncCall *func_call) {
 
 LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 	switch (expr->type) {
-		case AST_EXPR_VALUE: {
-			LLVMValueRef value = llvm_value(llvm, &expr->value);
-			return LLVMBuildLoad2(llvm->builder, llvm_resolve_type(expr->sema_type), value, "");
-		}
+		case AST_EXPR_VALUE: return LLVMBuildLoad2(llvm->builder, llvm_resolve_type(expr->sema_type), llvm_value(llvm, &expr->value), "");
+		case AST_EXPR_REF: return llvm_value(llvm, &expr->value);
 		case AST_EXPR_INTEGER: return LLVMConstInt(LLVMInt32Type(), expr->integer, false);
 		case AST_EXPR_BOOL: return LLVMConstInt(LLVMInt1Type(), expr->boolean, false);
 		case AST_EXPR_CHAR: return LLVMConstInt(LLVMInt8Type(), expr->character, false);
 		case AST_EXPR_STR: {
-			LLVMValueRef value = LLVMBuildAlloca(llvm->builder, LLVMArrayType(LLVMInt8Type(), expr->str.len), "");
+			LLVMTypeRef type = LLVMArrayType(LLVMInt8Type(), expr->str.len);
+			LLVMValueRef value = LLVMBuildAlloca(llvm->builder, type, "");
 			LLVMBuildStore(llvm->builder, LLVMConstString(expr->str.str, expr->str.len, true), value);
-			return value;
+			return LLVMBuildBitCast(llvm->builder, value, LLVMPointerType(LLVMInt8Type(), 0), "");
 		}
 		case AST_EXPR_AS: {
 			LLVMTypeRef to_type = llvm_resolve_type(expr->as.type.sema);
-			return LLVMBuildZExt(llvm->builder, LLVMBuildTrunc(llvm->builder, llvm_expr(llvm, expr->as.expr), to_type, ""), to_type, ""); // TODO: check possibility at sema 
+			LLVMValueRef value = llvm_expr(llvm, expr->as.expr);
+			int level[] = {
+				[PRIMITIVE_I8] = 1,
+				[PRIMITIVE_U8] = 1,
+				[PRIMITIVE_I16] = 2,
+				[PRIMITIVE_U16] = 2,
+				[PRIMITIVE_I32] = 3,
+				[PRIMITIVE_U32] = 3,
+				[PRIMITIVE_I64] = 4,
+				[PRIMITIVE_U64] = 4,
+				[PRIMITIVE_BOOL] = 0,
+			};
+			if (level[expr->as.expr->sema_type->primitive] == level[expr->sema_type->primitive]) {
+				return value;
+			}
+			if (level[expr->as.expr->sema_type->primitive] < level[expr->sema_type->primitive]) {
+				return LLVMBuildZExt(llvm->builder, value, to_type, "");
+			}
+			return LLVMBuildTrunc(llvm->builder, value, to_type, ""); // TODO: check possibility at sema 
 		}
-			//case AST_EXPR_AS: return llvm_expr(llvm, expr->as.expr);
 		case AST_EXPR_BINOP: {
 			LLVMValueRef right = llvm_expr(llvm, expr->binop.right);
 			LLVMValueRef left = llvm_expr(llvm, expr->binop.left);
@@ -53,33 +69,17 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 			assert(0, "invalid binop {int}", expr->binop.type);
 			return NULL;
 		}
-		case AST_EXPR_FUNCALL: return llvm_func_call(llvm, &expr->func_call);
-		case AST_EXPR_IDX: {
-			LLVMValueRef indices[] = {
-				llvm_expr(llvm, expr->idx.idx),
-			};
-			return LLVMBuildLoad2(
-				llvm->builder,
-				llvm_resolve_type(expr->sema_type),
-				LLVMBuildGEP2(
-					llvm->builder,
-					llvm_resolve_type(expr->sema_type),
-					llvm_expr(llvm, expr->idx.expr),
-					indices, 1,
-					""
-				), 
-				""
-			);
-		}
+		case AST_EXPR_FUNCALL: return llvm_func_call(llvm, &expr->func_call);	
 		case AST_EXPR_ARRAY: {
 			LLVMTypeRef ptr_to = llvm_resolve_type(expr->sema_type->ptr_to);
-			LLVMValueRef value = LLVMBuildAlloca(llvm->builder, LLVMArrayType(ptr_to, vec_len(expr->array)), "");
+			LLVMTypeRef type = LLVMArrayType(ptr_to, vec_len(expr->array));
+			LLVMValueRef value = LLVMBuildAlloca(llvm->builder, type, "");
 			LLVMValueRef *vals = alloca(sizeof(LLVMValueRef) * vec_len(expr->array));
 			for (size_t i = 0; i < vec_len(expr->array); i++) {
 				vals[i] = llvm_expr(llvm, &expr->array[i]);
 			}
 			LLVMBuildStore(llvm->builder, LLVMConstArray(ptr_to, vals, vec_len(expr->array)), value);
-			return value;
+			return LLVMBuildBitCast(llvm->builder, value, LLVMPointerType(ptr_to, 0), "");
 		}
 	}
 	assert(0, "invalid expr {int}", expr->type);

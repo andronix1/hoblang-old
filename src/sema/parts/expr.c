@@ -4,15 +4,20 @@
 #include "exprs/binop.c"
 #include "exprs/int.c"
 #include "exprs/array.c"
-#include "exprs/idx.c"
 
 SemaType *sema_ast_expr_type(Sema *sema, AstExpr *expr, SemaType *expectation) {
 	switch (expr->type) {
 		case AST_EXPR_VALUE: return expr->sema_type = sema_ast_value(sema, &expr->value);
+		case AST_EXPR_REF: {
+			expr->sema_type = sema_ast_value(sema, &expr->value);
+			if (!expr->sema_type) {
+				return NULL;
+			}
+			return expr->sema_type = sema_type_new_pointer(expr->sema_type);
+		}
 		case AST_EXPR_STR: return expr->sema_type = sema_type_new_pointer(&primitives[PRIMITIVE_U8]);
 		case AST_EXPR_CHAR: return expr->sema_type = &primitives[PRIMITIVE_U8];
 		case AST_EXPR_BOOL: return expr->sema_type = &primitives[PRIMITIVE_BOOL];
-		case AST_EXPR_IDX: return expr->sema_type = sema_ast_expr_idx(sema, &expr->idx, expectation);
 		case AST_EXPR_ARRAY: return expr->sema_type = sema_ast_expr_array(sema, expr->array, expectation);
 		case AST_EXPR_INTEGER: return expr->sema_type = sema_ast_expr_int(sema, expr->integer, expectation);
 		case AST_EXPR_BINOP: return expr->sema_type = sema_ast_expr_binop(sema, &expr->binop, expectation);

@@ -13,19 +13,29 @@ bool parse_value(Parser *parser, AstValue *value) {
 			case TOKEN_MULTIPLY:
 				segment.type = AST_VALUE_DEREF;
 				break;
-			case TOKEN_REF:
-				segment.type = AST_VALUE_REF;
-				break;
 			default:
 				parse_err("expected value got {tok}", parser->token);
 				return false;
 		}
 		value->segments = vec_push(value->segments, &segment);
-		parser_next_token(parser);
-		if (token_type(parser->token) != TOKEN_DOT) {
-			value->sema_type = segment.sema_type;
-			parser->skip_next = true;
-			return true;
+		bool next = false;
+		while (!next) {
+			parser_next_token(parser);
+			switch (token_type(parser->token)) {
+				case TOKEN_DOT: next = true; break;
+				case TOKEN_OPENING_SQUARE_BRACE: {
+					AstValueSegment idx_seg;
+					idx_seg.type = AST_VALUE_IDX;
+					if (!(idx_seg.idx = parse_expr_before(parser, token_idx_stop))) {
+						return false;
+					}
+					value->segments = vec_push(value->segments, &idx_seg);
+					break;
+				}
+				default:
+					parser->skip_next = true;
+					return true;
+			}
 		}
 	}
 }

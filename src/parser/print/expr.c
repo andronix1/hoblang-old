@@ -25,7 +25,7 @@ void print_ast_value(FILE *stream, va_list *list) {
 		switch (seg->type) {
 			case AST_VALUE_IDENT: print_to(stream, i == 0 ? "{slice}" : ".{slice}", &seg->ident); break;
 			case AST_VALUE_DEREF: print_to(stream, ".*"); break;
-			case AST_VALUE_REF: print_to(stream, ".&"); break;
+			case AST_VALUE_IDX: print_to(stream, "[{ast::expr}]", seg->idx); break;
 		}
 	}
 }
@@ -33,7 +33,8 @@ void print_ast_value(FILE *stream, va_list *list) {
 void print_ast_expr(FILE *stream, va_list *list) {
 	AstExpr *expr = va_arg(*list, AstExpr*);
 	switch (expr->type) {
-		case AST_EXPR_VALUE: print_to(stream, "{slice}", &expr->value); break;
+		case AST_EXPR_REF: print_to(stream, "&{ast::val}", &expr->value); break;
+		case AST_EXPR_VALUE: print_to(stream, "{ast::val}", &expr->value); break;
 		case AST_EXPR_INTEGER: print_to(stream, "{long}", expr->integer); break;
 		case AST_EXPR_CHAR: fprintf(stream, "'%c'", expr->character); break;
 		case AST_EXPR_BOOL: print_to(stream, "{bool}", &expr->boolean); break;
@@ -55,9 +56,6 @@ void print_ast_expr(FILE *stream, va_list *list) {
 				print_to(stream, "{ast::expr}", &expr->func_call.args[i]);
 			}
 			print_to(stream, ")");
-			break;
-		case AST_EXPR_IDX:
-			print_to(stream, "{ast::expr}[{ast::expr}]", expr->idx.expr, expr->idx.idx);
 			break;
 		case AST_EXPR_AS:
 			print_to(stream, "{ast::expr} as {ast::type}", expr->as.expr, &expr->as.type);

@@ -45,6 +45,11 @@ set(SOURCE_FILES
 	src/llvm/llvm.c
 	src/llvm/parts/module.c
 	src/llvm/parts/body.c
+	src/llvm/parts/stmts/assign.c
+	src/llvm/parts/stmts/if.c
+	src/llvm/parts/stmts/return.c
+	src/llvm/parts/stmts/var.c
+	src/llvm/parts/stmts/while.c
 	src/llvm/parts/expr.c
 	src/llvm/parts/value.c
 )

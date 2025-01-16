@@ -4,7 +4,6 @@
 #include "expr/as.h"
 #include "expr/binop.h"
 #include "expr/func_call.h"
-#include "expr/idx.h"
 
 typedef enum {
 	AST_EXPR_VALUE,
@@ -13,10 +12,10 @@ typedef enum {
 	AST_EXPR_STR,
 	AST_EXPR_BOOL,
 	AST_EXPR_FUNCALL,
+	AST_EXPR_REF,
 	AST_EXPR_AS,
 	AST_EXPR_BINOP,
 	AST_EXPR_ARRAY,
-	AST_EXPR_IDX,
 } AstExprType;
 
 struct _SemaType;
@@ -28,7 +27,6 @@ typedef struct _AstExpr {
 		AstFuncCall func_call;
 		AstExprAs as;
 		struct _AstExpr *array;
-		AstIdx idx;
 		AstValue value;
 		Slice str;
 		uint64_t integer;

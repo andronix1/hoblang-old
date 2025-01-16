@@ -39,7 +39,8 @@ int main(int argc, char **argv) {
 			return 1;
 		}
 		AstModule module;
-		if (!parse_module(&parser, &module) || lexer.failed) {
+		parse_module(&parser, &module);
+		if (lexer.failed || parser.failed) {
 			return 1;
 		}
 		hob_log(LOGD, "parsed successfully!");
