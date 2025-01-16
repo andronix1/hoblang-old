@@ -13,7 +13,7 @@ LLVMValueRef llvm_value(LlvmBackend *llvm, AstValue *value) {
 			case AST_VALUE_DEREF: {
 				val = LLVMBuildLoad2(
 					llvm->builder,
-					llvm_resolve_type(seg->sema_type),
+					LLVMPointerType(llvm_resolve_type(seg->sema_type), 0),
 					val, 
 					""
 				);

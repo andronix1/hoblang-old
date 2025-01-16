@@ -59,11 +59,19 @@ fun test_arr1(): void {
 	put_char('\n');
 }
 
+fun toggle(what: *bool): void {
+	if what.* { # TODO: not operator
+		what.* = false;
+	} else {
+		what.* = true;
+	}
+}
+
 fun main(): void {
 	put_str(['H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\0']);
 	put_str("Hello, world using strs!\0");
 	test_arr1();
-	test_arr1();
+	var ball: bool = true;
 	var sum: i32 = 0;
 	while true {
 		put_char('>');

@@ -6,6 +6,4 @@
 typedef struct {
 	AstValue value;
 	struct _AstExpr *args;
-
-	struct _AstFuncInfo *func;
 } AstFuncCall;

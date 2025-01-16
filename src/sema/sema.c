@@ -78,7 +78,7 @@ SemaValueDecl *sema_push_decl(SemaModule *sema, Slice name, SemaType *type) {
 	data->name = name;
 	data->llvm_value = NULL;
 	scope->decls = vec_push(scope->decls, &data);
-	return vec_top(scope->decls);
+	return scope->decls[vec_len(scope->decls) - 1];
 }
 
 void sema_push_primitive(SemaModule *sema, const char *name, Primitive primitive) {
