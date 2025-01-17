@@ -30,32 +30,17 @@ int main(int argc, char **argv) {
     if (!strcmp(command, "compile")) {
 		const char *src_path = args_shift(&argc, &argv);
 		char *output_path = args_shift(&argc, &argv);
-        Lexer lexer;
-		if (!lexer_init(&lexer, src_path)) {
-			return 1;
-		}
-		Parser parser;
-		if (!parser_init(&parser, &lexer)) {
-			return 1;
-		}
-		AstModule module;
-		parse_module(&parser, &module);
-		if (lexer.failed || parser.failed) {
-			return 1;
-		}
-		hob_log(LOGD, "parsed successfully!");
-		SemaModule sema = sema_new_module(&module);
-		sema_module_read(&sema);
-		sema_module(&sema);
-		if (sema.failed) {
-			return 1;
-		}
+		SemaProject *project = sema_project_new();
+		sema_project_add_module(project, src_path);
+		sema_project(project);
 		hob_log(LOGD, "analyzed successfully!");
 		LlvmBackend llvm;
 		if (!llvm_init(&llvm)) {
 			return 1;
 		}
-		llvm_module(&llvm, &module);
+		for (size_t i = 0; i < vec_len(project->modules); i++) {
+			llvm_module(&llvm, project->modules[i]->ast);
+		}
 		llvm_write_module(&llvm, output_path);
 		hob_log(LOGI, "finished!");
     } else {

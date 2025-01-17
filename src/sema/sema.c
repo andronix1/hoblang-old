@@ -1,11 +1,11 @@
 #include "sema.h"
 
-SemaModule sema_new_module(AstModule *module) {
-	SemaModule result = {
-		.scopes = vec_new(SemaScope),
-		.failed = false,
-		.ast = module
-	};
+SemaModule *sema_new_module(AstModule *module) {
+	SemaModule *result = malloc(sizeof(SemaModule));
+	result->scopes = vec_new(SemaScope);
+	result->modules = vec_new(SemaModuleUsage);
+	result->failed = false;
+	result->ast = module;
 	return result;
 }
 
@@ -98,3 +98,63 @@ void sema_push_primitives(SemaModule *sema) {
 	sema_push_primitive(sema, "u64", PRIMITIVE_U64);
 }
 
+SemaProject *sema_project_new() {
+	SemaProject *result = malloc(sizeof(SemaProject));
+	result->modules = vec_new(SemaModule*);
+	return result;
+}
+
+SemaModule *sema_project_add_module(SemaProject *project, const char *path) {
+	Lexer lexer;
+	if (!lexer_init(&lexer, path)) {
+		return NULL;
+	}
+	Parser parser;
+	if (!parser_init(&parser, &lexer)) {
+		return NULL;
+	}
+	AstModule *module = malloc(sizeof(AstModule));
+	parse_module(&parser, module);
+	if (lexer.failed || parser.failed) {
+		return NULL;
+	}
+	SemaModule *sema = sema_new_module(module);
+	sema->project = project;
+	sema_module_read(sema);
+	if (sema->failed) {
+		return NULL;
+	}
+	hob_log(LOGD, "module `{cstr}` readed successfully!", path);
+	project->modules = vec_push(project->modules, &sema);
+	return sema;
+}
+
+SemaModule *sema_resolve_module(SemaModule *sema, Slice *name) {
+	for (size_t j = 0; j < vec_len(sema->modules); j++) {
+		SemaModuleUsage *module = &sema->modules[j];
+		if (slice_eq(name, &module->name)) {
+			return module->module;
+		}
+	}
+	return NULL;
+}
+
+bool sema_push_module_usage(SemaModule *sema, Slice name, SemaModule *module) {
+	if (sema_resolve_module(sema, &name)) {
+		sema_err("module `{slice}` is already used", &name);
+		return false;
+	}
+	SemaModuleUsage mod = {
+		.module = module,
+		.name = name
+	};
+	sema->modules = vec_push(sema->modules, &mod);
+	return true;
+}
+
+SemaModule *sema_project(SemaProject *project) {
+	for (size_t i = 0; i < vec_len(project->modules); i++) {
+		sema_module(project->modules[i]);
+	}
+	return *(SemaModule**)vec_top(project->modules);
+}

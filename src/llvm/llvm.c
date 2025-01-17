@@ -2,6 +2,7 @@
 
 bool llvm_init(LlvmBackend *llvm) {
 	llvm->builder = LLVMCreateBuilder();
+	llvm->module = LLVMModuleCreateWithName("main");
 	return true;	
 }
 
@@ -19,7 +20,7 @@ LLVMTypeRef llvm_resolve_type(SemaType *type) {
 			assert(0, "invalid primitive {int}", type->primitive);
 			return NULL;
 		case SEMA_TYPE_FUNCTION: {
-			LLVMTypeRef *params = malloc(sizeof(LLVMTypeRef) * vec_len(type->func.args));
+			LLVMTypeRef *params = alloca(sizeof(LLVMTypeRef) * vec_len(type->func.args));
 			for (size_t i = 0; i < vec_len(type->func.args); i++) {
 				params[i] = llvm_resolve_type(type->func.args[i].type.sema);
 			}

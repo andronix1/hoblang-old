@@ -8,3 +8,5 @@ SemaType *sema_ast_type(SemaModule *sema, AstType *type);
 SemaType *sema_ast_expr_type(SemaModule *sema, AstExpr *expr, SemaType *expectation);
 SemaType *sema_ast_func_call(SemaModule *sema, AstFuncCall *func_call);
 SemaType *sema_ast_value(SemaModule *sema, AstValue *value);
+SemaValueDecl *sema_resolve_value_path(SemaModule *sema, AstModPath *path);
+SemaModule *sema_resolve_module_path(SemaModule *sema, AstModPath *path);

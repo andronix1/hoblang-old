@@ -16,7 +16,21 @@ void sema_add_ast_func_info(SemaModule *sema, AstFuncInfo *info) {
 
 void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 	switch (node->type) {
-		case AST_MODULE_NODE_USE: case AST_MODULE_NODE_IMPORT: assert(0, "NIY");
+		case AST_MODULE_NODE_USE:
+			assert(0, "NIY");
+			break;
+
+		case AST_MODULE_NODE_IMPORT: {
+			SemaModuleUsage usage = {
+				.module = sema_project_add_module(sema->project, node->import.path),
+				.name = node->import.as
+			};
+			if (usage.module) {
+				sema->modules = vec_push(sema->modules, &usage);
+			}
+			break;
+		}
+
 		case AST_MODULE_NODE_FUNC:
 			sema_add_ast_func_info(sema, &node->func_decl.info);
 			break;
@@ -60,5 +74,4 @@ void sema_module(SemaModule *sema) {
 	for (size_t i = 0; i < vec_len(sema->ast->nodes); i++) {
 		sema_ast_module_node(sema, &sema->ast->nodes[i]);
 	}
-	sema_pop_scope(sema);
 }

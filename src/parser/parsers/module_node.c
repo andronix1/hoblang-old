@@ -51,12 +51,15 @@ bool parse_module_node(Parser *parser, AstModuleNode *node) {
 		case TOKEN_IMPORT:
 			parse_exp_next(TOKEN_STR, "file path");
 			node->type = AST_MODULE_NODE_IMPORT;
-			node->import.path.str = parser->token->str;
-			node->import.path.len = vec_len(parser->token->str);
+			char c0 = '\0';
+			node->import.path = parser->token->str = vec_push(parser->token->str, &c0);
+			parse_exp_next(TOKEN_AS, "module name");
+			parse_exp_next(TOKEN_IDENT, "module name");
+			node->import.as = parser->token->ident;
 			parse_exp_next(TOKEN_SEMICOLON, "semicolon");
 			return true;
 		case TOKEN_USE:
-			node->type = AST_MODULE_NODE_IMPORT;
+			node->type = AST_MODULE_NODE_USE;
 			if (!parse_mod_path(parser, &node->use.path)) {
 				return false;
 			}

@@ -38,6 +38,7 @@ set(SOURCE_FILES
 	src/sema/sema.c
 	src/sema/type.c
 	src/sema/parts/module.c
+	src/sema/parts/mod_path.c
 	src/sema/parts/type.c
 	src/sema/parts/body.c
 	src/sema/parts/expr.c

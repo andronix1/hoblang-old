@@ -4,7 +4,6 @@
 #include "module_node.h"
 
 typedef struct _AstModule {
-	Slice name;
 	AstModuleNode *nodes;
 } AstModule;
 

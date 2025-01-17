@@ -8,6 +8,7 @@ syntax keyword hobBoolean
 
 syntax keyword hobKeywords 
 	\ var
+	\ import
 	\ fun
 	\ if
 	\ else

@@ -1,87 +1,15 @@
-module main;
-
-# import "std.hob";
-# use std::hob;
-
-extern(exit) fun exit(status: i32): void
-extern(putchar) fun put_char(c: u8): void
-extern(getchar) fun get_char(): u8
-extern(puts) fun put_str(str: *u8): void
-extern(printf) fun printf(str: *u8): void
-
-fun get_int(): i32 {
-	var res: i32 = 0;
-	var c: u8 = get_char();
-	while c != '\n' {
-		if c < '0' || c > '9' {
-			put_str("invalid character!\0");
-			exit(1);
-		}
-		res = res * 10 + (c - '0') as i32;
-		c = get_char();
-	}
-	return res;
-}
-
-fun put_int(val: i32): void {
-	if (val < 0) {
-		val = 0 - val; # TODO: unary
-		put_char('-');
-	}
-	if (val == 0) {
-		put_char('0');
-		return;
-	}
-	var buf: *u8 = "\0\0\0\0\0\0\0\0\0\0\0\0";
-	var len = 13;
-	var i = 0;
-	while val > 0 {
-		buf[len - i - 1] = '0' + (val - (val / 10 * 10)) as u8;
-		i = i + 1;
-		val = val / 10;
-	}
-	printf(@buf[len - i]);
-}
-
-fun test_arr1(): void {
-	var test: *i32 = [23, 34, 45, 56, 12];
-	put_char('[');
-	var i = 0;
-	while i < 5 {
-		if i != 0 {
-			put_char(',');
-			put_char(' ');
-		}
-		put_int(test[i]);
-		i = i + 1;
-	}
-	put_char(']');
-	put_char('\n');
-}
-
-fun toggle(what: *bool): void {
-	what.* = !what.*;
-}
+import "std.hob" as std;
 
 fun main(): void {
-	put_str(['H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\0']);
-	put_str("Hello, world using strs!\0");
-	test_arr1();
-	var ball: bool = true;
-	toggle(@ball);
-	if ball {
-		put_str("oops! was not toggled!\0");
-		return;
-	} else {
-		put_str("wow! boolean was toggled by reference!\0");
-	}
-	var sum: i32 = 0;
+	var sum = 10;
+	std::put_cstr(['H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\n', '\0']);
+	std::put_cstr("Hello, world using strs!\n\0");
 	while true {
-		put_char('>');
-		put_char(' ');
-		var a = get_int();
+		std::libc::put_char('>');
+		std::libc::put_char(' ');
+		var a = std::get_int();
 		sum = sum + a;
-		put_int(sum);
-		put_char('\n');
+		std::put_int(sum);
+		std::libc::put_char('\n');
 	}
 }

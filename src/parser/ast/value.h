@@ -19,7 +19,6 @@ typedef struct {
 
 typedef struct {
 	struct _SemaType *sema_type;
+	AstModPath mod_path;
 	AstValueSegment *segments;
-
-	struct _SemaValueDecl *decl;
 } AstValue;

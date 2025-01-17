@@ -57,7 +57,6 @@ bool lex_next(Lexer *lexer) {
 	KEYWORD("else", TOKEN_ELSE);
 	KEYWORD("return", TOKEN_RETURN);
 	KEYWORD("extern", TOKEN_EXTERN);
-	KEYWORD("module", TOKEN_MODULE);
 	KEYWORD("import", TOKEN_IMPORT);
 	KEYWORD("use", TOKEN_USE);
 	KEYWORD("as", TOKEN_AS);

@@ -1,7 +1,6 @@
 SemaType *sema_ast_func_call(SemaModule *sema, AstFuncCall *func_call) {
 	SemaType *type = sema_ast_value(sema, &func_call->value);
 	if (!type) {
-		sema_err("function `{ast::val}` is undefined", &func_call->value);
 		return NULL;
 	}
 	if (type->type != SEMA_TYPE_FUNCTION) {	

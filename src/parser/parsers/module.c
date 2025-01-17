@@ -1,10 +1,6 @@
 #include "../parsers.h"
 
 bool parse_module(Parser *parser, AstModule *module) {
-	parse_exp_next(TOKEN_MODULE, "module info");
-	parse_exp_next(TOKEN_IDENT, "module name");
-	module->name = parser->token->ident;
-	parse_exp_next(TOKEN_SEMICOLON, "semicolon");
 	module->nodes = vec_new(AstModuleNode);
 	while (true) {
 		AstModuleNode node;

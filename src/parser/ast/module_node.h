@@ -8,12 +8,11 @@ struct _AstModule;
 
 typedef struct {
 	AstModPath path;
-	struct _AstModule *module;
 } AstUse;
 
 typedef struct {
-	Slice path;
-	struct _AstModule *module;
+	const char *path;
+	Slice as;
 } AstImport;
 
 typedef struct {
