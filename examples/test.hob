@@ -1,16 +1,23 @@
 import "std.hob" as std;
 
-use std::libc;
+use std::libc as c;
 
 fun main(): void {
-	var sum = 10;
+	var sum = 0;
 	std::put_cstr(['H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\n', '\0']);
 	std::put_cstr("Hello, world using strs!\n\0");
 	while true {
 		std::libc::put_char('>');
 		std::libc::put_char(' ');
 		var a = std::get_int();
+		var prev_sum = sum;
 		sum = sum + a;
+		if sum < 0 || sum < prev_sum {
+			std::panic("looks like overflow :(\n\0");
+			# dead code, equals to panic
+			std::put_cstr("looks like overflow :(\n\0");
+			c::exit(1);
+		}
 		std::put_int(sum);
 		std::libc::put_char('\n');
 	}

@@ -19,7 +19,7 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 		case AST_MODULE_NODE_USE: {
 			SemaModuleUsage usage = {
 				.module = sema_resolve_module_path(sema, &node->use.path),
-				.name = *(Slice*)vec_top(node->use.path.segments)
+				.name = node->use.has_alias ? node->use.alias : *(Slice*)vec_top(node->use.path.segments)
 			};
 			if (usage.module) {
 				sema->modules = vec_push(sema->modules, &usage);

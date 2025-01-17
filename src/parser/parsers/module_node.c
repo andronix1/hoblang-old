@@ -63,7 +63,20 @@ bool parse_module_node(Parser *parser, AstModuleNode *node) {
 			if (!parse_mod_path(parser, &node->use.path)) {
 				return false;
 			}
-			parse_exp_next(TOKEN_SEMICOLON, "semicolon");
+			parser_next_token(parser);
+			node->use.has_alias = false;
+			switch (token_type(parser->token)) {
+				case TOKEN_SEMICOLON: break;
+				case TOKEN_AS:
+					parse_exp_next(TOKEN_IDENT, "alias");
+					node->use.has_alias = true;
+					node->use.alias = parser->token->ident;
+					parse_exp_next(TOKEN_SEMICOLON, "semicolon");
+					break;
+				default:
+					parse_err("expected alias or end of use statement got {tok}", parser->token);
+					return false;
+			}
 			return true;
 		case TOKEN_FUN:
 			node->type = AST_MODULE_NODE_FUNC;

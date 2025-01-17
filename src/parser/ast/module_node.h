@@ -8,6 +8,8 @@ struct _AstModule;
 
 typedef struct {
 	AstModPath path;
+	bool has_alias;
+	Slice alias;
 } AstUse;
 
 typedef struct {
