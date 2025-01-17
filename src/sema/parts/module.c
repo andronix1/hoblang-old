@@ -16,9 +16,16 @@ void sema_add_ast_func_info(SemaModule *sema, AstFuncInfo *info) {
 
 void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 	switch (node->type) {
-		case AST_MODULE_NODE_USE:
-			assert(0, "NIY");
+		case AST_MODULE_NODE_USE: {
+			SemaModuleUsage usage = {
+				.module = sema_resolve_module_path(sema, &node->use.path),
+				.name = *(Slice*)vec_top(node->use.path.segments)
+			};
+			if (usage.module) {
+				sema->modules = vec_push(sema->modules, &usage);
+			}
 			break;
+		}
 
 		case AST_MODULE_NODE_IMPORT: {
 			SemaModuleUsage usage = {

@@ -1,5 +1,7 @@
 import "std.hob" as std;
 
+use std::libc;
+
 fun main(): void {
 	var sum = 10;
 	std::put_cstr(['H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', '!', '\n', '\0']);
