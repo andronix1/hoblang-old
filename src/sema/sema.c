@@ -156,7 +156,7 @@ SemaModule *sema_project_add_module(SemaProject *project, const char *path) {
 		chdir(cwd);
 		return NULL;
 	}
-	hob_log(LOGD, "module `{cstr}` readed successfully!", path);
+	hob_log(LOGD, "module `{cstr}` readed successfully!", fname);
 	SemaImportedModule imported_module = {
 		.module = sema,
 		.path = slice_path
