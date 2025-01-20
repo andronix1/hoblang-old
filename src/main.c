@@ -32,7 +32,9 @@ int main(int argc, char **argv) {
 		char *output_path = args_shift(&argc, &argv);
 		SemaProject *project = sema_project_new();
 		sema_project_add_module(project, src_path);
-		sema_project(project);
+		if (!sema_project(project)) {
+			return 1;
+		}
 		hob_log(LOGD, "analyzed successfully!");
 		LlvmBackend llvm;
 		if (!llvm_init(&llvm)) {

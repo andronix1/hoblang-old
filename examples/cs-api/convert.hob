@@ -1,4 +1,4 @@
-import "libc.hob" as c;
+import "../libc.hob" as c;
 
 fun to_int32(str: *u8): i32 {
 	var res = 0;

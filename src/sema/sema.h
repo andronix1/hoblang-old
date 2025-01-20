@@ -4,6 +4,7 @@
 #include "lexer/lex.h"
 #include "parser/parsers.h"
 #include "core/slice.h"
+#include "core/path.h"
 #include "type.h"
 
 typedef struct _SemaTypeDecl {
@@ -70,5 +71,5 @@ typedef struct _SemaProject {
 
 SemaProject *sema_project_new();
 SemaModule *sema_project_add_module(SemaProject *project, const char *path);
-SemaModule *sema_project(SemaProject *project);
+bool sema_project(SemaProject *project);
 SemaModule *sema_resolve_module(SemaModule *sema, Slice *name);

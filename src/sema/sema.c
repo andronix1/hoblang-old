@@ -105,29 +105,55 @@ SemaProject *sema_project_new() {
 }
 
 SemaModule *sema_project_add_module(SemaProject *project, const char *path) {
-	Slice slice_path = slice_from_cstr(path);
+	const char *full_path = realpath(path, NULL);
+	if (!full_path) {
+		hob_log(LOGE, "cannot resolve path {cstr}", path);
+		return NULL;
+	}
+	Slice slice_path = slice_from_cstr(full_path);
 	for (size_t i = 0; i < vec_len(project->modules); i++) {
 		if (slice_eq(&slice_path, &project->modules[i].path)) {
 			return project->modules[i].module;
 		}
 	}
 	Lexer lexer;
-	if (!lexer_init(&lexer, path)) {
+
+	char *pathc = strdup(path);
+	char *fname = pathc;
+	char *dirname = NULL;
+	for (int i = strlen(pathc) - 1; i >= 0; i--) {
+		if (pathc[i] == '/') {
+			pathc[i] = '\0';
+			dirname = pathc;
+			fname = &pathc[i + 1];
+		}
+	}
+
+	char cwd[PATH_MAX];
+	getcwd(cwd, PATH_MAX);
+	if (dirname) {
+		chdir(dirname);
+	}
+	if (!lexer_init(&lexer, fname)) {
+		chdir(cwd);
 		return NULL;
 	}
 	Parser parser;
 	if (!parser_init(&parser, &lexer)) {
+		chdir(cwd);
 		return NULL;
 	}
 	AstModule *module = malloc(sizeof(AstModule));
 	parse_module(&parser, module);
 	if (lexer.failed || parser.failed) {
+		chdir(cwd);
 		return NULL;
 	}
 	SemaModule *sema = sema_new_module(module);
 	sema->project = project;
 	sema_module_read(sema);
 	if (sema->failed) {
+		chdir(cwd);
 		return NULL;
 	}
 	hob_log(LOGD, "module `{cstr}` readed successfully!", path);
@@ -136,6 +162,7 @@ SemaModule *sema_project_add_module(SemaProject *project, const char *path) {
 		.path = slice_path
 	};
 	project->modules = vec_push(project->modules, &imported_module);
+		chdir(cwd);
 	return sema;
 }
 
@@ -162,9 +189,14 @@ bool sema_push_module_usage(SemaModule *sema, Slice name, SemaModule *module) {
 	return true;
 }
 
-SemaModule *sema_project(SemaProject *project) {
+bool sema_project(SemaProject *project) {
+	bool failed = false;
 	for (size_t i = 0; i < vec_len(project->modules); i++) {
-		sema_module(project->modules[i].module);
+		SemaModule *sema = project->modules[i].module;
+		sema_module(sema);
+		if (sema->failed) {
+			failed = true;
+		}
 	}
-	return *(SemaModule**)vec_top(project->modules);
+	return !failed;//*(SemaModule**)vec_top(project->modules);
 }

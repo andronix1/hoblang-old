@@ -1,4 +1,4 @@
-import "libc.hob" as c;
+import "../libc.hob" as c;
 
 fun read_line(): *u8 {
 	var c = c::get_char();

@@ -8,6 +8,7 @@ message(STATUS "LLVM version: ${LLVM_PACKAGE_VERSION}")
 set(SOURCE_FILES
     src/main.c
 
+	src/core/path.c
 	src/core/vec.c
 	src/core/slice.c
 	src/core/print.c

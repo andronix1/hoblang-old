@@ -1,7 +1,7 @@
-import "csharp.hob" as csharp;
+import "cs-api/lib.hob" as cs_api;
 
-use csharp::console;
-use csharp::convert;
+use cs_api::console;
+use cs_api::convert;
 
 fun main(): void {
 	var str = console::read_line();
