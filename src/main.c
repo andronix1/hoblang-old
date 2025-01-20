@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
 			return 1;
 		}
 		for (size_t i = 0; i < vec_len(project->modules); i++) {
-			llvm_module(&llvm, project->modules[i]->ast);
+			llvm_module(&llvm, project->modules[i].module->ast);
 		}
 		llvm_write_module(&llvm, output_path);
 		hob_log(LOGI, "finished!");

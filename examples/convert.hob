@@ -1,0 +1,52 @@
+import "libc.hob" as c;
+
+fun to_int32(str: *u8): i32 {
+	var res = 0;
+	var i = 0;
+	var minus: bool = false;
+	if str[0] == '-' {
+		i = i + 1;
+		minus = true;
+	}
+	while str[i] != '\0' {
+		if str[i] > '9' || str[i] < '0' {
+			return 0;
+		}
+		res = res * 10;
+		res = res + (str[i] - '0') as i32;
+		i = i + 1;
+	}
+	if minus {
+		res = 0 - res;
+	}
+	return res;
+}
+
+fun int32_to_string(val: i32): *u8 {
+	var len = 16;
+	var buf: *u8 = c::malloc(len) as *u8;
+	var i = len - 1;
+	buf[i] = '\0';
+	i = i - 1;
+
+	var minus = val < 0;
+	if (val < 0) {
+		val = 0 - val; # TODO: unary operator
+	}
+
+	if (val == 0) {
+		buf[i] = '0';
+		i = i - 1;
+	} else {
+		while val > 0 {
+			buf[i] = '0' + (val - (val / 10 * 10)) as u8;
+			i = i - 1;
+			val = val / 10;
+		}
+	}
+	if minus {
+		buf[i] = '-';
+		i = i - 1;
+	}
+	return @buf[i + 1];
+}

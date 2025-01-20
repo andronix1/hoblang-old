@@ -59,8 +59,13 @@ void sema_push_type(SemaModule *sema, Slice name, SemaType *type);
 SemaValueDecl *sema_push_decl(SemaModule *sema, Slice name, SemaType *type);
 SemaValueDecl *sema_resolve_value_decl(SemaModule *sema, Slice *name);
 
+typedef struct {
+	SemaModule *module;
+	Slice path;
+} SemaImportedModule;
+
 typedef struct _SemaProject {
-	SemaModule **modules;
+	SemaImportedModule *modules;
 } SemaProject;
 
 SemaProject *sema_project_new();

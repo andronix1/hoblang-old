@@ -100,11 +100,17 @@ void sema_push_primitives(SemaModule *sema) {
 
 SemaProject *sema_project_new() {
 	SemaProject *result = malloc(sizeof(SemaProject));
-	result->modules = vec_new(SemaModule*);
+	result->modules = vec_new(SemaImportedModule);
 	return result;
 }
 
 SemaModule *sema_project_add_module(SemaProject *project, const char *path) {
+	Slice slice_path = slice_from_cstr(path);
+	for (size_t i = 0; i < vec_len(project->modules); i++) {
+		if (slice_eq(&slice_path, &project->modules[i].path)) {
+			return project->modules[i].module;
+		}
+	}
 	Lexer lexer;
 	if (!lexer_init(&lexer, path)) {
 		return NULL;
@@ -125,7 +131,11 @@ SemaModule *sema_project_add_module(SemaProject *project, const char *path) {
 		return NULL;
 	}
 	hob_log(LOGD, "module `{cstr}` readed successfully!", path);
-	project->modules = vec_push(project->modules, &sema);
+	SemaImportedModule imported_module = {
+		.module = sema,
+		.path = slice_path
+	};
+	project->modules = vec_push(project->modules, &imported_module);
 	return sema;
 }
 
@@ -154,7 +164,7 @@ bool sema_push_module_usage(SemaModule *sema, Slice name, SemaModule *module) {
 
 SemaModule *sema_project(SemaProject *project) {
 	for (size_t i = 0; i < vec_len(project->modules); i++) {
-		sema_module(project->modules[i]);
+		sema_module(project->modules[i].module);
 	}
 	return *(SemaModule**)vec_top(project->modules);
 }

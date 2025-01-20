@@ -44,13 +44,13 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 				[PRIMITIVE_U64] = 4,
 				[PRIMITIVE_BOOL] = 0,
 			};
-			if (level[expr->as.expr->sema_type->primitive] == level[expr->sema_type->primitive]) {
-				return LLVMBuildBitCast(llvm->builder, value, to_type, "");
+			if (expr->sema_type->type == SEMA_TYPE_PRIMITIVE) {
+				if (level[expr->as.expr->sema_type->primitive] < level[expr->sema_type->primitive]) {
+					return LLVMBuildZExt(llvm->builder, value, to_type, "");
+				}
+				return LLVMBuildTrunc(llvm->builder, value, to_type, ""); // TODO: check possibility at sema 
 			}
-			if (level[expr->as.expr->sema_type->primitive] < level[expr->sema_type->primitive]) {
-				return LLVMBuildZExt(llvm->builder, value, to_type, "");
-			}
-			return LLVMBuildTrunc(llvm->builder, value, to_type, ""); // TODO: check possibility at sema 
+			return LLVMBuildBitCast(llvm->builder, value, to_type, "");
 		}
 		case AST_EXPR_BINOP: {
 			LLVMValueRef right = llvm_expr(llvm, expr->binop.right);
