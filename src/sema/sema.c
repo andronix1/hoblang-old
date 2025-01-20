@@ -126,6 +126,7 @@ SemaModule *sema_project_add_module(SemaProject *project, const char *path) {
 			pathc[i] = '\0';
 			dirname = pathc;
 			fname = &pathc[i + 1];
+			break;
 		}
 	}
 
