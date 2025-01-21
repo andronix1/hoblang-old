@@ -11,20 +11,41 @@ gcc <output> -o <binary-output>
 ./<binary-output>
 ```
 ## Syntax
-C# API like example(`examples/cstest.hob`)
+C#-like API example(`examples/cstest.hob`)
 ```
-import "csharp.hob" as csharp;
+import "cs-api/lib.hob" as cs_api;
+import "libc/lib.hob" as libc;
 
-use csharp::console;
-use csharp::convert;
+use cs_api::console;
+use cs_api::convert;
+use libc::mem as cmem;
+
+type int = libc::int32_t;
+
+type Inner = struct {
+	integer: i32
+};
+
+type Test = struct {
+	inner: Inner
+};
 
 fun main(): void {
+	var test: Test;	
+	defer console::write_line("finished!\0");
 	var str = console::read_line();
+	defer cmem::free(str as *void);
 	console::write("your number: \0");
 	console::write_line(str);
 	console::write_line("incrementing it...\0");
-	var int = convert::to_int32(str);
-	console::write_line(convert::int32_to_string(int + 1));
+	test.inner.integer = convert::to_int32(str);
+	if test.inner.integer == 68 {
+		console::write_line("I am not ChatGPT, but...\0");
+		return;
+	}
+	var istr = convert::int32_to_string(test.inner.integer + 1);
+	defer cmem::free(istr as *void);
+	console::write_line(istr);
 }
 ```
 ### To compile
