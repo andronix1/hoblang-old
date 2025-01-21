@@ -24,6 +24,18 @@ SemaScope *sema_pop_scope(SemaModule *sema) {
 	return vec_pop(sema->scopes);
 }
 
+SemaTypeDecl *sema_resolve_type_decl(SemaModule *sema, Slice *name) {
+	for (size_t i = 0; i < vec_len(sema->scopes); i++) {
+		for (size_t j = 0; j < vec_len(sema->scopes[i].types); j++) {
+			SemaTypeDecl *decl = sema->scopes[i].types[j];
+			if (slice_eq(name, &decl->name)) {
+				return decl;
+			}
+		}
+	}
+	return NULL;
+}
+
 SemaValueDecl *sema_resolve_value_decl(SemaModule *sema, Slice *name) {
 	for (size_t i = 0; i < vec_len(sema->scopes); i++) {
 		for (size_t j = 0; j < vec_len(sema->scopes[i].decls); j++) {

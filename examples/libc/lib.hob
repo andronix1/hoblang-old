@@ -1,2 +1,4 @@
 import "mem.hob" as mem;
 import "io.hob" as io;
+
+type int32_t = i32;

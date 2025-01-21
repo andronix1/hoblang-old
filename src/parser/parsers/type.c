@@ -5,9 +5,9 @@ bool parse_type(Parser *parser, AstType *type) {
 	type->sema = NULL;
 	switch (token_type(parser->token)) {
 		case TOKEN_IDENT:
-			type->type = AST_TYPE_IDENT;
-			type->ident = parser->token->ident;
-			return true;
+			type->type = AST_TYPE_PATH;
+			parser->skip_next = true;
+			return parse_mod_path(parser, &type->path);
 		case TOKEN_MULTIPLY: {
 			type->type = AST_TYPE_POINTER;
 			type->ptr_to = malloc(sizeof(AstType));

@@ -5,13 +5,12 @@ SemaType *sema_ast_type(SemaModule *sema, AstType *type) {
 		return type->sema;
 	}
 	switch (type->type) {
-		case AST_TYPE_IDENT: {
-			SemaType *sema_type = sema_resolve_ident_type(sema, &type->ident);
-			if (!sema_type) {
-				sema_err("unknown type `{slice}`", &type->ident);
+		case AST_TYPE_PATH: {
+			SemaTypeDecl *decl = sema_resolve_type_path(sema, &type->path);
+			if (!decl) {
 				return NULL;
 			}
-			type->sema = sema_type;
+			type->sema = decl->type;
 			break;
 		}
 		case AST_TYPE_POINTER: {

@@ -60,6 +60,7 @@ SemaType *sema_resolve_decl_type(SemaModule *sema, Slice *name);
 void sema_push_type(SemaModule *sema, Slice name, SemaType *type);
 SemaValueDecl *sema_push_decl(SemaModule *sema, Slice name, SemaType *type);
 SemaValueDecl *sema_resolve_value_decl(SemaModule *sema, Slice *name);
+SemaTypeDecl *sema_resolve_type_decl(SemaModule *sema, Slice *name);
 
 typedef struct {
 	SemaModule *module;
