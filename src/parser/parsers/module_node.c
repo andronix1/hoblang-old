@@ -78,6 +78,16 @@ bool parse_module_node(Parser *parser, AstModuleNode *node) {
 					return false;
 			}
 			return true;
+		case TOKEN_TYPE:
+			node->type = AST_MODULE_NODE_TYPE_ALIAS;
+			parse_exp_next(TOKEN_IDENT, "alias");
+			node->type_alias.alias = parser->token->ident;
+			parse_exp_next(TOKEN_ASSIGN, "assign");
+			if (!parse_type(parser, &node->type_alias.type)) {
+				return false;
+			}
+			parse_exp_next(TOKEN_SEMICOLON, "semicolon");
+			return true;
 		case TOKEN_FUN:
 			node->type = AST_MODULE_NODE_FUNC;
 			return parse_func_decl(parser, &node->func_decl);

@@ -2,7 +2,10 @@
 
 void llvm_module_node(LlvmBackend *llvm, AstModuleNode *node) {
 	switch (node->type) {
-		case AST_MODULE_NODE_USE: case AST_MODULE_NODE_IMPORT: break;
+		case AST_MODULE_NODE_USE:
+		case AST_MODULE_NODE_TYPE_ALIAS:
+		case AST_MODULE_NODE_IMPORT:
+			break;
 
 		case AST_MODULE_NODE_EXTERNAL_FUNC:
 			LLVMSetValueName(llvm_sema_value(llvm, node->ext_func_decl.info.decl), slice_to_cstr(&node->ext_func_decl.info.public_name));

@@ -7,6 +7,11 @@
 struct _AstModule;
 
 typedef struct {
+	AstType type;
+	Slice alias;
+} AstTypeAlias;
+
+typedef struct {
 	AstModPath path;
 	bool has_alias;
 	Slice alias;
@@ -32,6 +37,7 @@ typedef enum {
 	AST_MODULE_NODE_EXTERNAL_FUNC,
 	AST_MODULE_NODE_USE,
 	AST_MODULE_NODE_IMPORT,
+	AST_MODULE_NODE_TYPE_ALIAS,
 } AstModuleNodeType;
 
 typedef struct {
@@ -40,6 +46,7 @@ typedef struct {
 		AstFuncDecl func_decl;		
 		AstExtFuncDecl ext_func_decl;		
 		AstImport import;	
+		AstTypeAlias type_alias;	
 		AstUse use;	
 	};
 } AstModuleNode;

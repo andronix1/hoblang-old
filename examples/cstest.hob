@@ -5,6 +5,8 @@ use cs_api::console;
 use cs_api::convert;
 use libc::mem as cmem;
 
+type int = i32;
+
 fun main(): void {
 	defer console::write_line("finished!\0");
 	var str = console::read_line();
@@ -12,12 +14,12 @@ fun main(): void {
 	console::write("your number: \0");
 	console::write_line(str);
 	console::write_line("incrementing it...\0");
-	var int = convert::to_int32(str);
-	if int == 68 {
+	var integer: int = convert::to_int32(str);
+	if integer == 68 {
 		console::write_line("I am not ChatGPT, but...\0");
 		return;
 	}
-	var istr = convert::int32_to_string(int + 1);
+	var istr = convert::int32_to_string(integer + 1);
 	defer cmem::free(istr as *void);
 	console::write_line(istr);
 }

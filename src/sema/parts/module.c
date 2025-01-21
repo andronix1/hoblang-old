@@ -16,6 +16,10 @@ void sema_add_ast_func_info(SemaModule *sema, AstFuncInfo *info) {
 
 void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 	switch (node->type) {
+		case AST_MODULE_NODE_TYPE_ALIAS: {
+			sema_push_type(sema, node->type_alias.alias, sema_ast_type(sema, &node->type_alias.type));
+			break;
+		}
 		case AST_MODULE_NODE_USE: {
 			SemaModuleUsage usage = {
 				.module = sema_resolve_module_path(sema, &node->use.path),
@@ -59,7 +63,12 @@ void sema_push_ast_func_info(SemaModule *sema, AstFuncInfo *info) {
 void sema_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 	sema_push_scope(sema);
 	switch (node->type) {
-		case AST_MODULE_NODE_EXTERNAL_FUNC: case AST_MODULE_NODE_USE: case AST_MODULE_NODE_IMPORT: break;
+		case AST_MODULE_NODE_TYPE_ALIAS:
+		case AST_MODULE_NODE_EXTERNAL_FUNC:
+		case AST_MODULE_NODE_USE:
+		case AST_MODULE_NODE_IMPORT:
+			break;
+
 		case AST_MODULE_NODE_FUNC:
 			sema_push_ast_func_info(sema, &node->func_decl.info);
 			sema->returning = node->func_decl.info.returning.sema;

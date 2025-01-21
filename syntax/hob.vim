@@ -10,6 +10,7 @@ syntax keyword hobKeywords
 	\ var
 	\ import
 	\ defer
+	\ type 
 	\ use 
 	\ fun
 	\ if
