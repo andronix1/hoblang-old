@@ -5,6 +5,23 @@ SemaType *sema_ast_type(SemaModule *sema, AstType *type) {
 		return type->sema;
 	}
 	switch (type->type) {
+		case AST_TYPE_STRUCT: {
+			for (size_t i = 0; i < vec_len(type->struct_type.members); i++) {
+				AstStructMember *member = &type->struct_type.members[i];
+				for (size_t j = 0; j < i; j++) {
+					AstStructMember *jmember = &type->struct_type.members[j];
+					if (slice_eq(&member->name, &jmember->name)) {
+						sema_err("field {slice} duplicated", &member->name);
+					}
+				}
+				sema_ast_type(sema, member->type);
+			}
+			SemaType *stype = malloc(sizeof(SemaType));
+			stype->type = SEMA_TYPE_STRUCT;
+			stype->struct_type = &type->struct_type;
+			type->sema = stype;
+			break;
+		}
 		case AST_TYPE_PATH: {
 			SemaTypeDecl *decl = sema_resolve_type_path(sema, &type->path);
 			if (!decl) {

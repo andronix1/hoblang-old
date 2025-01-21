@@ -11,7 +11,25 @@ SemaType *sema_ast_value(SemaModule *sema, AstValue *value) {
 		AstValueSegment *seg = &value->segments[i];
 		switch (seg->type) {
 			case AST_VALUE_IDENT:
-				sema_err("inner idents are not supported now");
+				if (type->type != SEMA_TYPE_STRUCT) {
+					sema_err("cannot get member {slice} of type {sema::type}", &seg->ident, type);
+					return NULL;
+				}
+				bool found = false;
+				for (size_t i = 0; i < vec_len(type->struct_type->members); i++) {
+					AstStructMember *member = &type->struct_type->members[i];
+					if (slice_eq(&member->name, &seg->ident.ident)) {
+						type = member->type->sema;
+						seg->ident.struct_member_idx = i;
+						seg->ident.struct_sema_type = type;
+						found = true;
+						break;
+					}
+				}
+				if (found) {
+					break;
+				}
+				sema_err("member {slice} doesn't exists in given type", &seg->ident.ident);
 				return NULL;
 
 			case AST_VALUE_IDX: {

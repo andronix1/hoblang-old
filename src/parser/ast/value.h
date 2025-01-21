@@ -9,10 +9,18 @@ typedef enum {
 struct _SemaType;
 
 typedef struct {
+	Slice ident;
+
+	// sema
+	size_t struct_member_idx;
+	struct _SemaType *struct_sema_type;
+} AstValueIdent;
+
+typedef struct {
 	struct _SemaType *sema_type;
 	AstValueType type;
 	union {
-		Slice ident;
+		AstValueIdent ident;
 		struct _AstExpr *idx;
 	};
 } AstValueSegment;

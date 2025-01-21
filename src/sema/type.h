@@ -22,6 +22,7 @@ typedef enum {
 	SEMA_TYPE_PRIMITIVE,
 	SEMA_TYPE_POINTER,
 	SEMA_TYPE_FUNCTION,
+	SEMA_TYPE_STRUCT,
 } SemaTypeKind;
 
 typedef struct _SemaType {
@@ -33,6 +34,7 @@ typedef struct _SemaType {
 		Primitive primitive;
 		SemaFunction func;
 		struct _SemaType *ptr_to;
+		AstStructType *struct_type;
 	};
 } SemaType;
 

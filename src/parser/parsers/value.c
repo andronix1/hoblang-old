@@ -30,7 +30,7 @@ bool parse_value(Parser *parser, AstValue *value) {
 		switch (token_type(parser->token)) {
 			case TOKEN_IDENT:
 				segment.type = AST_VALUE_IDENT;
-				segment.ident = parser->token->ident;
+				segment.ident.ident = parser->token->ident;
 				break;
 			case TOKEN_MULTIPLY:
 				segment.type = AST_VALUE_DEREF;

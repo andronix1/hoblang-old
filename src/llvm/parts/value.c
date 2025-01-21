@@ -15,7 +15,11 @@ LLVMValueRef llvm_sema_value(LlvmBackend *llvm, SemaValueDecl *decl) {
 			LLVMTypeRef type = LLVMFunctionType(llvm_resolve_type(decl->type->func.returning), params, vec_len(decl->type->func.args), false);
 			return decl->llvm_value = LLVMAddFunction(llvm->module, "", type);
 		}
-		case SEMA_TYPE_PRIMITIVE: case SEMA_TYPE_POINTER: break;
+
+		case SEMA_TYPE_STRUCT:
+		case SEMA_TYPE_PRIMITIVE:
+		case SEMA_TYPE_POINTER:
+			break;
 	}
 	assert(0, "xref was not caught!");
 }
@@ -27,6 +31,16 @@ LLVMValueRef llvm_value(LlvmBackend *llvm, AstValue *value) {
 		AstValueSegment *seg = &value->segments[i];
 		switch (seg->type) {
 			case AST_VALUE_IDENT: {
+				LLVMValueRef indices[] = {
+					LLVMConstInt(LLVMInt32Type(), seg->ident.struct_member_idx, false)
+				};
+				val = LLVMBuildGEP2(
+					llvm->builder,
+					llvm_resolve_type(seg->ident.struct_sema_type),
+					val,
+					indices, 1,
+					""
+				);
 				hob_log(LOGW, "unexpected ident in value");
 				break;
 			}

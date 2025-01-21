@@ -8,6 +8,13 @@ bool llvm_init(LlvmBackend *llvm) {
 
 LLVMTypeRef llvm_resolve_type(SemaType *type) {
 	switch (type->type) {
+		case SEMA_TYPE_STRUCT: {
+			LLVMTypeRef *elements = alloca(sizeof(LLVMTypeRef) * vec_len(type->struct_type->members));
+			for (size_t i = 0; i < vec_len(type->struct_type->members); i++) {
+				elements[i] = llvm_resolve_type(type->struct_type->members[i].type->sema);
+			}
+			return LLVMStructType(elements, vec_len(type->struct_type->members), false);
+		}
 		case SEMA_TYPE_PRIMITIVE:
 			switch (type->primitive) {
 				case PRIMITIVE_I8: case PRIMITIVE_U8: return LLVMInt8Type();

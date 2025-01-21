@@ -19,6 +19,7 @@ void print_token(FILE *stream, va_list *list) {
     	case TOKEN_DEFER: fprintf(stream, "defer"); return;
     	case TOKEN_USE: fprintf(stream, "use"); return;
     	case TOKEN_AS: fprintf(stream, "as"); return;
+    	case TOKEN_STRUCT: fprintf(stream, "struct"); return;
     	case TOKEN_FUN: fprintf(stream, "fun"); return;
     	case TOKEN_VAR: fprintf(stream, "var"); return;
 		case TOKEN_IF: fprintf(stream, "if"); return;

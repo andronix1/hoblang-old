@@ -7,19 +7,28 @@ use libc::mem as cmem;
 
 type int = libc::int32_t;
 
+type Inner = struct {
+	integer: i32
+};
+
+type Test = struct {
+	inner: Inner
+};
+
 fun main(): void {
+	var test: Test;	
 	defer console::write_line("finished!\0");
 	var str = console::read_line();
 	defer cmem::free(str as *void);
 	console::write("your number: \0");
 	console::write_line(str);
 	console::write_line("incrementing it...\0");
-	var integer: int = convert::to_int32(str);
-	if integer == 68 {
+	test.inner.integer = convert::to_int32(str);
+	if test.inner.integer == 68 {
 		console::write_line("I am not ChatGPT, but...\0");
 		return;
 	}
-	var istr = convert::int32_to_string(integer + 1);
+	var istr = convert::int32_to_string(test.inner.integer + 1);
 	defer cmem::free(istr as *void);
 	console::write_line(istr);
 }

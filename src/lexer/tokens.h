@@ -18,6 +18,8 @@ typedef enum {
     TOKEN_EXTERN,
     TOKEN_AS,
     
+	TOKEN_STRUCT,
+    
 	TOKEN_IF,
     TOKEN_ELSE,
 

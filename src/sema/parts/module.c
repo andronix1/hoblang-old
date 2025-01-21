@@ -17,7 +17,11 @@ void sema_add_ast_func_info(SemaModule *sema, AstFuncInfo *info) {
 void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 	switch (node->type) {
 		case AST_MODULE_NODE_TYPE_ALIAS: {
-			sema_push_type(sema, node->type_alias.alias, sema_ast_type(sema, &node->type_alias.type));
+			SemaType *type = sema_ast_type(sema, &node->type_alias.type);
+			if (!type) {
+				break;
+			}
+			sema_push_type(sema, node->type_alias.alias, type);
 			break;
 		}
 		case AST_MODULE_NODE_USE: {
