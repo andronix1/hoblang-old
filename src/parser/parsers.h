@@ -9,6 +9,7 @@ bool parse_module(Parser *parser, AstModule *module);
 bool parse_module_node(Parser *parser, AstModuleNode *node);
 bool parse_func_info(Parser *parser, AstFuncInfo *info);
 bool parse_body(Parser *parser, AstBody *body);
+bool parse_body_ola(Parser *parser, AstBody *body);
 bool parse_func_call_args(Parser *parser, AstFuncCall *func_call);
 AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType));
 bool parse_expr(Parser *parser, AstExpr *expr, bool (*stop)(TokenType));

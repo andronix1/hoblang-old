@@ -51,9 +51,25 @@ bool parse_stmt(Parser *parser, AstStmt *stmt) {
 	}
 }
 
-bool parse_body(Parser *parser, AstBody *body) {
+bool parse_body_maybe_ola(Parser *parser, AstBody *body, bool one_line_allowed) {
 	body->stmts = vec_new(AstStmt);
-	parse_exp_next(TOKEN_OPENING_FIGURE_BRACE, "body opening");
+	parser_next_token(parser);
+	switch (token_type(parser->token)) {
+		case TOKEN_OPENING_FIGURE_BRACE: break;
+		default: {
+			parser->skip_next = true;
+			if (!one_line_allowed) {
+				parse_err(EXPECTED("body open"));
+				return false;
+			}
+			AstStmt stmt;
+			if (parse_stmt(parser, &stmt)) {
+				body->stmts = vec_push(body->stmts, &stmt);
+				return true;
+			}
+			return false;
+		}
+	}
 	while (true) {
 		parser_next_token(parser);
 		switch (token_type(parser->token)) {
@@ -76,4 +92,12 @@ bool parse_body(Parser *parser, AstBody *body) {
 	}
 	parse_exp_next(TOKEN_CLOSING_FIGURE_BRACE, "body closing");
 	return false;
+}
+
+bool parse_body_ola(Parser *parser, AstBody *body) {
+	return parse_body_maybe_ola(parser, body, true);
+}
+
+bool parse_body(Parser *parser, AstBody *body) {
+	return parse_body_maybe_ola(parser, body, false);
 }
