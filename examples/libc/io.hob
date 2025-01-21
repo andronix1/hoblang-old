@@ -3,7 +3,3 @@ extern(getchar) fun get_char(): u8
 extern(printf) fun printf(str: *u8): void
 extern(exit) fun exit(status: i32): void
 extern(puts) fun puts(cstr: *u8): void
-
-extern(malloc) fun malloc(size: i32): *void
-extern(realloc) fun realloc(ptr: *void, size: i32): *void
-extern(free) fun free(ptr: *void): void

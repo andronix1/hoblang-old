@@ -1,23 +1,26 @@
-import "../libc.hob" as c;
+import "../libc/lib.hob" as libc;
+
+use libc::mem;
+use libc::io;
 
 fun read_line(): *u8 {
-	var c = c::get_char();
+	var c = io::get_char();
 	var i = 1;
-	var result = c::malloc(i) as *u8;
+	var result = mem::malloc(i) as *u8;
 	while c != '\n' {
 		result[i - 1] = c;
 		i = i + 1;
-		result = c::realloc(result as *void, i + 1) as *u8;
-		c = c::get_char();
+		result = mem::realloc(result as *void, i + 1) as *u8;
+		c = io::get_char();
 	}
 	result[i] = '\0';
 	return result;
 }
 
 fun write(str: *u8): void {
-	c::printf(str);
+	io::printf(str);
 }
 
 fun write_line(str: *u8): void {
-	c::puts(str);
+	io::puts(str);
 }

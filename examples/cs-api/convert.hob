@@ -1,4 +1,6 @@
-import "../libc.hob" as c;
+import "../libc/lib.hob" as libc;
+
+use libc::mem;
 
 fun to_int32(str: *u8): i32 {
 	var res = 0;
@@ -24,7 +26,7 @@ fun to_int32(str: *u8): i32 {
 
 fun int32_to_string(val: i32): *u8 {
 	var len = 16;
-	var buf: *u8 = c::malloc(len) as *u8;
+	var buf: *u8 = mem::malloc(len) as *u8;
 	var i = 0;
 
 	if (val < 0) {
