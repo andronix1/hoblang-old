@@ -15,6 +15,7 @@ void print_token(FILE *stream, va_list *list) {
     	case TOKEN_EXTERN: fprintf(stream, "extern"); return;
     	case TOKEN_RETURN: fprintf(stream, "return"); return;
     	case TOKEN_IMPORT: fprintf(stream, "import"); return;
+    	case TOKEN_DEFER: fprintf(stream, "defer"); return;
     	case TOKEN_USE: fprintf(stream, "use"); return;
     	case TOKEN_AS: fprintf(stream, "as"); return;
     	case TOKEN_FUN: fprintf(stream, "fun"); return;

@@ -28,6 +28,7 @@ typedef struct {
 typedef struct {
 	SemaValueDecl **decls;
 	SemaTypeDecl **types;
+	AstDefer **defers;
 } SemaScope;
 
 struct _SemaProject;
@@ -73,3 +74,6 @@ SemaProject *sema_project_new();
 SemaModule *sema_project_add_module(SemaProject *project, const char *path);
 bool sema_project(SemaProject *project);
 SemaModule *sema_resolve_module(SemaModule *sema, Slice *name);
+
+void sema_push_defer(SemaModule *sema, AstDefer *defer);
+AstDefer **sema_resolve_defers(SemaModule *sema);

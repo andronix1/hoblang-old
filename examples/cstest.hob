@@ -1,13 +1,28 @@
 import "cs-api/lib.hob" as cs_api;
+import "libc.hob" as c;
 
 use cs_api::console;
 use cs_api::convert;
 
 fun main(): void {
+	defer {
+		console::write_line("finished!\0");
+	}
 	var str = console::read_line();
+	defer {
+		c::free(str as *void);
+	}
 	console::write("your number: \0");
 	console::write_line(str);
 	console::write_line("incrementing it...\0");
 	var int = convert::to_int32(str);
-	console::write_line(convert::int32_to_string(int + 1));
+	if int == 68 {
+		console::write_line("I am not ChatGPT, but...\n\0");
+		return;
+	}
+	var istr = convert::int32_to_string(int + 1);
+	defer {
+		c::free(istr as *void);
+	}
+	console::write_line(istr);
 }

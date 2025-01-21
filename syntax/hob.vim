@@ -9,6 +9,7 @@ syntax keyword hobBoolean
 syntax keyword hobKeywords 
 	\ var
 	\ import
+	\ defer
 	\ use 
 	\ fun
 	\ if

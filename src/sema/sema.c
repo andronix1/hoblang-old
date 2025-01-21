@@ -12,6 +12,7 @@ SemaModule *sema_new_module(AstModule *module) {
 void sema_push_scope(SemaModule *sema) {
 	SemaScope scope = {
 		.decls = vec_new(SemaValueDecl*),
+		.defers = vec_new(AstDefer*),
 		.types = vec_new(SemaTypeDecl*)
 	};
 	assert(scope.decls, "a");
@@ -53,6 +54,22 @@ SemaType *sema_resolve_ident_type(SemaModule *sema, Slice *name) {
 		}
 	}
 	return NULL;
+}
+
+void sema_push_defer(SemaModule *sema, AstDefer *defer) {
+	SemaScope *scope = vec_top(sema->scopes);
+	scope->defers = vec_push(scope->defers, &defer);
+}
+
+AstDefer **sema_resolve_defers(SemaModule *sema) {
+	AstDefer **result = vec_new(AstDefer*);
+	for (int i = vec_len(sema->scopes) - 1; i >= 0; i--) {
+		SemaScope *scope = &sema->scopes[i];
+		for (int j = vec_len(scope->defers) - 1; j >= 0; j--) {
+			result = vec_push(result, &scope->defers[j]);
+		}
+	}
+	return result;
 }
 
 void sema_push_type(SemaModule *sema, Slice name, SemaType *type) {

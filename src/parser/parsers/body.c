@@ -1,6 +1,7 @@
 #include "../parsers.h"
 
 #include "stmts/if_else.c"
+#include "stmts/defer.c"
 #include "stmts/var.c"
 #include "stmts/return.c"
 #include "stmts/while.c"
@@ -29,6 +30,9 @@ bool parse_stmt(Parser *parser, AstStmt *stmt) {
 					return false;
 			}
 		}
+		case TOKEN_DEFER:
+			stmt->type = AST_STMT_DEFER;
+			return parse_defer(parser, &stmt->defer);
 		case TOKEN_IF:
 			stmt->type = AST_STMT_IF;
 			return parse_if_else(parser, &stmt->if_else);

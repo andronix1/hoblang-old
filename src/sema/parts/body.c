@@ -2,6 +2,7 @@
 #include "stmts/assign.c"
 #include "stmts/if_else.c"
 #include "stmts/return.c"
+#include "stmts/defer.c"
 #include "stmts/var.c"
 #include "stmts/while.c"
 
@@ -14,7 +15,9 @@ void sema_ast_body(SemaModule *sema, AstBody *body) {
 			case AST_STMT_WHILE: sema_stmt_while_loop(sema, &stmt->while_loop); break;
 			case AST_STMT_IF: sema_stmt_if_else(sema, &stmt->if_else); break;
 			case AST_STMT_ASSIGN: sema_stmt_assign(sema, &stmt->assign); break;
+			case AST_STMT_DEFER: sema_stmt_defer(sema, &stmt->defer); break;
 			case AST_STMT_FUNC_CALL: sema_ast_func_call(sema, &stmt->func_call); break;
 		}
 	}
+	body->defers = sema_resolve_defers(sema);
 } 

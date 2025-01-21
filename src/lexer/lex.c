@@ -52,6 +52,7 @@ bool lex_next(Lexer *lexer) {
 	SYMBOL_DUAL('<', '=', TOKEN_LESS, TOKEN_LESS_OR_EQUALS);
 	SYMBOL_DUAL('!', '=', TOKEN_NOT, TOKEN_NOT_EQUALS);
 	KEYWORD("var", TOKEN_VAR);
+	KEYWORD("defer", TOKEN_DEFER);
 	KEYWORD("fun", TOKEN_FUN);
 	KEYWORD("if", TOKEN_IF);
 	KEYWORD("else", TOKEN_ELSE);

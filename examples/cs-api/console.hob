@@ -7,7 +7,7 @@ fun read_line(): *u8 {
 	while c != '\n' {
 		result[i - 1] = c;
 		i = i + 1;
-		result = c::realloc(result as *void, i) as *u8;
+		result = c::realloc(result as *void, i + 1) as *u8;
 		c = c::get_char();
 	}
 	result[i] = '\0';

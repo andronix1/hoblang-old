@@ -8,6 +8,7 @@
 
 typedef enum { 
 	TOKEN_FUN,
+	TOKEN_DEFER,
 	TOKEN_IMPORT,
 	TOKEN_USE,
 	TOKEN_WHILE,
