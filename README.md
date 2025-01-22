@@ -50,9 +50,9 @@ fun main(): void {
 ```
 ### To compile
 ```
-cd examples # Must be run in examples folder, i'll fix this later
+cd examples
 mkdir .build
-../.build/hoblang compile cstest.hob .build/cstest.o
+hoblang compile examples/cstest.hob .build/cstest.o
 gcc .build/cstest.o -o .build/cstest
 .build/cstest
 ```
