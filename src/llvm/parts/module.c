@@ -20,8 +20,9 @@ void llvm_module_node(LlvmBackend *llvm, AstModuleNode *node) {
 				LLVMValueRef value = arg->decl->llvm_value = LLVMBuildAlloca(llvm->builder, llvm_resolve_type(arg->type.sema), "");
 				LLVMBuildStore(llvm->builder, LLVMGetParam(llvm->func, i), value);
 			}
-			llvm_body(llvm, &node->func_decl.body);
-			llvm_body_break(llvm, &node->func_decl.body);
+			if (llvm_body(llvm, &node->func_decl.body)) {
+				llvm_body_break(llvm, &node->func_decl.body);
+			}
 			if (sema_types_equals(node->func_decl.info.returning.sema, &primitives[PRIMITIVE_VOID])) {
 				LLVMBuildRetVoid(llvm->builder);
 			}
