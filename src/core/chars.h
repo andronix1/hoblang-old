@@ -7,7 +7,7 @@ inline static bool char_is_whitespace(char c) {
 }
 
 inline static bool char_is_latin(char c) {
-	return ('a' <= c && c <= 'z') || ('A' < c && c <= 'Z');
+	return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
 
 inline static bool char_is_digit(char c) {
