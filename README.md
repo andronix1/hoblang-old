@@ -20,8 +20,6 @@ use cs_api::console;
 use cs_api::convert;
 use libc::mem as cmem;
 
-type int = libc::int32_t;
-
 type Inner = struct {
 	integer: i32
 };

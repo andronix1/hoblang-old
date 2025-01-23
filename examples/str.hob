@@ -1,0 +1,75 @@
+import "libc/lib.hob" as libc;
+
+use libc::mem;
+use libc::io;
+
+type String = struct {
+	data: *u8,
+	length: i32,
+	capacity: i32
+};
+
+fun new(): String {
+    var result: String;
+	result.data = 0 as *u8;
+	result.length = 0;
+	result.capacity = 0;
+    return result;
+}
+
+fun free_s(self: *String): void {
+	if self.*.data != (0 as *u8) { # TODO: null
+		mem::free(self.*.data as *void);
+	}
+}
+
+fun reserve(self: *String, size: i32): void {
+	if self.*.capacity > size {
+		return;
+	}
+	if self.*.data == (0 as *u8) { # TODO: null
+		self.*.data = mem::malloc(size as libc::types::size_t) as *u8;
+	} else {
+		self.*.data = mem::realloc(self.*.data as *void, size as libc::types::size_t) as *u8;
+	}
+	self.*.capacity = size;
+}
+
+fun from_mem(ptr: *u8, size: i32): String {
+    var result = new();
+    reserve(@result, size);
+    var i = 0;
+    while i < size {
+        push(@result, ptr[i]);
+        i = i + 1;
+    }
+    return result;
+}
+
+fun push(self: *String, c: u8): void {
+	reserve(self, self.*.length + 1);
+	self.*.length = self.*.length + 1;
+	self.*.data[self.*.length - 1] = c;
+}
+
+fun append(self: *String, other: *String): void {
+	if other.*.length == 0 {
+		return;
+	}
+	var required_size = self.*.length + other.*.length;
+	reserve(self, required_size);
+	mem::copy(
+		@self.*.data[self.*.length] as *void,
+		other.*.data as *void,
+		other.*.length
+	);
+	self.*.length = self.*.length + other.*.length;
+}
+
+fun print(self: *String): void {
+	var i = 0;
+	while i < self.*.length {
+		io::put_char(self.*.data[i]);
+		i = i + 1;
+	}
+}

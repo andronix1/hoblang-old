@@ -32,13 +32,14 @@ LLVMValueRef llvm_value(LlvmBackend *llvm, AstValue *value) {
 		switch (seg->type) {
 			case AST_VALUE_IDENT: {
 				LLVMValueRef indices[] = {
+					LLVMConstInt(LLVMInt32Type(), 0, false),
 					LLVMConstInt(LLVMInt32Type(), seg->ident.struct_member_idx, false)
 				};
 				val = LLVMBuildGEP2(
 					llvm->builder,
-					llvm_resolve_type(seg->ident.struct_sema_type),
+					llvm_resolve_type(i == 0 ? decl->type : value->segments[i - 1].sema_type),
 					val,
-					indices, 1,
+					indices, 2,
 					""
 				);
 				break;

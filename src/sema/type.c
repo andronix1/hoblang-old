@@ -72,13 +72,14 @@ void print_sema_type(FILE* stream, va_list list) {
 	SemaType *type = va_arg(list, SemaType*);
 	switch (type->type) {
 		case SEMA_TYPE_STRUCT:
-			print_to(stream, "struct {", type->ptr_to);
+			print_to(stream, "struct ", type->ptr_to);
+			fprintf(stream, "{ ");
 			for (size_t i = 0; i < vec_len(type->struct_type->members); i++) {
 				if (i != 0) {
 					print_to(stream, ", ");
 				}
 				AstStructMember *member = &type->struct_type->members[i];
-				print_to(stream, " {slice}: {sema::type}", member->name, member->type->sema);
+				print_to(stream, "{slice}: {sema::type}", &member->name, member->type->sema);
 			}
 			print_to(stream, " }");
 			break;

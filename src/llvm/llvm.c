@@ -7,10 +7,12 @@ bool llvm_init(LlvmBackend *llvm) {
 }
 
 LLVMTypeRef llvm_resolve_type(SemaType *type) {
+	assert(type, "type is null");
 	switch (type->type) {
 		case SEMA_TYPE_STRUCT: {
 			LLVMTypeRef *elements = alloca(sizeof(LLVMTypeRef) * vec_len(type->struct_type->members));
 			for (size_t i = 0; i < vec_len(type->struct_type->members); i++) {
+
 				elements[i] = llvm_resolve_type(type->struct_type->members[i].type->sema);
 			}
 			return LLVMStructType(elements, vec_len(type->struct_type->members), false);
@@ -50,8 +52,8 @@ bool llvm_write_module_ir(LlvmBackend *llvm, char *output_path) {
 }
 
 bool llvm_write_module(LlvmBackend *llvm, char *output_path) {
+	llvm_write_module_ir(llvm, "dump.ll");
 	if (LLVMVerifyModule(llvm->module, LLVMAbortProcessAction | LLVMPrintMessageAction | LLVMReturnStatusAction, NULL)) {
-		llvm_write_module_ir(llvm, "dump.ll");
 		exit(1);
 	}
 
