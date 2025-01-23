@@ -2,3 +2,9 @@ extern(putchar) fun put_char(c: u8): void
 extern(getchar) fun get_char(): u8
 extern(printf) fun printf(str: *u8): void
 extern(puts) fun puts(cstr: *u8): void
+
+type Fd = i32;
+
+extern(write) fun write(socket: Fd, ptr: *u8, size: i32): i64
+extern(fsync) fun flush(socket: Fd): void
+extern(close) fun close(socket: Fd): void

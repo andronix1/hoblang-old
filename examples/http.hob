@@ -1,0 +1,45 @@
+import "libc/lib.hob" as c;
+
+use c::io;
+use c::process;
+use c::socket;
+
+fun panic(s: *u8): void {
+    io::puts(s);
+}
+
+fun main(): i32 {
+    var sock = socket::new(2, 1, 0);
+    if sock == 0 - 1 {
+        panic("cannot create a socket\0");
+        return 1;
+    }
+    # defer socket::close(sock);
+    var server_address: socket::AddressIn;
+    server_address.family = 2;
+    server_address.port = 7969;
+    server_address.in_addr = 0;
+    server_address._reserved = 0;
+    if socket::bind(sock, @server_address, 16) == 0 - 1 {
+        panic("cannot bind a socket\0");
+        return 1;
+    }
+    if socket::listen(sock, 1) == 0 - 1 {
+        panic("cannot listen a socket\0");
+        return 1;
+    }
+    while true {
+        var client_address: socket::AddressIn;
+        var client_addr_size: u64 = 16;
+        var client_socket = socket::accept(sock, @client_address, @client_addr_size);
+        if client_socket == 0 - 1 {
+            panic("cannot accept a socket\0");
+            return 1;
+        }
+        # defer close(client_socket);
+        io::write(client_socket, "hello\n", 6);
+        io::flush(client_socket);
+        io::close(client_socket);
+    }
+    return 0;
+}

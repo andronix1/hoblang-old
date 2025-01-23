@@ -1,4 +1,5 @@
 import "mem.hob" as mem;
 import "types.hob" as types;
 import "io.hob" as io;
+import "socket.hob" as socket;
 import "process.hob" as process;
