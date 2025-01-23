@@ -17,7 +17,7 @@ fun new(): String {
     return result;
 }
 
-fun free_s(self: *String): void {
+fun free(self: *String): void {
 	if self.*.data != (0 as *u8) { # TODO: null
 		mem::free(self.*.data as *void);
 	}
