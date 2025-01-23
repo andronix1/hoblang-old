@@ -1,4 +1,4 @@
 import "mem.hob" as mem;
+import "types.hob" as types;
 import "io.hob" as io;
-
-type int32_t = i32;
+import "process.hob" as process;

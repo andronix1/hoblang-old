@@ -25,9 +25,10 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 		case AST_EXPR_BOOL: return LLVMConstInt(LLVMInt1Type(), expr->boolean, false);
 		case AST_EXPR_CHAR: return LLVMConstInt(LLVMInt8Type(), expr->character, false);
 		case AST_EXPR_STR: {
+			
 			LLVMTypeRef type = LLVMArrayType(LLVMInt8Type(), expr->str.len);
-			LLVMValueRef value = LLVMBuildAlloca(llvm->builder, type, "");
-			LLVMBuildStore(llvm->builder, LLVMConstString(expr->str.str, expr->str.len, true), value);
+			LLVMValueRef value = LLVMAddGlobal(llvm->module, type, ""); //LLVMBuildAlloca(llvm->builder, type, "");
+			LLVMSetInitializer(value, LLVMConstString(expr->str.str, expr->str.len, true));
 			return LLVMBuildBitCast(llvm->builder, value, LLVMPointerType(LLVMInt8Type(), 0), "");
 		}
 		case AST_EXPR_AS: {
@@ -44,6 +45,14 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 				[PRIMITIVE_U64] = 4,
 				[PRIMITIVE_BOOL] = 0,
 			};
+			if (expr->as.expr->sema_type->type == SEMA_TYPE_POINTER
+					&& expr->as.type.sema->type == SEMA_TYPE_PRIMITIVE) {
+				return LLVMBuildPtrToInt(llvm->builder, value, to_type, "");
+			}
+			if (expr->as.expr->sema_type->type == SEMA_TYPE_PRIMITIVE
+					&& expr->as.type.sema->type == SEMA_TYPE_POINTER) {
+				return LLVMBuildIntToPtr(llvm->builder, value, to_type, "");
+			}
 			if (expr->sema_type->type == SEMA_TYPE_PRIMITIVE) {
 				if (level[expr->as.expr->sema_type->primitive] < level[expr->sema_type->primitive]) {
 					return LLVMBuildZExt(llvm->builder, value, to_type, "");

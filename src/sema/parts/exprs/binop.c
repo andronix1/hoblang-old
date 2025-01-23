@@ -17,7 +17,7 @@ SemaType *sema_ast_expr_binop(SemaModule *sema, AstExprBinop *binop, SemaType *e
 	if (!ltype) {
 		return NULL;
 	}
-	if (ltype->type != SEMA_TYPE_PRIMITIVE || ltype->primitive == PRIMITIVE_VOID) {
+	if ((ltype->type != SEMA_TYPE_PRIMITIVE && ltype->type != SEMA_TYPE_POINTER) || ltype->primitive == PRIMITIVE_VOID) {
 		sema_err("cannot use binop for type {sema::type}", ltype);
 		return NULL;
 	}

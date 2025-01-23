@@ -41,7 +41,6 @@ LLVMValueRef llvm_value(LlvmBackend *llvm, AstValue *value) {
 					indices, 1,
 					""
 				);
-				hob_log(LOGW, "unexpected ident in value");
 				break;
 			}
 			case AST_VALUE_DEREF: {

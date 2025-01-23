@@ -5,16 +5,6 @@ use cs_api::console;
 use cs_api::convert;
 use libc::mem as cmem;
 
-type int = libc::int32_t;
-
-type Inner = struct {
-	integer: i32
-};
-
-type Test = struct {
-	inner: Inner
-};
-
 fun main(): void {
 	var test: Test;	
 	defer console::write_line("finished!\0");
