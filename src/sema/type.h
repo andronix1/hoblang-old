@@ -44,4 +44,4 @@ SemaType *sema_type_new_func(SemaType *returning, AstFuncArg *args);
 SemaType *sema_type_new_pointer(SemaType *to);
 
 bool sema_types_equals(SemaType *type, SemaType *other);
-void print_sema_type(FILE* stream, va_list *list);
+void print_sema_type(FILE* stream, va_list list);

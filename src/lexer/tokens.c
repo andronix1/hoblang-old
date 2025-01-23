@@ -4,8 +4,8 @@ TokenType token_type(Token *token) {
 	return token == NULL ? TOKEN_EOI : token->type;
 }
 
-void print_token(FILE *stream, va_list *list) {	
-	const Token *token = va_arg(*list, Token*);
+void print_token(FILE *stream, va_list list) {	
+	const Token *token = va_arg(list, Token*);
 	if (token == NULL || token->type == TOKEN_EOI) {
 		fprintf(stream, "<EOF>");
 		return;

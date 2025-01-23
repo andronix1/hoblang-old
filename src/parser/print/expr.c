@@ -1,8 +1,8 @@
 #include <stdarg.h>
 #include "../ast.h"
 
-void print_ast_binop_type(FILE *stream, va_list *list) {
-	AstBinopType binop = va_arg(*list, AstBinopType);
+void print_ast_binop_type(FILE *stream, va_list list) {
+	AstBinopType binop = va_arg(list, AstBinopType);
 	const char *strs[] = {
 		[AST_BINOP_ADD] = "+",
 		[AST_BINOP_SUB] = "-",
@@ -18,8 +18,8 @@ void print_ast_binop_type(FILE *stream, va_list *list) {
 	print_to(stream, strs[binop]);
 }
 
-void print_ast_value(FILE *stream, va_list *list) {
-	AstValue *value = va_arg(*list, AstValue*);
+void print_ast_value(FILE *stream, va_list list) {
+	AstValue *value = va_arg(list, AstValue*);
 	for (size_t i = 0; i < vec_len(value->segments); i++) {
 		AstValueSegment *seg = &value->segments[i];
 		switch (seg->type) {
@@ -30,8 +30,8 @@ void print_ast_value(FILE *stream, va_list *list) {
 	}
 }
 
-void print_ast_expr(FILE *stream, va_list *list) {
-	AstExpr *expr = va_arg(*list, AstExpr*);
+void print_ast_expr(FILE *stream, va_list list) {
+	AstExpr *expr = va_arg(list, AstExpr*);
 	switch (expr->type) {
 		case AST_EXPR_REF: print_to(stream, "&{ast::val}", &expr->value); break;
 		case AST_EXPR_NOT: print_to(stream, "!({ast::val})", &expr->value); break;

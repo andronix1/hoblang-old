@@ -56,7 +56,7 @@ bool sema_types_equals(SemaType *type, SemaType *other) {
 	assert(0, "invalid sema type kind {int}", type->type);
 }
 
-void print_sema_type(FILE* stream, va_list *list) {
+void print_sema_type(FILE* stream, va_list list) {
 	const char *strs[] = {
 		[PRIMITIVE_I8] = "i8",
 		[PRIMITIVE_I16] = "i16",
@@ -69,7 +69,7 @@ void print_sema_type(FILE* stream, va_list *list) {
 		[PRIMITIVE_BOOL] = "bool",
 		[PRIMITIVE_VOID] = "void",
 	};
-	SemaType *type = va_arg(*list, SemaType*);
+	SemaType *type = va_arg(list, SemaType*);
 	switch (type->type) {
 		case SEMA_TYPE_STRUCT:
 			print_to(stream, "struct {", type->ptr_to);

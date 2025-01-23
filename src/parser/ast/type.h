@@ -2,6 +2,7 @@
 
 #include "core/slice.h"
 #include "types/struct.h"
+#include "mod_path.h"
 
 struct _SemaType;
 
@@ -20,5 +21,3 @@ typedef struct _AstType {
 		struct _AstType *ptr_to;
 	};
 } AstType;
-
-void print_ast_type(FILE *stream, va_list *list);

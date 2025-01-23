@@ -37,5 +37,3 @@ typedef struct _AstExpr {
 	};
 	struct _SemaType *sema_type; // for sema
 } AstExpr;
-
-void print_ast_expr(FILE *stream, va_list *list);
