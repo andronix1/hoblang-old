@@ -28,7 +28,7 @@ fun stop(server: *TcpServer): void {
 fun init(server: *TcpServer, input_port: TcpPort): bool {
     var break: bool = true;
     server.*.socket = socket::new(2, 1, 0);
-    if server.*.socket == 0 - 1 {
+    if server.*.socket == -1 {
         io::puts("cannot create a socket\0");
         return false;
     }
@@ -46,16 +46,16 @@ fun init(server: *TcpServer, input_port: TcpPort): bool {
     server_address._reserved = 0;
 
     var reuse: i32 = 1;
-    if socket::set_options(server.*.socket, 1, 2, @reuse as *socket::OptionValue, 4) == 0 - 1 {
+    if socket::set_options(server.*.socket, 1, 2, &reuse as *socket::OptionValue, 4) == -1 {
         io::puts("failed to set socket options\0");
         return false;
     }
 
-    if socket::bind(server.*.socket, @server_address, 16) == 0 - 1 {
+    if socket::bind(server.*.socket, &server_address, 16) == -1 {
         io::puts("cannot bind a socket\0");
         return false;
     }
-    if socket::listen(server.*.socket, 1) == 0 - 1 {
+    if socket::listen(server.*.socket, 1) == -1 {
         io::puts("cannot listen a socket\0");
         return false;
     }
@@ -67,8 +67,8 @@ fun init(server: *TcpServer, input_port: TcpPort): bool {
 fun accept(server: *TcpServer, client: *handle::TcpClientHandle): bool {
     var client_address: socket::AddressIn;
     var client_addr_size: u64 = 16;
-    client.*.socket = socket::accept(server.*.socket, @client_address, @client_addr_size);
-    if client.*.socket == 0 - 1 {
+    client.*.socket = socket::accept(server.*.socket, &client_address, &client_addr_size);
+    if client.*.socket == -1 {
         io::puts("cannot accept a socket\0");
         return false;
     }

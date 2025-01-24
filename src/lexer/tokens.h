@@ -41,7 +41,6 @@ typedef enum {
     TOKEN_MULTIPLY,
     TOKEN_DIVIDE,
     TOKEN_NOT,
-    TOKEN_REF,
     TOKEN_DOT,
     TOKEN_BITOR,
     TOKEN_BITAND,

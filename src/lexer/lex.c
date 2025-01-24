@@ -39,7 +39,6 @@ bool lex_next(Lexer *lexer) {
 	SYMBOL('+', TOKEN_ADD);
 	SYMBOL('-', TOKEN_MINUS);
 	SYMBOL('*', TOKEN_MULTIPLY);
-	SYMBOL('@', TOKEN_REF);
 	SYMBOL('/', TOKEN_DIVIDE);
 	SYMBOL(';', TOKEN_SEMICOLON);
 	SYMBOL(',', TOKEN_COMMA);

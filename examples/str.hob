@@ -37,10 +37,10 @@ fun reserve(self: *String, size: i32): void {
 
 fun from_mem(ptr: *u8, size: i32): String {
     var result = new();
-    reserve(@result, size);
+    reserve(&result, size);
     var i = 0;
     while i < size {
-        push(@result, ptr[i]);
+        push(&result, ptr[i]);
         i = i + 1;
     }
     return result;
@@ -59,7 +59,7 @@ fun append(self: *String, other: *String): void {
 	var required_size = self.*.length + other.*.length;
 	reserve(self, required_size);
 	mem::copy(
-		@self.*.data[self.*.length] as *void,
+		&self.*.data[self.*.length] as *void,
 		other.*.data as *void,
 		other.*.length
 	);

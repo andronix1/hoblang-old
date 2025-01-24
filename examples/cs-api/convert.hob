@@ -29,7 +29,7 @@ fun int32_to_string(val: i32): *u8 {
 	var i = 0;
 
 	if (val < 0) {
-		val = 0 - val; # TODO: unary operator
+		val = -val;
 		buf[i] = '-';
 		i = i + 1;
 	}

@@ -6,28 +6,28 @@ use c::process;
 
 fun main(): i32 {
     var server: tcp::server::TcpServer;
-    if !tcp::server::init(@server, 7979 as u16) {
+    if !tcp::server::init(&server, 7979 as u16) {
         return 1;
     }
-    defer tcp::server::stop(@server);
+    defer tcp::server::stop(&server);
 
 	while true {
 		var client: tcp::handle::TcpClientHandle;
-		if !tcp::server::accept(@server, @client) {
+		if !tcp::server::accept(&server, &client) {
 			return 1;
 		}
 		io::puts("new connection!\0");
 		var buffer = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
 		var reading = true;
 		while reading {	
-			var len = tcp::handle::read(@client, buffer, 16) as i32;
+			var len = tcp::handle::read(&client, buffer, 16) as i32;
 			if len <= 0 {
 				reading = false;
 			} else {
-				tcp::handle::send(@client, buffer, len as u64);
+				tcp::handle::send(&client, buffer, len as u64);
 			}
 		}
-		tcp::handle::close(@client);
+		tcp::handle::close(&client);
 		io::puts("connection closed!\0");
 	}
     return 0;

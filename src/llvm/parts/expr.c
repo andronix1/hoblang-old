@@ -61,11 +61,24 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 			}
 			return LLVMBuildBitCast(llvm->builder, value, to_type, "");
 		}
+		case AST_EXPR_UNARY: {
+			switch (expr->unary.type) {
+				case AST_UNARY_MINUS:
+					return LLVMBuildNeg(
+						llvm->builder,
+						llvm_expr(llvm, expr->unary.expr),
+						""
+					);
+			}
+			assert(0, "invalid unary {int}", expr->unary.type);
+			return NULL;
+		}
 		case AST_EXPR_BINOP: {
 			LLVMValueRef right = llvm_expr(llvm, expr->binop.right);
 			LLVMValueRef left = llvm_expr(llvm, expr->binop.left);
 			switch (expr->binop.type) {
 				case AST_BINOP_ADD: return LLVMBuildAdd(llvm->builder, left, right, "");
+				case AST_BINOP_BITAND: return LLVMBuildAnd(llvm->builder, left, right, "");
 				case AST_BINOP_SUB: return LLVMBuildSub(llvm->builder, left, right, "");
 				case AST_BINOP_MUL: return LLVMBuildMul(llvm->builder, left, right, "");
 				case AST_BINOP_DIV: return LLVMBuildSDiv(llvm->builder, left, right, "");

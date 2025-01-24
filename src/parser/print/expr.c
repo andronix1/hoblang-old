@@ -7,6 +7,7 @@ void print_ast_binop_type(FILE *stream, va_list list) {
 		[AST_BINOP_ADD] = "+",
 		[AST_BINOP_SUB] = "-",
 		[AST_BINOP_MUL] = "*",
+		[AST_BINOP_BITAND] = "&",
 		[AST_BINOP_DIV] = "/",
 		[AST_BINOP_EQ] = "==",
 		[AST_BINOP_NEQ] = "!=",
@@ -33,7 +34,15 @@ void print_ast_value(FILE *stream, va_list list) {
 void print_ast_expr(FILE *stream, va_list list) {
 	AstExpr *expr = va_arg(list, AstExpr*);
 	switch (expr->type) {
-		case AST_EXPR_REF: print_to(stream, "&{ast::val}", &expr->value); break;
+		case AST_EXPR_UNARY: {
+			switch (expr->unary.type) {
+				case AST_UNARY_MINUS:
+					print_to(stream, "-{ast::expr}", expr->unary.expr);
+					return;
+			}
+			break;
+		}
+		case AST_EXPR_REF: print_to(stream, "&{ast::expr}", &expr->value); break;
 		case AST_EXPR_NOT: print_to(stream, "!({ast::val})", &expr->value); break;
 		case AST_EXPR_VALUE: print_to(stream, "{ast::val}", &expr->value); break;
 		case AST_EXPR_INTEGER: print_to(stream, "{long}", expr->integer); break;

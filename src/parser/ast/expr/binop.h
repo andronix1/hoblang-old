@@ -1,8 +1,7 @@
 #pragma once
 
-#include "expr.h"
-
 typedef enum {
+	AST_BINOP_AND,
 	AST_BINOP_ADD,
 	AST_BINOP_SUB,
 	AST_BINOP_MUL,
@@ -13,8 +12,8 @@ typedef enum {
 	AST_BINOP_GE,
 	AST_BINOP_LT,
 	AST_BINOP_LE,
-	AST_BINOP_AND,
 	AST_BINOP_OR,
+	AST_BINOP_BITAND
 } AstBinopType;
 
 typedef struct {
