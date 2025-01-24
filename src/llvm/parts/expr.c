@@ -21,7 +21,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 		case AST_EXPR_NOT: return LLVMBuildNot(llvm->builder, llvm_expr(llvm, expr->not_expr), "");
 		case AST_EXPR_VALUE: return LLVMBuildLoad2(llvm->builder, llvm_resolve_type(expr->sema_type), llvm_value(llvm, &expr->value), "");
 		case AST_EXPR_REF: return llvm_value(llvm, &expr->value);
-		case AST_EXPR_INTEGER: return LLVMConstInt(LLVMInt32Type(), expr->integer, false);
+		case AST_EXPR_INTEGER: return LLVMConstInt(llvm_resolve_type(expr->sema_type), expr->integer, false);
 		case AST_EXPR_BOOL: return LLVMConstInt(LLVMInt1Type(), expr->boolean, false);
 		case AST_EXPR_CHAR: return LLVMConstInt(LLVMInt8Type(), expr->character, false);
 		case AST_EXPR_STR: {
