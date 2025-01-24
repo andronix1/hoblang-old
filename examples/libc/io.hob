@@ -5,6 +5,7 @@ extern(puts) fun puts(cstr: *u8): void
 
 type Fd = i32;
 
-extern(write) fun write(socket: Fd, ptr: *u8, size: i32): i64
-extern(fsync) fun flush(socket: Fd): void
-extern(close) fun close(socket: Fd): void
+extern(write) fun write(fd: Fd, ptr: *u8, size: i32): i64
+extern(read) fun read(fd: Fd, ptr: *u8, size: i32): i64
+extern(fsync) fun fsync(fd: Fd): void
+extern(close) fun close(fd: Fd): void

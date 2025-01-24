@@ -19,6 +19,7 @@ type AddressIn = struct {
 };
 extern(bind) fun bind(socket: Socket, addr: *AddressIn, size: u32): Socket
 extern(accept) fun accept(socket: Socket, addr: *AddressIn, size: *u64): Socket
+extern(send) fun send(socket: Socket, buf: *u8, size: u64, flags: i32): i64 
 
 type Level = i32;
 type OptionName = i32;

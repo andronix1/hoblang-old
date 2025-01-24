@@ -1,1 +1,2 @@
 extern(exit) fun exit(status: i32): void
+extern(signal) fun signal(number: i32, handler: *void): void

@@ -72,6 +72,5 @@ fun accept(server: *TcpServer, client: *handle::TcpClientHandle): bool {
         io::puts("cannot accept a socket\0");
         return false;
     }
-    io::write(client.*.socket, "hello\n", 6);
     return true;
 }

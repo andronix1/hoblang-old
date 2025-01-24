@@ -1,4 +1,8 @@
 import "tcp/lib.hob" as tcp;
+import "libc/lib.hob" as c;
+
+use c::io;
+use c::process;
 
 fun main(): i32 {
     var server: tcp::server::TcpServer;
@@ -7,10 +11,24 @@ fun main(): i32 {
     }
     defer tcp::server::stop(@server);
 
-    var client: tcp::handle::TcpClientHandle;
-    if !tcp::server::accept(@server, @client) {
-        return 1;
-    }
-    defer tcp::handle::close(@client);
+	while true {
+		var client: tcp::handle::TcpClientHandle;
+		if !tcp::server::accept(@server, @client) {
+			return 1;
+		}
+		io::puts("new connection!\0");
+		var buffer = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+		var reading = true;
+		while reading {	
+			var len = tcp::handle::read(@client, buffer, 16) as i32;
+			if len <= 0 {
+				reading = false;
+			} else {
+				tcp::handle::send(@client, buffer, len as u64);
+			}
+		}
+		tcp::handle::close(@client);
+		io::puts("connection closed!\0");
+	}
     return 0;
 }
