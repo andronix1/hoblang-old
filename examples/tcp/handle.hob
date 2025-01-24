@@ -18,6 +18,6 @@ fun read(client: *TcpClientHandle, data: *u8, size: i32): i64 {
 
 fun send(client: *TcpClientHandle, data: *u8, size: u64): void {
 	# MSG_NOSIGNAL = 0x4000 = 16386
-    socket::send(client.*.socket, data, size, 16386);
-	io::fsync(client.*.socket);
+    socket::send(client.*.socket, data, size, 0x4000);
+	# io::fsync(client.*.socket);
 }

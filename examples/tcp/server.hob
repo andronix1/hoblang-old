@@ -28,16 +28,16 @@ fun stop(server: *TcpServer): void {
 fun init(server: *TcpServer, input_port: TcpPort): bool {
     var break: bool = true;
     server.*.socket = socket::new(2, 1, 0);
+    if server.*.socket == 0 - 1 {
+        io::puts("cannot create a socket\0");
+        return false;
+    }
     defer {
         if (break) {
             io::close(server.*.socket);
         }
     }
 
-    if server.*.socket == 0 - 1 {
-        io::puts("cannot create a socket\0");
-        return false;
-    }
 
     var server_address: socket::AddressIn;
     server_address.family = 2;

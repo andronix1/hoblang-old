@@ -1,0 +1,30 @@
+import "tcp/lib.hob" as tcp;
+import "libc/lib.hob" as c;
+
+use c::io;
+use c::process;
+
+fun main(): i32 {
+    var server: tcp::server::TcpServer;
+    if !tcp::server::init(@server, 7979 as u16) {
+        return 1;
+    }
+    defer tcp::server::stop(@server);
+
+	while true {
+		var client: tcp::handle::TcpClientHandle;
+		if !tcp::server::accept(@server, @client) {
+			return 1;
+		}
+		io::puts("new connection!\0");
+		var buf = "\0\0\0\0\0";
+		while tcp::handle::read(@client, buf, 5) == 5 { }
+		tcp::handle::send(@client, "HTTP/1.1 200 OK\n\r", 17);
+		tcp::handle::send(@client, "Content-Length: 6\n\r", 9);
+		tcp::handle::send(@client, "\n\r\n\r", 4);
+		tcp::handle::send(@client, "hello, world!\n\r", 14);
+		tcp::handle::close(@client);
+		io::puts("connection closed!\0");
+	}
+    return 0;
+}
