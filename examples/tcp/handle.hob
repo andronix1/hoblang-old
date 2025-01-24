@@ -1,0 +1,13 @@
+import "../libc/lib.hob" as c;
+
+use c::socket;
+use c::io;
+
+type TcpClientHandle = struct {
+    address: socket::AddressIn,
+    socket: socket::Socket
+};
+
+fun close(client: *TcpClientHandle): void {
+    io::close(client.*.socket);
+}

@@ -1,0 +1,16 @@
+import "tcp/lib.hob" as tcp;
+
+fun main(): i32 {
+    var server: tcp::server::TcpServer;
+    if !tcp::server::init(@server, 7979 as u16) {
+        return 1;
+    }
+    defer tcp::server::stop(@server);
+
+    var client: tcp::handle::TcpClientHandle;
+    if !tcp::server::accept(@server, @client) {
+        return 1;
+    }
+    defer tcp::handle::close(@client);
+    return 0;
+}
