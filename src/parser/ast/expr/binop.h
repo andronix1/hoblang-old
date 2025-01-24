@@ -13,7 +13,12 @@ typedef enum {
 	AST_BINOP_LT,
 	AST_BINOP_LE,
 	AST_BINOP_OR,
-	AST_BINOP_BITAND
+	
+	AST_BINOP_BITAND,
+	AST_BINOP_BITOR,
+	AST_BINOP_SHR,
+	AST_BINOP_SHL,
+	AST_BINOP_XOR,
 } AstBinopType;
 
 typedef struct {

@@ -2,6 +2,11 @@
 
 void expr_push_down(AstExpr *expr) {
 	static int priority[] = {
+		[AST_BINOP_BITAND] = 30,
+		[AST_BINOP_BITOR] =  15,
+		[AST_BINOP_SHR] =    30,
+		[AST_BINOP_SHL] =    30,
+		[AST_BINOP_XOR] =    30,
 		[AST_BINOP_MUL] = 20,
 		[AST_BINOP_DIV] = 20,
 		[AST_BINOP_ADD] = 10,
@@ -154,6 +159,11 @@ AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType)) {
 				break;
 			}
 			case TOKEN_ADD: PARSE_BINOP(AST_BINOP_ADD); break;
+			case TOKEN_XOR: PARSE_BINOP(AST_BINOP_XOR); break;
+			case TOKEN_BITOR: PARSE_BINOP(AST_BINOP_BITOR); break;
+			case TOKEN_BITNOT: return expr_make_unary(parser, AST_UNARY_BITNOT, stop); break;
+			case TOKEN_SHR: PARSE_BINOP(AST_BINOP_SHR); break;
+			case TOKEN_SHL: PARSE_BINOP(AST_BINOP_SHL); break;
 			case TOKEN_MINUS: PARSE_BINOP_MAYBE_UNARY(AST_UNARY_MINUS, AST_BINOP_SUB); break;
 			case TOKEN_MULTIPLY: PARSE_BINOP(AST_BINOP_MUL); break;
 			case TOKEN_DIVIDE: PARSE_BINOP(AST_BINOP_DIV); break;

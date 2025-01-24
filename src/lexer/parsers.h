@@ -1,8 +1,14 @@
 #pragma once
 
 #include "lexer.h"
+#include "core/assert.h"
 
-LexOneErr lex_symbol_dual(Lexer *lexer, char symbol, char next, TokenType type, TokenType next_type);
+typedef struct {
+    char symbol;
+    TokenType type;
+} LexSymbolAlt;
+
+LexOneErr lex_symbol_alt(Lexer *lexer, LexSymbolAlt *symbols, size_t len);
 LexOneErr lex_symbol(Lexer *lexer, char symbol, TokenType type);
 LexOneErr lex_keyword(Lexer *lexer, const char *keyword, TokenType type);
 LexOneErr lex_integer(Lexer *lexer);

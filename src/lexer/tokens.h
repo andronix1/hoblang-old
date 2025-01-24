@@ -42,8 +42,13 @@ typedef enum {
     TOKEN_DIVIDE,
     TOKEN_NOT,
     TOKEN_DOT,
+
     TOKEN_BITOR,
     TOKEN_BITAND,
+    TOKEN_BITNOT,
+    TOKEN_XOR,
+    TOKEN_SHR,
+    TOKEN_SHL,
 
     TOKEN_AND,
     TOKEN_OR,

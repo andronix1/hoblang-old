@@ -6,7 +6,7 @@ use c::process;
 
 fun main(): i32 {
     var server: tcp::server::TcpServer;
-    if !tcp::server::init(&server, 7978 as u16) {
+    if !tcp::server::init(&server, 8080) {
         return 1;
     }
     defer tcp::server::stop(&server);

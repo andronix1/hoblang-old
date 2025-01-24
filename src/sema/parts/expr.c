@@ -19,6 +19,11 @@ SemaType *sema_ast_expr_type(SemaModule *sema, AstExpr *expr, SemaType *expectat
 						sema_err("cannot apply unary minus to non-primitive types");
 					}
 					return type;
+				case AST_UNARY_BITNOT:
+					if (type->type != SEMA_TYPE_PRIMITIVE) {
+						sema_err("cannot apply unary bitnot to non-primitive types");
+					}
+					return type;
 			}
 			assert(0, "invalid unary type: {int}", expr->unary.type);
 			break;

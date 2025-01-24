@@ -1,5 +1,6 @@
 typedef enum {
     AST_UNARY_MINUS,
+	AST_UNARY_BITNOT,
 } AstUnaryType;
 
 typedef struct {

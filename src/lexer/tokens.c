@@ -39,8 +39,10 @@ void print_token(FILE *stream, va_list list) {
 		case TOKEN_OPENING_SQUARE_BRACE: fprintf(stream, "["); return;
 		case TOKEN_CLOSING_SQUARE_BRACE: fprintf(stream, "]"); return;
 		case TOKEN_NOT: fprintf(stream, "!"); return;
+		case TOKEN_BITNOT: fprintf(stream, "~"); return;
 		case TOKEN_BITAND: fprintf(stream, "&"); return;
 		case TOKEN_BITOR: fprintf(stream, "|"); return;
+		case TOKEN_XOR: fprintf(stream, "^"); return;
 		case TOKEN_AND: fprintf(stream, "&&"); return;
 		case TOKEN_OR: fprintf(stream, "||"); return;
 		case TOKEN_DOT: fprintf(stream, "."); return;
@@ -52,8 +54,10 @@ void print_token(FILE *stream, va_list list) {
     	case TOKEN_NOT_EQUALS: fprintf(stream, "!="); return;
     	case TOKEN_LESS: fprintf(stream, "<"); return;
     	case TOKEN_LESS_OR_EQUALS: fprintf(stream, "<="); return;
+    	case TOKEN_SHL: fprintf(stream, "<<"); return;
     	case TOKEN_GREATER: fprintf(stream, ">"); return;
     	case TOKEN_GREATER_OR_EQUALS: fprintf(stream, ">="); return;
+    	case TOKEN_SHR: fprintf(stream, ">>"); return;
     	case TOKEN_INTEGER: fprintf(stream, "integer %ld", token->integer); return;
     	case TOKEN_CHAR: fprintf(stream, "char '%c'", token->character); return;
     	case TOKEN_STR: fprintf(stream, "string \"TODO\""); return;

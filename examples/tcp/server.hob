@@ -11,7 +11,7 @@ type TcpServer = struct {
 type TcpPort = u16;
 
 fun port(input_port: u16): TcpPort {
-    return input_port; # todo: htons
+    return input_port & 0xff << 8 | input_port >> 8 & 0xff;
 }
 
 fun stop(server: *TcpServer): void {
@@ -38,18 +38,17 @@ fun init(server: *TcpServer, input_port: TcpPort): bool {
         }
     }
 
+    var reuse: i32 = 1;
+    if socket::set_options(server.*.socket, 1, 2, &reuse as *socket::OptionValue, 4) == -1 {
+        io::puts("failed to set socket options\0");
+        return false;
+    }
 
     var server_address: socket::AddressIn;
     server_address.family = 2;
     server_address.port = port(input_port);
     server_address.in_addr = 0;
     server_address._reserved = 0;
-
-    var reuse: i32 = 1;
-    if socket::set_options(server.*.socket, 1, 2, &reuse as *socket::OptionValue, 4) == -1 {
-        io::puts("failed to set socket options\0");
-        return false;
-    }
 
     if socket::bind(server.*.socket, &server_address, 16) == -1 {
         io::puts("cannot bind a socket\0");
