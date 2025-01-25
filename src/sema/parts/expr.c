@@ -1,9 +1,10 @@
 #include "../parts.h"
-#include "exprs/func_call.c"
-#include "exprs/as.c"
-#include "exprs/binop.c"
-#include "exprs/int.c"
-#include "exprs/array.c"
+
+SemaType *sema_ast_expr_array(SemaModule *sema, AstExpr *array, SemaType *expectation);
+SemaType *sema_ast_expr_as(SemaModule *sema, AstExprAs *as);
+SemaType *sema_ast_expr_binop(SemaModule *sema, AstExprBinop *binop, SemaType *expectation);
+SemaType *sema_ast_func_call(SemaModule *sema, AstFuncCall *func_call);
+SemaType *sema_ast_expr_int(SemaModule *sema __attribute__((unused)), uint64_t integer __attribute__((unused)), SemaType *expectation);
 
 SemaType *sema_ast_expr_type(SemaModule *sema, AstExpr *expr, SemaType *expectation) {
 	switch (expr->type) {

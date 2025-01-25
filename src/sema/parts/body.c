@@ -1,10 +1,11 @@
 #include "../parts.h"
-#include "stmts/assign.c"
-#include "stmts/if_else.c"
-#include "stmts/return.c"
-#include "stmts/defer.c"
-#include "stmts/var.c"
-#include "stmts/while.c"
+
+void sema_stmt_assign(SemaModule *sema, AstAssign *assign);
+void sema_stmt_defer(SemaModule *sema, AstDefer *defer);
+void sema_stmt_if_else(SemaModule *sema, AstIfElse *if_else);
+void sema_stmt_return(SemaModule *sema, AstReturn *ret);
+void sema_stmt_var(SemaModule *sema, AstVar *var);
+void sema_stmt_while_loop(SemaModule *sema, AstWhile *while_loop);
 
 void sema_ast_body(SemaModule *sema, AstBody *body) {
 	for (size_t i = 0; i < vec_len(body->stmts); i++) {

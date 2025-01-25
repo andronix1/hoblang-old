@@ -1,3 +1,5 @@
+#include "../../parts.h"
+
 SemaType *sema_ast_expr_as(SemaModule *sema, AstExprAs *as) {
 	SemaType *as_type = sema_ast_type(sema, &as->type);
 	if (!as_type) {

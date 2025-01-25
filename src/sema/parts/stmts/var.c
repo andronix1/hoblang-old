@@ -1,3 +1,5 @@
+#include "../../parts.h"
+
 void sema_stmt_var(SemaModule *sema, AstVar *var) {
 	SemaType *var_type;
 	if (var->typed) {

@@ -27,6 +27,13 @@ set(SOURCE_FILES
 	src/parser/parser.c
 	src/parser/print/expr.c
 	src/parser/print/type.c
+	src/parser/parsers/stmts/var.c
+	src/parser/parsers/stmts/return.c
+	src/parser/parsers/stmts/while.c
+	src/parser/parsers/stmts/defer.c
+	src/parser/parsers/stmts/if_else.c
+	src/parser/parsers/decls/ext_func.c
+	src/parser/parsers/decls/func.c
 	src/parser/parsers/module.c
 	src/parser/parsers/module_node.c
 	src/parser/parsers/type.c
@@ -38,6 +45,17 @@ set(SOURCE_FILES
 
 	src/sema/sema.c
 	src/sema/type.c
+	src/sema/parts/exprs/array.c
+	src/sema/parts/exprs/as.c
+	src/sema/parts/exprs/binop.c
+	src/sema/parts/exprs/func_call.c
+	src/sema/parts/exprs/int.c
+	src/sema/parts/stmts/assign.c
+	src/sema/parts/stmts/if_else.c
+	src/sema/parts/stmts/return.c
+	src/sema/parts/stmts/defer.c
+	src/sema/parts/stmts/var.c
+	src/sema/parts/stmts/while.c
 	src/sema/parts/module.c
 	src/sema/parts/mod_path.c
 	src/sema/parts/type.c
