@@ -8,7 +8,7 @@ use c::process;
 
 fun handle_conn(handle: *tcp::handle::TcpClientHandle): void {
 	io::puts("new connection!\0");
-	var buf = "\0\0\0\0\0";
+	var buf = [0 as u8, 0, 0, 0, 0];
 	while tcp::handle::read(handle, buf, 5) == 5 { }
 	tcp::handle::send(handle, "HTTP/1.1 200 OK\n\r", 17);
 	tcp::handle::send(handle, "Content-Length: 14\n\r", 9);
