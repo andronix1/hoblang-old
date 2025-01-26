@@ -4,27 +4,36 @@ import "libc/lib.hob" as c;
 use c::io;
 use c::process;
 
+# global / export
+
+fun handle_conn(handle: *tcp::handle::TcpClientHandle): void {
+	io::puts("new connection!\0");
+	var buf = "\0\0\0\0\0";
+	while tcp::handle::TcpClientHandle(handle, buf, 5) == 5 { }
+	tcp::handle::send(handle, "HTTP/1.1 200 OK\n\r", 17);
+	tcp::handle::send(handle, "Content-Length: 14\n\r", 9);
+	tcp::handle::send(handle, "\n\r\n\r", 4);
+	tcp::handle::send(handle, "hello, world!\n", 14);
+	tcp::handle::close(handle);
+	io::puts("connection closed!\0");
+}
+
 fun main(): i32 {
     var server: tcp::server::TcpServer;
-    if !tcp::server::init(&server, 8080) {
+    if !tcp::server::init(&server, 9000) {
         return 1;
     }
     defer tcp::server::stop(&server);
+
+	# TODO: function pointers
+	var func: fun (i32) -> void = handle_conn;
 
 	while true {
 		var client: tcp::handle::TcpClientHandle;
 		if !tcp::server::accept(&server, &client) {
 			return 1;
 		}
-		io::puts("new connection!\0");
-		var buf = "\0\0\0\0\0";
-		while tcp::handle::read(&client, buf, 5) == 5 { }
-		tcp::handle::send(&client, "HTTP/1.1 200 OK\n\r", 17);
-		tcp::handle::send(&client, "Content-Length: 6\n\r", 9);
-		tcp::handle::send(&client, "\n\r\n\r", 4);
-		tcp::handle::send(&client, "hello, world!\n\r", 14);
-		tcp::handle::close(&client);
-		io::puts("connection closed!\0");
+		handle_conn(&client);
 	}
     return 0;
 }
