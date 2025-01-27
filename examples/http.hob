@@ -12,7 +12,6 @@ use pthread::thread;
 fun handle_conn(handle: *tcp::handle::TcpClientHandle): void {
 	defer mem::free(handle as *void);
 	defer tcp::handle::close(handle);
-	defer io::puts("freed\0");
 
 	io::puts("new connection!\0");
 	var buf = [0 as u8, 0, 0, 0, 0];
@@ -31,9 +30,9 @@ fun handle_conn(handle: *tcp::handle::TcpClientHandle): void {
 		return;
 	}
 
-	tcp::handle::send(handle, "HTTP/1.1 200 OK\n\r", 17);
-	tcp::handle::send(handle, "Content-Type: text/html\n\r", 25);
-	tcp::handle::send(handle, "\n\r\n\r", 4);
+	tcp::handle::send(handle, "HTTP/1.1 200 OK\r\n", 17);
+	tcp::handle::send(handle, "Content-Type: text/html\r\n", 25);
+	tcp::handle::send(handle, "\r\n", 2);
 	if io::send_file(handle.*.socket, fd, 0, stat.size) < 0 {
 		io::puts("failed to send file!\0");
 		return;

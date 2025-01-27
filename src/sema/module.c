@@ -111,7 +111,7 @@ AstDefer **sema_module_resolve_defers(SemaModule *sema) {
     AstDefer **result = vec_new(AstDefer*);
     for (ssize_t i = (size_t)vec_len(sema->scopes) - 1; i >= 0; i--) {
         SemaScope *scope = &sema->scopes[i];
-        for (size_t j = 0; j < vec_len(scope->defers); j++) {
+        for (ssize_t j = (size_t)vec_len(scope->defers) - 1; j >= 0; j--) {
             result = vec_push(result, &scope->defers[j]);
         }
     }

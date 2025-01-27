@@ -8,7 +8,7 @@ type Fd = i32;
 extern(write) fun write(fd: Fd, ptr: *u8, size: i32): i64
 extern(read) fun read(fd: Fd, ptr: *u8, size: i32): i64
 extern(fsync) fun fsync(fd: Fd): void
-extern(close) fun close(fd: Fd): void
+extern(close) fun close(fd: Fd): i32
 
 type File = *void;
 
