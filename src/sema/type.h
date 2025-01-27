@@ -7,7 +7,7 @@
 #include "parser/ast.h"
 
 typedef struct {
-	AstFuncArg *args;
+	struct _SemaType **args;
 	struct _SemaType *returning;
 } SemaFunction;
 
@@ -40,7 +40,7 @@ typedef struct _SemaType {
 
 extern SemaType primitives[];
 
-SemaType *sema_type_new_func(SemaType *returning, AstFuncArg *args);
+SemaType *sema_type_new_func(SemaType *returning, SemaType **args);
 SemaType *sema_type_new_pointer(SemaType *to);
 
 bool sema_types_equals(SemaType *type, SemaType *other);

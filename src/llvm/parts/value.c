@@ -1,6 +1,6 @@
 #include "../parts.h"
 
-LLVMValueRef llvm_sema_value(LlvmBackend *llvm, SemaValueDecl *decl) {
+LLVMValueRef llvm_sema_value(LlvmBackend *llvm, SemaScopeValueDecl *decl) {
 	assert(decl, "value was not mapped to decl");
 	if (decl->llvm_value) {
 		return decl->llvm_value;
@@ -10,7 +10,7 @@ LLVMValueRef llvm_sema_value(LlvmBackend *llvm, SemaValueDecl *decl) {
 		case SEMA_TYPE_FUNCTION: {
 			LLVMTypeRef *params = alloca(sizeof(LLVMTypeRef) * vec_len(decl->type->func.args));
 			for (size_t i = 0; i < vec_len(decl->type->func.args); i++) {
-				params[i] = llvm_resolve_type(decl->type->func.args[i].type.sema);
+				params[i] = llvm_resolve_type(decl->type->func.args[i]);
 			}
 			LLVMTypeRef type = LLVMFunctionType(llvm_resolve_type(decl->type->func.returning), params, vec_len(decl->type->func.args), false);
 			return decl->llvm_value = LLVMAddFunction(llvm->module, "", type);
@@ -25,7 +25,7 @@ LLVMValueRef llvm_sema_value(LlvmBackend *llvm, SemaValueDecl *decl) {
 }
 
 LLVMValueRef llvm_value(LlvmBackend *llvm, AstValue *value) {
-	SemaValueDecl *decl = value->mod_path.value;
+	SemaScopeValueDecl *decl = value->mod_path.value;
 	LLVMValueRef val = decl->llvm_value ? decl->llvm_value : llvm_sema_value(llvm, decl);
 	for (size_t i = 0; i < vec_len(value->segments); i++) {
 		AstValueSegment *seg = &value->segments[i];
@@ -60,7 +60,7 @@ LLVMValueRef llvm_value(LlvmBackend *llvm, AstValue *value) {
 				val = LLVMBuildGEP2(
 					llvm->builder,
 					llvm_resolve_type(seg->sema_type),
-					LLVMBuildLoad2(llvm->builder, llvm_resolve_type(i == 0 ? decl->type :  value->segments[i - 1].sema_type), val, ""),
+					LLVMBuildLoad2(llvm->builder, llvm_resolve_type(i == 0 ? decl->type : value->segments[i - 1].sema_type), val, ""),
 					indices, 1,
 					""
 				);

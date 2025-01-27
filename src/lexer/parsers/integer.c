@@ -3,7 +3,6 @@
 int char_to_digit10(char c) { return c - '0'; }
 
 int char_to_digit16(char c) {
-	printf("hex: %c\n", c);
 	if (char_is_digit(c)) return char_to_digit10(c);
 	if ('a' <= c && c <= 'f') return c - 'a' + 10;
 	if ('A' <= c && c <= 'F') return c - 'A' + 10;

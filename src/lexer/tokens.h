@@ -19,6 +19,7 @@ typedef enum {
     TOKEN_AS,
     
 	TOKEN_STRUCT,
+    TOKEN_FUNC_RETURNS,
     
 	TOKEN_IF,
     TOKEN_ELSE,

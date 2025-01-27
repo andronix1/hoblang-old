@@ -28,5 +28,5 @@ void sema_stmt_var(SemaModule *sema, AstVar *var) {
 			return;
 		}
 	}
-	var->decl = sema_push_decl(sema, var->name, var_type);
+	var->decl = &sema_module_push_decl(sema, sema_scope_decl_new_value(var->name, var_type))->value_decl;
 }

@@ -9,5 +9,5 @@ typedef struct {
 	AstExpr expr;
 	bool initializes, typed;
 	
-	struct _SemaValueDecl *decl;
+	struct _SemaScopeValueDecl *decl;
 } AstVar;

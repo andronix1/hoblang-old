@@ -45,7 +45,7 @@ bool sema_types_equals(SemaType *type, SemaType *other) {
 				return false;
 			}
 			for (size_t i = 0; i < vec_len(type->func.args); i++) {	
-				if (!sema_types_equals(type->func.args[i].type.sema, other->func.args[i].type.sema)) {
+				if (!sema_types_equals(type->func.args[i], other->func.args[i])) {
 					return false;
 				}
 			}
@@ -94,7 +94,7 @@ void print_sema_type(FILE* stream, va_list list) {
 			print_to(stream, "fun (");
 			for (size_t i = 0; i < vec_len(type->func.args); i++) {
 				if (i != 0) print_to(stream, ", ");
-				print_to(stream, "{sema::type}", type->func.args[i].type.sema);
+				print_to(stream, "{sema::type}", type->func.args[i]);
 			}
 			print_to(stream, "): {sema::type}", type->func.returning);
 			break;
@@ -111,7 +111,7 @@ SemaType *sema_type_new_pointer(SemaType *to) {
 	return result;
 }
 
-SemaType *sema_type_new_func(SemaType *returning, AstFuncArg *args) {
+SemaType *sema_type_new_func(SemaType *returning, SemaType **args) {
 	SemaType *result = malloc(sizeof(SemaType));
 	result->type = SEMA_TYPE_FUNCTION;
 	result->func.returning = returning;

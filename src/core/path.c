@@ -1,10 +1,14 @@
 #include "path.h"
 
-char *realpath_rel(const char *path, const char *wd) {
-	char cwd[PATH_MAX];
-	getcwd(cwd, PATH_MAX);
-	chdir(wd);
-	char *result = realpath(path, NULL);
-	chdir(cwd);
-	return result;
+void path_split_filename_dir(char *source, char **dir, char **filename) {
+	*filename = source;
+	*dir = NULL;
+	for (int i = strlen(source) - 1; i >= 0; i--) {
+		if (source[i] == '/') {
+			source[i] = '\0';
+			*dir = source;
+			*filename = &source[i + 1];
+			break;
+		}
+	}
 }

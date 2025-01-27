@@ -1,8 +1,11 @@
 import "tcp/lib.hob" as tcp;
 import "libc/lib.hob" as c;
+# import "pthread/lib.hob" as pthread;
 
+use c::mem;
 use c::io;
 use c::process;
+# use pthread::thread;
 
 # global / export
 
@@ -16,6 +19,7 @@ fun handle_conn(handle: *tcp::handle::TcpClientHandle): void {
 	tcp::handle::send(handle, "hello, world!\n", 14);
 	tcp::handle::close(handle);
 	io::puts("connection closed!\0");
+	# thread::exit(0 as *void);
 }
 
 fun main(): i32 {
@@ -25,15 +29,21 @@ fun main(): i32 {
     }
     defer tcp::server::stop(&server);
 
-	# TODO: function pointers
-	# var func: fun (i32) -> void = handle_conn;
+	# var func = handle_conn;
 
 	while true {
-		var client: tcp::handle::TcpClientHandle;
-		if !tcp::server::accept(&server, &client) {
+		# TODO: sizeof
+		var client = mem::malloc(20) as *tcp::handle::TcpClientHandle;
+		if !tcp::server::accept(&server, client) {
 			return 1;
 		}
-		handle_conn(&client);
+		# var t: thread::Thread;
+		# var attr: pthread::attr::Attr;
+		# if thread::create(&t, 0 as *pthread::attr::Attr, func as fun (*void) -> *void, client as *void) != 0 {
+		# 	io::puts("failed to create the thread!\0");
+		# }
+		handle_conn(client);
+		mem::free(client as *void);
 	}
     return 0;
 }

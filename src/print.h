@@ -49,5 +49,6 @@ void print_setup() {
 	print_register(slice_from_cstr("ast::expr"), print_ast_expr);
 	print_register(slice_from_cstr("ast::binop"), print_ast_binop_type);
 	print_register(slice_from_cstr("ast::type"), print_ast_type);
+	print_register(slice_from_cstr("ast::path"), print_ast_mod_path);
 	print_register(slice_from_cstr("ast::val"), print_ast_value);
 }

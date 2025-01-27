@@ -1,0 +1,12 @@
+import "attr.hob" as attr;
+
+type Thread = u64;
+
+extern(pthread_create) fun create(
+    thread: *Thread,
+    attr: *attr::Attr,
+    routine: fun (*void) -> *void,
+    arg: *void
+): i32
+
+extern(pthread_exit) fun exit(value: *void): void

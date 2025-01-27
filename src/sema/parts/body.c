@@ -20,5 +20,5 @@ void sema_ast_body(SemaModule *sema, AstBody *body) {
 			case AST_STMT_FUNC_CALL: sema_ast_func_call(sema, &stmt->func_call); break;
 		}
 	}
-	body->defers = sema_resolve_defers(sema);
+	body->defers = sema_module_resolve_defers(sema);
 } 

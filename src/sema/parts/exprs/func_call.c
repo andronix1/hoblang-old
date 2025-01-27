@@ -14,12 +14,12 @@ SemaType *sema_ast_func_call(SemaModule *sema, AstFuncCall *func_call) {
 		return NULL;
 	}
 	for (size_t i = 0; i < vec_len(func_call->args); i++) {
-		SemaType *arg_type = sema_ast_expr_type(sema, &func_call->args[i], type->func.args[i].type.sema);
+		SemaType *arg_type = sema_ast_expr_type(sema, &func_call->args[i], type->func.args[i]);
 		if (!arg_type) {
 			return NULL;
 		}
-		if (!sema_types_equals(arg_type, type->func.args[i].type.sema)) {
-			sema_err("expected {sema::type} arg type but {sema::type} was passed", type->func.args[i].type.sema, arg_type);
+		if (!sema_types_equals(arg_type, type->func.args[i])) {
+			sema_err("expected {sema::type} arg type but {sema::type} was passed", type->func.args[i], arg_type);
 			return NULL;
 		}
 	}

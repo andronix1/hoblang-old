@@ -23,12 +23,20 @@ void print_ast_binop_type(FILE *stream, va_list list) {
 	print_to(stream, strs[binop]);
 }
 
+void print_ast_mod_path(FILE *stream, va_list list) {
+	AstModPath *path = va_arg(list, AstModPath*);
+	for (size_t i = 0; i < vec_len(path->segments); i++) {
+		print_to(stream, i == 0 ? "{slice}" : "::{slice}", &path->segments[i]);
+	}
+}
+
 void print_ast_value(FILE *stream, va_list list) {
 	AstValue *value = va_arg(list, AstValue*);
+	print_to(stream, "{ast::path}", &value->mod_path);
 	for (size_t i = 0; i < vec_len(value->segments); i++) {
 		AstValueSegment *seg = &value->segments[i];
 		switch (seg->type) {
-			case AST_VALUE_IDENT: print_to(stream, i == 0 ? "{slice}" : ".{slice}", &seg->ident); break;
+			case AST_VALUE_IDENT: print_to(stream, ".{slice}", &seg->ident); break;
 			case AST_VALUE_DEREF: print_to(stream, ".*"); break;
 			case AST_VALUE_IDX: print_to(stream, "[{ast::expr}]", seg->idx); break;
 		}

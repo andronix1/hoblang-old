@@ -43,7 +43,8 @@ set(SOURCE_FILES
 	src/parser/parsers/mod_path.c
 	src/parser/parsers/body.c
 
-	src/sema/sema.c
+	src/sema/module.c
+	src/sema/project.c
 	src/sema/type.c
 	src/sema/parts/exprs/array.c
 	src/sema/parts/exprs/as.c
@@ -79,7 +80,7 @@ include_directories(${LLVM_INCLUDE_DIRS})
 link_directories(${LLVM_LIBRARY_DIRS})
 add_executable(hoblang ${SOURCE_FILES})
 target_compile_options(hoblang PRIVATE 
-	-Wall -Wextra -Wpedantic -Werror
+	-Wall -Wextra -Werror
 	-Wno-format
 	-Wno-error=unused-parameter -Wno-error=unused-variable
 )

@@ -5,13 +5,19 @@ void sema_add_ast_func_info(SemaModule *sema, AstFuncInfo *info) {
 	if (!returning) {
 		return;
 	}
+	SemaType **args = vec_new(SemaType*);
 	for (size_t i = 0; i < vec_len(info->args); i++) {
 		AstFuncArg *arg = &info->args[i];
-		if (!sema_ast_type(sema, &arg->type)) {
+		SemaType *type = sema_ast_type(sema, &arg->type);
+		if (!type) {
 			return;
 		}
+		args = vec_push(args, &type);
 	}
-	info->decl = sema_push_decl(sema, info->name, sema_type_new_func(returning, info->args));
+	info->decl = &sema_module_push_public_decl(sema, sema_scope_decl_new_value(
+		info->name,
+		sema_type_new_func(returning, args)
+	))->value_decl;
 }
 
 void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
@@ -21,28 +27,27 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 			if (!type) {
 				break;
 			}
-			sema_push_type(sema, node->type_alias.alias, type);
+			sema_module_push_public_decl(sema, sema_scope_decl_new_type(node->type_alias.alias, type));
 			break;
 		}
 		case AST_MODULE_NODE_USE: {
-			SemaModuleUsage usage = {
-				.module = sema_resolve_module_path(sema, &node->use.path),
-				.name = node->use.has_alias ? node->use.alias : *(Slice*)vec_top(node->use.path.segments)
-			};
-			if (usage.module) {
-				sema->modules = vec_push(sema->modules, &usage);
+			SemaModule *module = sema_resolve_mod_path_module(sema, &node->use.path);
+			if (!module) {
+				break;
 			}
+			sema_module_push_public_decl(sema, sema_scope_decl_new_module(
+				node->use.has_alias ? node->use.alias : *(Slice*)vec_top(node->use.path.segments),
+				module
+			));
 			break;
 		}
 
 		case AST_MODULE_NODE_IMPORT: {
-			SemaModuleUsage usage = {
-				.module = sema_project_add_module(sema->project, node->import.path),
-				.name = node->import.as
-			};
-			if (usage.module) {
-				sema->modules = vec_push(sema->modules, &usage);
+			SemaModule *module = sema_project_add_module_at(sema->project, node->import.path);
+			if (!module) {
+				break;
 			}
+			sema_module_push_public_decl(sema, sema_scope_decl_new_module(node->import.as, module));
 			break;
 		}
 
@@ -60,12 +65,12 @@ void sema_push_ast_func_info(SemaModule *sema, AstFuncInfo *info) {
 	for (size_t i = 0; i < vec_len(info->args); i++) {
 		AstFuncArg *arg = &info->args[i];
 		SemaType *type = sema_ast_type(sema, &arg->type);
-		arg->decl = sema_push_decl(sema, arg->name, type);
+		arg->decl = &sema_module_push_decl(sema, sema_scope_decl_new_value(arg->name, type))->value_decl;
 	}
 }
 
 void sema_ast_module_node(SemaModule *sema, AstModuleNode *node) {
-	sema_push_scope(sema);
+	sema_module_push_scope(sema);
 	switch (node->type) {
 		case AST_MODULE_NODE_TYPE_ALIAS:
 		case AST_MODULE_NODE_EXTERNAL_FUNC:
@@ -79,12 +84,12 @@ void sema_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 			sema_ast_body(sema, &node->func_decl.body);
 			break;	
 	}
-	sema_pop_scope(sema);
+	sema_module_pop_scope(sema);
 }
 
 void sema_module_read(SemaModule *sema) {
-	sema_push_scope(sema);
-	sema_push_primitives(sema);
+	sema_module_push_scope(sema);
+	sema_module_push_primitives(sema);
 	for (size_t i = 0; i < vec_len(sema->ast->nodes); i++) {
 		sema_push_ast_module_node(sema, &sema->ast->nodes[i]);
 	}
@@ -94,4 +99,5 @@ void sema_module(SemaModule *sema) {
 	for (size_t i = 0; i < vec_len(sema->ast->nodes); i++) {
 		sema_ast_module_node(sema, &sema->ast->nodes[i]);
 	}
+	sema_module_pop_scope(sema);
 }
