@@ -9,3 +9,14 @@ extern(write) fun write(fd: Fd, ptr: *u8, size: i32): i64
 extern(read) fun read(fd: Fd, ptr: *u8, size: i32): i64
 extern(fsync) fun fsync(fd: Fd): void
 extern(close) fun close(fd: Fd): void
+
+type File = *void;
+
+type FileStatus = struct {
+    a: u64, b: u64, c: u64, d: u64, e: u64, f: u64, size: u64,
+    g: u64, h: u64, i: u64, j: u64, k: u64, l: u64, m: u64, n: u64, o: u64, p: u64, q: u64
+};
+
+extern(open) fun open(path: *u8, flags: i32): i32
+extern(fstat) fun file_status(fd: Fd, output: *FileStatus): i32
+extern(sendfile) fun send_file(out: Fd, in: Fd, offset: u64, size: u64): i64

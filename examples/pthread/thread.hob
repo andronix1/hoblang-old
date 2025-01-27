@@ -9,5 +9,7 @@ extern(pthread_create) fun create(
     arg: *void
 ): i32
 
+extern(sleep) fun sleep(secs: u32): u32
+extern(pthread_join) fun join(thread: Thread): i32
 extern(pthread_detach) fun detach(thread: Thread): i32
 extern(pthread_exit) fun exit(value: *void): void

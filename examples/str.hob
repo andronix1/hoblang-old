@@ -1,7 +1,7 @@
-import "libc/lib.hob" as libc;
+import "libc/lib.hob" as c;
 
-use libc::mem;
-use libc::io;
+use c::mem;
+use c::io;
 
 type String = struct {
 	data: *u8,
