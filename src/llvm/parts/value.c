@@ -1,32 +1,8 @@
 #include "../parts.h"
 
-LLVMValueRef llvm_sema_value(LlvmBackend *llvm, SemaScopeValueDecl *decl) {
-	assert(decl, "value was not mapped to decl");
-	if (decl->llvm_value) {
-		return decl->llvm_value;
-	}
-	assert(decl->type, "type was not mapped to decl's value");
-	switch (decl->type->type) {
-		case SEMA_TYPE_FUNCTION: {
-			LLVMTypeRef *params = alloca(sizeof(LLVMTypeRef) * vec_len(decl->type->func.args));
-			for (size_t i = 0; i < vec_len(decl->type->func.args); i++) {
-				params[i] = llvm_resolve_type(decl->type->func.args[i]);
-			}
-			LLVMTypeRef type = LLVMFunctionType(llvm_resolve_type(decl->type->func.returning), params, vec_len(decl->type->func.args), false);
-			return decl->llvm_value = LLVMAddFunction(llvm->module, "", type);
-		}
-
-		case SEMA_TYPE_STRUCT:
-		case SEMA_TYPE_PRIMITIVE:
-		case SEMA_TYPE_POINTER:
-			break;
-	}
-	assert(0, "xref was not caught!");
-}
-
 LLVMValueRef llvm_value(LlvmBackend *llvm, AstValue *value) {
 	SemaScopeValueDecl *decl = value->mod_path.value;
-	LLVMValueRef val = decl->llvm_value ? decl->llvm_value : llvm_sema_value(llvm, decl);
+	LLVMValueRef val = decl->llvm_value;
 	for (size_t i = 0; i < vec_len(value->segments); i++) {
 		AstValueSegment *seg = &value->segments[i];
 		switch (seg->type) {

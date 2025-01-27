@@ -40,7 +40,10 @@ LLVMTypeRef llvm_resolve_type(SemaType *type) {
 			for (size_t i = 0; i < vec_len(type->func.args); i++) {
 				params[i] = llvm_resolve_type(type->func.args[i]);
 			}
-			return LLVMFunctionType(llvm_resolve_type(type->func.returning), params, vec_len(type->func.args), false /* IsVarArg */);
+			return LLVMPointerType(
+				LLVMFunctionType(llvm_resolve_type(type->func.returning), params, vec_len(type->func.args), false /* IsVarArg */),
+				0
+			);
 		}
 		case SEMA_TYPE_POINTER: {
 			return LLVMPointerType(llvm_resolve_type(type->ptr_to), 0);

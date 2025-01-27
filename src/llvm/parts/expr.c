@@ -13,7 +13,18 @@ LLVMValueRef llvm_func_call(LlvmBackend *llvm, AstFuncCall *func_call) {
 	for (size_t i = 0; i < vec_len(func_call->args); i++) {
 		params[i] = llvm_expr(llvm, &func_call->args[i]);
 	}
-	return LLVMBuildCall2(llvm->builder, llvm_resolve_type(func_call->value.sema_type), llvm_value(llvm, &func_call->value), params, vec_len(func_call->args), "");
+	return LLVMBuildCall2(
+		llvm->builder,
+		llvm_sema_function_type(&func_call->value.sema_type->func),
+		LLVMBuildLoad2(
+			llvm->builder,
+			llvm_resolve_type(func_call->value.sema_type),
+			llvm_value(llvm, &func_call->value),
+			""
+		),
+		params, vec_len(func_call->args),
+		""
+	);
 }
 
 LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
