@@ -7,7 +7,7 @@ use c::io;
 use c::process;
 use pthread::thread;
 
-# global / export
+# TODO: global / export
 
 fun handle_conn(handle: *tcp::handle::TcpClientHandle): void {
 	defer mem::free(handle as *void);

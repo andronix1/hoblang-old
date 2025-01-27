@@ -11,39 +11,72 @@ gcc <output> -o <binary-output>
 ./<binary-output>
 ```
 ## Syntax
-C#-like API example(`examples/cstest.hob`)
+Multithreaded HTTP example(`examples/cstest.hob`)
 ```
-import "cs-api/lib.hob" as cs_api;
-import "libc/lib.hob" as libc;
+import "tcp/lib.hob" as tcp;
+import "libc/lib.hob" as c;
+import "pthread/lib.hob" as pthread;
 
-use cs_api::console;
-use cs_api::convert;
-use libc::mem as cmem;
+use c::mem;
+use c::io;
+use c::process;
+use pthread::thread;
 
-type Inner = struct {
-	integer: i32
-};
+fun handle_conn(handle: *tcp::handle::TcpClientHandle): void {
+	defer mem::free(handle as *void);
+	defer tcp::handle::close(handle);
 
-type Test = struct {
-	inner: Inner
-};
+	io::puts("new connection!\0");
+	var buf = [0 as u8, 0, 0, 0, 0];
+	while tcp::handle::read(handle, buf, 5) == 5 { }
 
-fun main(): void {
-	var test: Test;	
-	defer console::write_line("finished!\0");
-	var str = console::read_line();
-	defer cmem::free(str as *void);
-	console::write("your number: \0");
-	console::write_line(str);
-	console::write_line("incrementing it...\0");
-	test.inner.integer = convert::to_int32(str);
-	if test.inner.integer == 68 {
-		console::write_line("I am not ChatGPT, but...\0");
+	var fd = io::open("test.html\0", 0);
+	if fd < 0 {
+		io::puts("failed to open a file test.html\0");
 		return;
 	}
-	var istr = convert::int32_to_string(test.inner.integer + 1);
-	defer cmem::free(istr as *void);
-	console::write_line(istr);
+	defer io::close(fd);
+
+	var stat: io::FileStatus;
+	if io::file_status(fd, &stat) != 0 {
+		io::puts("failed to get file status!\0");
+		return;
+	}
+
+	tcp::handle::send(handle, "HTTP/1.1 200 OK\r\n", 17);
+	tcp::handle::send(handle, "Content-Type: text/html\r\n", 25);
+	tcp::handle::send(handle, "\r\n", 2);
+	if io::send_file(handle.*.socket, fd, 0, stat.size) < 0 {
+		io::puts("failed to send file!\0");
+		return;
+	}
+	
+	io::puts("connection closed!\0");
+}
+
+fun main(): i32 {
+    var server: tcp::server::TcpServer;
+    if !tcp::server::init(&server, 9000) {
+        return 1;
+    }
+    defer tcp::server::stop(&server);
+
+	var func = handle_conn;
+
+	while true {
+		var client = mem::malloc(20) as *tcp::handle::TcpClientHandle;
+		if !tcp::server::accept(&server, client) {
+			return 1;
+		}
+		var t: thread::Thread;
+		if thread::create(&t, 0 as *pthread::attr::Attr, func as fun (*void) -> *void, client as *void) != 0 {
+			io::puts("failed to create the thread!\0");
+		}
+		if thread::detach(t) != 0 {
+			io::puts("failed to detach thread!\0");
+		}
+	}
+    return 0;
 }
 ```
 ### To compile
