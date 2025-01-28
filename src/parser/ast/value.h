@@ -1,5 +1,7 @@
 #pragma once
 
+#include "mod_path.h"
+
 typedef enum {
 	AST_VALUE_IDENT,
 	AST_VALUE_IDX,

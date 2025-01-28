@@ -7,9 +7,29 @@ use c::io;
 use c::process;
 use pthread::thread;
 
-# TODO:global / export
+# TODO: global / export
 
 fun handle_conn(handle: *tcp::handle::TcpClientHandle): void {
+	var test = 10;
+	asm {
+		# FORMAT:
+		#	<mnem> <arg1>, <arg2>;
+		# ARGUMENTS:
+		# 	 ecx  - register
+		# 	  x   - variable
+		# 	(...) - expression
+		mov $eax, (0);
+		mov test, $eax;
+	}
+
+	if test == 0 {
+		io::puts("COOL!!!\n");
+	} else if test == 10 {
+		io::puts("NO MOVING!!!\n");
+	} else {
+		io::puts("So bad((((\n");
+	}
+
 	defer mem::free(handle as *void);
 	defer tcp::handle::close(handle);
 

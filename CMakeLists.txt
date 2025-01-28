@@ -27,12 +27,13 @@ set(SOURCE_FILES
 	src/parser/parser.c
 	src/parser/print/expr.c
 	src/parser/print/type.c
-	src/parser/parsers/stmts/asm.c
+	src/parser/ast/stmts/asm.c
 	src/parser/parsers/stmts/var.c
 	src/parser/parsers/stmts/return.c
 	src/parser/parsers/stmts/while.c
 	src/parser/parsers/stmts/defer.c
 	src/parser/parsers/stmts/if_else.c
+	src/parser/parsers/stmts/asm.c
 	src/parser/parsers/decls/ext_func.c
 	src/parser/parsers/decls/func.c
 	src/parser/parsers/module.c
@@ -69,6 +70,7 @@ set(SOURCE_FILES
 	src/llvm/llvm.c
 	src/llvm/parts/module.c
 	src/llvm/parts/body.c
+	src/llvm/parts/stmts/asm/x86.c
 	src/llvm/parts/stmts/assign.c
 	src/llvm/parts/stmts/asm/x86.c
 	src/llvm/parts/stmts/if.c
