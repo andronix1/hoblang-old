@@ -48,10 +48,6 @@ bool parse_asm_mnemonic(Parser *parser, AstAsmMnemonic *mnem) {
                 mnem->args = vec_push(mnem->args, &arg);
                 break;
             }
-
-            // default:
-            //     parse_err(EXPECTED("asm arg"));
-            //     break;
         }
         parser_next_token(parser);
         switch (token_type(parser->token)) {
@@ -67,28 +63,31 @@ bool parse_asm_mnemonic(Parser *parser, AstAsmMnemonic *mnem) {
 }
 
 bool parse_asm_body(Parser *parser, AstInlineAsm *inline_asm) {
-    parse_exp_next(TOKEN_OPENING_CIRCLE_BRACE, "asm clobers opening");
-    inline_asm->clobbers = vec_new(Slice);
-    bool reading = true;
     parser_next_token(parser);
-    if (token_type(parser->token) == TOKEN_CLOSING_CIRCLE_BRACE) {
-        return true;
-    }
-    parser->skip_next = true;
-    while (reading) {
-        parse_exp_next(TOKEN_IDENT, "register name");
-        inline_asm->clobbers = vec_push(inline_asm->clobbers, &parser->token->ident);
+    inline_asm->clobbers = vec_new(Slice);
+    if (token_type(parser->token) == TOKEN_OPENING_CIRCLE_BRACE) {
         parser_next_token(parser);
-        switch (token_type(parser->token)) {
-            case TOKEN_CLOSING_CIRCLE_BRACE:
-                reading = false;
-                break;
-            case TOKEN_COMMA:
-                break;
-            default:
-                parse_err("expected clobber break");
-                return false;
+        if (token_type(parser->token) != TOKEN_CLOSING_CIRCLE_BRACE) {
+            bool reading = true;
+            parser->skip_next = true;
+            while (reading) {
+                parse_exp_next(TOKEN_IDENT, "register name");
+                inline_asm->clobbers = vec_push(inline_asm->clobbers, &parser->token->ident);
+                parser_next_token(parser);
+                switch (token_type(parser->token)) {
+                    case TOKEN_CLOSING_CIRCLE_BRACE:
+                        reading = false;
+                        break;
+                    case TOKEN_COMMA:
+                        break;
+                    default:
+                        parse_err("expected clobber break");
+                        return false;
+                }
+            }
         }
+    } else {
+        parser->skip_next = true;
     }
     parser_next_token(parser);
     if (token_type(parser->token) == TOKEN_VOLATILE) {

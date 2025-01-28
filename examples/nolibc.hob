@@ -19,11 +19,19 @@ fun exit(status: i64): void {
 	}
 }
 
+fun test_call(): void {
+	write(0, "So-called\n", 10);
+}
+
 fun _start(): void {
 	var test: i64 = 10;
-	asm (rax) volatile { # it is not nececcary to be a volatile but it is an example
+	asm (rax) volatile {
 		mov $rax, 1 as i64 + test;
 		mov [test], $rax;
+	}
+
+	asm {
+		call test_call;
 	}
 
 	if test == 11 {
