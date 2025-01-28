@@ -70,6 +70,7 @@ bool llvm_write_module(LlvmBackend *llvm, char *output_path) {
 
 	LLVMInitializeNativeTarget();
 	LLVMInitializeNativeAsmPrinter();
+	LLVMInitializeNativeAsmParser();
 
 	LLVMTargetRef target = LLVMGetFirstTarget();
 	// const char *target_name = "aarch64";

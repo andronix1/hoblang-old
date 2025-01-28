@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <printf.h>
 #include <stdint.h>
+#include "core/vec.h"
 #include "core/location.h"
 #include "core/slice.h"
 
