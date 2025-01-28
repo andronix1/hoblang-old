@@ -13,6 +13,7 @@ void print_token(FILE *stream, va_list list) {
 	switch (token->type) {
     	case TOKEN_EOI: fprintf(stream, "<EOI>"); return;
     	case TOKEN_ASM: fprintf(stream, "asm"); return;
+    	case TOKEN_VOLATILE: fprintf(stream, "volatile"); return;
     	case TOKEN_DOLLAR: fprintf(stream, "$"); return;
     	case TOKEN_EXTERN: fprintf(stream, "extern"); return;
     	case TOKEN_TYPE: fprintf(stream, "type"); return;

@@ -20,9 +20,8 @@ typedef enum {
     TOKEN_AS,
     TOKEN_ASM,
     TOKEN_DOLLAR,
+    TOKEN_VOLATILE,
     
-	TOKEN_ASM,
-	TOKEN_DOLLAR,
 	TOKEN_STRUCT,
     TOKEN_FUNC_RETURNS,
     
