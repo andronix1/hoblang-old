@@ -1,0 +1,23 @@
+import "../libc/lib.hob" as c;
+
+use c::socket;
+use c::io;
+
+type TcpClientHandle = struct {
+    address: socket::AddressIn,
+    socket: socket::Socket
+};
+
+fun close(client: *TcpClientHandle): void {
+    io::close(client.*.socket);
+}
+
+fun read(client: *TcpClientHandle, data: *u8, size: i32): i64 {
+	return io::read(client.*.socket, data, size);
+}
+
+fun send(client: *TcpClientHandle, data: *u8, size: u64): void {
+	# MSG_NOSIGNAL = 0x4000 = 16386
+    socket::send(client.*.socket, data, size, 0x4000);
+	# io::fsync(client.*.socket);
+}

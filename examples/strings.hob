@@ -1,134 +1,26 @@
-import "libc/lib.hob" as libc;
-import "cs-api/lib.hob" as cs;
+import "str.hob" as str;
 
-use libc::mem;
-use libc::io;
-
-type String = struct {
-	data: *u8,
-	length: i32,
-	capacity: i32
-};
-
-fun init(self: *String): void {
-	self.*.data = 0 as *u8;
-	self.*.length = 0;
-	self.*.capacity = 0;
-}
-
-fun free_s(self: *String): void {
-	if self.*.data != (0 as *u8) { # TODO: null
-		mem::free(self.*.data as *void);
-	}
-}
-
-fun reserve(self: *String, size: i32): void {
-	if self.*.capacity > size {
-		return;
-	}
-	if self.*.data == (0 as *u8) { # TODO: null
-		cs::console::write_line("first malloc\0");
-		cs::console::write_line(cs::convert::int32_to_string(size));
-		self.*.data = mem::malloc(size as libc::types::size_t) as *u8;
-	} else {
-		cs::console::write_line("first realloc\0");
-		self.*.data = mem::realloc(self.*.data as *void, size as libc::types::size_t) as *u8;
-	}
-	cs::console::write_line("allocated!\0");
-	self.*.capacity = size;
-}
-
-fun from_mem(self: *String, ptr: *u8, size: i32): void {
-	self.*.data = ptr;
-	self.*.length = size;
-	self.*.capacity = 0-1; # TODO: unary operator
-}
-
-fun push(self: *String, c: u8): void {
-	cs::console::write_line("before alloc:\0");
-	cs::console::write_line(cs::convert::int32_to_string(self.*.data as i32));
-	reserve(self, self.*.length + 1);
-	cs::console::write_line("after alloc:\0");
-	cs::console::write_line(cs::convert::int32_to_string(self.*.data as i32));
-	cs::console::write_line("cap:\0");
-	cs::console::write_line(cs::convert::int32_to_string(self.*.capacity));
-	self.*.length = self.*.length + 1;
-	self.*.data[self.*.length - 1] = c;
-}
-
-fun append(self: *String, other: *String): void {
-	if other.*.length == 0 {
-		return;
-	}
-	var required_size = self.*.length + other.*.length;
-	reserve(self, required_size);
-	#mem::copy(
-	#	@self.*.data[self.*.length] as *void,
-	#	other.*.data as *void,
-	#	other.*.length
-	#);
-	self.*.length = self.*.length + other.*.length;
-}
-
-fun print(self: *String): void {
-	var i = 0;
-	while i < self.*.length {
-		# io::put_char(self.*.data[i]);
-		i = i + 1;
-	}
-}
-
-type S = struct {
-	a: *u8,
-	b: i32,
-	c: i32
-};
-
-fun test(s: *S): void {
-	var m = mem::malloc(2) as *u8;
-	m[0] = 'a';
-	m[1] = '\0';
-	cs::console::write_line(cs::convert::int32_to_string(m as i32))
-	s.*.a = m;
-	cs::console::write_line(cs::convert::int32_to_string(s.*.a as i32))
-	s.*.b = 321;
-	s.*.c = 123;
-}
+type String = str::String;
 
 fun main(): void {
-	var s: S;
-	test(@s);
-	cs::console::write_line(cs::convert::int32_to_string(s.a as i32))
-	#s.a.* = '\0';#[0] = 'H';
-	#s.a[1] = 'e';
-	#s.a[2] = 'l';
-	#s.a[3] = 'l';
-	#s.a[4] = 'o';
-	#s.a[5] = '\0';
-	cs::console::write_line(s.a)
-	cs::console::write_line(cs::convert::int32_to_string(s.b))
-	cs::console::write_line(cs::convert::int32_to_string(s.c))
-}
+	var str = str::new();
+	defer str::free(&str);
+	str::push(&str, '#');
+	str::push(&str, ' ');
 
-fun _main(): void {
-	var str: String;
-	init(@str);
-	push(@str, 'a');
-	#var hello: String;
-	#from_mem(@hello, "hello", 5);
-	# defer free(@hello);
+	var hello = str::from_mem("hello", 5);
+	defer str::free(&hello);
 
-	#var sep: String;
-	#from_mem(@sep, ", ", 3);
-	# defer free(@sep);
+	var sep = str::from_mem(", ", 2);
+	defer str::free(&sep);
 
-	#var world: String;
-	#from_mem(@world, "world", 5);
-	# defer free(@world);
+	var world = str::from_mem("world", 5);
+	defer str::free(&world);
 
-	#append(@str, @hello);
-	#append(@str, @sep);
-	#append(@str, @world);
+	str::append(&str, &hello);
+	str::append(&str, &sep);
+	str::append(&str, &world);
+	str::push(&str, '\n');
 
-	print(@str);
+	str::print(&str);
 }

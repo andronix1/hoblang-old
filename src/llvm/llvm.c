@@ -6,7 +6,16 @@ bool llvm_init(LlvmBackend *llvm) {
 	return true;	
 }
 
+LLVMTypeRef llvm_sema_function_type(SemaFunction *func) {
+	LLVMTypeRef *params = alloca(sizeof(LLVMTypeRef) * vec_len(func->args));
+	for (size_t i = 0; i < vec_len(func->args); i++) {
+		params[i] = llvm_resolve_type(func->args[i]);
+	}
+	return LLVMFunctionType(llvm_resolve_type(func->returning), params, vec_len(func->args), false);
+}
+
 LLVMTypeRef llvm_resolve_type(SemaType *type) {
+	assert(type, "type is null");
 	switch (type->type) {
 		case SEMA_TYPE_STRUCT: {
 			LLVMTypeRef *elements = alloca(sizeof(LLVMTypeRef) * vec_len(type->struct_type->members));
@@ -29,9 +38,12 @@ LLVMTypeRef llvm_resolve_type(SemaType *type) {
 		case SEMA_TYPE_FUNCTION: {
 			LLVMTypeRef *params = alloca(sizeof(LLVMTypeRef) * vec_len(type->func.args));
 			for (size_t i = 0; i < vec_len(type->func.args); i++) {
-				params[i] = llvm_resolve_type(type->func.args[i].type.sema);
+				params[i] = llvm_resolve_type(type->func.args[i]);
 			}
-			return LLVMFunctionType(llvm_resolve_type(type->func.returning), params, vec_len(type->func.args), false /* IsVarArg */);
+			return LLVMPointerType(
+				LLVMFunctionType(llvm_resolve_type(type->func.returning), params, vec_len(type->func.args), false /* IsVarArg */),
+				0
+			);
 		}
 		case SEMA_TYPE_POINTER: {
 			return LLVMPointerType(llvm_resolve_type(type->ptr_to), 0);
@@ -41,6 +53,7 @@ LLVMTypeRef llvm_resolve_type(SemaType *type) {
 }
 
 bool llvm_write_module_ir(LlvmBackend *llvm, char *output_path) {
+	hob_log(LOGD, "emitting llvm ir dump...!");
 	char *error;	
 	if (LLVMPrintModuleToFile(llvm->module, output_path, &error) == 1) {
 		hob_log(LOGE, "failed to emit to file: %s", error);
@@ -57,7 +70,6 @@ bool llvm_write_module(LlvmBackend *llvm, char *output_path) {
 
 	LLVMInitializeNativeTarget();
 	LLVMInitializeNativeAsmPrinter();
-	LLVMInitializeNativeAsmParser();
 
 	LLVMTargetRef target = LLVMGetFirstTarget();
 	// const char *target_name = "aarch64";

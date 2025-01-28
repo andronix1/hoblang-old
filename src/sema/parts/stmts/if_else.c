@@ -1,3 +1,5 @@
+#include "../../parts.h"
+
 void sema_if_else_body(SemaModule *sema, AstIfBody *if_body) {
 	SemaType *type = sema_ast_expr_type(sema, &if_body->expr, &primitives[PRIMITIVE_BOOL]);
 	if (!type) {

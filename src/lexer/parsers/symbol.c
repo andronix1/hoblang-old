@@ -1,13 +1,19 @@
 #include "../parsers.h"
 
-LexOneErr lex_symbol_dual(Lexer *lexer, char symbol, char next, TokenType type, TokenType next_type) {
-	if (symbol == lexer_next_char(lexer)) {
-		if (lexer_future_char(lexer) == next) {
-			lexer_next_char(lexer);
-			lexer->token.type = next_type;
-			return LEX_ONE_OK;
+LexOneErr lex_symbol_alt(Lexer *lexer, LexSymbolAlt *symbols, size_t len) {
+	assert(len, "symbols len must be non-zero");
+	LexSymbolAlt *start = &symbols[0];
+	if (start->symbol == lexer_next_char(lexer)) {
+		char futc = lexer_future_char(lexer);
+		for (size_t i = 1; i < len; i++) {
+			LexSymbolAlt *alt = &symbols[i];
+			if (futc == alt->symbol) {
+				lexer_next_char(lexer);
+				lexer->token.type = alt->type;
+				return LEX_ONE_OK;
+			}
 		}
-		lexer->token.type = type;
+		lexer->token.type = start->type;
 		return LEX_ONE_OK;
 	}
 	return LEX_ONE_MISSMATCH;

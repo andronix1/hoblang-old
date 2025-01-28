@@ -2,12 +2,15 @@
 
 #include "core/slice.h"
 #include "types/struct.h"
+#include "types/function.h"
+#include "mod_path.h"
 
 struct _SemaType;
 
 typedef enum {
 	AST_TYPE_PATH,
 	AST_TYPE_STRUCT,
+	AST_TYPE_FUNCTION,
 	AST_TYPE_POINTER
 } AstTypeKind;
 
@@ -17,8 +20,7 @@ typedef struct _AstType {
 	union {
 		AstModPath path;
 		AstStructType struct_type;
+		AstFunctionType func;
 		struct _AstType *ptr_to;
 	};
 } AstType;
-
-void print_ast_type(FILE *stream, va_list *list);

@@ -1,6 +1,7 @@
 #include "../parsers.h"
-#include "decls/ext_func.c"
-#include "decls/func.c"
+
+bool parse_ext_func_decl(Parser *parser, AstExtFuncDecl *info);
+bool parse_func_decl(Parser *parser, AstFuncDecl *decl);
 
 bool parse_func_info(Parser *parser, AstFuncInfo *info) {
 	parse_exp_next(TOKEN_IDENT, "function name");

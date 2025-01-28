@@ -6,32 +6,32 @@
 #include "core/print.h"
 #include "sema/type.h"
 
-void print_slice(FILE *stream, va_list *list) {
-	slice_write_to(va_arg(*list, Slice*), stream);
+void print_slice(FILE *stream, va_list list) {
+	slice_write_to(va_arg(list, Slice*), stream);
 }
 
-void print_errno(FILE *stream, va_list *list __attribute__((unused))) {
+void print_errno(FILE *stream, va_list list __attribute__((unused))) {
 	fprintf(stream, "%s", strerror(errno));
 }
 
-void print_bool(FILE *stream, va_list *list) {
-	fprintf(stream, "%s", va_arg(*list, int) ? "true" : "false");
+void print_bool(FILE *stream, va_list list) {
+	fprintf(stream, "%s", va_arg(list, int) ? "true" : "false");
 }
 
-void print_size(FILE *stream, va_list *list) {
-	fprintf(stream, "%lu", va_arg(*list, size_t));
+void print_size(FILE *stream, va_list list) {
+	fprintf(stream, "%lu", va_arg(list, size_t));
 }
 
-void print_int(FILE *stream, va_list *list) {
-	fprintf(stream, "%d", va_arg(*list, int));
+void print_int(FILE *stream, va_list list) {
+	fprintf(stream, "%d", va_arg(list, int));
 }
 
-void print_char(FILE *stream, va_list *list) {
-	fputc(va_arg(*list, int), stream);
+void print_char(FILE *stream, va_list list) {
+	fputc(va_arg(list, int), stream);
 }
 
-void print_cstr(FILE *stream, va_list *list) {
-	fputs(va_arg(*list, const char*), stream);
+void print_cstr(FILE *stream, va_list list) {
+	fputs(va_arg(list, const char*), stream);
 }
 
 void print_setup() {
@@ -49,5 +49,6 @@ void print_setup() {
 	print_register(slice_from_cstr("ast::expr"), print_ast_expr);
 	print_register(slice_from_cstr("ast::binop"), print_ast_binop_type);
 	print_register(slice_from_cstr("ast::type"), print_ast_type);
+	print_register(slice_from_cstr("ast::path"), print_ast_mod_path);
 	print_register(slice_from_cstr("ast::val"), print_ast_value);
 }

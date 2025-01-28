@@ -1,12 +1,17 @@
 #include <stdarg.h>
 #include "../ast.h"
 
-void print_ast_binop_type(FILE *stream, va_list *list) {
-	AstBinopType binop = va_arg(*list, AstBinopType);
+void print_ast_binop_type(FILE *stream, va_list list) {
+	AstBinopType binop = va_arg(list, AstBinopType);
 	const char *strs[] = {
 		[AST_BINOP_ADD] = "+",
 		[AST_BINOP_SUB] = "-",
 		[AST_BINOP_MUL] = "*",
+		[AST_BINOP_BITAND] = "&",
+		[AST_BINOP_BITOR] = "|",
+		[AST_BINOP_SHR] = ">>",
+		[AST_BINOP_SHL] = "<<",
+		[AST_BINOP_XOR] = "^",
 		[AST_BINOP_DIV] = "/",
 		[AST_BINOP_EQ] = "==",
 		[AST_BINOP_NEQ] = "!=",
@@ -18,22 +23,37 @@ void print_ast_binop_type(FILE *stream, va_list *list) {
 	print_to(stream, strs[binop]);
 }
 
-void print_ast_value(FILE *stream, va_list *list) {
-	AstValue *value = va_arg(*list, AstValue*);
+void print_ast_mod_path(FILE *stream, va_list list) {
+	AstModPath *path = va_arg(list, AstModPath*);
+	for (size_t i = 0; i < vec_len(path->segments); i++) {
+		print_to(stream, i == 0 ? "{slice}" : "::{slice}", &path->segments[i]);
+	}
+}
+
+void print_ast_value(FILE *stream, va_list list) {
+	AstValue *value = va_arg(list, AstValue*);
+	print_to(stream, "{ast::path}", &value->mod_path);
 	for (size_t i = 0; i < vec_len(value->segments); i++) {
 		AstValueSegment *seg = &value->segments[i];
 		switch (seg->type) {
-			case AST_VALUE_IDENT: print_to(stream, i == 0 ? "{slice}" : ".{slice}", &seg->ident); break;
+			case AST_VALUE_IDENT: print_to(stream, ".{slice}", &seg->ident); break;
 			case AST_VALUE_DEREF: print_to(stream, ".*"); break;
 			case AST_VALUE_IDX: print_to(stream, "[{ast::expr}]", seg->idx); break;
 		}
 	}
 }
 
-void print_ast_expr(FILE *stream, va_list *list) {
-	AstExpr *expr = va_arg(*list, AstExpr*);
+void print_ast_expr(FILE *stream, va_list list) {
+	AstExpr *expr = va_arg(list, AstExpr*);
 	switch (expr->type) {
-		case AST_EXPR_REF: print_to(stream, "&{ast::val}", &expr->value); break;
+		case AST_EXPR_UNARY: {
+			switch (expr->unary.type) {
+				case AST_UNARY_MINUS: print_to(stream, "-{ast::expr}", expr->unary.expr); break;
+				case AST_UNARY_BITNOT: print_to(stream, "~{ast::expr}", expr->unary.expr); break;
+			}
+			break;
+		}
+		case AST_EXPR_REF: print_to(stream, "&{ast::expr}", &expr->value); break;
 		case AST_EXPR_NOT: print_to(stream, "!({ast::val})", &expr->value); break;
 		case AST_EXPR_VALUE: print_to(stream, "{ast::val}", &expr->value); break;
 		case AST_EXPR_INTEGER: print_to(stream, "{long}", expr->integer); break;

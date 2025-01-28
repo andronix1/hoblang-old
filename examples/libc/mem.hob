@@ -1,6 +1,7 @@
 import "types.hob" as types;
 
 extern(malloc) fun malloc(size: types::size_t): *void
+extern(calloc) fun calloc(num: types::size_t, size: types::size_t): *void
 
 extern(realloc) fun realloc(ptr: *void, size: types::size_t): *void
 extern(free) fun free(ptr: *void): void

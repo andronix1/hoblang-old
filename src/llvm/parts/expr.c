@@ -13,7 +13,18 @@ LLVMValueRef llvm_func_call(LlvmBackend *llvm, AstFuncCall *func_call) {
 	for (size_t i = 0; i < vec_len(func_call->args); i++) {
 		params[i] = llvm_expr(llvm, &func_call->args[i]);
 	}
-	return LLVMBuildCall2(llvm->builder, llvm_resolve_type(func_call->value.sema_type), llvm_value(llvm, &func_call->value), params, vec_len(func_call->args), "");
+	return LLVMBuildCall2(
+		llvm->builder,
+		llvm_sema_function_type(&func_call->value.sema_type->func),
+		LLVMBuildLoad2(
+			llvm->builder,
+			llvm_resolve_type(func_call->value.sema_type),
+			llvm_value(llvm, &func_call->value),
+			""
+		),
+		params, vec_len(func_call->args),
+		""
+	);
 }
 
 LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
@@ -21,7 +32,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 		case AST_EXPR_NOT: return LLVMBuildNot(llvm->builder, llvm_expr(llvm, expr->not_expr), "");
 		case AST_EXPR_VALUE: return LLVMBuildLoad2(llvm->builder, llvm_resolve_type(expr->sema_type), llvm_value(llvm, &expr->value), "");
 		case AST_EXPR_REF: return llvm_value(llvm, &expr->value);
-		case AST_EXPR_INTEGER: return LLVMConstInt(LLVMInt32Type(), expr->integer, false);
+		case AST_EXPR_INTEGER: return LLVMConstInt(llvm_resolve_type(expr->sema_type), expr->integer, false);
 		case AST_EXPR_BOOL: return LLVMConstInt(LLVMInt1Type(), expr->boolean, false);
 		case AST_EXPR_CHAR: return LLVMConstInt(LLVMInt8Type(), expr->character, false);
 		case AST_EXPR_STR: {
@@ -61,11 +72,24 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 			}
 			return LLVMBuildBitCast(llvm->builder, value, to_type, "");
 		}
+		case AST_EXPR_UNARY: {
+			switch (expr->unary.type) {
+				case AST_UNARY_MINUS: return LLVMBuildNeg(llvm->builder, llvm_expr(llvm, expr->unary.expr), "");
+				case AST_UNARY_BITNOT: return LLVMBuildNot(llvm->builder, llvm_expr(llvm, expr->unary.expr), "");
+			}
+			assert(0, "invalid unary {int}", expr->unary.type);
+			return NULL;
+		}
 		case AST_EXPR_BINOP: {
 			LLVMValueRef right = llvm_expr(llvm, expr->binop.right);
 			LLVMValueRef left = llvm_expr(llvm, expr->binop.left);
 			switch (expr->binop.type) {
 				case AST_BINOP_ADD: return LLVMBuildAdd(llvm->builder, left, right, "");
+				case AST_BINOP_XOR: return LLVMBuildXor(llvm->builder, left, right, "");
+				case AST_BINOP_BITAND: return LLVMBuildAnd(llvm->builder, left, right, "");
+				case AST_BINOP_BITOR: return LLVMBuildOr(llvm->builder, left, right, "");
+				case AST_BINOP_SHR: return LLVMBuildLShr(llvm->builder, left, right, "");
+				case AST_BINOP_SHL: return LLVMBuildShl(llvm->builder, left, right, "");
 				case AST_BINOP_SUB: return LLVMBuildSub(llvm->builder, left, right, "");
 				case AST_BINOP_MUL: return LLVMBuildMul(llvm->builder, left, right, "");
 				case AST_BINOP_DIV: return LLVMBuildSDiv(llvm->builder, left, right, "");

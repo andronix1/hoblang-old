@@ -1,3 +1,5 @@
+#include "../../parts.h"
+
 SemaType *sema_ast_expr_array(SemaModule *sema, AstExpr *array, SemaType *expectation) {
 	SemaType *expect;
 	if (vec_len(array) > 0) {

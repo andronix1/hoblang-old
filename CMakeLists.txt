@@ -28,6 +28,7 @@ set(SOURCE_FILES
 	src/parser/print/expr.c
 	src/parser/print/type.c
 	src/parser/ast/stmts/asm.c
+	src/parser/parsers/stmts/asm.c
 	src/parser/parsers/stmts/var.c
 	src/parser/parsers/stmts/return.c
 	src/parser/parsers/stmts/while.c
@@ -44,7 +45,8 @@ set(SOURCE_FILES
 	src/parser/parsers/mod_path.c
 	src/parser/parsers/body.c
 
-	src/sema/sema.c
+	src/sema/module.c
+	src/sema/project.c
 	src/sema/type.c
 	src/sema/parts/exprs/array.c
 	src/sema/parts/exprs/as.c
@@ -52,6 +54,7 @@ set(SOURCE_FILES
 	src/sema/parts/exprs/func_call.c
 	src/sema/parts/exprs/int.c
 	src/sema/parts/stmts/assign.c
+	src/sema/parts/stmts/asm.c
 	src/sema/parts/stmts/if_else.c
 	src/sema/parts/stmts/return.c
 	src/sema/parts/stmts/defer.c
@@ -67,8 +70,8 @@ set(SOURCE_FILES
 	src/llvm/llvm.c
 	src/llvm/parts/module.c
 	src/llvm/parts/body.c
-	src/llvm/parts/stmts/asm/x86.c
 	src/llvm/parts/stmts/assign.c
+	src/llvm/parts/stmts/asm/x86.c
 	src/llvm/parts/stmts/if.c
 	src/llvm/parts/stmts/return.c
 	src/llvm/parts/stmts/var.c
@@ -81,7 +84,7 @@ include_directories(${LLVM_INCLUDE_DIRS})
 link_directories(${LLVM_LIBRARY_DIRS})
 add_executable(hoblang ${SOURCE_FILES})
 target_compile_options(hoblang PRIVATE 
-	-Wall -Wextra -Wpedantic -Werror
+	-Wall -Wextra -Werror
 	-Wno-format
 	-Wno-error=unused-parameter -Wno-error=unused-variable
 )

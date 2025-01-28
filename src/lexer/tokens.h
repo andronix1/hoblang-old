@@ -16,11 +16,12 @@ typedef enum {
     TOKEN_VAR,
     TOKEN_RETURN,
     TOKEN_EXTERN,
-    TOKEN_AS,
-    TOKEN_ASM,
-    TOKEN_DOLLAR,
+	TOKEN_AS,
     
+	TOKEN_ASM,
+	TOKEN_DOLLAR,
 	TOKEN_STRUCT,
+    TOKEN_FUNC_RETURNS,
     
 	TOKEN_IF,
     TOKEN_ELSE,
@@ -43,10 +44,14 @@ typedef enum {
     TOKEN_MULTIPLY,
     TOKEN_DIVIDE,
     TOKEN_NOT,
-    TOKEN_REF,
     TOKEN_DOT,
+
     TOKEN_BITOR,
     TOKEN_BITAND,
+    TOKEN_BITNOT,
+    TOKEN_XOR,
+    TOKEN_SHR,
+    TOKEN_SHL,
 
     TOKEN_AND,
     TOKEN_OR,
@@ -86,4 +91,4 @@ typedef struct {
 } TokensSlice;
 
 TokenType token_type(Token *token);
-void print_token(FILE *stream, va_list *list);
+void print_token(FILE *stream, va_list list);

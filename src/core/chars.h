@@ -7,11 +7,17 @@ inline static bool char_is_whitespace(char c) {
 }
 
 inline static bool char_is_latin(char c) {
-	return ('a' <= c && c <= 'z') || ('A' < c && c <= 'Z');
+	return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
 
 inline static bool char_is_digit(char c) {
 	return '0' <= c && c <= '9';
+}
+
+inline static bool char_is_hex(char c) {
+	return char_is_digit(c) ||
+		('a' <= c && c <= 'f') || 
+		('A' <= c && c <= 'F');
 }
 
 inline static bool char_is_ident_start(char c) {

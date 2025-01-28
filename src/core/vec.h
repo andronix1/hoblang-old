@@ -9,11 +9,11 @@ typedef struct {
 } VecHeader;
 
 VecHeader *vec_header(void *vec);
-void *vec_new_sized(size_t esize);
-void *vec_reserve(void *vec, size_t cap);
-void *vec_push(void *vec, void *element);
-void *vec_top(void *vec);
-void *vec_pop(void *vec);
+void *_vec_new(size_t esize);
+void *_vec_reserve(void *vec, size_t cap);
+void *_vec_push(void *vec, void *element);
+void *_vec_top(void *vec);
+void *_vec_pop(void *vec);
 size_t vec_len(void *vec);
 void *_vec_append_raw(void *vec, const void *ptr, size_t len);
 void vec_free(void *vec);

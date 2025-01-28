@@ -2,6 +2,11 @@
 
 void expr_push_down(AstExpr *expr) {
 	static int priority[] = {
+		[AST_BINOP_BITAND] = 30,
+		[AST_BINOP_BITOR] =  15,
+		[AST_BINOP_SHR] =    30,
+		[AST_BINOP_SHL] =    30,
+		[AST_BINOP_XOR] =    30,
 		[AST_BINOP_MUL] = 20,
 		[AST_BINOP_DIV] = 20,
 		[AST_BINOP_ADD] = 10,
@@ -54,12 +59,37 @@ bool expr_make_binop(Parser *parser, AstBinopType type, AstExpr **current_expr, 
 	return true;
 }
 
-#define AST_EXPR_PARSE_SKIP_NESTED() do { if (stop(token_type(parser->token))) return current_expr; } while (0)
-#define PARSE_BINOP(type) do { if (!expr_make_binop(parser, type, &current_expr, stop)) { return NULL; } AST_EXPR_PARSE_SKIP_NESTED(); } while (0)
+AstExpr *expr_make_unary(Parser *parser, AstUnaryType type, bool(*stop)(TokenType)) {
+	AstExpr *result = malloc(sizeof(AstExpr));				
+	result->type = AST_EXPR_UNARY;
+	result->unary.type = type;
+	if (!(result->unary.expr = parse_expr_before(parser, stop))) {
+		return NULL;
+	}
+	return result;
+}
 
+#define AST_EXPR_PARSE_SKIP_NESTED() do { if (stop(token_type(parser->token))) return current_expr; } while (0)
+#define PARSE_BINOP(type) do { \
+		if (first) { \
+			parse_err("binary operator without left hand expression"); \
+			return NULL; \
+		} \
+		if (!expr_make_binop(parser, type, &current_expr, stop)) { \
+			return NULL; \
+		} \
+		AST_EXPR_PARSE_SKIP_NESTED(); \
+	} while (0)
+#define PARSE_BINOP_MAYBE_UNARY(unary_type, binop_type) do { \
+		if (first) { \
+			return expr_make_unary(parser, unary_type, stop); \
+		} else { \
+			PARSE_BINOP(binop_type); \
+		} \
+	} while (0)
 
 AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType)) {
-	bool first = false;
+	bool first = true;
 	AstExpr *current_expr = malloc(sizeof(AstExpr));
 	while (true) {
 		parser_next_token(parser);
@@ -69,7 +99,6 @@ AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType)) {
 			}
 			return current_expr;
 		}
-		first = false;
 		switch (token_type(parser->token)) {
 			case TOKEN_TRUE: case TOKEN_FALSE:
 				current_expr->type = AST_EXPR_BOOL;
@@ -110,13 +139,6 @@ AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType)) {
 				}
 				break;
 			}
-			case TOKEN_REF: {
-				current_expr->type = AST_EXPR_REF;
-				if (!parse_value(parser, &current_expr->value)) {
-					return NULL;
-				}
-				break;
-			}
 			case TOKEN_NOT: {
 				current_expr->type = AST_EXPR_NOT;
 				if (!(current_expr->not_expr = parse_expr_before(parser, stop))) {
@@ -125,8 +147,24 @@ AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType)) {
 				parser->skip_next = true;
 				break;
 			}
+			case TOKEN_BITAND: {
+				if (first) {
+					current_expr->type = AST_EXPR_REF;
+					if (!parse_value(parser, &current_expr->value)) {
+						return NULL;
+					}
+				} else {
+					PARSE_BINOP(AST_BINOP_BITAND);
+				}
+				break;
+			}
 			case TOKEN_ADD: PARSE_BINOP(AST_BINOP_ADD); break;
-			case TOKEN_MINUS: PARSE_BINOP(AST_BINOP_SUB); break;
+			case TOKEN_XOR: PARSE_BINOP(AST_BINOP_XOR); break;
+			case TOKEN_BITOR: PARSE_BINOP(AST_BINOP_BITOR); break;
+			case TOKEN_BITNOT: return expr_make_unary(parser, AST_UNARY_BITNOT, stop); break;
+			case TOKEN_SHR: PARSE_BINOP(AST_BINOP_SHR); break;
+			case TOKEN_SHL: PARSE_BINOP(AST_BINOP_SHL); break;
+			case TOKEN_MINUS: PARSE_BINOP_MAYBE_UNARY(AST_UNARY_MINUS, AST_BINOP_SUB); break;
 			case TOKEN_MULTIPLY: PARSE_BINOP(AST_BINOP_MUL); break;
 			case TOKEN_DIVIDE: PARSE_BINOP(AST_BINOP_DIV); break;
 			case TOKEN_EQUALS: PARSE_BINOP(AST_BINOP_EQ); break;
@@ -136,7 +174,6 @@ AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType)) {
 			case TOKEN_GREATER: PARSE_BINOP(AST_BINOP_GT); break;
 			case TOKEN_GREATER_OR_EQUALS: PARSE_BINOP(AST_BINOP_GE); break;
 			case TOKEN_OR: PARSE_BINOP(AST_BINOP_OR); break;
-			case TOKEN_AND: PARSE_BINOP(AST_BINOP_AND); break;
 			case TOKEN_OPENING_CIRCLE_BRACE:
 				if (!(current_expr = parse_expr_before(parser, token_closing_circle_brace_stop))) {
 					return NULL;
@@ -176,6 +213,7 @@ AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType)) {
 				parser->skip_next = true;
 				break;
 		}
+		first = false;
 	}
 }
 

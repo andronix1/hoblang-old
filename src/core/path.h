@@ -1,7 +1,6 @@
 #pragma once
 
-#include <stdlib.h>
-#include <unistd.h>
-#include <linux/limits.h>
+#include <stddef.h>
+#include <string.h>
 
-char *realpath_rel(const char *path, const char *wd);
+void path_split_filename_dir(char *source, char **dir, char **filename);

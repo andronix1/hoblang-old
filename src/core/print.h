@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include "slice.h"
 
-typedef void(*PrintFunc)(FILE* stream, va_list *args);
+typedef void(*PrintFunc)(FILE* stream, va_list args);
 
 typedef struct {
 	Slice name;

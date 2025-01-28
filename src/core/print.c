@@ -26,7 +26,7 @@ void print_va_list_to(FILE *stream, const char *fmt, va_list args) {
 				for (size_t i = 0; i < vec_len(print_infos); i++) {
 					PrintInfo *info = &print_infos[i];
 					if (slice_eq(&info->name, &arg)) {
-						info->func(stream, &args);
+						info->func(stream, args);
 						found = true;
 						break;
 					}

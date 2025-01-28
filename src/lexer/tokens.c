@@ -4,8 +4,8 @@ TokenType token_type(Token *token) {
 	return token == NULL ? TOKEN_EOI : token->type;
 }
 
-void print_token(FILE *stream, va_list *list) {	
-	const Token *token = va_arg(*list, Token*);
+void print_token(FILE *stream, va_list list) {	
+	const Token *token = va_arg(list, Token*);
 	if (token == NULL || token->type == TOKEN_EOI) {
 		fprintf(stream, "<EOF>");
 		return;
@@ -17,6 +17,7 @@ void print_token(FILE *stream, va_list *list) {
     	case TOKEN_EXTERN: fprintf(stream, "extern"); return;
     	case TOKEN_TYPE: fprintf(stream, "type"); return;
     	case TOKEN_RETURN: fprintf(stream, "return"); return;
+    	case TOKEN_FUNC_RETURNS: fprintf(stream, "->"); return;
     	case TOKEN_IMPORT: fprintf(stream, "import"); return;
     	case TOKEN_DEFER: fprintf(stream, "defer"); return;
     	case TOKEN_USE: fprintf(stream, "use"); return;
@@ -41,9 +42,10 @@ void print_token(FILE *stream, va_list *list) {
 		case TOKEN_OPENING_SQUARE_BRACE: fprintf(stream, "["); return;
 		case TOKEN_CLOSING_SQUARE_BRACE: fprintf(stream, "]"); return;
 		case TOKEN_NOT: fprintf(stream, "!"); return;
-		case TOKEN_REF: fprintf(stream, "@"); return;
+		case TOKEN_BITNOT: fprintf(stream, "~"); return;
 		case TOKEN_BITAND: fprintf(stream, "&"); return;
 		case TOKEN_BITOR: fprintf(stream, "|"); return;
+		case TOKEN_XOR: fprintf(stream, "^"); return;
 		case TOKEN_AND: fprintf(stream, "&&"); return;
 		case TOKEN_OR: fprintf(stream, "||"); return;
 		case TOKEN_DOT: fprintf(stream, "."); return;
@@ -55,8 +57,10 @@ void print_token(FILE *stream, va_list *list) {
     	case TOKEN_NOT_EQUALS: fprintf(stream, "!="); return;
     	case TOKEN_LESS: fprintf(stream, "<"); return;
     	case TOKEN_LESS_OR_EQUALS: fprintf(stream, "<="); return;
+    	case TOKEN_SHL: fprintf(stream, "<<"); return;
     	case TOKEN_GREATER: fprintf(stream, ">"); return;
     	case TOKEN_GREATER_OR_EQUALS: fprintf(stream, ">="); return;
+    	case TOKEN_SHR: fprintf(stream, ">>"); return;
     	case TOKEN_INTEGER: fprintf(stream, "integer %ld", token->integer); return;
     	case TOKEN_CHAR: fprintf(stream, "char '%c'", token->character); return;
     	case TOKEN_STR: fprintf(stream, "string \"TODO\""); return;

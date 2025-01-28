@@ -79,3 +79,4 @@ bool parse_asm_body(Parser *parser, AstInlineAsm *inline_asm) {
         inline_asm->mnems = vec_push(inline_asm->mnems, &mnem);
     }
 }
+

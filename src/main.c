@@ -21,6 +21,7 @@ void usage() {
 
 int main(int argc, char **argv) {
 	print_setup();
+
 	if (argc != 4) {
 		usage();
 		return 0;
@@ -31,8 +32,8 @@ int main(int argc, char **argv) {
 		const char *src_path = args_shift(&argc, &argv);
 		char *output_path = args_shift(&argc, &argv);
 		SemaProject *project = sema_project_new();
-		sema_project_add_module(project, src_path);
-		if (!sema_project(project)) {
+		sema_project_add_module_at(project, src_path);
+		if (!sema_project_analyze(project)) {
 			return 1;
 		}
 		hob_log(LOGD, "analyzed successfully!");
@@ -41,6 +42,11 @@ int main(int argc, char **argv) {
 			return 1;
 		}
 		for (size_t i = 0; i < vec_len(project->modules); i++) {
+			hob_log(LOGD, "compiling {slice}", &project->modules[i].path);
+			llvm_module_init(&llvm, project->modules[i].module);
+		}
+		for (size_t i = 0; i < vec_len(project->modules); i++) {
+			hob_log(LOGD, "compiling {slice}", &project->modules[i].path);
 			llvm_module(&llvm, project->modules[i].module->ast);
 		}
 		llvm_write_module(&llvm, output_path);

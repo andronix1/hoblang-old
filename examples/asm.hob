@@ -1,0 +1,25 @@
+import "libc/lib.hob" as c;
+
+use c::io;
+
+fun main(): void {
+	var test = 10;
+	asm {
+		# FORMAT:
+		#	<mnem> <arg1>, <arg2>;
+		# ARGUMENTS:
+		# 	 ecx  - register
+		# 	  x   - variable
+		# 	(...) - expression
+		mov $eax, (0);
+		mov test, $eax;
+	}
+
+	if test == 0 {
+		io::puts("COOL!!!\n");
+	} else if test == 10 {
+		io::puts("NO MOVING!!!\n");
+	} else {
+		io::puts("So bad((((\n");
+	}
+}

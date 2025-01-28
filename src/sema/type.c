@@ -45,7 +45,7 @@ bool sema_types_equals(SemaType *type, SemaType *other) {
 				return false;
 			}
 			for (size_t i = 0; i < vec_len(type->func.args); i++) {	
-				if (!sema_types_equals(type->func.args[i].type.sema, other->func.args[i].type.sema)) {
+				if (!sema_types_equals(type->func.args[i], other->func.args[i])) {
 					return false;
 				}
 			}
@@ -56,7 +56,7 @@ bool sema_types_equals(SemaType *type, SemaType *other) {
 	assert(0, "invalid sema type kind {int}", type->type);
 }
 
-void print_sema_type(FILE* stream, va_list *list) {
+void print_sema_type(FILE* stream, va_list list) {
 	const char *strs[] = {
 		[PRIMITIVE_I8] = "i8",
 		[PRIMITIVE_I16] = "i16",
@@ -69,16 +69,17 @@ void print_sema_type(FILE* stream, va_list *list) {
 		[PRIMITIVE_BOOL] = "bool",
 		[PRIMITIVE_VOID] = "void",
 	};
-	SemaType *type = va_arg(*list, SemaType*);
+	SemaType *type = va_arg(list, SemaType*);
 	switch (type->type) {
 		case SEMA_TYPE_STRUCT:
-			print_to(stream, "struct {", type->ptr_to);
+			print_to(stream, "struct ", type->ptr_to);
+			fprintf(stream, "{ ");
 			for (size_t i = 0; i < vec_len(type->struct_type->members); i++) {
 				if (i != 0) {
 					print_to(stream, ", ");
 				}
 				AstStructMember *member = &type->struct_type->members[i];
-				print_to(stream, " {slice}: {sema::type}", member->name, member->type->sema);
+				print_to(stream, "{slice}: {sema::type}", &member->name, member->type->sema);
 			}
 			print_to(stream, " }");
 			break;
@@ -93,7 +94,7 @@ void print_sema_type(FILE* stream, va_list *list) {
 			print_to(stream, "fun (");
 			for (size_t i = 0; i < vec_len(type->func.args); i++) {
 				if (i != 0) print_to(stream, ", ");
-				print_to(stream, "{sema::type}", type->func.args[i].type.sema);
+				print_to(stream, "{sema::type}", type->func.args[i]);
 			}
 			print_to(stream, "): {sema::type}", type->func.returning);
 			break;
@@ -110,7 +111,7 @@ SemaType *sema_type_new_pointer(SemaType *to) {
 	return result;
 }
 
-SemaType *sema_type_new_func(SemaType *returning, AstFuncArg *args) {
+SemaType *sema_type_new_func(SemaType *returning, SemaType **args) {
 	SemaType *result = malloc(sizeof(SemaType));
 	result->type = SEMA_TYPE_FUNCTION;
 	result->func.returning = returning;

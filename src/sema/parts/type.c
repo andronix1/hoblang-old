@@ -5,6 +5,22 @@ SemaType *sema_ast_type(SemaModule *sema, AstType *type) {
 		return type->sema;
 	}
 	switch (type->type) {
+		case AST_TYPE_FUNCTION: {
+			SemaType **args = vec_new(SemaType*);
+			for (size_t i = 0; i < vec_len(type->func.args); i++) {
+				SemaType* arg_type = sema_ast_type(sema, &type->func.args[i]);
+				if (!arg_type) {
+					return NULL;
+				}
+				args = vec_push(args, &arg_type);
+			}
+			SemaType *stype = malloc(sizeof(SemaType));
+			stype->type = SEMA_TYPE_FUNCTION;
+			stype->func.args = args;
+			stype->func.returning = sema_ast_type(sema, type->func.returns);
+			type->sema = stype;
+			break;
+		}
 		case AST_TYPE_STRUCT: {
 			for (size_t i = 0; i < vec_len(type->struct_type.members); i++) {
 				AstStructMember *member = &type->struct_type.members[i];
@@ -23,11 +39,7 @@ SemaType *sema_ast_type(SemaModule *sema, AstType *type) {
 			break;
 		}
 		case AST_TYPE_PATH: {
-			SemaTypeDecl *decl = sema_resolve_type_path(sema, &type->path);
-			if (!decl) {
-				return NULL;
-			}
-			type->sema = decl->type;
+			type->sema = sema_resolve_mod_path_type(sema, &type->path);
 			break;
 		}
 		case AST_TYPE_POINTER: {

@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include "expr/as.h"
 #include "expr/binop.h"
+#include "expr/unary.h"
 #include "expr/func_call.h"
 
 typedef enum {
@@ -13,10 +14,11 @@ typedef enum {
 	AST_EXPR_BOOL,
 	AST_EXPR_FUNCALL,
 	AST_EXPR_NOT,
-	AST_EXPR_REF,
 	AST_EXPR_AS,
 	AST_EXPR_BINOP,
+	AST_EXPR_UNARY,
 	AST_EXPR_ARRAY,
+	AST_EXPR_REF,
 } AstExprType;
 
 struct _SemaType;
@@ -26,6 +28,7 @@ typedef struct _AstExpr {
 	union {
 		AstExprBinop binop;
 		AstFuncCall func_call;
+		AstExprUnary unary;
 		AstExprAs as;
 		struct _AstExpr *array;
 		struct _AstExpr *not_expr;
@@ -37,5 +40,3 @@ typedef struct _AstExpr {
 	};
 	struct _SemaType *sema_type; // for sema
 } AstExpr;
-
-void print_ast_expr(FILE *stream, va_list *list);

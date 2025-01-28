@@ -1,7 +1,7 @@
 #include "../parts.h"
 
 SemaType *sema_ast_value(SemaModule *sema, AstValue *value) {
-	SemaValueDecl *decl = sema_resolve_value_path(sema, &value->mod_path);
+	SemaScopeValueDecl *decl = sema_resolve_mod_path_value(sema, &value->mod_path);
 	if (!decl) {
 		return NULL;
 	}	

@@ -11,6 +11,9 @@ bool lexer_next_escaped(Lexer *lexer, char stop, char *output) {
 			case '0':
 				*output = '\0';
 				return true;
+			case 'r':
+				*output = '\r';
+				return true;
 			case 'n':
 				*output = '\n';
 				return true;

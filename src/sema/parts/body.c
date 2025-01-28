@@ -22,5 +22,5 @@ void sema_ast_body(SemaModule *sema, AstBody *body) {
 			case AST_STMT_INLINE_ASM: sema_stmt_inline_asm(sema, &stmt->inline_asm); break;
 		}
 	}
-	body->defers = sema_resolve_defers(sema);
+	body->defers = sema_module_resolve_defers(sema);
 } 

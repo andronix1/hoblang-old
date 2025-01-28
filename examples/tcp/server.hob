@@ -1,0 +1,75 @@
+import "../libc/lib.hob" as c;
+import "handle.hob" as handle;
+
+use c::socket;
+use c::io;
+
+type TcpServer = struct {
+    socket: socket::Socket
+};
+
+type TcpPort = u16;
+
+fun port(input_port: u16): TcpPort {
+    return input_port & 0xff << 8 | input_port >> 8 & 0xff;
+}
+
+fun stop(server: *TcpServer): void {
+    io::close(server.*.socket);
+}
+
+# TODO: error type.
+# fun new_server(port: TcpPort): ?TcpServer {
+#   error {
+#     io::close(server.*.socket);
+#   }
+#   return ...; # how to return an error?
+# }
+fun init(server: *TcpServer, input_port: TcpPort): bool {
+    var break: bool = true;
+    server.*.socket = socket::new(2, 1, 0);
+    if server.*.socket == -1 {
+        io::puts("cannot create a socket\0");
+        return false;
+    }
+    defer {
+        if (break) {
+            io::close(server.*.socket);
+        }
+    }
+
+    var reuse: i32 = 1;
+    if socket::set_options(server.*.socket, 1, 2, &reuse as *socket::OptionValue, 4) == -1 {
+        io::puts("failed to set socket options\0");
+        return false;
+    }
+
+    var server_address: socket::AddressIn;
+    server_address.family = 2;
+    server_address.port = port(input_port);
+    server_address.in_addr = 0;
+    server_address._reserved = 0;
+
+    if socket::bind(server.*.socket, &server_address, 16) == -1 {
+        io::puts("cannot bind a socket\0");
+        return false;
+    }
+    if socket::listen(server.*.socket, 1) == -1 {
+        io::puts("cannot listen a socket\0");
+        return false;
+    }
+
+    break = false;
+    return true;
+}
+
+fun accept(server: *TcpServer, client: *handle::TcpClientHandle): bool {
+    var client_address: socket::AddressIn;
+    var client_addr_size: u64 = 16;
+    client.*.socket = socket::accept(server.*.socket, &client_address, &client_addr_size);
+    if client.*.socket == -1 {
+        io::puts("cannot accept a socket\0");
+        return false;
+    }
+    return true;
+}
