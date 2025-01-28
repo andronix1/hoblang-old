@@ -1,6 +1,6 @@
 fun write(fd: i64, buf: *u8, len: i64): i64 {
 	var res: i64 = 123;
-	asm(rax, rdi, rsi, rdx, rcx, r11) {
+	asm (rax, rdi, rsi, rdx, rcx, r11) {
 		mov $rax, 1;
 		mov $rdi, (fd);
 		mov $rsi, (buf);
@@ -12,7 +12,7 @@ fun write(fd: i64, buf: *u8, len: i64): i64 {
 }
 
 fun exit(status: i64): void {
-	asm(rax, rdi) {
+	asm (rax, rdi) {
 		mov $rax, 60;
 		mov $rdi, (status);
 		syscall;
