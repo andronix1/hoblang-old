@@ -13,6 +13,7 @@ void print_ast_type(FILE *stream, va_list list) {
 			break;
 		case AST_TYPE_POINTER: print_to(stream, "*{ast::type}", type->ptr_to); break;
 		case AST_TYPE_PATH: print_to(stream, "<mod path is NIY>"); break;
+		case AST_TYPE_SLICE: print_to(stream, "[]{ast::type}"); break;
 		case AST_TYPE_STRUCT:
 			print_to(stream, "struct {");
 			for (size_t i = 0; i < vec_len(type->struct_type.members); i++) {

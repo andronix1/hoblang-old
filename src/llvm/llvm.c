@@ -45,6 +45,10 @@ LLVMTypeRef llvm_resolve_type(SemaType *type) {
 				0
 			);
 		}
+		case SEMA_TYPE_SLICE: {
+			LLVMTypeRef elements[2] = { LLVMInt64Type(), LLVMPointerType(llvm_resolve_type(type->slice_of), 0) };
+			return LLVMStructType(elements, 2, false);
+		}
 		case SEMA_TYPE_POINTER: {
 			return LLVMPointerType(llvm_resolve_type(type->ptr_to), 0);
 		}

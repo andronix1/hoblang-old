@@ -12,7 +12,7 @@ void sema_stmt_var(SemaModule *sema, AstVar *var) {
 				return;
 			}
 			if (!sema_types_equals(type, var_type)) {
-				sema_err("cannot put {sema::type} in {sema::type} variable", type, &var_type);
+				sema_err("cannot put {sema::type} in {sema::type} variable", type, var_type);
 				return;
 			}
 		}

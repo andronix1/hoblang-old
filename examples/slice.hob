@@ -1,0 +1,3 @@
+fun main(): void {
+    var test: []u8 = { 1, 2, 3 };
+}

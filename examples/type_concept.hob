@@ -1,0 +1,32 @@
+type IntegerKind = enum {
+	Byte, Short, Word, Quad
+};
+
+type IntegerUnion = union {
+	byte: u8,
+	short: u16,
+	word: u32,
+	quad: u64
+};
+
+type IntegerVariant = variant {
+	Byte { byte: u8 },
+	Short { short: u8 },
+	Word { word: u8 },
+	Quad { quad: u8 },
+};
+
+type IntegerVariantAlt = struct {
+	kind: IntegerKind,
+	value: IntegerUnion
+}
+
+fun main(): void {
+    var v1 = enum IntegerVariant.Byte(1);
+    var v2 = struct IntegerVariantAlt {
+        kind: IntegerKind.Byte,
+        value: union IntegerUnion
+    };
+
+	var test: []u8 = { 10, 20, 30, 40 };
+}

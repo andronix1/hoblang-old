@@ -37,6 +37,8 @@ bool sema_types_equals(SemaType *type, SemaType *other) {
 			return true;
 		case SEMA_TYPE_PRIMITIVE:
 			return type->primitive == other->primitive;
+		case SEMA_TYPE_SLICE:
+			return sema_types_equals(type->slice_of, other->slice_of);
 		case SEMA_TYPE_FUNCTION:
 			if (vec_len(type->func.args) != vec_len(other->func.args)) {
 				return false;
@@ -98,10 +100,20 @@ void print_sema_type(FILE* stream, va_list list) {
 			}
 			print_to(stream, "): {sema::type}", type->func.returning);
 			break;
+		case SEMA_TYPE_SLICE:
+			print_to(stream, "[]{sema::type}", type->ptr_to);
+			break;
 		case SEMA_TYPE_POINTER:
-			print_to(stream, "{sema::type}*", type->ptr_to);
+			print_to(stream, "*{sema::type}", type->ptr_to);
 			break;
 	}
+}
+
+SemaType *sema_type_new_slice(SemaType *of) {
+	SemaType *result = malloc(sizeof(SemaType));
+	result->type = SEMA_TYPE_SLICE;
+	result->slice_of = of;
+	return result;
 }
 
 SemaType *sema_type_new_pointer(SemaType *to) {

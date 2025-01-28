@@ -12,8 +12,7 @@ bool parse_type(Parser *parser, AstType *type) {
 			return parse_mod_path(parser, &type->path);
 		case TOKEN_MULTIPLY: {
 			type->type = AST_TYPE_POINTER;
-			type->ptr_to = malloc(sizeof(AstType));
-			return parse_type(parser, type->ptr_to);
+			return parse_type(parser, type->ptr_to = malloc(sizeof(AstType)));
 		}
 		case TOKEN_STRUCT: {
 			type->type = AST_TYPE_STRUCT;
@@ -22,6 +21,11 @@ bool parse_type(Parser *parser, AstType *type) {
 		case TOKEN_FUN: {
 			type->type = AST_TYPE_FUNCTION;
 			return parse_ast_func_type(parser, &type->func);
+		}
+		case TOKEN_OPENING_SQUARE_BRACE: {
+			type->type = AST_TYPE_SLICE;
+			parse_exp_next(TOKEN_CLOSING_SQUARE_BRACE, "slice closing brace");
+			return parse_type(parser, type->slice_of = malloc(sizeof(AstType)));
 		}
 		default:
 			parse_err(EXPECTED("type"));
