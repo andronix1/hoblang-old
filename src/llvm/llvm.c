@@ -50,13 +50,14 @@ bool llvm_write_module_ir(LlvmBackend *llvm, char *output_path) {
 }
 
 bool llvm_write_module(LlvmBackend *llvm, char *output_path) {
+	llvm_write_module_ir(llvm, "dump.ll");
 	if (LLVMVerifyModule(llvm->module, LLVMAbortProcessAction | LLVMPrintMessageAction | LLVMReturnStatusAction, NULL)) {
-		llvm_write_module_ir(llvm, "dump.ll");
 		exit(1);
 	}
 
 	LLVMInitializeNativeTarget();
 	LLVMInitializeNativeAsmPrinter();
+	LLVMInitializeNativeAsmParser();
 
 	LLVMTargetRef target = LLVMGetFirstTarget();
 	// const char *target_name = "aarch64";

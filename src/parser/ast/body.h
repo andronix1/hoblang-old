@@ -7,6 +7,7 @@
 #include "stmts/return.h"
 #include "stmts/assign.h"
 #include "stmts/while.h"
+#include "stmts/asm.h"
 
 typedef enum {
 	AST_STMT_IF,
@@ -14,6 +15,7 @@ typedef enum {
 	AST_STMT_FUNC_CALL,
 	AST_STMT_RETURN,
 	AST_STMT_WHILE,
+	AST_STMT_INLINE_ASM,
 	AST_STMT_DEFER,
 	AST_STMT_ASSIGN
 } AstStmtType;
@@ -27,6 +29,7 @@ typedef struct {
 		AstReturn ret;
 		AstDefer defer;
 		AstWhile while_loop;
+		AstInlineAsm inline_asm;
 		AstAssign assign;
 	};
 } AstStmt;

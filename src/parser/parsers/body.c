@@ -1,10 +1,11 @@
 #include "../parsers.h"
 
-#include "stmts/if_else.c"
-#include "stmts/defer.c"
-#include "stmts/var.c"
-#include "stmts/return.c"
-#include "stmts/while.c"
+bool parse_defer(Parser *parser, AstDefer *defer);
+bool parse_if_else(Parser *parser, AstIfElse *if_else);
+bool parse_return(Parser *parser, AstReturn *ret);
+bool parse_var(Parser *parser, AstVar *var);
+bool parse_while(Parser *parser, AstWhile *while_loop);
+bool parse_asm_body(Parser *parser, AstInlineAsm *inline_asm);
 
 bool parse_stmt(Parser *parser, AstStmt *stmt) {
 	parser_next_token(parser);
@@ -45,6 +46,9 @@ bool parse_stmt(Parser *parser, AstStmt *stmt) {
 		case TOKEN_VAR:
 			stmt->type = AST_STMT_VAR;
 			return parse_var(parser, &stmt->var);
+		case TOKEN_ASM:
+			stmt->type = AST_STMT_INLINE_ASM;
+			return parse_asm_body(parser, &stmt->inline_asm);
 		default:
 			parse_err("unexpected `{tok}` while parsing statement", parser->token);
 			return false;
