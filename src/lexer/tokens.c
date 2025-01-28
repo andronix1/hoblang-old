@@ -12,6 +12,8 @@ void print_token(FILE *stream, va_list list) {
 	}
 	switch (token->type) {
     	case TOKEN_EOI: fprintf(stream, "<EOI>"); return;
+    	case TOKEN_ASM: fprintf(stream, "asm"); return;
+    	case TOKEN_DOLLAR: fprintf(stream, "$"); return;
     	case TOKEN_EXTERN: fprintf(stream, "extern"); return;
     	case TOKEN_TYPE: fprintf(stream, "type"); return;
     	case TOKEN_RETURN: fprintf(stream, "return"); return;
@@ -61,7 +63,14 @@ void print_token(FILE *stream, va_list list) {
     	case TOKEN_SHR: fprintf(stream, ">>"); return;
     	case TOKEN_INTEGER: fprintf(stream, "integer %ld", token->integer); return;
     	case TOKEN_CHAR: fprintf(stream, "char '%c'", token->character); return;
-    	case TOKEN_STR: fprintf(stream, "string \"TODO\""); return;
+    	case TOKEN_STR: {
+			Slice str = {
+				.len = vec_len(token->str),
+				.str = token->str
+			};
+			print_to(stream, "string \"{slice}\"", &str);
+			return;
+		}
     	case TOKEN_IDENT: 
 			fprintf(stream, "ident `");
 			slice_write_to(&token->ident, stream);

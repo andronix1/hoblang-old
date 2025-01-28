@@ -1,0 +1,41 @@
+fun write(fd: i64, buf: *u8, len: i64): i64 {
+	var res: i64 = 123;
+	asm(rax, rdi, rsi, rdx, rcx, r11) {
+		mov $rax, 1;
+		mov $rdi, (fd);
+		mov $rsi, (buf);
+		mov $rdx, (len);
+		syscall;
+		mov res, $rax;
+	}
+	return res;
+}
+
+fun exit(status: i64): void {
+	asm(rax, rdi) {
+		mov $rax, 60;
+		mov $rdi, (status);
+		syscall;
+	}
+}
+
+fun _start(): void {
+	var test: i64 = 10;
+	asm(rax) {
+		mov $rax, (1 as i64 + test);
+		mov test, $rax;
+	}
+
+	if test == 11 {
+		if write(0, "COOL!!!\n", 8) == 8 {
+			exit(0);
+		}
+		exit(6);
+	}
+	if test == 10 {
+		write(0, "So stable...\n", 13);
+		exit(10);
+	}
+	write(0, "So bad((((\n", 11);
+	exit(test);
+}

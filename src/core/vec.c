@@ -47,6 +47,15 @@ void *_vec_push(void *vec, void *element) {
 	return vec;
 }
 
+void *_vec_append_raw(void *vec, const void *ptr, size_t len) {
+	VecHeader *header = vec_header(vec);
+	vec = _vec_reserve(vec, header->len + len);
+	for (size_t i = 0; i < len; i++) {
+		vec = _vec_push(vec, (char*)ptr + i * header->esize);
+	}
+	return vec;
+}
+
 size_t vec_len(void *vec) {
 	return vec_header(vec)->len;
 }

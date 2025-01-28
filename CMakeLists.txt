@@ -27,6 +27,8 @@ set(SOURCE_FILES
 	src/parser/parser.c
 	src/parser/print/expr.c
 	src/parser/print/type.c
+	src/parser/ast/stmts/asm.c
+	src/parser/parsers/stmts/asm.c
 	src/parser/parsers/stmts/var.c
 	src/parser/parsers/stmts/return.c
 	src/parser/parsers/stmts/while.c
@@ -52,6 +54,7 @@ set(SOURCE_FILES
 	src/sema/parts/exprs/func_call.c
 	src/sema/parts/exprs/int.c
 	src/sema/parts/stmts/assign.c
+	src/sema/parts/stmts/asm.c
 	src/sema/parts/stmts/if_else.c
 	src/sema/parts/stmts/return.c
 	src/sema/parts/stmts/defer.c
@@ -68,6 +71,7 @@ set(SOURCE_FILES
 	src/llvm/parts/module.c
 	src/llvm/parts/body.c
 	src/llvm/parts/stmts/assign.c
+	src/llvm/parts/stmts/asm/x86.c
 	src/llvm/parts/stmts/if.c
 	src/llvm/parts/stmts/return.c
 	src/llvm/parts/stmts/var.c

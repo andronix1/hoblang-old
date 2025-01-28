@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <printf.h>
 #include <stdint.h>
+#include "core/vec.h"
 #include "core/location.h"
 #include "core/slice.h"
 
@@ -16,8 +17,10 @@ typedef enum {
     TOKEN_VAR,
     TOKEN_RETURN,
     TOKEN_EXTERN,
-    TOKEN_AS,
+	TOKEN_AS,
     
+	TOKEN_ASM,
+	TOKEN_DOLLAR,
 	TOKEN_STRUCT,
     TOKEN_FUNC_RETURNS,
     
