@@ -21,7 +21,7 @@ fun exit(status: i64): void {
 
 fun _start(): void {
 	var test: i64 = 10;
-	asm(rax) {
+	asm (rax) {
 		mov $rax, (1 as i64 + test);
 		mov test, $rax;
 	}
