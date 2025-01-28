@@ -40,14 +40,19 @@ void llvm_stmt_asm(LlvmBackend *llvm, AstInlineAsm *inline_asm) {
                 }
 
                 case AST_INLINE_ASM_ARG_VALUE: {
-                    LLVMValueRef value = llvm_value(llvm, &arg->value);
+                    LLVMValueRef value = LLVMBuildPtrToInt(
+						llvm->builder,
+						llvm_value(llvm, &arg->value),
+						LLVMInt32Type(),
+						""
+					);
                     values = vec_push(values, &value);
                     LLVMTypeRef type = llvm_resolve_type(arg->value.sema_type);
                     types = vec_push(types, &type);
                     if (args_count > 0) {
                         constraint = vec_append_raw(constraint, ",", 1);
                     }
-                    constraint = vec_append_raw(constraint, "X", 1);
+                    constraint = vec_append_raw(constraint, "m", 1);
                     assembly = vec_append_raw(assembly, int_buf, sprintf(int_buf, "$%ld", args_count++));
                     break;
                 }

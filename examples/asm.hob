@@ -11,8 +11,8 @@ fun main(): void {
 		# 	 ecx  - register
 		# 	  x   - variable
 		# 	(...) - expression
-		mov $eax, (0);
-		mov test, $eax;
+		mov $w7, (0);
+		str $w7, test;
 	}
 
 	if test == 0 {
