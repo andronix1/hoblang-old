@@ -25,58 +25,40 @@ void llvm_stmt_asm(LlvmBackend *llvm, AstInlineAsm *inline_asm) {
     LLVMTypeRef *types = vec_new(LLVMTypeRef);
 
     for (size_t i = 0; i < vec_len(inline_asm->mnems); i++) {
-        AstInlineAsmMnemonic *mnemonic = &inline_asm->mnems[i];
+        AstAsmMnemonic *mnemonic = &inline_asm->mnems[i];
         APPEND_ASM_PTR(mnemonic->name.str, mnemonic->name.len);
         APPEND_ASM(" ");
         for (size_t j = 0; j < vec_len(mnemonic->args); j++) {
             if (j != 0) {
                 APPEND_ASM(",");
             }
-            AstInlineAsmArg *arg = &mnemonic->args[j];
+            AstAsmArg *arg = &mnemonic->args[j];
             switch (arg->type) {
-                case AST_INLINE_ASM_ARG_REGISTER:
+                case AST_ASM_ARG_REGISTER:
                     APPEND_ASM_PTR(arg->reg.str, arg->reg.len);
                     break;
 
-                case AST_INLINE_ASM_ARG_INT:
-                    APPEND_ASM("%ld", arg->integer);
+                case AST_ASM_ARG_EXPR: {
+                    LLVMValueRef value = llvm_expr(llvm, arg->expr);
+                    values = vec_push(values, &value);
+                    LLVMTypeRef type = llvm_resolve_type(arg->expr->sema_type);
+                    types = vec_push(types, &type);
+                    APPEND_ASM("$%lu", args_count++);
+                    APPEND_CONSTR("rim");
                     break;
-
-                case AST_INLINE_ASM_ARG_LANG: {
-                    hob_log(LOGW, "TODO: check clobbers");
-                    const char *clob = NULL;
-                    switch (arg->lang.type) {
-                        case AST_INLINE_ASM_LANG_ARG_EXPR: {
-                            LLVMValueRef value = llvm_expr(llvm, arg->lang.expr);
-                            values = vec_push(values, &value);
-                            LLVMTypeRef type = llvm_resolve_type(arg->lang.expr->sema_type);
-                            types = vec_push(types, &type);
-                            APPEND_ASM("$%lu", args_count++);
-                            hob_log(LOGW, "TODO: check expression type from regs");
-                            clob = "rim";
-                            break;
-                        }
-                        case AST_INLINE_ASM_LANG_ARG_VALUE: {
-                            LLVMValueRef value = 
-                            LLVMBuildPtrToInt(
-                                llvm->builder,
-                                llvm_value(llvm, &arg->lang.value),
-                                LLVMInt64Type(),
-                                ""
-                            );
-                            values = vec_push(values, &value);
-                            LLVMTypeRef type = LLVMInt64Type();
-                            types = vec_push(types, &type);
-                            APPEND_ASM("$%ld", args_count++);
-                            clob = "p";
-                            break;
-                        }
-                    }
-                    if (arg->lang.has_constraint) {
-                        APPEND_CONSTR_PTR(arg->lang.constraint.str, arg->lang.constraint.len);
-                    } else {
-                        APPEND_CONSTR(clob);
-                    }
+                }
+                case AST_ASM_ARG_VALUE: {
+                    LLVMValueRef value = LLVMBuildPtrToInt(
+                        llvm->builder,
+                        llvm_value(llvm, &arg->value),
+                        LLVMInt64Type(),
+                        ""
+                    );
+                    values = vec_push(values, &value);
+                    LLVMTypeRef type = LLVMInt64Type();
+                    types = vec_push(types, &type);
+                    APPEND_ASM("$%ld", args_count++);
+                    APPEND_CONSTR("p");
                     break;
                 }
             }
@@ -103,6 +85,6 @@ void llvm_stmt_asm(LlvmBackend *llvm, AstInlineAsm *inline_asm) {
         LLVMInlineAsmDialectIntel,
         false
     );
-    LLVMSetVolatile(call, true);
+    LLVMSetVolatile(call, inline_asm->is_volatile);
     LLVMBuildCall2(llvm->builder, LLVMFunctionType(LLVMVoidType(), types, vec_len(types), false), call, values, vec_len(values), "");
 }

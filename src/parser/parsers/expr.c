@@ -179,10 +179,10 @@ AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType)) {
 					return NULL;
 				}
 				break;
-			case TOKEN_OPENING_SQUARE_BRACE:
+			case TOKEN_OPENING_FIGURE_BRACE:
 				current_expr->type = AST_EXPR_ARRAY;
 				current_expr->array = vec_new(AstExpr);
-				while (token_type(parser->token) != TOKEN_CLOSING_SQUARE_BRACE) {
+				while (token_type(parser->token) != TOKEN_CLOSING_FIGURE_BRACE) {
 					AstExpr *expr = parse_expr_before(parser, token_array_arg_stop);
 					if (!expr) {
 						return NULL;

@@ -14,7 +14,7 @@ fun handle_conn(handle: *tcp::handle::TcpClientHandle): void {
 	defer tcp::handle::close(handle);
 
 	io::puts("new connection!\0");
-	var buf = [0 as u8, 0, 0, 0, 0];
+	var buf = { 0 as u8, 0, 0, 0, 0 };
 	while tcp::handle::read(handle, buf, 5) == 5 { }
 
 	var fd = io::open("test.html\0", 0);

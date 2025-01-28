@@ -27,7 +27,6 @@ set(SOURCE_FILES
 	src/parser/parser.c
 	src/parser/print/expr.c
 	src/parser/print/type.c
-	src/parser/ast/stmts/asm.c
 	src/parser/parsers/stmts/asm.c
 	src/parser/parsers/stmts/var.c
 	src/parser/parsers/stmts/return.c

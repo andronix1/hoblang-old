@@ -2,11 +2,11 @@ fun write(fd: i64, buf: *u8, len: i64): i64 {
 	var res: i64 = 123;
 	asm (rax, rdi, rsi, rdx, rcx, r11) {
 		mov $rax, 1;
-		mov $rdi, (fd);
-		mov $rsi, (buf);
-		mov $rdx, (len);
+		mov $rdi, fd;
+		mov $rsi, buf;
+		mov $rdx, len;
 		syscall;
-		mov res, $rax;
+		mov [res], $rax;
 	}
 	return res;
 }
@@ -14,21 +14,21 @@ fun write(fd: i64, buf: *u8, len: i64): i64 {
 fun exit(status: i64): void {
 	asm (rax, rdi) {
 		mov $rax, 60;
-		mov $rdi, (status);
+		mov $rdi, status;
 		syscall;
 	}
 }
 
 fun _start(): void {
 	var test: i64 = 10;
-	asm (rax) {
-		mov $rax, (1 as i64 + test);
-		mov test, $rax;
+	asm (rax) volatile { # it is not nececcary to be a volatile but it is an example
+		mov $rax, 1 as i64 + test;
+		mov [test], $rax;
 	}
 
 	if test == 11 {
-		if write(0, "COOL!!!\n", 8) == 8 {
-			exit(0);
+		if write(0, "SO COOL!!!\n", 11) == 11 {
+			exit(101);
 		}
 		exit(6);
 	}

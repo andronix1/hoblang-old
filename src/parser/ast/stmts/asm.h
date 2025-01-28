@@ -5,46 +5,39 @@
 #include "../value.h"
 
 typedef enum {
-    AST_INLINE_ASM_ARG_INT,
-    AST_INLINE_ASM_ARG_REGISTER,
-    AST_INLINE_ASM_ARG_LANG,
-} AstInlineAsmArgType;
+    AST_ASM_ARG_REGISTER,
+    AST_ASM_ARG_EXPR,
+    AST_ASM_ARG_VALUE,
+} AstAsmArgType;
 
-typedef enum {
-    AST_INLINE_ASM_LANG_ARG_VALUE,
-    AST_INLINE_ASM_LANG_ARG_EXPR,
-} AstInlineAsmLangArgType;
-
-typedef struct {
-    AstInlineAsmLangArgType type;
-    bool has_constraint;
-    Slice constraint;
-    union {
-        AstValue value;
-        AstExpr *expr;
-    };
-} AstInlineAsmLangArg;
+// typedef enum {
+//     AST_ASM_CLOBBER_IMM = 1 << 1,
+//     AST_ASM_CLOBBER_MEM = 1 << 2,
+//     AST_ASM_CLOBBER_REG = 1 << 3,
+//     AST_ASM_CLOBBER_ADDR = 1 << 4,
+// } AstAsmConstraint;
 
 typedef struct {
-    AstInlineAsmArgType type;
+    AstAsmArgType type;
     union {
-        uint64_t integer;
         Slice reg;
-        AstInlineAsmLangArg lang;
+        AstExpr *expr;
+        AstValue value;
     };
-} AstInlineAsmArg;
+} AstAsmArg;
 
-AstInlineAsmArg ast_asm_reg(Slice reg);
-AstInlineAsmArg ast_asm_int(uint64_t value);
-void ast_inline_arg_init_value(AstInlineAsmLangArg *arg, AstValue value);
-void ast_inline_arg_init_expr(AstInlineAsmLangArg *arg, AstExpr *expr);
+AstAsmArg ast_asm_reg(Slice reg);
+AstAsmArg ast_asm_expr(AstExpr *expr);
+AstAsmArg ast_asm_value(AstValue value);
 
 typedef struct {
     Slice name;
-    AstInlineAsmArg *args;
-} AstInlineAsmMnemonic;
+    AstAsmArg *args;
+} AstAsmMnemonic;
 
 typedef struct {
+    // AstAsmClobbers clobbers;
+    bool is_volatile;
     Slice *clobbers;
-    AstInlineAsmMnemonic *mnems;
+    AstAsmMnemonic *mnems;
 } AstInlineAsm;

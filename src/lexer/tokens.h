@@ -18,6 +18,7 @@ typedef enum {
     TOKEN_RETURN,
     TOKEN_EXTERN,
 	TOKEN_AS,
+	TOKEN_VOLATILE,
     
 	TOKEN_ASM,
 	TOKEN_DOLLAR,

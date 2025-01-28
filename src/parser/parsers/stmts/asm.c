@@ -4,40 +4,10 @@ bool token_is_asm_arg_end(TokenType type) {
     return type == TOKEN_COMMA || type == TOKEN_SEMICOLON;
 }
 
-bool parse_asm_lang_arg(Parser *parser, AstInlineAsmLangArg *arg) {
-    parser_next_token(parser);
-    switch (token_type(parser->token)) {
-        case TOKEN_IDENT: {
-            AstValue value;
-            parser->skip_next = true;
-            if (!parse_value(parser, &value)) {
-                return false;
-            }
-            ast_inline_arg_init_value(arg, value);
-            return true;
-        }
-        
-        case TOKEN_OPENING_CIRCLE_BRACE: {
-            parser->skip_next = true;
-            AstExpr *expr = parse_expr_before(parser, token_is_asm_arg_end);
-            parser->skip_next = true;
-            if (!expr) {
-                return false;
-            }
-            ast_inline_arg_init_expr(arg, expr);
-            return true;
-        }
-
-        default:
-            parse_err(EXPECTED("asm lang arg"));
-            return false;
-    }
-}
-
-bool parse_asm_mnemonic(Parser *parser, AstInlineAsmMnemonic *mnem) {
+bool parse_asm_mnemonic(Parser *parser, AstAsmMnemonic *mnem) {
     parse_exp_next(TOKEN_IDENT, "asm mnemonic");
     mnem->name = parser->token->ident;
-    mnem->args = vec_new(AstInlineAsmArg);
+    mnem->args = vec_new(AstAsmArg);
     parser_next_token(parser);
     if (token_type(parser->token) == TOKEN_SEMICOLON) {
         return true;
@@ -48,50 +18,40 @@ bool parse_asm_mnemonic(Parser *parser, AstInlineAsmMnemonic *mnem) {
         switch (token_type(parser->token)) {
             case TOKEN_DOLLAR: {
                 parse_exp_next(TOKEN_IDENT, "register name");
-                AstInlineAsmArg arg = ast_asm_reg(parser->token->ident);
+                AstAsmArg arg = {
+                    .type = AST_ASM_ARG_REGISTER,
+                    .reg = parser->token->ident
+                };
                 mnem->args = vec_push(mnem->args, &arg);
                 break;
             }
 
-            case TOKEN_INTEGER: {
-                AstInlineAsmArg arg = ast_asm_int(parser->token->integer);
-                mnem->args = vec_push(mnem->args, &arg);
-                break;
-            }
-
-            case TOKEN_STR: {
-                Slice constr = {
-                    .str = parser->token->str,
-                    .len = vec_len(parser->token->str)
-                };
-                AstInlineAsmArg arg = {
-                    .type = AST_INLINE_ASM_ARG_LANG
-                };
-                if (!parse_asm_lang_arg(parser, &arg.lang)) {
+            case TOKEN_OPENING_SQUARE_BRACE: {
+                AstAsmArg arg = { .type = AST_ASM_ARG_VALUE };
+                if (!parse_value(parser, &arg.value)) {
                     return false;
                 }
-                arg.lang.has_constraint = true;
-                arg.lang.constraint = constr;
+                parse_exp_next(TOKEN_CLOSING_SQUARE_BRACE, "address close");
                 mnem->args = vec_push(mnem->args, &arg);
                 break;
             }
 
-            case TOKEN_IDENT:
-            case TOKEN_OPENING_CIRCLE_BRACE: {
+            default: {
                 parser->skip_next = true;
-                AstInlineAsmArg arg = {
-                    .type = AST_INLINE_ASM_ARG_LANG
+                AstAsmArg arg = {
+                    .type = AST_ASM_ARG_EXPR
                 };
-                if (!parse_asm_lang_arg(parser, &arg.lang)) {
+                if (!(arg.expr = parse_expr_before(parser, token_is_asm_arg_end))) {
                     return false;
                 }
+                parser->skip_next = true;
                 mnem->args = vec_push(mnem->args, &arg);
                 break;
             }
 
-            default:
-                parse_err(EXPECTED("asm arg"));
-                break;
+            // default:
+            //     parse_err(EXPECTED("asm arg"));
+            //     break;
         }
         parser_next_token(parser);
         switch (token_type(parser->token)) {
@@ -130,15 +90,22 @@ bool parse_asm_body(Parser *parser, AstInlineAsm *inline_asm) {
                 return false;
         }
     }
-    parse_exp_next(TOKEN_OPENING_FIGURE_BRACE, "asm body opening");
-    inline_asm->mnems = vec_new(AstInlineAsmMnemonic);
+    parser_next_token(parser);
+    if (token_type(parser->token) == TOKEN_VOLATILE) {
+        inline_asm->is_volatile = true;
+        parser_next_token(parser);
+    } else {
+        inline_asm->is_volatile = false;
+    }
+    parse_exp(TOKEN_OPENING_FIGURE_BRACE, "asm body opening");
+    inline_asm->mnems = vec_new(AstAsmMnemonic);
     while (true) {
         parser_next_token(parser);
         if (token_type(parser->token) == TOKEN_CLOSING_FIGURE_BRACE) {
             return true;
         }
         parser->skip_next = true;
-        AstInlineAsmMnemonic mnem;
+        AstAsmMnemonic mnem;
         if (!parse_asm_mnemonic(parser, &mnem)) {
             return false;
         }
