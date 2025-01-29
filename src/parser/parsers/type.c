@@ -23,9 +23,17 @@ bool parse_type(Parser *parser, AstType *type) {
 			return parse_ast_func_type(parser, &type->func);
 		}
 		case TOKEN_OPENING_SQUARE_BRACE: {
-			type->type = AST_TYPE_SLICE;
-			parse_exp_next(TOKEN_CLOSING_SQUARE_BRACE, "slice closing brace");
-			return parse_type(parser, type->slice_of = malloc(sizeof(AstType)));
+			parser_next_token(parser);
+			if (token_type(parser->token) == TOKEN_INTEGER) {
+				type->type = AST_TYPE_ARRAY;
+				type->array.length = parser->token->integer;
+				parse_exp_next(TOKEN_CLOSING_SQUARE_BRACE, "array length closing brace");
+				return parse_type(parser, type->array.of = malloc(sizeof(AstType)));
+			} else {
+				parse_exp(TOKEN_CLOSING_SQUARE_BRACE, "slice closing brace");
+				type->type = AST_TYPE_SLICE;
+				return parse_type(parser, type->slice_of = malloc(sizeof(AstType)));
+			}
 		}
 		default:
 			parse_err(EXPECTED("type"));

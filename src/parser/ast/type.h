@@ -10,6 +10,7 @@ typedef enum {
 	AST_TYPE_STRUCT,
 	AST_TYPE_FUNCTION,
 	AST_TYPE_SLICE,
+	AST_TYPE_ARRAY,
 	AST_TYPE_POINTER
 } AstTypeKind;
 
@@ -27,6 +28,11 @@ typedef struct {
 	AstStructMember *members;
 } AstStructType;
 
+typedef struct {
+	struct _AstType *of;
+	size_t length;
+} AstArrayType;
+
 typedef struct _AstType {
 	AstTypeKind type;
 	struct _SemaType *sema;
@@ -36,5 +42,6 @@ typedef struct _AstType {
 		AstFunctionType func;
 		struct _AstType *ptr_to;
 		struct _AstType *slice_of;
+		AstArrayType array;
 	};
 } AstType;

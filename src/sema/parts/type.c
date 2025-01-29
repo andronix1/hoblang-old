@@ -42,6 +42,14 @@ SemaType *sema_ast_type(SemaModule *sema, AstType *type) {
 			type->sema = sema_resolve_mod_path_type(sema, &type->path);
 			break;
 		}
+		case AST_TYPE_ARRAY: {
+			SemaType *array_of = sema_ast_type(sema, type->array.of);
+			if (!array_of) {
+				return NULL;
+			}
+			type->sema = sema_type_new_array(type->array.length, array_of);
+			break;
+		}
 		case AST_TYPE_SLICE: {
 			SemaType *slice_of = sema_ast_type(sema, type->slice_of);
 			if (!slice_of) {
