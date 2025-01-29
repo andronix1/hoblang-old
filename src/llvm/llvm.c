@@ -94,7 +94,7 @@ bool llvm_write_module(LlvmBackend *llvm, char *output_path) {
 	hob_log(LOGD, "triple: {cstr}", triple);
 	hob_log(LOGD, "with features {cstr}", features);
 	hob_log(LOGD, "cpu: {cstr}", cpu);
-	llvm->machine = LLVMCreateTargetMachine(target, triple, cpu, features, LLVMCodeGenLevelNone, LLVMRelocDefault, LLVMCodeModelDefault);
+	llvm->machine = LLVMCreateTargetMachine(target, triple, cpu, features, LLVMCodeGenLevelAggressive, LLVMRelocDefault, LLVMCodeModelDefault);
 	if (!llvm->machine) {
 		hob_log(LOGE, "failed to create target machine");
 		return false;

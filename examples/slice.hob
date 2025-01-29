@@ -1,16 +1,15 @@
 import "libc/lib.hob" as c;
 
-fun test2(): [2][]u8 {
-	return { "hidden)))\0", "word)00))\0" };
-}
+# fun test2(): [2][]u8 {
+# 	return { "hidden)))\0", "word)00))\0" };
+# }
 
-fun test1(): [1][]u8 {
-	return { "hellow\0" };
-}
+# fun test1(): [1][]u8 {
+# 	return { "hellow\0" };
+# }
 
 fun main(): void {
-	var arr_ = { "hello\0", "lol\0", "bruh\0" };
-	var arr = arr_ as [][]u8;
+	var arr = { "hello\0" } as [][]u8;
 	var s = arr[0];
 	c::io::puts(s as *u8);
 	# c::io::puts(&arr[1]);
