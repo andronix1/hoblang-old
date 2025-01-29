@@ -1,8 +1,21 @@
 import "libc/lib.hob" as c;
 
+#fun test2(): [1]*u8 {
+#	return { " word)00))\0" };
+#}
+
+#fun test1(): [1]*u8 {
+#	return { "hellow\0" };
+#}
+
 fun main(): void {
-    var test: []*u8 = { "hello\0", "world\0", "lol\0" } as []*u8;
-	c::io::puts(test[0]);
-	c::io::puts(test[1]);
-	c::io::puts(test[2]);
+	var arr_ = { "hello\0", "lol\0", "bruh\0" };
+	var arr = arr_ as []*u8;
+	c::io::puts(arr[0]);
+	c::io::puts(arr[1]);
+	c::io::puts(arr[2]);
+	# var t1 = test1() as []*u8;
+	#var t2 = test2() as []*u8;
+	#c::io::puts(t1[0]);
+	#c::io::puts(t2[1]);
 }

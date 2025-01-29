@@ -60,7 +60,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 					&& expr->as.type.sema->type == SEMA_TYPE_SLICE) {
 				LLVMTypeRef slice_type = llvm_resolve_type(expr->as.type.sema);
 				LLVMValueRef slice_ptr = LLVMBuildAlloca(llvm->builder, slice_type, "new_slice");
-				LLVMValueRef indices[] = { LLVMConstInt(LLVMInt32Type(), 0, false) };
+				/* LLVMValueRef indices[] = { LLVMConstInt(LLVMInt32Type(), 0, false) };
 				LLVMValueRef pointer = LLVMBuildGEP2(
 					llvm->builder,
 					llvm_resolve_type(expr->as.expr->sema_type->array.of),
@@ -68,6 +68,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 					indices, 1,
 					"arr_ptr"
 				);
+				*/
 				LLVMValueRef indices_len[2] = { LLVMConstInt(LLVMInt32Type(), 0, false), LLVMConstInt(LLVMInt32Type(), 0, false) };
 				LLVMValueRef slice_len_ptr = LLVMBuildGEP2(
 					llvm->builder,
@@ -85,7 +86,10 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 					indices_ptr, 2,
 					"slice_ptr"
 				);
-				LLVMBuildStore(llvm->builder, pointer, slice_ptr_ptr);
+				LLVMValueRef llvm_alloca = LLVMBuildAlloca(llvm->builder, LLVMArrayType(LLVMPointerType(LLVMInt8Type(), 0), 3), "");
+				LLVMBuildStore(llvm->builder, value, llvm_alloca);
+				LLVMValueRef ptr = LLVMBuildBitCast(llvm->builder, llvm_alloca, LLVMPointerType(LLVMPointerType(LLVMInt8Type(), 0), 0), "");
+				LLVMBuildStore(llvm->builder, ptr, slice_ptr_ptr);
 				return LLVMBuildLoad2(llvm->builder, slice_type, slice_ptr, "");
 			}
 			if (expr->as.expr->sema_type->type == SEMA_TYPE_POINTER
@@ -141,13 +145,11 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 		case AST_EXPR_ARRAY: {
 			LLVMTypeRef ptr_to = llvm_resolve_type(expr->sema_type->ptr_to);
 			LLVMTypeRef type = LLVMArrayType(ptr_to, vec_len(expr->array));
-			LLVMValueRef value = LLVMBuildAlloca(llvm->builder, type, "");
 			LLVMValueRef *vals = alloca(sizeof(LLVMValueRef) * vec_len(expr->array));
 			for (size_t i = 0; i < vec_len(expr->array); i++) {
 				vals[i] = llvm_expr(llvm, &expr->array[i]);
 			}
-			LLVMBuildStore(llvm->builder, LLVMConstArray(ptr_to, vals, vec_len(expr->array)), value);
-			return LLVMBuildBitCast(llvm->builder, value, LLVMPointerType(ptr_to, 0), "");
+			return LLVMConstArray(ptr_to, vals, vec_len(expr->array));
 		}
 	}
 	assert(0, "invalid expr {int}", expr->type);
