@@ -8,17 +8,32 @@ LLVMValueRef llvm_value(LlvmBackend *llvm, AstValue *value) {
 		AstValueSegment *seg = &value->segments[i];
 		switch (seg->type) {
 			case AST_VALUE_IDENT: {
-				LLVMValueRef indices[] = {
-					LLVMConstInt(LLVMInt32Type(), 0, false),
-					LLVMConstInt(LLVMInt32Type(), seg->ident.struct_member_idx, false)
-				};
-				val = LLVMBuildGEP2(
-					llvm->builder,
-					llvm_resolve_type(i == 0 ? decl->type : value->segments[i - 1].sema_type),
-					val,
-					indices, 2,
-					""
-				);
+				switch (seg->ident.get_type) {
+					case SEMA_VALUE_GET_SLICE: {
+						LLVMTypeRef type = llvm_resolve_type(i == 0 ? decl->type : value->segments[i - 1].sema_type);
+						switch (seg->ident.slice_ident.member) {
+							case SEMA_VALUE_SLICE_MEMBER_LENGTH:
+								return llvm_slice_len(llvm, type, val);
+							case SEMA_VALUE_SLICE_MEMBER_POINTER:
+								return llvm_slice_ptr(llvm, type, val);
+						}
+						break;
+					}
+					case SEMA_VALUE_GET_STRUCT: {
+						LLVMValueRef indices[] = {
+							LLVMConstInt(LLVMInt32Type(), 0, false),
+							LLVMConstInt(LLVMInt32Type(), seg->ident.struct_ident.member_idx, false)
+						};
+						val = LLVMBuildGEP2(
+							llvm->builder,
+							llvm_resolve_type(i == 0 ? decl->type : value->segments[i - 1].sema_type),
+							val,
+							indices, 2,
+							""
+						);
+						break;
+					}
+				}
 				break;
 			}
 			case AST_VALUE_DEREF: {

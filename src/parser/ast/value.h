@@ -10,12 +10,35 @@ typedef enum {
 
 struct _SemaType;
 
+typedef enum {
+	SEMA_VALUE_GET_STRUCT,
+	SEMA_VALUE_GET_SLICE,
+} SemaValueGetIdentType;
+
+typedef enum {
+	SEMA_VALUE_SLICE_MEMBER_LENGTH,
+	SEMA_VALUE_SLICE_MEMBER_POINTER
+} SemaValueSliceMember;
+
+typedef struct {
+	SemaValueSliceMember member;
+	struct _SemaType *slice_of;
+} SemaValueGetSliceIdent;
+
+typedef struct {
+	size_t member_idx;
+	struct _SemaType *sema_type;
+} SemaValueGetStructIdent;
+
 typedef struct {
 	Slice ident;
 
 	// sema
-	size_t struct_member_idx;
-	struct _SemaType *struct_sema_type;
+	SemaValueGetIdentType get_type;
+	union {
+		SemaValueGetStructIdent struct_ident;
+		SemaValueGetSliceIdent slice_ident;
+	};
 } AstValueIdent;
 
 typedef struct {

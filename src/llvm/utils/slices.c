@@ -30,7 +30,6 @@ LLVMValueRef llvm_alloca_slice(LlvmBackend *llvm, LLVMTypeRef of, LLVMValueRef p
 }
 
 LLVMValueRef llvm_slice_from_array(LlvmBackend *llvm, LLVMTypeRef of, LLVMValueRef array, size_t len) {
-    LLVMTypeRef slice_type = llvm_slice_type(of);
     LLVMValueRef arr_alloca = LLVMBuildAlloca(llvm->builder, LLVMArrayType(of, len), "arr_alloca");
     LLVMBuildStore(llvm->builder, array, arr_alloca);
     LLVMValueRef array_ptr = LLVMBuildBitCast(llvm->builder, arr_alloca, LLVMPointerType(of, 0), "");
@@ -39,7 +38,6 @@ LLVMValueRef llvm_slice_from_array(LlvmBackend *llvm, LLVMTypeRef of, LLVMValueR
 }
 
 LLVMValueRef llvm_slice_from_str(LlvmBackend *llvm, Slice *str) {
-    LLVMTypeRef slice_type = llvm_slice_type(LLVMInt8Type());
     LLVMValueRef str_global = LLVMAddGlobal(llvm->module, LLVMArrayType(LLVMInt8Type(), str->len), "str");
     LLVMSetInitializer(str_global, LLVMConstString(str->str, str->len, true));
     LLVMValueRef str_ptr = LLVMBuildBitCast(llvm->builder, str_global, LLVMPointerType(LLVMInt8Type(), 0), "");
