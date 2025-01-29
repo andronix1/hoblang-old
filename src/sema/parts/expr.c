@@ -41,7 +41,7 @@ SemaType *sema_ast_expr_type(SemaModule *sema, AstExpr *expr, SemaType *expectat
 				sema_err("not operator can be only be applied to booleans, not {sema::type}", expr->sema_type);
 			}
 			return expr->sema_type = &primitives[PRIMITIVE_BOOL];
-		case AST_EXPR_STR: return expr->sema_type = sema_type_new_pointer(&primitives[PRIMITIVE_U8]);
+		case AST_EXPR_STR: return expr->sema_type = sema_type_new_slice(&primitives[PRIMITIVE_U8]);
 		case AST_EXPR_CHAR: return expr->sema_type = &primitives[PRIMITIVE_U8];
 		case AST_EXPR_BOOL: return expr->sema_type = &primitives[PRIMITIVE_BOOL];
 		case AST_EXPR_ARRAY: return expr->sema_type = sema_ast_expr_array(sema, expr->array, expectation);

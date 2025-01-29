@@ -21,6 +21,14 @@ LLVMValueRef llvm_slice_ptr(LlvmBackend *llvm, LLVMTypeRef type, LLVMValueRef sl
     return LLVMBuildGEP2(llvm->builder, type, slice, indices, 2, "slice_ptr");
 }
 
+LLVMValueRef llvm_alloca_slice(LlvmBackend *llvm, LLVMTypeRef of, LLVMValueRef ptr, size_t len) {
+    LLVMTypeRef slice_type = llvm_slice_type(of);
+    LLVMValueRef slice = LLVMBuildAlloca(llvm->builder, slice_type, "slice");
+    LLVMBuildStore(llvm->builder, LLVMConstInt(LLVMInt64Type(), len, false), llvm_slice_len(llvm, slice_type, slice));
+    LLVMBuildStore(llvm->builder, ptr, llvm_slice_ptr(llvm, slice_type, slice));
+    return LLVMBuildLoad2(llvm->builder, slice_type, slice, "loaded_slice");
+}
+
 LLVMValueRef llvm_slice_from_array(LlvmBackend *llvm, LLVMTypeRef of, LLVMValueRef array, size_t len) {
     LLVMTypeRef slice_type = llvm_slice_type(of);
     LLVMValueRef indices[1] = {
@@ -29,14 +37,15 @@ LLVMValueRef llvm_slice_from_array(LlvmBackend *llvm, LLVMTypeRef of, LLVMValueR
     LLVMValueRef arr_alloca = LLVMBuildAlloca(llvm->builder, LLVMArrayType(of, len), "arr_alloca");
     LLVMBuildStore(llvm->builder, array, arr_alloca);
     LLVMValueRef array_ptr = LLVMBuildBitCast(llvm->builder, arr_alloca, LLVMPointerType(of, 0), "");
-    // LLVMValueRef array_ptr = LLVMBuildGEP2(llvm->builder, LLVMPointerType(of, 0), array, indices, 1, "array_ptr");
 
-    LLVMValueRef slice = LLVMBuildAlloca(llvm->builder, slice_type, "slice");
-    // LLVMValueRef slice = LLVMGetPoison(slice_type);
-    // LLVMBuildInsertValue(llvm->builder, slice, LLVMConstInt(LLVMInt64Type(), len, false), 0, "");
-    LLVMBuildStore(llvm->builder, LLVMConstInt(LLVMInt64Type(), len, false), llvm_slice_len(llvm, slice_type, slice));
-    // LLVMBuildInsertValue(llvm->builder, slice, array_ptr, 1, "");
-    LLVMBuildStore(llvm->builder, array_ptr, llvm_slice_ptr(llvm, slice_type, slice));
-    // return slice;
-    return LLVMBuildLoad2(llvm->builder, slice_type, slice, "loaded_slice");
+    return llvm_alloca_slice(llvm, of, array_ptr, len);
+}
+
+LLVMValueRef llvm_slice_from_str(LlvmBackend *llvm, Slice *str) {
+    LLVMTypeRef type = LLVMArrayType(LLVMInt8Type(), str->len);
+    LLVMValueRef value = LLVMAddGlobal(llvm->module, type, ""); //LLVMBuildAlloca(llvm->builder, type, "");
+    LLVMSetInitializer(value, LLVMConstString(str->str, str->len, true));
+    LLVMValueRef str_ptr = LLVMBuildBitCast(llvm->builder, value, LLVMPointerType(LLVMInt8Type(), 0), "");
+
+    return llvm_alloca_slice(llvm, LLVMInt8Type(), str_ptr, str->len);
 }
