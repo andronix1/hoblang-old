@@ -44,6 +44,8 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 				case SEMA_AS_CONV_EXTEND: return LLVMBuildZExt(llvm->builder, value, to_type, "");
 				case SEMA_AS_CONV_TRUNC: return LLVMBuildTrunc(llvm->builder, value, to_type, "");
 				case SEMA_AS_CONV_BITCAST: return LLVMBuildBitCast(llvm->builder, value, to_type, "");
+				case SEMA_AS_CONV_PTR_TO_INT: return LLVMBuildPtrToInt(llvm->builder, value, to_type, "");
+				case SEMA_AS_CONV_INT_TO_PTR: return LLVMBuildIntToPtr(llvm->builder, value, to_type, "");
 				case SEMA_AS_CONV_ARR_TO_SLICE: return llvm_slice_from_array(
 					llvm,
 					llvm_resolve_type(expr->as.expr->sema_type->array.of),

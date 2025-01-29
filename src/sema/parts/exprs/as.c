@@ -12,7 +12,7 @@ void sema_conv_pointer(
 		return;
 	}
 	if (sema_types_equals(dest, &primitives[PRIMITIVE_I64])) {
-		*type = SEMA_AS_CONV_BITCAST;
+		*type = SEMA_AS_CONV_PTR_TO_INT;
 		return;
 	}
 	sema_err("{sema::type} cannot be casted to {sema::type}", source, dest);
@@ -106,7 +106,7 @@ void sema_conv_primitive(
 						sema_err("only 64-bit values can be casted to pointer");
 						break;
 					}
-					*type = SEMA_AS_CONV_BITCAST;
+					*type = SEMA_AS_CONV_INT_TO_PTR;
 					break;
 				}
 
