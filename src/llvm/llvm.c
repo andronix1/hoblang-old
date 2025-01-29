@@ -3,6 +3,7 @@
 bool llvm_init(LlvmBackend *llvm) {
 	llvm->builder = LLVMCreateBuilder();
 	llvm->module = LLVMModuleCreateWithName("main");
+	LLVMContextRef context = LLVMGetGlobalContext();
 	return true;	
 }
 

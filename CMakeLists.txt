@@ -67,6 +67,7 @@ set(SOURCE_FILES
 	src/sema/parts/value.c
 
 	src/llvm/llvm.c
+	src/llvm/utils/slices.c
 	src/llvm/parts/module.c
 	src/llvm/parts/body.c
 	src/llvm/parts/stmts/asm/x86.c

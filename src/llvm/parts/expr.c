@@ -1,4 +1,5 @@
 #include "../parts.h"
+#include "../utils/slices.h"
 
 bool llvm_is_signed(SemaType *type) {
 	return
@@ -45,68 +46,86 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 		case AST_EXPR_AS: {
 			LLVMTypeRef to_type = llvm_resolve_type(expr->as.type.sema);
 			LLVMValueRef value = llvm_expr(llvm, expr->as.expr);
-			int level[] = {
-				[PRIMITIVE_I8] = 1,
-				[PRIMITIVE_U8] = 1,
-				[PRIMITIVE_I16] = 2,
-				[PRIMITIVE_U16] = 2,
-				[PRIMITIVE_I32] = 3,
-				[PRIMITIVE_U32] = 3,
-				[PRIMITIVE_I64] = 4,
-				[PRIMITIVE_U64] = 4,
-				[PRIMITIVE_BOOL] = 0,
-			};
-			if (expr->as.expr->sema_type->type == SEMA_TYPE_ARRAY
-					&& expr->as.type.sema->type == SEMA_TYPE_SLICE) {
-				LLVMTypeRef slice_type = llvm_resolve_type(expr->as.type.sema);
-				LLVMValueRef slice_ptr = LLVMBuildAlloca(llvm->builder, slice_type, "new_slice");
-				/* LLVMValueRef indices[] = { LLVMConstInt(LLVMInt32Type(), 0, false) };
-				LLVMValueRef pointer = LLVMBuildGEP2(
-					llvm->builder,
+			switch (expr->as.conv_type) {
+				case SEMA_AS_CONV_EXTEND: return LLVMBuildZExt(llvm->builder, value, to_type, "");
+				case SEMA_AS_CONV_TRUNC: return LLVMBuildTrunc(llvm->builder, value, to_type, "");
+				case SEMA_AS_CONV_BITCAST: return LLVMBuildBitCast(llvm->builder, value, to_type, "");
+				case SEMA_AS_CONV_ARR_TO_SLICE: return llvm_slice_from_array(
+					llvm,
 					llvm_resolve_type(expr->as.expr->sema_type->array.of),
 					value,
-					indices, 1,
-					"arr_ptr"
+					expr->as.expr->sema_type->array.length
 				);
-				*/
-				LLVMValueRef indices_len[2] = { LLVMConstInt(LLVMInt32Type(), 0, false), LLVMConstInt(LLVMInt32Type(), 0, false) };
-				LLVMValueRef slice_len_ptr = LLVMBuildGEP2(
+				case SEMA_AS_CONV_SLICE_TO_PTR: return LLVMBuildLoad2(
 					llvm->builder,
-					slice_type, // llvm_resolve_type(expr->as.expr->sema_type->array.of), //llvm_resolve_type(expr->as.expr->sema_type->array.of),
-					slice_ptr,
-					indices_len, 2,
-					"slice_len"
+					LLVMInt32Type(),
+					llvm_slice_ptr(llvm, llvm_resolve_type(expr->as.expr->sema_type), value),
+					""
 				);
-				LLVMBuildStore(llvm->builder, LLVMConstInt(LLVMInt64Type(), expr->as.expr->sema_type->array.length, 0), slice_len_ptr);
-				LLVMValueRef indices_ptr[2] = { LLVMConstInt(LLVMInt32Type(), 0, false), LLVMConstInt(LLVMInt32Type(), 1, false) };
-				LLVMValueRef slice_ptr_ptr = LLVMBuildGEP2(
-					llvm->builder,
-					slice_type, // llvm_resolve_type(expr->as.expr->sema_type->array.of),
-					slice_ptr,
-					indices_ptr, 2,
-					"slice_ptr"
-				);
-				LLVMValueRef llvm_alloca = LLVMBuildAlloca(llvm->builder, LLVMArrayType(LLVMPointerType(LLVMInt8Type(), 0), expr->as.expr->sema_type->array.length), "");
-				LLVMBuildStore(llvm->builder, value, llvm_alloca);
-				LLVMValueRef ptr = LLVMBuildBitCast(llvm->builder, llvm_alloca, LLVMPointerType(LLVMPointerType(LLVMInt8Type(), 0), 0), "");
-				LLVMBuildStore(llvm->builder, ptr, slice_ptr_ptr);
-				return LLVMBuildLoad2(llvm->builder, slice_type, slice_ptr, "");
 			}
-			if (expr->as.expr->sema_type->type == SEMA_TYPE_POINTER
-					&& expr->as.type.sema->type == SEMA_TYPE_PRIMITIVE) {
-				return LLVMBuildPtrToInt(llvm->builder, value, to_type, "");
-			}
-			if (expr->as.expr->sema_type->type == SEMA_TYPE_PRIMITIVE
-					&& expr->as.type.sema->type == SEMA_TYPE_POINTER) {
-				return LLVMBuildIntToPtr(llvm->builder, value, to_type, "");
-			}
-			if (expr->sema_type->type == SEMA_TYPE_PRIMITIVE) {
-				if (level[expr->as.expr->sema_type->primitive] < level[expr->sema_type->primitive]) {
-					return LLVMBuildZExt(llvm->builder, value, to_type, "");
-				}
-				return LLVMBuildTrunc(llvm->builder, value, to_type, ""); // TODO: check possibility at sema 
-			}
-			return LLVMBuildBitCast(llvm->builder, value, to_type, "");
+			break;
+			// int level[] = {
+			// 	[PRIMITIVE_I8] = 1,
+			// 	[PRIMITIVE_U8] = 1,
+			// 	[PRIMITIVE_I16] = 2,
+			// 	[PRIMITIVE_U16] = 2,
+			// 	[PRIMITIVE_I32] = 3,
+			// 	[PRIMITIVE_U32] = 3,
+			// 	[PRIMITIVE_I64] = 4,
+			// 	[PRIMITIVE_U64] = 4,
+			// 	[PRIMITIVE_BOOL] = 0,
+			// };
+			// if (expr->as.expr->sema_type->type == SEMA_TYPE_ARRAY
+			// 		&& expr->as.type.sema->type == SEMA_TYPE_SLICE) {
+			// 	LLVMTypeRef slice_type = llvm_resolve_type(expr->as.type.sema);
+			// 	LLVMValueRef slice_ptr = LLVMBuildAlloca(llvm->builder, slice_type, "new_slice");
+			// 	/* LLVMValueRef indices[] = { LLVMConstInt(LLVMInt32Type(), 0, false) };
+			// 	LLVMValueRef pointer = LLVMBuildGEP2(
+			// 		llvm->builder,
+			// 		llvm_resolve_type(expr->as.expr->sema_type->array.of),
+			// 		value,
+			// 		indices, 1,
+			// 		"arr_ptr"
+			// 	);
+			// 	*/
+			// 	LLVMValueRef indices_len[2] = { LLVMConstInt(LLVMInt32Type(), 0, false), LLVMConstInt(LLVMInt32Type(), 0, false) };
+			// 	LLVMValueRef slice_len_ptr = LLVMBuildGEP2(
+			// 		llvm->builder,
+			// 		slice_type, // llvm_resolve_type(expr->as.expr->sema_type->array.of), //llvm_resolve_type(expr->as.expr->sema_type->array.of),
+			// 		slice_ptr,
+			// 		indices_len, 2,
+			// 		"slice_len"
+			// 	);
+			// 	LLVMBuildStore(llvm->builder, LLVMConstInt(LLVMInt64Type(), expr->as.expr->sema_type->array.length, 0), slice_len_ptr);
+			// 	LLVMValueRef indices_ptr[2] = { LLVMConstInt(LLVMInt32Type(), 0, false), LLVMConstInt(LLVMInt32Type(), 1, false) };
+			// 	LLVMValueRef slice_ptr_ptr = LLVMBuildGEP2(
+			// 		llvm->builder,
+			// 		slice_type, // llvm_resolve_type(expr->as.expr->sema_type->array.of),
+			// 		slice_ptr,
+			// 		indices_ptr, 2,
+			// 		"slice_ptr"
+			// 	);
+			// 	LLVMValueRef llvm_alloca = LLVMBuildAlloca(llvm->builder, LLVMArrayType(LLVMPointerType(LLVMInt8Type(), 0), expr->as.expr->sema_type->array.length), "");
+			// 	LLVMBuildStore(llvm->builder, value, llvm_alloca);
+			// 	LLVMValueRef ptr = LLVMBuildBitCast(llvm->builder, llvm_alloca, LLVMPointerType(LLVMPointerType(LLVMInt8Type(), 0), 0), "");
+			// 	LLVMBuildStore(llvm->builder, ptr, slice_ptr_ptr);
+			// 	return LLVMBuildLoad2(llvm->builder, slice_type, slice_ptr, "");
+			// }
+			// if (expr->as.expr->sema_type->type == SEMA_TYPE_POINTER
+			// 		&& expr->as.type.sema->type == SEMA_TYPE_PRIMITIVE) {
+			// 	return LLVMBuildPtrToInt(llvm->builder, value, to_type, "");
+			// }
+			// if (expr->as.expr->sema_type->type == SEMA_TYPE_PRIMITIVE
+			// 		&& expr->as.type.sema->type == SEMA_TYPE_POINTER) {
+			// 	return LLVMBuildIntToPtr(llvm->builder, value, to_type, "");
+			// }
+			// if (expr->sema_type->type == SEMA_TYPE_PRIMITIVE) {
+			// 	if (level[expr->as.expr->sema_type->primitive] < level[expr->sema_type->primitive]) {
+			// 		return LLVMBuildZExt(llvm->builder, value, to_type, "");
+			// 	}
+			// 	return LLVMBuildTrunc(llvm->builder, value, to_type, ""); // TODO: check possibility at sema 
+			// }
+			// return LLVMBuildBitCast(llvm->builder, value, to_type, "");
 		}
 		case AST_EXPR_UNARY: {
 			switch (expr->unary.type) {
