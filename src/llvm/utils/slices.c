@@ -1,7 +1,7 @@
 #include "slices.h"
 
 LLVMTypeRef llvm_slice_type(LLVMTypeRef of) {
-    LLVMTypeRef fields[2] = { LLVMInt64Type(), of };
+    LLVMTypeRef fields[2] = { LLVMInt64Type(), LLVMPointerType(of, 0) };
     return LLVMStructType(fields, 2, false);
 }
 
@@ -28,11 +28,11 @@ LLVMValueRef llvm_slice_from_array(LlvmBackend *llvm, LLVMTypeRef of, LLVMValueR
     };
     LLVMValueRef arr_alloca = LLVMBuildAlloca(llvm->builder, LLVMArrayType(of, len), "arr_alloca");
     LLVMBuildStore(llvm->builder, array, arr_alloca);
-    LLVMValueRef array_ptr = LLVMBuildBitCast(llvm->builder, arr_alloca, LLVMPointerType(LLVMPointerType(of, 0), 0), "");
+    LLVMValueRef array_ptr = LLVMBuildBitCast(llvm->builder, arr_alloca, LLVMPointerType(of, 0), "");
     // LLVMValueRef array_ptr = LLVMBuildGEP2(llvm->builder, LLVMPointerType(of, 0), array, indices, 1, "array_ptr");
 
     LLVMValueRef slice = LLVMBuildAlloca(llvm->builder, slice_type, "slice");
     LLVMBuildStore(llvm->builder, LLVMConstInt(LLVMInt64Type(), len, false), llvm_slice_len(llvm, slice_type, slice));
     LLVMBuildStore(llvm->builder, array_ptr, llvm_slice_ptr(llvm, slice_type, slice));
-    return slice;
+    return LLVMBuildLoad2(llvm->builder, slice_type, slice, "loaded_slice");
 }
