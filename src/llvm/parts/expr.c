@@ -102,7 +102,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 				LLVMBuildStore(
 					llvm->builder,
 					llvm_expr(llvm, &expr->array[i]),
-					LLVMBuildGEP2(llvm->builder, type, array, indices, 1, "")
+					LLVMBuildGEP2(llvm->builder, of, array, indices, 1, "arri")
 				);
 			}
 			return array;

@@ -54,17 +54,11 @@ LLVMValueRef llvm_value(LlvmBackend *llvm, AstValue *value) {
 				val = LLVMBuildGEP2(
 					llvm->builder,
 					llvm_resolve_type(seg->sema_type),
-					LLVMBuildExtractValue(
+					LLVMBuildLoad2(
 						llvm->builder,
-						LLVMBuildLoad2(
-							llvm->builder,
-							type,
-							// llvm_slice_ptr(llvm, type, val),
-							val,
-							""
-						),
-						1,
-						"ptr"
+						LLVMPointerType(llvm_resolve_type(seg->sema_type), 0),
+						llvm_slice_ptr(llvm, type, val),
+						""
 					),
 					indices, 2,
 					"idx_val"
