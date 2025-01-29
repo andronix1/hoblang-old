@@ -18,4 +18,6 @@ fun main(): void {
 	var t2 = test2() as []*u8;
 	c::io::puts(t1[0]);
 	c::io::puts(t2[1]);
+	var t2p = t2 as **u8;
+	c::io::puts(t2p.*);
 }

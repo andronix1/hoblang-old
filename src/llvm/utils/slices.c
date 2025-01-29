@@ -32,7 +32,11 @@ LLVMValueRef llvm_slice_from_array(LlvmBackend *llvm, LLVMTypeRef of, LLVMValueR
     // LLVMValueRef array_ptr = LLVMBuildGEP2(llvm->builder, LLVMPointerType(of, 0), array, indices, 1, "array_ptr");
 
     LLVMValueRef slice = LLVMBuildAlloca(llvm->builder, slice_type, "slice");
+    // LLVMValueRef slice = LLVMGetPoison(slice_type);
+    // LLVMBuildInsertValue(llvm->builder, slice, LLVMConstInt(LLVMInt64Type(), len, false), 0, "");
     LLVMBuildStore(llvm->builder, LLVMConstInt(LLVMInt64Type(), len, false), llvm_slice_len(llvm, slice_type, slice));
+    // LLVMBuildInsertValue(llvm->builder, slice, array_ptr, 1, "");
     LLVMBuildStore(llvm->builder, array_ptr, llvm_slice_ptr(llvm, slice_type, slice));
+    // return slice;
     return LLVMBuildLoad2(llvm->builder, slice_type, slice, "loaded_slice");
 }

@@ -56,12 +56,17 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 					value,
 					expr->as.expr->sema_type->array.length
 				);
-				case SEMA_AS_CONV_SLICE_TO_PTR: return LLVMBuildLoad2(
+				case SEMA_AS_CONV_SLICE_TO_PTR: return LLVMBuildExtractValue(
 					llvm->builder,
-					LLVMInt32Type(),
-					llvm_slice_ptr(llvm, llvm_resolve_type(expr->as.expr->sema_type), value),
+					value,
+					1,
 					""
 				);
+				// return llvm_slice_ptr(
+				// 	llvm,
+				// 	llvm_resolve_type(expr->as.expr->sema_type),
+				// 	value
+				// );
 			}
 			break;
 			// int level[] = {
