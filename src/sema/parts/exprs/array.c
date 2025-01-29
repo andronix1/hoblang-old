@@ -1,9 +1,12 @@
 #include "../../parts.h"
 
 SemaType *sema_ast_expr_array(SemaModule *sema, AstExpr *array, SemaType *expectation) {
-	SemaType *expect = expectation;
+	SemaType *expect = NULL;
+	if (expectation->type == SEMA_TYPE_ARRAY) {
+		expect = expectation->array.of;
+	}
 	if (vec_len(array) > 0) {
-		if (!(expect = sema_ast_expr_type(sema, &array[0], expectation))) {
+		if (!(expect = sema_ast_expr_type(sema, &array[0], expect))) {
 			return NULL;
 		}
 	} else if (!expectation) {
