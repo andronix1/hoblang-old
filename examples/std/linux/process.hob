@@ -1,0 +1,5 @@
+import "syscall.hob" as syscall;
+
+fun exit(status: i64): void {
+	syscall::arg1(60, status);
+}

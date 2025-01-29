@@ -1,0 +1,38 @@
+import "io.hob" as io;
+import "syscall.hob" as syscall;
+
+type Socket = io::Fd;
+
+fun socket(domain: i64, socket_type: i64, protocol: i64): Socket {
+	return syscall::arg3(41, domain, socket_type, protocol);
+}
+
+type Family = u16;
+type Port = u16;
+type InAddr = i32;
+type AddressIn = struct {
+    family: Family,
+    port: Port,
+    in_addr: InAddr,
+    _reserved: u64
+};
+
+fun bind(fd: Socket, addr: *void, size: i64): Socket {
+	return syscall::arg3(49, fd, addr as i64, size);
+}
+
+fun listen(fd: Socket, backlog: i64): Socket {
+	return syscall::arg2(50, fd, backlog);
+}
+
+fun accept(fd: Socket, addr: *void, size: *i32): Socket {
+	return syscall::arg3(43, fd, addr as i64, size as i64);
+}
+
+fun htons(input_port: u16): Port {
+    return input_port & 0xff << 8 | input_port >> 8 & 0xff;
+}
+
+fun setsockopt(fd: Socket, level: i64, optname: i64, value: *void, size: i64): i64 {
+	return syscall::arg5(54, fd, level, optname, value as i64, size);
+}

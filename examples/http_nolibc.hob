@@ -1,0 +1,32 @@
+import "std/process.hob" as process;
+import "std/tcp.hob" as tcp;
+import "std/io.hob" as io;
+
+fun main(): i32 {
+	var server = tcp::bind(8080, 16);
+	if server < 0 {
+		io::println("cannot bind a socket :(");
+		return 1;
+	}
+	var _buf: [5]u8 = { 0, 0, 0, 0, 0 };
+	var buf = _buf as []u8;
+	while true {
+		var client = tcp::accept(server);
+		io::println("yay, new connection!");
+		if client < 0 {
+			io::println("cannot accept a socket :(");
+		} else {
+			while io::read_from(client, &buf) == 5 {
+				io::print(buf);
+			}
+			io::write_to(client, "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nhello, world!\n");
+			tcp::close(client);
+			io::println("wow, closed the connection!");
+		}
+	}
+	return 0;
+}
+
+fun _start(): void {
+	process::exit(main());
+}

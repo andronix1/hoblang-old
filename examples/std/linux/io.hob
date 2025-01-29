@@ -1,0 +1,19 @@
+import "syscall.hob" as syscall;
+
+type Fd = i64;
+
+fun write(fd: Fd, buf: *u8, len: i64): i64 {
+	return syscall::arg3(1, fd, buf as i64, len);
+}
+
+fun read(fd: Fd, buf: *u8, len: i64): i64 {
+	return syscall::arg3(0, fd, buf as i64, len);
+}
+
+fun open(filename: *u8, flags: i64, mode: i64): Fd {
+	return syscall::arg3(2, filename as i64, flags, mode);
+}
+
+fun close(fd: Fd): i64 {
+	return syscall::arg1(3, fd);
+}

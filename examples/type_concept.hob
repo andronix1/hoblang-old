@@ -1,3 +1,5 @@
+# this is CONCEPT. NOT YET IMPLEMENTED
+
 type IntegerKind = enum {
 	Byte, Short, Word, Quad
 };

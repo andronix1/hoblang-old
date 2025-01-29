@@ -1,0 +1,5 @@
+import "linux/process.hob" as process;
+
+fun exit(status: i32): void {
+    process::exit(status as i64);
+}

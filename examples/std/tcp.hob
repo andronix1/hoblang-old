@@ -1,0 +1,45 @@
+import "linux/io.hob" as io;
+import "linux/net.hob" as net;
+
+type Socket = net::Socket;
+type Port = u16;
+
+# TODO: err handling
+fun bind(port: Port, backlog: i32): Socket {
+    var result: Socket = net::socket(2, 1, 0);
+
+    if result < 0 {
+        return -1;
+    }
+
+    var reuse: i32 = 1;
+    if net::setsockopt(result, 1, 2, &reuse as *void, 4) == -1 {
+        return -1;
+    }
+
+    var server_address: net::AddressIn;
+    server_address.family = 2;
+    server_address.port = net::htons(port);
+    server_address.in_addr = 0;
+    server_address._reserved = 0;
+
+    if net::bind(result, &server_address as *void, 16) == -1 {
+        return -1;
+    }
+
+    if net::listen(result, backlog as i64) == -1 {
+        return -1;
+    }
+
+    return result;
+}
+
+fun accept(socket: Socket): Socket {
+    var client_address: net::AddressIn;
+    var client_addr_size: i32 = 16;
+    return net::accept(socket, &client_address as *void, &client_addr_size);
+}
+
+fun close(socket: Socket): void {
+    io::close(socket);
+}

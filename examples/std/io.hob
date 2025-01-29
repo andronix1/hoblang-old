@@ -1,0 +1,18 @@
+import "linux/io.hob" as io;
+
+fun write_to(fd: io::Fd, str: []u8): void {
+    io::write(fd, str.raw, str.length as i64);
+}
+
+fun read_from(fd: io::Fd, output: *[]u8): i64 {
+    return io::read(fd, output.*.raw, output.*.length as i64);
+}
+
+fun print(str: []u8): void {
+    write_to(0, str);
+}
+
+fun println(str: []u8): void {
+    print(str);
+    print("\n");
+}

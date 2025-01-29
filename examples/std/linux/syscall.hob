@@ -1,0 +1,74 @@
+fun arg0(num: i64): i64 {
+    var res: i64;
+	asm (rax, rdi) {
+		mov $rax, num;
+		syscall;
+		mov [res], $rax;
+	}
+	return res;
+}
+
+fun arg1(num: i64, a: i64): i64 {
+    var res: i64;
+	asm (rax, rdi, rcx, r11) {
+		mov $rax, num;
+		mov $rdi, a;
+		syscall;
+		mov [res], $rax;
+	}
+	return res;
+}
+
+fun arg2(num: i64, a: i64, b: i64): i64 {
+    var res: i64;
+	asm (rax, rdi, rsi, rcx, r11) {
+		mov $rax, num;
+		mov $rdi, a;
+		mov $rsi, b;
+		syscall;
+		mov [res], $rax;
+	}
+	return res;
+}
+
+fun arg3(num: i64, a: i64, b: i64, c: i64): i64 {
+    var res: i64;
+	asm (rax, rdi, rsi, rdx, rcx, r11) {
+		mov $rax, num;
+		mov $rdi, a;
+		mov $rsi, b;
+		mov $rdx, c;
+		syscall;
+		mov [res], $rax;
+	}
+	return res;
+}
+
+fun arg4(num: i64, a: i64, b: i64, c: i64, d: i64): i64 {
+    var res: i64;
+	asm (rax, rdi, rsi, rdx, r10, rcx, r11) {
+		mov $rax, num;
+		mov $rdi, a;
+		mov $rsi, b;
+		mov $rdx, c;
+		mov $r10, d;
+		syscall;
+		mov [res], $rax;
+	}
+	return res;
+}
+
+fun arg5(num: i64, a: i64, b: i64, c: i64, d: i64, e: i64): i64 {
+    var res: i64;
+	asm (rax, rdi, rsi, rdx, r10, rcx, r11) {
+		mov $rax, num;
+		mov $rdi, a;
+		mov $rsi, b;
+		mov $rdx, c;
+		mov $r10, d;
+        mov $r8, e;
+		syscall;
+		mov [res], $rax;
+	}
+	return res;
+}
