@@ -91,11 +91,6 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 		case AST_EXPR_ARRAY: {
 			LLVMTypeRef of = llvm_resolve_type(expr->sema_type->array.of);
 			LLVMTypeRef type = LLVMArrayType(of, vec_len(expr->array));
-			// LLVMValueRef *vals = alloca(sizeof(LLVMValueRef) * vec_len(expr->array));
-			// for (size_t i = 0; i < vec_len(expr->array); i++) {
-			// 	vals[i] = llvm_expr(llvm, &expr->array[i]);
-			// }
-			// return LLVMConstArray(of, vals, vec_len(expr->array));
 			LLVMValueRef array = LLVMBuildAlloca(llvm->builder, type, "new_arr");
 			for (size_t i = 0; i < vec_len(expr->array); i++) {
 				LLVMValueRef indices[1] = { LLVMConstInt(LLVMInt32Type(), i, false) };
@@ -105,7 +100,12 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 					LLVMBuildGEP2(llvm->builder, of, array, indices, 1, "arri")
 				);
 			}
-			return array;
+			return LLVMBuildLoad2(
+				llvm->builder,
+				type,
+				array,
+				""
+			);
 		}
 	}
 	assert(0, "invalid expr {int}", expr->type);

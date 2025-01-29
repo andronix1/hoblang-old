@@ -31,9 +31,9 @@ LLVMValueRef llvm_alloca_slice(LlvmBackend *llvm, LLVMTypeRef of, LLVMValueRef p
 
 LLVMValueRef llvm_slice_from_array(LlvmBackend *llvm, LLVMTypeRef of, LLVMValueRef array, size_t len) {
     LLVMTypeRef slice_type = llvm_slice_type(of);
-    // LLVMValueRef arr_alloca = LLVMBuildAlloca(llvm->builder, LLVMArrayType(of, len), "arr_alloca");
-    // LLVMBuildStore(llvm->builder, array, arr_alloca);
-    LLVMValueRef array_ptr = LLVMBuildBitCast(llvm->builder, array/* arr_alloca */, LLVMPointerType(of, 0), "");
+    LLVMValueRef arr_alloca = LLVMBuildAlloca(llvm->builder, LLVMArrayType(of, len), "arr_alloca");
+    LLVMBuildStore(llvm->builder, array, arr_alloca);
+    LLVMValueRef array_ptr = LLVMBuildBitCast(llvm->builder, arr_alloca, LLVMPointerType(of, 0), "");
 
     return llvm_alloca_slice(llvm, of, array_ptr, len);
 }
