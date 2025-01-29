@@ -86,7 +86,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 					indices_ptr, 2,
 					"slice_ptr"
 				);
-				LLVMValueRef llvm_alloca = LLVMBuildAlloca(llvm->builder, LLVMArrayType(LLVMPointerType(LLVMInt8Type(), 0), 3), "");
+				LLVMValueRef llvm_alloca = LLVMBuildAlloca(llvm->builder, LLVMArrayType(LLVMPointerType(LLVMInt8Type(), 0), expr->as.expr->sema_type->array.length), "");
 				LLVMBuildStore(llvm->builder, value, llvm_alloca);
 				LLVMValueRef ptr = LLVMBuildBitCast(llvm->builder, llvm_alloca, LLVMPointerType(LLVMPointerType(LLVMInt8Type(), 0), 0), "");
 				LLVMBuildStore(llvm->builder, ptr, slice_ptr_ptr);
