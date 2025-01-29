@@ -56,6 +56,38 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 				[PRIMITIVE_U64] = 4,
 				[PRIMITIVE_BOOL] = 0,
 			};
+			if (expr->as.expr->sema_type->type == SEMA_TYPE_ARRAY
+					&& expr->as.type.sema->type == SEMA_TYPE_SLICE) {
+				LLVMValueRef *indices[1] = { LLVMConstInt(LLVMInt32Type(), 0, false) };
+				LLVMValueRef pointer = LLVMBuildGEP2(
+					llvm->builder,
+					llvm_resolve_type(expr->as.expr->sema_type->array.of),
+					value,
+					indices, 1,
+					""
+				);
+				LLVMTypeRef slice_type = llvm_resolve_type(expr->as.type.sema->type);
+				LLVMValueRef slice_ptr = LLVMBuildAlloca(llvm->builder, slice_type, "");
+				LLVMValueRef *indices_len[1] = { LLVMConstInt(LLVMInt32Type(), 0, false), LLVMConstInt(LLVMInt32Type(), 0, false) };
+				LLVMValueRef slice_len_ptr = LLVMBuildGEP2(
+					llvm->builder,
+					llvm_resolve_type(expr->as.expr->sema_type->array.of),
+					value,
+					indices_len, 2,
+					""
+				);
+				LLVMBuildStore(llvm->builder, LLVMConstInt(LLVMInt32Type(), expr->as.expr->sema_type->array.length, 0), slice_len_ptr);
+				LLVMValueRef *indices_ptr[1] = { LLVMConstInt(LLVMInt32Type(), 0, false), LLVMConstInt(LLVMInt32Type(), 1, false) };
+				LLVMValueRef slice_ptr_ptr = LLVMBuildGEP2(
+					llvm->builder,
+					llvm_resolve_type(expr->as.expr->sema_type->array.of),
+					value,
+					indices_ptr, 2,
+					""
+				);
+				LLVMBuildStore(llvm->builder, value, slice_ptr_ptr);
+				return LLVMBuildLoad2(llvm->builder, slice_type, slice_ptr, "");
+			}
 			if (expr->as.expr->sema_type->type == SEMA_TYPE_POINTER
 					&& expr->as.type.sema->type == SEMA_TYPE_PRIMITIVE) {
 				return LLVMBuildPtrToInt(llvm->builder, value, to_type, "");

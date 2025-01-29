@@ -1,7 +1,7 @@
 #include "../../parts.h"
 
 SemaType *sema_ast_expr_array(SemaModule *sema, AstExpr *array, SemaType *expectation) {
-	SemaType *expect;
+	SemaType *expect = expectation;
 	if (vec_len(array) > 0) {
 		if (!(expect = sema_ast_expr_type(sema, &array[0], expectation))) {
 			return NULL;
@@ -26,5 +26,5 @@ SemaType *sema_ast_expr_array(SemaModule *sema, AstExpr *array, SemaType *expect
 			return NULL;
 		}
 	}
-	return sema_type_new_pointer(expect);
+	return sema_type_new_array(vec_len(array), expect);
 }
