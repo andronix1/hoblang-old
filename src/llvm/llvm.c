@@ -50,7 +50,7 @@ LLVMTypeRef llvm_resolve_type(SemaType *type) {
 			return LLVMStructType(elements, 2, false);
 		}
 		case SEMA_TYPE_ARRAY: {
-			return LLVMArrayType2(llvm_resolve_type(type->array.of), type->array.length);
+			return LLVMArrayType(llvm_resolve_type(type->array.of), type->array.length);
 		}
 		case SEMA_TYPE_POINTER: {
 			return LLVMPointerType(llvm_resolve_type(type->ptr_to), 0);

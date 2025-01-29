@@ -58,34 +58,34 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 			};
 			if (expr->as.expr->sema_type->type == SEMA_TYPE_ARRAY
 					&& expr->as.type.sema->type == SEMA_TYPE_SLICE) {
-				LLVMValueRef *indices[1] = { LLVMConstInt(LLVMInt32Type(), 0, false) };
+				LLVMTypeRef slice_type = llvm_resolve_type(expr->as.type.sema);
+				LLVMValueRef slice_ptr = LLVMBuildAlloca(llvm->builder, slice_type, "new_slice");
+				LLVMValueRef indices[] = { LLVMConstInt(LLVMInt32Type(), 0, false) };
 				LLVMValueRef pointer = LLVMBuildGEP2(
 					llvm->builder,
 					llvm_resolve_type(expr->as.expr->sema_type->array.of),
 					value,
 					indices, 1,
-					""
+					"arr_ptr"
 				);
-				LLVMTypeRef slice_type = llvm_resolve_type(expr->as.type.sema->type);
-				LLVMValueRef slice_ptr = LLVMBuildAlloca(llvm->builder, slice_type, "");
-				LLVMValueRef *indices_len[1] = { LLVMConstInt(LLVMInt32Type(), 0, false), LLVMConstInt(LLVMInt32Type(), 0, false) };
+				LLVMValueRef indices_len[2] = { LLVMConstInt(LLVMInt32Type(), 0, false), LLVMConstInt(LLVMInt32Type(), 0, false) };
 				LLVMValueRef slice_len_ptr = LLVMBuildGEP2(
 					llvm->builder,
-					llvm_resolve_type(expr->as.expr->sema_type->array.of),
-					value,
+					slice_type, // llvm_resolve_type(expr->as.expr->sema_type->array.of), //llvm_resolve_type(expr->as.expr->sema_type->array.of),
+					slice_ptr,
 					indices_len, 2,
-					""
+					"slice_len"
 				);
-				LLVMBuildStore(llvm->builder, LLVMConstInt(LLVMInt32Type(), expr->as.expr->sema_type->array.length, 0), slice_len_ptr);
-				LLVMValueRef *indices_ptr[1] = { LLVMConstInt(LLVMInt32Type(), 0, false), LLVMConstInt(LLVMInt32Type(), 1, false) };
+				LLVMBuildStore(llvm->builder, LLVMConstInt(LLVMInt64Type(), expr->as.expr->sema_type->array.length, 0), slice_len_ptr);
+				LLVMValueRef indices_ptr[2] = { LLVMConstInt(LLVMInt32Type(), 0, false), LLVMConstInt(LLVMInt32Type(), 1, false) };
 				LLVMValueRef slice_ptr_ptr = LLVMBuildGEP2(
 					llvm->builder,
-					llvm_resolve_type(expr->as.expr->sema_type->array.of),
-					value,
+					slice_type, // llvm_resolve_type(expr->as.expr->sema_type->array.of),
+					slice_ptr,
 					indices_ptr, 2,
-					""
+					"slice_ptr"
 				);
-				LLVMBuildStore(llvm->builder, value, slice_ptr_ptr);
+				LLVMBuildStore(llvm->builder, pointer, slice_ptr_ptr);
 				return LLVMBuildLoad2(llvm->builder, slice_type, slice_ptr, "");
 			}
 			if (expr->as.expr->sema_type->type == SEMA_TYPE_POINTER

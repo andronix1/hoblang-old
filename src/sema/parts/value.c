@@ -33,11 +33,11 @@ SemaType *sema_ast_value(SemaModule *sema, AstValue *value) {
 				return NULL;
 
 			case AST_VALUE_IDX: {
-				if (type->type != SEMA_TYPE_POINTER) {
-					sema_err("only pointers can be indexed");
+				if (type->type != SEMA_TYPE_SLICE) {
+					sema_err("only slices can be indexed");
 					return NULL;
 				}
-				type = type->ptr_to;
+				type = type->slice_of;
 				SemaType *idx_type = sema_ast_expr_type(sema, seg->idx, &primitives[PRIMITIVE_I32]);
 				if (idx_type && !sema_types_equals(idx_type, &primitives[PRIMITIVE_I32])) {
 					sema_err("indexes must be i32");

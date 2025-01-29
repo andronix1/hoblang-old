@@ -30,15 +30,31 @@ LLVMValueRef llvm_value(LlvmBackend *llvm, AstValue *value) {
 				break;
 			}
 			case AST_VALUE_IDX: {
+				LLVMValueRef indices_ptr[] = {
+					LLVMConstInt(LLVMInt32Type(), 0, false),
+					LLVMConstInt(LLVMInt32Type(), 1, false),
+					//llvm_expr(llvm, seg->idx),
+				};
+				LLVMTypeRef type = llvm_resolve_type(i == 0 ? decl->type : value->segments[i - 1].sema_type);
+				LLVMValueRef slice_ptr = LLVMBuildGEP2(
+					llvm->builder,
+					type,
+					val, // LLVMBuildLoad2(llvm->builder, type, val, "idx_load"),
+					indices_ptr, 2,
+					"idx_val"
+				);
+				LLVMValueRef raw_ptr = LLVMBuildLoad2(llvm->builder, LLVMPointerType(llvm_resolve_type(seg->sema_type), 0), slice_ptr, "");
 				LLVMValueRef indices[] = {
+					// LLVMConstInt(LLVMInt32Type(), 0, false),
+					//LLVMConstInt(LLVMInt32Type(), 1, false),
 					llvm_expr(llvm, seg->idx),
 				};
 				val = LLVMBuildGEP2(
 					llvm->builder,
 					llvm_resolve_type(seg->sema_type),
-					LLVMBuildLoad2(llvm->builder, llvm_resolve_type(i == 0 ? decl->type : value->segments[i - 1].sema_type), val, ""),
+					raw_ptr,
 					indices, 1,
-					""
+					"idx_val"
 				);
 				break;
 			}

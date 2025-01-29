@@ -1,3 +1,8 @@
+import "libc/lib.hob" as c;
+
 fun main(): void {
-    var test: []u8 = { 1, 2, 3 } as []u8;
+    var test: []*u8 = { "hello\0", "world\0", "lol\0" } as []*u8;
+	c::io::puts(test[0]);
+	c::io::puts(test[1]);
+	c::io::puts(test[2]);
 }
