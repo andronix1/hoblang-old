@@ -1,14 +1,21 @@
 import "std/process.hob" as process;
 import "std/tcp.hob" as tcp;
 import "std/io.hob" as io;
+import "std/fs.hob" as fs;
 
 fun main(): i32 {
+	var file = fs::open_read("test.html\0");
+	if file < 0 {
+		io::println("cannot open file `test.hml`");
+		return 1;
+	}
+
 	var server = tcp::bind(8080, 16);
 	if server < 0 {
 		io::println("cannot bind a socket :(");
 		return 1;
 	}
-	var _buf: [5]u8 = { 0, 0, 0, 0, 0 };
+	var _buf: [5]u8;
 	var buf = _buf as []u8;
 	while true {
 		var client = tcp::accept(server);
@@ -16,10 +23,11 @@ fun main(): i32 {
 		if client < 0 {
 			io::println("cannot accept a socket :(");
 		} else {
-			while io::read_from(client, &buf) == 5 {
-				io::print(buf);
-			}
-			io::write_to(client, "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nhello, world!\n");
+			# while io::read_from(client, &buf) == 5 {
+			# 	io::print(buf);
+			# }
+			io::write_to(client, "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n");
+			io::full_forward(file, client);
 			tcp::close(client);
 			io::println("wow, closed the connection!");
 		}

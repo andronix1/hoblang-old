@@ -21,7 +21,7 @@ inline static bool char_is_hex(char c) {
 }
 
 inline static bool char_is_ident_start(char c) {
-	return char_is_latin(c) || c == '_' || c == '$' || c == '@';
+	return char_is_latin(c) || c == '_';
 }
 
 inline static bool char_is_ident(char c) {

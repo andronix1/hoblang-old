@@ -4,7 +4,7 @@ import "syscall.hob" as syscall;
 type Socket = io::Fd;
 
 fun socket(domain: i64, socket_type: i64, protocol: i64): Socket {
-	return syscall::arg3(41, domain, socket_type, protocol);
+	return syscall::arg3(41, domain, socket_type, protocol) as Socket;
 }
 
 type Family = u16;
@@ -18,15 +18,15 @@ type AddressIn = struct {
 };
 
 fun bind(fd: Socket, addr: *void, size: i64): Socket {
-	return syscall::arg3(49, fd, addr as i64, size);
+	return syscall::arg3(49, fd as i64, addr as i64, size) as Socket;
 }
 
 fun listen(fd: Socket, backlog: i64): Socket {
-	return syscall::arg2(50, fd, backlog);
+	return syscall::arg2(50, fd as i64, backlog) as Socket;
 }
 
 fun accept(fd: Socket, addr: *void, size: *i32): Socket {
-	return syscall::arg3(43, fd, addr as i64, size as i64);
+	return syscall::arg3(43, fd as i64, addr as i64, size as i64) as Socket;
 }
 
 fun htons(input_port: u16): Port {
@@ -34,5 +34,5 @@ fun htons(input_port: u16): Port {
 }
 
 fun setsockopt(fd: Socket, level: i64, optname: i64, value: *void, size: i64): i64 {
-	return syscall::arg5(54, fd, level, optname, value as i64, size);
+	return syscall::arg5(54, fd as i64, level, optname, value as i64, size);
 }
