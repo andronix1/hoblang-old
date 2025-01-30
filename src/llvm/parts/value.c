@@ -46,22 +46,41 @@ LLVMValueRef llvm_value(LlvmBackend *llvm, AstValue *value) {
 				break;
 			}
 			case AST_VALUE_IDX: {
-				LLVMTypeRef type = llvm_resolve_type(i == 0 ? decl->type : value->segments[i - 1].sema_type);
-				LLVMValueRef indices[] = {
-					llvm_expr(llvm, seg->idx),
-				};
-				val = LLVMBuildGEP2(
-					llvm->builder,
-					llvm_resolve_type(seg->sema_type),
-					LLVMBuildLoad2(
-						llvm->builder,
-						LLVMPointerType(llvm_resolve_type(seg->sema_type), 0),
-						llvm_slice_ptr(llvm, type, val),
-						"loaded_ptr"
-					),
-					indices, 1,
-					""
-				);
+				LLVMValueRef idx = llvm_expr(llvm, seg->idx.expr);
+				switch (seg->idx.type) {
+					case SEMA_VALUE_IDX_SLICE: {
+						LLVMTypeRef type = llvm_resolve_type(i == 0 ? decl->type : value->segments[i - 1].sema_type);
+						LLVMValueRef indices[] = { idx };
+						val = LLVMBuildGEP2(
+							llvm->builder,
+							llvm_resolve_type(seg->sema_type),
+							LLVMBuildLoad2(
+								llvm->builder,
+								LLVMPointerType(llvm_resolve_type(seg->sema_type), 0),
+								llvm_slice_ptr(llvm, type, val),
+								"loaded_ptr"
+							),
+							indices, 1,
+							""
+						);
+						break;
+					}
+					case SEMA_VALUE_IDX_ARRAY: {
+						LLVMTypeRef type = llvm_resolve_type(i == 0 ? decl->type : value->segments[i - 1].sema_type);
+						LLVMValueRef indices[] = {
+							LLVMConstInt(LLVMInt32Type(), 0, false),
+							idx
+						};
+						val = LLVMBuildGEP2(
+							llvm->builder,
+							type,
+							val,
+							indices, 2,
+							""
+						);
+						break;
+					}
+				}
 				break;
 			}
 		}

@@ -46,7 +46,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 				case SEMA_AS_CONV_BITCAST: return LLVMBuildBitCast(llvm->builder, value, to_type, "");
 				case SEMA_AS_CONV_PTR_TO_INT: return LLVMBuildPtrToInt(llvm->builder, value, to_type, "");
 				case SEMA_AS_CONV_INT_TO_PTR: return LLVMBuildIntToPtr(llvm->builder, value, to_type, "");
-				case SEMA_AS_CONV_ARR_TO_SLICE: return llvm_slice_from_array(
+				case SEMA_AS_CONV_ARR_PTR_TO_SLICE: return llvm_slice_from_array_ptr(
 					llvm,
 					llvm_resolve_type(expr->as.expr->sema_type->array.of),
 					value,
@@ -90,6 +90,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 			return NULL;
 		}
 		case AST_EXPR_FUNCALL: return llvm_func_call(llvm, &expr->func_call);	
+		/*
 		case AST_EXPR_ARRAY: {
 			LLVMTypeRef of = llvm_resolve_type(expr->sema_type->array.of);
 			LLVMTypeRef type = LLVMArrayType(of, vec_len(expr->array));
@@ -102,13 +103,10 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 					LLVMBuildGEP2(llvm->builder, of, array, indices, 1, "arri")
 				);
 			}
-			return LLVMBuildLoad2(
-				llvm->builder,
-				type,
-				array,
-				""
-			);
+			
+			return LLVMBuildLoad2(llvm->builder, type, array, "");
 		}
+		*/
 	}
 	assert(0, "invalid expr {int}", expr->type);
 	return NULL;

@@ -179,6 +179,7 @@ AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType)) {
 					return NULL;
 				}
 				break;
+			/*
 			case TOKEN_OPENING_FIGURE_BRACE:
 				current_expr->type = AST_EXPR_ARRAY;
 				current_expr->array = vec_new(AstExpr);
@@ -190,6 +191,7 @@ AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType)) {
 					current_expr->array = vec_push(current_expr->array, expr);
 				}
 				break;
+			*/
 			case TOKEN_EOI:
 				parse_err("EOI while parsing expression");
 				return NULL;

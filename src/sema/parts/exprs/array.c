@@ -2,7 +2,7 @@
 
 SemaType *sema_ast_expr_array(SemaModule *sema, AstExpr *array, SemaType *expectation) {
 	SemaType *expect = NULL;
-	if (expectation->type == SEMA_TYPE_ARRAY) {
+	if (expectation && expectation->type == SEMA_TYPE_ARRAY) {
 		expect = expectation->array.of;
 	}
 	if (vec_len(array) > 0) {

@@ -14,7 +14,7 @@ bool parse_value(Parser *parser, AstValue *value) {
 				case TOKEN_OPENING_SQUARE_BRACE: {
 					AstValueSegment idx_seg;
 					idx_seg.type = AST_VALUE_IDX;
-					if (!(idx_seg.idx = parse_expr_before(parser, token_idx_stop))) {
+					if (!(idx_seg.idx.expr = parse_expr_before(parser, token_idx_stop))) {
 						return false;
 					}
 					value->segments = vec_push(value->segments, &idx_seg);

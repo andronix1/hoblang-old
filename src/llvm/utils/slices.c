@@ -29,10 +29,21 @@ LLVMValueRef llvm_alloca_slice(LlvmBackend *llvm, LLVMTypeRef of, LLVMValueRef p
     return LLVMBuildLoad2(llvm->builder, slice_type, slice, "loaded_slice");
 }
 
-LLVMValueRef llvm_slice_from_array(LlvmBackend *llvm, LLVMTypeRef of, LLVMValueRef array, size_t len) {
-    LLVMValueRef arr_alloca = LLVMBuildAlloca(llvm->builder, LLVMArrayType(of, len), "arr_alloca");
-    LLVMBuildStore(llvm->builder, array, arr_alloca);
-    LLVMValueRef array_ptr = LLVMBuildBitCast(llvm->builder, arr_alloca, LLVMPointerType(of, 0), "");
+LLVMValueRef llvm_slice_from_array_ptr(LlvmBackend *llvm, LLVMTypeRef of, LLVMValueRef array, size_t len) {
+    // LLVMValueRef arr_alloca = LLVMBuildAlloca(llvm->builder, LLVMArrayType(of, len), "arr_alloca");
+    // LLVMBuildStore(llvm->builder, array, arr_alloca);
+    // LLVMValueRef array_ptr = LLVMBuildBitCast(llvm->builder, arr_alloca, LLVMPointerType(of, 0), "");
+	LLVMValueRef indices[] = {
+		LLVMConstInt(LLVMInt32Type(), 0, false),
+		LLVMConstInt(LLVMInt32Type(), 0, false)
+	};
+	LLVMValueRef array_ptr = LLVMBuildGEP2(
+		llvm->builder,
+		of,
+		array,
+		indices, 2,
+		"array_ptr"
+	);
 
     return llvm_alloca_slice(llvm, of, array_ptr, len);
 }

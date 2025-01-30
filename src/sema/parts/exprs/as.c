@@ -8,6 +8,10 @@ void sema_conv_pointer(
 ) {
 	assert(source->type == SEMA_TYPE_POINTER, "passed non-pointer type {sema::type}", source);
 	if (dest->type == SEMA_TYPE_POINTER) {
+		if (dest->ptr_to->type == SEMA_TYPE_ARRAY) {
+			*type = SEMA_AS_CONV_ARR_PTR_TO_SLICE;
+			return;
+		}
 		*type = SEMA_AS_CONV_BITCAST;
 		return;
 	}
@@ -43,14 +47,14 @@ void sema_conv_array(
 	SemaAsConvType *type
 ) {
 	assert(source->type == SEMA_TYPE_ARRAY, "passed non-array type {sema::type}", source);
-	if (dest->type == SEMA_TYPE_SLICE) {
+	/*if (dest->type == SEMA_TYPE_SLICE) {
 		if (!sema_types_equals(source->array.of, dest->slice_of)) {
-			sema_err("cannot cast {sema::type} to {sema::type} because of different inner types", source, dest);
+			sema_err("cannot cast {semas::type} to {semas::type} because of different inner types", source, dest);
 			return;
 		}
 		*type = SEMA_AS_CONV_ARR_TO_SLICE;
 		return;
-	}
+	}*/
 	sema_err("{sema::type} cannot be casted to {sema::type}", source, dest);
 }
 

@@ -108,7 +108,8 @@ void print_sema_type(FILE* stream, va_list list) {
 			print_to(stream, "[]{sema::type}", type->slice_of);
 			break;
 		case SEMA_TYPE_ARRAY:
-			print_to(stream, "[{long}]{sema::type}", type->array.length, type->array.of);
+			print_to(stream, "[{long}]", type->array.length);
+			print_to(stream, "{sema::type}", type->array.of);
 			break;
 		case SEMA_TYPE_POINTER:
 			print_to(stream, "*{sema::type}", type->ptr_to);

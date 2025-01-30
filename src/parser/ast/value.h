@@ -41,12 +41,23 @@ typedef struct {
 	};
 } AstValueIdent;
 
+typedef enum {
+	SEMA_VALUE_IDX_SLICE,
+	SEMA_VALUE_IDX_ARRAY,
+} SemaValueIdxType;
+
+typedef struct {
+	struct _AstExpr *expr;
+
+	SemaValueIdxType type;
+} AstValueIdx;
+
 typedef struct {
 	struct _SemaType *sema_type;
 	AstValueType type;
 	union {
 		AstValueIdent ident;
-		struct _AstExpr *idx;
+		AstValueIdx idx;
 	};
 } AstValueSegment;
 

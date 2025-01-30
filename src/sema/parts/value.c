@@ -51,15 +51,19 @@ SemaType *sema_ast_value(SemaModule *sema, AstValue *value) {
 				}
 
 			case AST_VALUE_IDX: {
-				if (type->type != SEMA_TYPE_SLICE) {
-					sema_err("only slices can be indexed");
+				if (type->type == SEMA_TYPE_SLICE) {
+					seg->idx.type = SEMA_VALUE_IDX_SLICE;
+				} else if (type->type == SEMA_TYPE_ARRAY) {
+					seg->idx.type = SEMA_VALUE_IDX_ARRAY;
+				} else {
+					sema_err("only slices or arrays can be indexed");
 					return NULL;
 				}
-				type = type->slice_of;
-				SemaType *idx_type = sema_ast_expr_type(sema, seg->idx, &primitives[PRIMITIVE_I32]);
+				SemaType *idx_type = sema_ast_expr_type(sema, seg->idx.expr, &primitives[PRIMITIVE_I32]);
 				if (idx_type && !sema_types_equals(idx_type, &primitives[PRIMITIVE_I32])) {
 					sema_err("indexes must be i32");
 				}
+				type = type->slice_of;
 				break;
 			}
 
