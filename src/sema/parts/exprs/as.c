@@ -7,11 +7,11 @@ void sema_conv_pointer(
 	SemaAsConvType *type
 ) {
 	assert(source->type == SEMA_TYPE_POINTER, "passed non-pointer type {sema::type}", source);
+	if (source->ptr_to->type == SEMA_TYPE_ARRAY && dest->type == SEMA_TYPE_SLICE) {
+		*type = SEMA_AS_CONV_ARR_PTR_TO_SLICE;
+		return;
+	}
 	if (dest->type == SEMA_TYPE_POINTER) {
-		if (dest->ptr_to->type == SEMA_TYPE_ARRAY) {
-			*type = SEMA_AS_CONV_ARR_PTR_TO_SLICE;
-			return;
-		}
 		*type = SEMA_AS_CONV_BITCAST;
 		return;
 	}

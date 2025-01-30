@@ -17,7 +17,7 @@ typedef enum {
 	AST_EXPR_AS,
 	AST_EXPR_BINOP,
 	AST_EXPR_UNARY,
-	/* AST_EXPR_ARRAY, */
+	AST_EXPR_ARRAY,
 	AST_EXPR_REF,
 } AstExprType;
 

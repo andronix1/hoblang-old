@@ -3,15 +3,12 @@
 extern(puts) fun puts(str: *u8): void
 
 fun main(): void {
-	var a: [3]u8;# = { 1, 2, 3 };
-	a[0] = 1;
-	a[1] = 2;
-	a[2] = 3;
+	var a: [3]u8 = { 1, 2, 3 };
 	var b = &a as []u8;
 	b[0] = 2;
 	var c = &a as []u8;
 	c[0] = 3;
-	if b[0] == c[0] {
+	if b[0] == c[0] && b[2] == c[0] {
 		var yay = "YAY!!!\0";
 		puts(yay.raw);
 	} else {

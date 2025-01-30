@@ -90,7 +90,6 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 			return NULL;
 		}
 		case AST_EXPR_FUNCALL: return llvm_func_call(llvm, &expr->func_call);	
-		/*
 		case AST_EXPR_ARRAY: {
 			LLVMTypeRef of = llvm_resolve_type(expr->sema_type->array.of);
 			LLVMTypeRef type = LLVMArrayType(of, vec_len(expr->array));
@@ -106,7 +105,6 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 			
 			return LLVMBuildLoad2(llvm->builder, type, array, "");
 		}
-		*/
 	}
 	assert(0, "invalid expr {int}", expr->type);
 	return NULL;

@@ -4,7 +4,8 @@ import "std/io.hob" as io;
 import "std/fs.hob" as fs;
 
 fun main(): i32 {
-	var file = fs::open_read("test.html\0");
+	var filename = "test.html\0";
+	var file = fs::open_read(filename);
 	if file < 0 {
 		io::println("cannot open file `test.hml`");
 		return 1;
@@ -15,17 +16,17 @@ fun main(): i32 {
 		io::println("cannot bind a socket :(");
 		return 1;
 	}
-	var _buf: [5]u8;
-	var buf = _buf as []u8;
+	var buf: [5]u8;
 	while true {
 		var client = tcp::accept(server);
 		io::println("yay, new connection!");
 		if client < 0 {
 			io::println("cannot accept a socket :(");
 		} else {
-			# while io::read_from(client, &buf) == 5 {
-			# 	io::print(buf);
-			# }
+			var buf_slice = &buf as []u8;
+			while io::read_from(client, &buf_slice) == 5 {
+				io::print(&buf as []u8);
+			}
 			io::write_to(client, "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n");
 			io::full_forward(file, client);
 			tcp::close(client);

@@ -60,14 +60,13 @@ void print_ast_expr(FILE *stream, va_list list) {
 		case AST_EXPR_CHAR: fprintf(stream, "'%c'", expr->character); break;
 		case AST_EXPR_BOOL: print_to(stream, "{bool}", &expr->boolean); break;
 		case AST_EXPR_BINOP: print_to(stream, "({ast::expr} {ast::binop} {ast::expr})", expr->binop.left, expr->binop.type, expr->binop.right); break;
-		/* case AST_EXPR_ARRAY:
+		case AST_EXPR_ARRAY:
 			print_to(stream, "[");
 			for (size_t i = 0; i < vec_len(expr->array); i++) {
 				print_to(stream, i == 0 ? "{ast::expr}" : ", {ast::expr}", &expr->array[i]);
 			}
 			print_to(stream, "]");
 			break;
-		*/
 		case AST_EXPR_STR:
 			print_to(stream, "\"{slice}\"", &expr->str);
 			break;

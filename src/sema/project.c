@@ -63,6 +63,7 @@ bool sema_project_analyze(SemaProject *project) {
 	bool success = true;
 	for (size_t i = 0; i < vec_len(project->modules); i++) {
 		SemaProjectModule *module = &project->modules[i];
+		hob_log(LOGD, "analyzing module `{slice}`...", &module->path);
 		sema_module(module->module);
 		if (module->module->failed) {
 			success = false;
