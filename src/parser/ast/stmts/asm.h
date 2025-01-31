@@ -2,12 +2,11 @@
 
 #include "core/slice.h"
 #include "../expr.h"
-#include "../value.h"
 
 typedef enum {
     AST_ASM_ARG_REGISTER,
     AST_ASM_ARG_EXPR,
-    AST_ASM_ARG_VALUE,
+    AST_ASM_ARG_ADDRESS,
 } AstAsmArgType;
 
 // typedef enum {
@@ -22,13 +21,12 @@ typedef struct {
     union {
         Slice reg;
         AstExpr *expr;
-        AstValue value;
     };
 } AstAsmArg;
 
 AstAsmArg ast_asm_reg(Slice reg);
 AstAsmArg ast_asm_expr(AstExpr *expr);
-AstAsmArg ast_asm_value(AstValue value);
+AstAsmArg ast_asm_address(AstExpr *expr);
 
 typedef struct {
     Slice name;

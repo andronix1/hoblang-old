@@ -8,6 +8,14 @@ Slice slice_from_cstr(const char *cstr) {
 	return result;
 }
 
+Slice slice_new(const char *str, size_t len) {
+	Slice result = {
+		.str = str,
+		.len = len
+	};
+	return result;
+}
+
 char *slice_to_cstr(const Slice *slice) {
 	char *result = malloc(slice->len + 1);
 	memcpy(result, slice->str, slice->len);

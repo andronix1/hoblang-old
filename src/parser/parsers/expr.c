@@ -51,7 +51,7 @@ bool expr_make_binop(Parser *parser, AstBinopType type, AstExpr **current_expr, 
 	result->type = AST_EXPR_BINOP;
 	result->binop.type = type;
 	result->binop.left = *current_expr;
-	if (!(result->binop.right = parse_expr_before(parser, stop))) {
+	if (!(result->binop.right = parse_expr(parser, stop))) {
 		return false;
 	}
 	expr_push_down(result);
@@ -63,7 +63,7 @@ AstExpr *expr_make_unary(Parser *parser, AstUnaryType type, bool(*stop)(TokenTyp
 	AstExpr *result = malloc(sizeof(AstExpr));				
 	result->type = AST_EXPR_UNARY;
 	result->unary.type = type;
-	if (!(result->unary.expr = parse_expr_before(parser, stop))) {
+	if (!(result->unary.expr = parse_expr(parser, stop))) {
 		return NULL;
 	}
 	return result;
@@ -88,9 +88,11 @@ AstExpr *expr_make_unary(Parser *parser, AstUnaryType type, bool(*stop)(TokenTyp
 		} \
 	} while (0)
 
-AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType)) {
+#define NOT_NULL(expr) ({typeof(expr) _expr = expr; if (!expr) { return NULL; } expr; })
+
+AstExpr *parse_expr(Parser *parser, bool (*stop)(TokenType)) {
 	bool first = true;
-	AstExpr *current_expr = malloc(sizeof(AstExpr));
+	AstExpr *current_expr = NULL;
 	while (true) {
 		parser_next_token(parser);
 		if (stop(token_type(parser->token))) {
@@ -99,60 +101,59 @@ AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType)) {
 			}
 			return current_expr;
 		}
+		
 		switch (token_type(parser->token)) {
-			case TOKEN_TRUE: case TOKEN_FALSE:
-				current_expr->type = AST_EXPR_BOOL;
-				current_expr->boolean = parser->token->type == TOKEN_TRUE;
-				break;
-			case TOKEN_CHAR:
-				current_expr->type = AST_EXPR_CHAR;
-				current_expr->integer = parser->token->character;
-				break;
-			case TOKEN_STR: {
-				current_expr->type = AST_EXPR_STR;
-				current_expr->str.len = vec_len(parser->token->str);
-				current_expr->str.str= parser->token->str;
-				break;
-			}
-			case TOKEN_INTEGER: {
-				current_expr->type = AST_EXPR_INTEGER;
-				current_expr->integer = parser->token->integer;
-				break;
-			}
+			case TOKEN_TRUE: case TOKEN_FALSE: return ast_expr_bool(parser->token->type == TOKEN_TRUE);
+			case TOKEN_CHAR: return ast_expr_char(parser->token->character);
+			case TOKEN_STR: return ast_expr_str(slice_new(parser->token->str, vec_len(parser->token->str)));
+			case TOKEN_INTEGER: return ast_expr_integer(parser->token->integer);
 			case TOKEN_IDENT: {
-				AstValue value;
 				parser->skip_next = true;
-				if (!parse_value(parser, &value)) {
+				AstPath path;
+				if (!parse_path(parser, &path)) {
 					return NULL;
 				}
-				parser_next_token(parser);
-				if (token_type(parser->token) != TOKEN_OPENING_CIRCLE_BRACE) {
-					current_expr->type = AST_EXPR_VALUE;
-					current_expr->value = value;
-					parser->skip_next = true;
-					break;
+				AstExpr *expr = ast_expr_get_local_path(path);
+				while (true) {
+					parser_next_token(parser);
+					switch (token_type(parser->token)) {
+						case TOKEN_OPENING_CIRCLE_BRACE:
+							expr = ast_expr_call(expr, NOT_NULL(parse_call_args(parser)));
+							break;
+						case TOKEN_DOT:
+							if (!parse_path(parser, &path)) {
+								return NULL;
+							}
+							expr = ast_expr_get_inner_path(expr, path);
+							break;
+						default:
+							parser->skip_next = true;
+							return expr;
+					}
 				}
-				current_expr->type = AST_EXPR_FUNCALL;
-				current_expr->func_call.value = value;
-				if (!parse_func_call_args(parser, &current_expr->func_call)) {
-					return NULL;
-				}
+				// AstValue value;
+				// parser->skip_next = true;
+				// if (!parse_value(parser, &value)) {
+				// 	return NULL;
+				// }
+				// parser_next_token(parser);
+				// if (token_type(parser->token) != TOKEN_OPENING_CIRCLE_BRACE) {
+				// 	current_expr->type = AST_EXPR_VALUE;
+				// 	current_expr->value = value;
+				// 	parser->skip_next = true;
+				// 	break;
+				// }
+				// current_expr->type = AST_EXPR_FUNCALL;
+				// current_expr->func_call.value = value;
+				// if (!parse_func_call_args(parser, &current_expr->func_call)) {
+				// 	return NULL;
+				// }
 				break;
 			}
-			case TOKEN_NOT: {
-				current_expr->type = AST_EXPR_NOT;
-				if (!(current_expr->not_expr = parse_expr_before(parser, stop))) {
-					return NULL;
-				}
-				parser->skip_next = true;
-				break;
-			}
+			case TOKEN_NOT: return ast_expr_not(NOT_NULL(parse_expr(parser, stop)));
 			case TOKEN_BITAND: {
 				if (first) {
-					current_expr->type = AST_EXPR_REF;
-					if (!parse_value(parser, &current_expr->value)) {
-						return NULL;
-					}
+					return ast_expr_ref(NOT_NULL(parse_expr(parser, stop)));
 				} else {
 					PARSE_BINOP(AST_BINOP_BITAND);
 				}
@@ -175,21 +176,17 @@ AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType)) {
 			case TOKEN_GREATER: PARSE_BINOP(AST_BINOP_GT); break;
 			case TOKEN_GREATER_OR_EQUALS: PARSE_BINOP(AST_BINOP_GE); break;
 			case TOKEN_OR: PARSE_BINOP(AST_BINOP_OR); break;
-			case TOKEN_OPENING_CIRCLE_BRACE:
-				if (!(current_expr = parse_expr_before(parser, token_closing_circle_brace_stop))) {
-					return NULL;
-				}
-				break;
+			case TOKEN_OPENING_CIRCLE_BRACE: return parse_expr(parser, token_closing_circle_brace_stop);
 			case TOKEN_OPENING_FIGURE_BRACE:
-				current_expr->type = AST_EXPR_ARRAY;
-				current_expr->array = vec_new(AstExpr);
+				AstExpr **values = vec_new(AstExpr*);
 				while (token_type(parser->token) != TOKEN_CLOSING_FIGURE_BRACE) {
-					AstExpr *expr = parse_expr_before(parser, token_array_arg_stop);
+					AstExpr *expr = parse_expr(parser, token_array_arg_stop);
 					if (!expr) {
 						return NULL;
 					}
-					current_expr->array = vec_push(current_expr->array, expr);
+					values = vec_push(values, &expr);
 				}
+				current_expr = ast_expr_array(values);
 				break;
 			case TOKEN_EOI:
 				parse_err("EOI while parsing expression");
@@ -216,14 +213,4 @@ AstExpr *parse_expr_before(Parser *parser, bool (*stop)(TokenType)) {
 		}
 		first = false;
 	}
-}
-
-bool parse_expr(Parser *parser, AstExpr *expr, bool (*stop)(TokenType)) {
-	AstExpr *result = parse_expr_before(parser, stop);
-	if (!result) {
-		return false;
-	}
-	memcpy(expr, result, sizeof(AstExpr));
-	free(result);
-	return true;
 }

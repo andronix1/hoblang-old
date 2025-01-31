@@ -4,6 +4,10 @@ bool token_is_asm_arg_end(TokenType type) {
     return type == TOKEN_COMMA || type == TOKEN_SEMICOLON;
 }
 
+bool token_is_asm_address_end(TokenType type) {
+    return type == TOKEN_CLOSING_SQUARE_BRACE;
+}
+
 bool parse_asm_mnemonic(Parser *parser, AstAsmMnemonic *mnem) {
     parse_exp_next(TOKEN_IDENT, "asm mnemonic");
     mnem->name = parser->token->ident;
@@ -27,8 +31,8 @@ bool parse_asm_mnemonic(Parser *parser, AstAsmMnemonic *mnem) {
             }
 
             case TOKEN_OPENING_SQUARE_BRACE: {
-                AstAsmArg arg = { .type = AST_ASM_ARG_VALUE };
-                if (!parse_value(parser, &arg.value)) {
+                AstAsmArg arg = { .type = AST_ASM_ARG_ADDRESS };
+                if (!(arg.expr = parse_expr(parser, token_is_asm_address_end))) {
                     return false;
                 }
                 parse_exp_next(TOKEN_CLOSING_SQUARE_BRACE, "address close");
@@ -41,7 +45,7 @@ bool parse_asm_mnemonic(Parser *parser, AstAsmMnemonic *mnem) {
                 AstAsmArg arg = {
                     .type = AST_ASM_ARG_EXPR
                 };
-                if (!(arg.expr = parse_expr_before(parser, token_is_asm_arg_end))) {
+                if (!(arg.expr = parse_expr(parser, token_is_asm_arg_end))) {
                     return false;
                 }
                 parser->skip_next = true;

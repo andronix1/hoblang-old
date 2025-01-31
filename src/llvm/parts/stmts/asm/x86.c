@@ -47,10 +47,11 @@ void llvm_stmt_asm(LlvmBackend *llvm, AstInlineAsm *inline_asm) {
                     APPEND_CONSTR("rim");
                     break;
                 }
-                case AST_ASM_ARG_VALUE: {
+                case AST_ASM_ARG_ADDRESS: {
                     LLVMValueRef value = LLVMBuildPtrToInt(
                         llvm->builder,
-                        llvm_value(llvm, &arg->value),
+                        NULL, // TODO: address
+                        // llvm_value(llvm, &arg->value),
                         LLVMInt64Type(),
                         ""
                     );

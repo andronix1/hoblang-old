@@ -18,7 +18,6 @@ void sema_ast_body(SemaModule *sema, AstBody *body) {
 			case AST_STMT_IF: sema_stmt_if_else(sema, &stmt->if_else); break;
 			case AST_STMT_ASSIGN: sema_stmt_assign(sema, &stmt->assign); break;
 			case AST_STMT_DEFER: sema_stmt_defer(sema, &stmt->defer); break;
-			case AST_STMT_FUNC_CALL: sema_ast_func_call(sema, &stmt->func_call); break;
 			case AST_STMT_INLINE_ASM: sema_stmt_inline_asm(sema, &stmt->inline_asm); break;
 		}
 	}

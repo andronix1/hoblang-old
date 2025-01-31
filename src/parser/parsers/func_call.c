@@ -1,17 +1,17 @@
 #include "../parsers.h"
 
-bool parse_func_call_args(Parser *parser, AstFuncCall *func_call) {
+AstExpr **parse_call_args(Parser *parser) {
 	parser_next_token(parser);
-	func_call->args = vec_new(AstExpr);
+	AstExpr** args = vec_new(AstExpr*);
 	bool first = true;
 	while (token_type(parser->token) != TOKEN_CLOSING_CIRCLE_BRACE) {
-		AstExpr expr;
 		parser->skip_next = first;
 		first = false;
-		if (!parse_expr(parser, &expr, token_funcall_arg_stop)) {
+		AstExpr *expr = parse_expr(parser, token_funcall_arg_stop);
+		if (!expr) {
 			return false;
 		}
-		func_call->args = vec_push(func_call->args, &expr);
+		args = vec_push(args, &expr);
 	}
-	return true;
+	return args;
 }

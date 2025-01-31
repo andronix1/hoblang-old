@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mod_path.h"
+#include "path.h"
 #include "func_info.h"
 #include "body.h"
 
@@ -12,7 +12,7 @@ typedef struct {
 } AstTypeAlias;
 
 typedef struct {
-	AstModPath path;
+	AstPath path;
 	bool has_alias;
 	Slice alias;
 } AstUse;

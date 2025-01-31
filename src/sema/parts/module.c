@@ -31,14 +31,15 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 			break;
 		}
 		case AST_MODULE_NODE_USE: {
-			SemaModule *module = sema_resolve_mod_path_module(sema, &node->use.path);
-			if (!module) {
-				break;
-			}
-			sema_module_push_public_decl(sema, sema_scope_decl_new_module(
-				node->use.has_alias ? node->use.alias : *(Slice*)vec_top(node->use.path.segments),
-				module
-			));
+			// SemaModule *module = sema_resolve_path_module(sema, &node->use.path);
+			// if (!module) {
+			// 	break;
+			// }
+			// TODO: restore
+			// sema_module_push_public_decl(sema, sema_scope_decl_new_module(
+			// 	node->use.has_alias ? node->use.alias : *(Slice*)vec_top(node->use.path.segments),
+			// 	module
+			// ));
 			break;
 		}
 
@@ -47,6 +48,7 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 			if (!module) {
 				break;
 			}
+
 			sema_module_push_public_decl(sema, sema_scope_decl_new_module(node->import.as, module));
 			break;
 		}

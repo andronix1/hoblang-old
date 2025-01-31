@@ -8,5 +8,8 @@ bool parse_return(Parser *parser, AstReturn *ret) {
 	}
 	ret->has_value = true;
 	parser->skip_next = true;
-	return parse_expr(parser, &ret->expr, token_semicolon_stop);
+	if (!(ret->expr = parse_expr(parser, token_semicolon_stop))) {
+		return false;
+	}
+	return true;
 }

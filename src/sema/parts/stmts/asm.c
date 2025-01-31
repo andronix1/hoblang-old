@@ -25,8 +25,8 @@ void sema_stmt_inline_asm(SemaModule *sema, AstInlineAsm *inline_asm) {
                     sema_ast_expr_type(sema, arg->expr, NULL);
                     break;
                 }
-                case AST_ASM_ARG_VALUE: {
-                    sema_ast_value(sema, &arg->value);
+                case AST_ASM_ARG_ADDRESS: {
+                    sema_ast_expr_type(sema, arg->expr, NULL); // TODO: check assignable
                     break;
                 }
             }

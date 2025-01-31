@@ -10,7 +10,10 @@ bool parse_var(Parser *parser, AstVar *var) {
 			return true;
 		case TOKEN_ASSIGN:
 			var->initializes = true;
-			return parse_expr(parser, &var->expr, token_semicolon_stop);
+			if (!(var->expr = parse_expr(parser, token_semicolon_stop))) {
+				return false;
+			}
+			return true;
 		case TOKEN_COLON:
 			var->typed = true;
 			if (!parse_type(parser, &var->type)) {
@@ -25,7 +28,10 @@ bool parse_var(Parser *parser, AstVar *var) {
 	switch (token_type(parser->token)) {
 		case TOKEN_ASSIGN:
 			var->initializes = true;
-			return parse_expr(parser, &var->expr, token_semicolon_stop);
+			if (!(var->expr = parse_expr(parser, token_semicolon_stop))) {
+				return false;
+			}
+			return true;
 		case TOKEN_SEMICOLON:
 			var->initializes = false;
 			return true;

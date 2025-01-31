@@ -1,14 +1,18 @@
 #include "../parts.h"
 
-SemaType *sema_ast_expr_array(SemaModule *sema, AstExpr *array, SemaType *expectation);
+SemaType *sema_ast_expr_array(SemaModule *sema, AstExpr **array, SemaType *expectation);
 SemaType *sema_ast_expr_as(SemaModule *sema, AstExprAs *as);
 SemaType *sema_ast_expr_binop(SemaModule *sema, AstExprBinop *binop, SemaType *expectation);
-SemaType *sema_ast_func_call(SemaModule *sema, AstFuncCall *func_call);
+SemaType *sema_ast_call(SemaModule *sema, AstCall *call);
 SemaType *sema_ast_expr_int(SemaModule *sema __attribute__((unused)), uint64_t integer __attribute__((unused)), SemaType *expectation);
 
 SemaType *sema_ast_expr_type(SemaModule *sema, AstExpr *expr, SemaType *expectation) {
 	switch (expr->type) {
-		case AST_EXPR_VALUE: return expr->sema_type = sema_ast_value(sema, &expr->value);
+		case AST_EXPR_GET_INNER_PATH:
+			assert(0, "NIY");
+		case AST_EXPR_GET_LOCAL_PATH:
+			print("LP {ast::path}!!!!\n", &expr->get_local.path);
+			return expr->sema_type = sema_resolve_path_type(sema, &expr->get_local.path);
 		case AST_EXPR_UNARY: {
 			SemaType *type = sema_ast_expr_type(sema, expr->unary.expr, expectation);
 			if (!type) {
@@ -19,18 +23,18 @@ SemaType *sema_ast_expr_type(SemaModule *sema, AstExpr *expr, SemaType *expectat
 					if (type->type != SEMA_TYPE_PRIMITIVE) {
 						sema_err("cannot apply unary minus to non-primitive types");
 					}
-					return type;
+					return expr->sema_type = type;
 				case AST_UNARY_BITNOT:
 					if (type->type != SEMA_TYPE_PRIMITIVE) {
 						sema_err("cannot apply unary bitnot to non-primitive types");
 					}
-					return type;
+					return expr->sema_type = type;
 			}
 			assert(0, "invalid unary type: {int}", expr->unary.type);
 			break;
 		}
 		case AST_EXPR_REF:
-			expr->sema_type = sema_ast_value(sema, &expr->value);
+			expr->sema_type = sema_ast_expr_type(sema, expr->ref_expr, NULL);
 			if (!expr->sema_type) {
 				return NULL;
 			}
@@ -48,7 +52,7 @@ SemaType *sema_ast_expr_type(SemaModule *sema, AstExpr *expr, SemaType *expectat
 		case AST_EXPR_INTEGER: return expr->sema_type = sema_ast_expr_int(sema, expr->integer, expectation);
 		case AST_EXPR_BINOP: return expr->sema_type = sema_ast_expr_binop(sema, &expr->binop, expectation);
 		case AST_EXPR_AS: return expr->sema_type = sema_ast_expr_as(sema, &expr->as);
-		case AST_EXPR_FUNCALL: return expr->sema_type = sema_ast_func_call(sema, &expr->func_call);
+		case AST_EXPR_CALL: return expr->sema_type = sema_ast_call(sema, &expr->call);
 	}
 	assert(0, "invalid expr type {int}", expr->type);
 }

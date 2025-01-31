@@ -1,12 +1,12 @@
 #include "../../parts.h"
 
-SemaType *sema_ast_expr_array(SemaModule *sema, AstExpr *array, SemaType *expectation) {
+SemaType *sema_ast_expr_array(SemaModule *sema, AstExpr **array, SemaType *expectation) {
 	SemaType *expect = NULL;
 	if (expectation && expectation->type == SEMA_TYPE_ARRAY) {
 		expect = expectation->array.of;
 	}
 	if (vec_len(array) > 0) {
-		if (!(expect = sema_ast_expr_type(sema, &array[0], expect))) {
+		if (!(expect = sema_ast_expr_type(sema, array[0], expect))) {
 			return NULL;
 		}
 	} else if (!expectation) {
@@ -20,7 +20,7 @@ SemaType *sema_ast_expr_array(SemaModule *sema, AstExpr *array, SemaType *expect
 		expect = expectation->ptr_to;
 	}
 	for (size_t i = 1; i < vec_len(array); i++) {
-		SemaType *stype = sema_ast_expr_type(sema, &array[i], expect);	
+		SemaType *stype = sema_ast_expr_type(sema, array[i], expect);	
 		if (!stype) {
 			return NULL;
 		}

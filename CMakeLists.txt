@@ -27,6 +27,7 @@ set(SOURCE_FILES
 	src/parser/parser.c
 	src/parser/print/expr.c
 	src/parser/print/type.c
+	src/parser/ast/expr.c
 	src/parser/parsers/stmts/var.c
 	src/parser/parsers/stmts/return.c
 	src/parser/parsers/stmts/while.c
@@ -38,10 +39,9 @@ set(SOURCE_FILES
 	src/parser/parsers/module.c
 	src/parser/parsers/module_node.c
 	src/parser/parsers/type.c
-	src/parser/parsers/value.c
 	src/parser/parsers/func_call.c
 	src/parser/parsers/expr.c
-	src/parser/parsers/mod_path.c
+	src/parser/parsers/path.c
 	src/parser/parsers/body.c
 
 	src/sema/module.c
@@ -50,7 +50,7 @@ set(SOURCE_FILES
 	src/sema/parts/exprs/array.c
 	src/sema/parts/exprs/as.c
 	src/sema/parts/exprs/binop.c
-	src/sema/parts/exprs/func_call.c
+	src/sema/parts/exprs/call.c
 	src/sema/parts/exprs/int.c
 	src/sema/parts/stmts/assign.c
 	src/sema/parts/stmts/asm.c
@@ -60,11 +60,10 @@ set(SOURCE_FILES
 	src/sema/parts/stmts/var.c
 	src/sema/parts/stmts/while.c
 	src/sema/parts/module.c
-	src/sema/parts/mod_path.c
+	src/sema/parts/path.c
 	src/sema/parts/type.c
 	src/sema/parts/body.c
 	src/sema/parts/expr.c
-	src/sema/parts/value.c
 
 	src/llvm/llvm.c
 	src/llvm/utils/slices.c
@@ -78,7 +77,6 @@ set(SOURCE_FILES
 	src/llvm/parts/stmts/var.c
 	src/llvm/parts/stmts/while.c
 	src/llvm/parts/expr.c
-	src/llvm/parts/value.c
 )
 
 include_directories(${LLVM_INCLUDE_DIRS})

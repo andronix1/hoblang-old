@@ -47,6 +47,92 @@ typedef struct _SemaType {
 	};
 } SemaType;
 
+// typedef enum {
+// 	SEMA_PATH_CONST,
+// 	SEMA_PATH_DECL
+// } SemaPathType;
+
+// typedef struct {
+// } SemaPathSegment;
+
+// typedef enum {
+// 	// SEMA_PATH_CONST_ENUM_VARIANT,
+// 	SEMA_PATH_CONST_FUNC,
+// } SemaPathConstType;
+
+// typedef struct {
+// 	SemaPathConstType type;
+// 	union {
+// 		// TODO: enum variant
+// 		struct _SemaScopeDecl *func_decl;
+// 	};
+// } SemaPathConst;
+
+// typedef struct {
+// 	SemaPathType type;
+// 	union {
+// 		SemaPathConst constant;
+// 		struct _SemaScopeDecl *decl;
+// 	};
+// } SemaPath;
+
+/*
+	a.b .c .d;
+
+	SemaScopeDecl:
+		- GetStructMember[]
+		- 
+
+		CONST,
+		VAR -> VAR -> VAR
+	// -> (&self)
+	// -> (self)
+
+	VAR, CONST // EXT_FUNC(&VAR)
+
+	[MODULE_PATH]
+	 |-	CONST
+	 |	ENUM
+	 |	 |	 |- VARIANT (int)
+	 |	 |- STRUCT
+	 |	 |- PRIMITIVE 
+	 |-	VAR <----------------
+	 	 |- EXT_FUNC 		|
+		 |- *				|
+			|- STRUCT		|
+				|- MEMBER ---
+
+	DECL	| a - module (assignable: false)
+			| b - module (assignable: false)
+			| c - struct (assignable: true)
+	SEGS	| d -   *    (assignable: *)
+	SemaPath {
+		init: variant SemaPathInit {
+			Decl {
+				decl: SemaScopeDecl,
+			},
+			Const {
+				Int(int),
+				...
+			}
+		},
+		segments: variant SemaPathSegment {
+			GetStructMember {
+				member_id: int
+			}
+			GetExtFunction {
+				decl: Decl
+			}
+		}
+	}
+*/
+
+// (expr) .b
+// expr -  * (assignable: false)
+//   b  -  * (assignable: false)
+
+
+
 extern SemaType primitives[];
 
 SemaType *sema_type_new_array(size_t length, SemaType *of);

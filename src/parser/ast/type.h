@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/slice.h"
-#include "mod_path.h"
+#include "path.h"
 
 struct _SemaType;
 
@@ -37,7 +37,7 @@ typedef struct _AstType {
 	AstTypeKind type;
 	struct _SemaType *sema;
 	union {
-		AstModPath path;
+		AstPath path;
 		AstStructType struct_type;
 		AstFunctionType func;
 		struct _AstType *ptr_to;

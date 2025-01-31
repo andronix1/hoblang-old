@@ -1,7 +1,7 @@
 #include "../../parsers.h"
 
 bool parse_if_else_body(Parser *parser, AstIfBody *body) {
-	if (!parse_expr(parser, &body->expr, token_opening_figure_brace_stop)) {
+	if (!(body->expr = parse_expr(parser, token_opening_figure_brace_stop))) {
 		return false;
 	}
 	parser->skip_next = true;

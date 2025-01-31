@@ -1,7 +1,7 @@
 #include "../../parts.h"
 
 void sema_stmt_while_loop(SemaModule *sema, AstWhile *while_loop) {
-	SemaType *type = sema_ast_expr_type(sema, &while_loop->expr, &primitives[PRIMITIVE_BOOL]);
+	SemaType *type = sema_ast_expr_type(sema, while_loop->expr, &primitives[PRIMITIVE_BOOL]);
 	if (!type) {
 		return;
 	}

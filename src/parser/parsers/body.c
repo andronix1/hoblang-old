@@ -7,25 +7,24 @@ bool parse_var(Parser *parser, AstVar *var);
 bool parse_while(Parser *parser, AstWhile *while_loop);
 bool parse_asm_body(Parser *parser, AstInlineAsm *inline_asm);
 
+static inline bool token_stmt_stop(TokenType type) { return type == TOKEN_ASSIGN || type == TOKEN_SEMICOLON; }
+
 bool parse_stmt(Parser *parser, AstStmt *stmt) {
 	parser_next_token(parser);
 	switch (token_type(parser->token)) {
-		case TOKEN_IDENT: {
+		case TOKEN_IDENT:
+		case TOKEN_OPENING_CIRCLE_BRACE: {
 			parser->skip_next = true;
-			AstValue value;
-			if (!parse_value(parser, &value)) {
+			AstExpr *expr = parse_expr(parser, token_stmt_stop);
+			if (!expr) {
 				return false;
 			}
 			parser_next_token(parser);
 			switch (token_type(parser->token)) {
-				case TOKEN_OPENING_CIRCLE_BRACE:
-					stmt->type = AST_STMT_FUNC_CALL;
-					stmt->func_call.value = value;
-					return parse_func_call_args(parser, &stmt->func_call);
 				case TOKEN_ASSIGN:
 					stmt->type = AST_STMT_ASSIGN;
-					stmt->assign.value = value;
-					return parse_expr(parser, &stmt->assign.expr, token_semicolon_stop);
+					stmt->assign.assign_expr = expr;
+					return (stmt->assign.expr = parse_expr(parser, token_semicolon_stop));
 				default:
 					parse_err("unexpected token `{tok}` after ident in statement");
 					return false;

@@ -7,7 +7,7 @@ void sema_stmt_var(SemaModule *sema, AstVar *var) {
 			return;
 		}
 		if (var->initializes) {
-			SemaType *type = sema_ast_expr_type(sema, &var->expr, var_type);
+			SemaType *type = sema_ast_expr_type(sema, var->expr, var_type);
 			if (!type) {
 				return;
 			}
@@ -18,15 +18,16 @@ void sema_stmt_var(SemaModule *sema, AstVar *var) {
 		}
 	} else {
 		if (var->initializes) {
-			if (!(var_type = sema_ast_expr_type(sema, &var->expr, NULL))) {
+			if (!(var_type = sema_ast_expr_type(sema, var->expr, NULL))) {
 				return;
 			}
 			var->typed = true;
-			var->type.sema = var->expr.sema_type; 
+			var->type.sema = var->expr->sema_type; 
 		} else {
 			sema_err("variable type must be specified or initializer must present");
 			return;
 		}
 	}
 	var->decl = &sema_module_push_decl(sema, sema_scope_decl_new_value(var->name, var_type))->value_decl;
+	printf("SET %p\n", &var->decl);
 }

@@ -3,6 +3,6 @@
 #include "defer.h"
 
 typedef struct {
-	AstExpr expr;
+	AstExpr *expr;
 	bool has_value;
 } AstReturn;

@@ -17,6 +17,8 @@ typedef enum {
 
 typedef struct _SemaScopeValueDecl {
     SemaType *type;
+    
+    bool constant;
     LLVMValueRef llvm_value;
 } SemaScopeValueDecl;
 
@@ -30,9 +32,6 @@ typedef struct _SemaScopeDecl {
     };
 } SemaScopeDecl;
 
-SemaScopeDecl *sema_scope_decl_new_type(Slice name, SemaType *sema_type);
-SemaScopeDecl *sema_scope_decl_new_value(Slice name, SemaType *sema_type);
-SemaScopeDecl *sema_scope_decl_new_module(Slice name, struct _SemaModule *module);
 
 typedef struct {
     SemaScopeDecl **decls;
@@ -63,5 +62,9 @@ SemaScopeDecl *sema_module_push_public_decl(SemaModule *sema, SemaScopeDecl *dec
 void sema_module_push_primitives(SemaModule *sema);
 void sema_module_push_scope(SemaModule *sema);
 void sema_module_pop_scope(SemaModule *sema);
+
+SemaScopeDecl *sema_scope_decl_new_type(Slice name, SemaType *sema_type);
+SemaScopeDecl *sema_scope_decl_new_value(Slice name, SemaType *type);
+SemaScopeDecl *sema_scope_decl_new_module(Slice name, SemaModule *module);
 
 AstDefer **sema_module_resolve_defers(SemaModule *sema);

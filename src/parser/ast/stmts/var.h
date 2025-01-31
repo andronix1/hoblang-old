@@ -6,7 +6,7 @@
 typedef struct {
 	Slice name;
 	AstType type;
-	AstExpr expr;
+	AstExpr *expr;
 	bool initializes, typed;
 	
 	struct _SemaScopeValueDecl *decl;

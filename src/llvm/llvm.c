@@ -15,7 +15,7 @@ LLVMTypeRef llvm_sema_function_type(SemaFunction *func) {
 }
 
 LLVMTypeRef llvm_resolve_type(SemaType *type) {
-	assert(type, "type is null");
+	assert(type, "type is unresolved");
 	switch (type->type) {
 		case SEMA_TYPE_STRUCT: {
 			LLVMTypeRef *elements = alloca(sizeof(LLVMTypeRef) * vec_len(type->struct_type->members));

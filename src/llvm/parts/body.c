@@ -19,7 +19,6 @@ bool llvm_body(LlvmBackend *llvm, AstBody *body) {
 		switch (stmt->type) {
 			case AST_STMT_VAR: llvm_stmt_var(llvm, &stmt->var); break;
 			case AST_STMT_RETURN: llvm_stmt_return(llvm, &stmt->ret, body); return false;
-			case AST_STMT_FUNC_CALL: llvm_func_call(llvm, &stmt->func_call); break;
 			case AST_STMT_WHILE: llvm_stmt_while(llvm, &stmt->while_loop); break;
 			case AST_STMT_IF: llvm_stmt_if(llvm, &stmt->if_else); break;
 			case AST_STMT_ASSIGN: llvm_stmt_assign(llvm, &stmt->assign); break;

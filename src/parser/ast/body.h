@@ -12,7 +12,6 @@
 typedef enum {
 	AST_STMT_IF,
 	AST_STMT_VAR,
-	AST_STMT_FUNC_CALL,
 	AST_STMT_RETURN,
 	AST_STMT_WHILE,
 	AST_STMT_INLINE_ASM,
@@ -25,7 +24,6 @@ typedef struct {
 	union {
 		AstVar var;
 		AstIfElse if_else;
-		AstFuncCall func_call;
 		AstReturn ret;
 		AstDefer defer;
 		AstWhile while_loop;

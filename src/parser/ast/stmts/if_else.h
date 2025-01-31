@@ -4,7 +4,7 @@
 #include "body.h"
 
 typedef struct {
-	AstExpr expr;
+	AstExpr *expr;
 	struct _AstBody *body;
 } AstIfBody;
 
