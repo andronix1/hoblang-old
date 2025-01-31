@@ -18,11 +18,12 @@ SemaScopeDecl *sema_scope_decl_new_type(Slice name, SemaType *sema_type) {
     return result;
 }
 
-SemaScopeDecl *sema_scope_decl_new_value(Slice name, SemaType *type) {
+SemaScopeDecl *sema_scope_decl_new_value(Slice name, SemaType *type, bool constant) {
     SemaScopeDecl *result = malloc(sizeof(SemaScopeDecl));
     result->type = SEMA_SCOPE_DECL_VALUE;
     result->name = name;
     result->value_decl.type = type;
+    result->value_decl.constant = constant;
     result->value_decl.llvm_value = NULL;
     return result;
 }

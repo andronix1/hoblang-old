@@ -1,5 +1,19 @@
 #include "../parts.h"
 
+/*
+path - const / var
+PATH: var / module / const / type
+	MOD_PATH: mod1::mod2::val;
+	 |-	TYPE
+	 |- MODULE
+	 |- CONST
+	 |- VAR
+	INNER_PATH: 
+	 |- TYPE -> const
+	 |- MODULE -> !
+	 |- CONST -> const		| TYPE OF
+	 |- VAR -> var			| SIZE_OF
+
 SemaType *sema_resolve_path_in_type(SemaModule *sema, SemaType *type, AstPath *path, size_t segment_idx) {
 	assert(segment_idx < vec_len(path->segments), "trying to resolve invalid path segment");
     if (vec_len(path->segments) == segment_idx) {
@@ -52,6 +66,8 @@ SemaType *sema_resolve_module_path(SemaModule *sema, AstPath *path, size_t segme
         return false;
     }
     bool is_last = vec_len(path->segments) == segment_idx + 1;
+	path->decl = decl;
+	path->inner_path_start = segment_idx;
     switch (decl->type) {
         case SEMA_SCOPE_DECL_MODULE:
             segment->sema.type = SEMA_PATH_SEGMENT_MODULE;
@@ -105,4 +121,35 @@ SemaType *sema_resolve_module_path(SemaModule *sema, AstPath *path, size_t segme
 
 SemaType *sema_resolve_path_type(SemaModule *sema, AstPath *path) {
     return sema_resolve_module_path(sema, path, 0);
+}
+*/
+
+SemaScopeDecl *sema_resolve_decl_path(SemaModule *sema, AstDeclPath *path) {
+	SemaModule *module = sema;
+	SemaScopeDecl *decl = NULL;
+	for (size_t i = 0; i < vec_len(path->segments); i++) {
+		decl = (i == 0 ?
+				sema_module_resolve_scope_decl :
+				sema_module_resolve_public_decl
+			)(module, &path->segments[i]);
+		if (i + 1 != vec_len(path->segments)) {
+			if (decl->type != SEMA_SCOPE_DECL_MODULE) {
+				sema_err("`{slice}` in `{ast::dpath}` is not a module", &path->segments[i], path);
+				return NULL;
+			}
+			module = decl->module;
+		}
+	}
+	assert(decl, "trying to resolve empty decl path");
+	return decl;
+}
+
+SemaType *_sema_resolve_inner_type_path(SemaModule *sema, SemaType *type, AstInnerPath *path, size_t segment_idx) {
+	AstInnerPathSegment *segment = &path->segments[segment_idx];
+	switch (segment->type) {
+		case AST_INNER_PATH_SEG_IDENT:
+			sema_err("cannot get a member `{slice}` from type `{sema::type}`", segment->ident, type);
+			return NULL;
+	}
+	return NULL;
 }

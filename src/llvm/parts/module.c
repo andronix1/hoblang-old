@@ -5,25 +5,11 @@ void llvm_module_node(LlvmBackend *llvm, AstModuleNode *node) {
 		case AST_MODULE_NODE_USE:
 		case AST_MODULE_NODE_TYPE_ALIAS:
 		case AST_MODULE_NODE_IMPORT:
+		case AST_MODULE_NODE_EXTERNAL_FUNC: 
 			break;
-
-		case AST_MODULE_NODE_EXTERNAL_FUNC: {
-			LLVMValueRef func = LLVMAddFunction(llvm->module, "", llvm_sema_function_type(&node->func_decl.info.decl->type->func));
-			LLVMSetInitializer(
-				node->ext_func_decl.info.decl->llvm_value,
-				func
-			);
-			LLVMSetValueName(func, slice_to_cstr(&node->ext_func_decl.info.public_name));
-			break;
-		}
 
 		case AST_MODULE_NODE_FUNC: {
-			llvm->func = LLVMAddFunction(llvm->module, "", llvm_sema_function_type(&node->func_decl.info.decl->type->func));
-			LLVMSetInitializer(
-				node->ext_func_decl.info.decl->llvm_value,
-				llvm->func
-			);
-			LLVMSetValueName(llvm->func, slice_to_cstr(&node->func_decl.info.public_name));
+			llvm->func = node->ext_func_decl.info.decl->llvm_value;
 			LLVMPositionBuilderAtEnd(llvm->builder, LLVMAppendBasicBlock(llvm->func, "entry"));
 			for (size_t i = 0; i < vec_len(node->func_decl.info.args); i++) {
 				AstFuncArg *arg = &node->func_decl.info.args[i];
@@ -41,20 +27,18 @@ void llvm_module_node(LlvmBackend *llvm, AstModuleNode *node) {
 	}
 }
 
-void llvm_module_init(LlvmBackend *llvm, SemaModule *module) {
-	for (size_t i = 0; i < vec_len(module->public_decls); i++) {
-		SemaScopeDecl *decl = module->public_decls[i];
-		switch (decl->type) {
-			case SEMA_SCOPE_DECL_VALUE:
-				decl->value_decl.llvm_value = LLVMAddGlobal(
-					llvm->module,
-					llvm_resolve_type(decl->value_decl.type),
-					""
-				);
+void llvm_module_init(LlvmBackend *llvm, AstModule *module) {
+	for (size_t i = 0; i < vec_len(module->nodes); i++) {
+		AstModuleNode *node = &module->nodes[i];
+		switch (node->type) {
+			case AST_MODULE_NODE_USE:
+			case AST_MODULE_NODE_TYPE_ALIAS:
+			case AST_MODULE_NODE_IMPORT:
 				break;
-
-			case SEMA_SCOPE_DECL_MODULE:
-			case SEMA_SCOPE_DECL_TYPE:
+			case AST_MODULE_NODE_EXTERNAL_FUNC:
+			case AST_MODULE_NODE_FUNC:
+				LLVMValueRef func = LLVMAddFunction(llvm->module, slice_to_cstr(&node->ext_func_decl.info.public_name), llvm_sema_function_type(&node->func_decl.info.decl->type->func));
+				node->func_decl.info.decl->llvm_value = func;
 				break;
 		}
 	}

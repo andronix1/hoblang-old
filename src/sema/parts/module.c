@@ -16,7 +16,8 @@ void sema_add_ast_func_info(SemaModule *sema, AstFuncInfo *info) {
 	}
 	info->decl = &sema_module_push_public_decl(sema, sema_scope_decl_new_value(
 		info->name,
-		sema_type_new_func(returning, args)
+		sema_type_new_func(returning, args),
+		true
 	))->value_decl;
 }
 
@@ -67,7 +68,7 @@ void sema_push_ast_func_info(SemaModule *sema, AstFuncInfo *info) {
 	for (size_t i = 0; i < vec_len(info->args); i++) {
 		AstFuncArg *arg = &info->args[i];
 		SemaType *type = sema_ast_type(sema, &arg->type);
-		arg->decl = &sema_module_push_decl(sema, sema_scope_decl_new_value(arg->name, type))->value_decl;
+		arg->decl = &sema_module_push_decl(sema, sema_scope_decl_new_value(arg->name, type, false))->value_decl;
 	}
 }
 

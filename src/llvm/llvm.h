@@ -19,6 +19,6 @@ typedef struct {
 bool llvm_init(LlvmBackend *llvm);
 LLVMTypeRef llvm_sema_function_type(SemaFunction *func);
 LLVMTypeRef llvm_resolve_type(SemaType *type);
-void llvm_module_init(LlvmBackend *llvm, SemaModule *module);
+void llvm_module_init(LlvmBackend *llvm, AstModule *module);
 bool llvm_write_module(LlvmBackend *llvm, char *output_path);
 bool llvm_write_module_ir(LlvmBackend *llvm, char *output_path);

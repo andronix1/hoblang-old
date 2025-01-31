@@ -64,7 +64,7 @@ void sema_module_push_scope(SemaModule *sema);
 void sema_module_pop_scope(SemaModule *sema);
 
 SemaScopeDecl *sema_scope_decl_new_type(Slice name, SemaType *sema_type);
-SemaScopeDecl *sema_scope_decl_new_value(Slice name, SemaType *type);
+SemaScopeDecl *sema_scope_decl_new_value(Slice name, SemaType *type, bool constant);
 SemaScopeDecl *sema_scope_decl_new_module(Slice name, SemaModule *module);
 
 AstDefer **sema_module_resolve_defers(SemaModule *sema);

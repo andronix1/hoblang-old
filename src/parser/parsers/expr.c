@@ -88,7 +88,7 @@ AstExpr *expr_make_unary(Parser *parser, AstUnaryType type, bool(*stop)(TokenTyp
 		} \
 	} while (0)
 
-#define NOT_NULL(expr) ({typeof(expr) _expr = expr; if (!expr) { return NULL; } expr; })
+#define NOT_NULL(expr) ({typeof(expr) _expr = expr; if (!_expr) { return NULL; } _expr; })
 
 AstExpr *parse_expr(Parser *parser, bool (*stop)(TokenType)) {
 	bool first = true;

@@ -131,8 +131,6 @@ typedef struct _SemaType {
 // expr -  * (assignable: false)
 //   b  -  * (assignable: false)
 
-
-
 extern SemaType primitives[];
 
 SemaType *sema_type_new_array(size_t length, SemaType *of);

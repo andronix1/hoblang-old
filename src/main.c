@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
 		}
 		for (size_t i = 0; i < vec_len(project->modules); i++) {
 			hob_log(LOGD, "compiling {slice}", &project->modules[i].path);
-			llvm_module_init(&llvm, project->modules[i].module);
+			llvm_module_init(&llvm, project->modules[i].module->ast);
 		}
 		for (size_t i = 0; i < vec_len(project->modules); i++) {
 			hob_log(LOGD, "compiling {slice}", &project->modules[i].path);
