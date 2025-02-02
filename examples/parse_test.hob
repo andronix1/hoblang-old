@@ -1,5 +1,21 @@
+type MyStruct = struct {
+    a: i32,
+    b: i32
+};
+
+fun test(): MyStruct {
+    var a: MyStruct;
+    a.a = 1;
+    a.b = 2;
+    return a;
+}
+
 fun main(): i32 {
+    var ms: MyStruct;
+    ms.a = 0;
     var a: i32 = 0;
     a = 123;
+    ms.a = a;
+    # var ms2 = test();
     return a;
 }

@@ -4,15 +4,16 @@ SemaType *sema_ast_expr_array(SemaModule *sema, AstExpr **array, SemaType *expec
 SemaType *sema_ast_expr_as(SemaModule *sema, AstExprAs *as);
 SemaType *sema_ast_expr_binop(SemaModule *sema, AstExprBinop *binop, SemaType *expectation);
 SemaType *sema_ast_call(SemaModule *sema, AstCall *call);
-SemaType *sema_ast_expr_int(SemaModule *sema __attribute__((unused)), uint64_t integer __attribute__((unused)), SemaType *expectation);
+SemaType *sema_ast_expr_int(SemaModule *sema, uint64_t integer, SemaType *expectation);
 
 SemaType *sema_ast_expr_type(SemaModule *sema, AstExpr *expr, SemaType *expectation) {
 	switch (expr->type) {
 		case AST_EXPR_GET_INNER_PATH:
 			assert(0, "NIY");
+            return NULL;
 		case AST_EXPR_GET_LOCAL_PATH:
 			print("LP {ast::path}!!!!\n", &expr->get_local.path);
-			return expr->sema_type = sema_resolve_path_type(sema, &expr->get_local.path);
+			return expr->sema_type = sema_resolve_value_path(sema, &expr->get_local.path);
 		case AST_EXPR_UNARY: {
 			SemaType *type = sema_ast_expr_type(sema, expr->unary.expr, expectation);
 			if (!type) {

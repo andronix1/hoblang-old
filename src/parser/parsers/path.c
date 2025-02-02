@@ -41,10 +41,10 @@ bool parse_path(Parser *parser, AstPath *path) {
 		return false;
 	}
 	parser_next_token(parser);
+    path->inner_path.segments = vec_new(AstInnerPathSegment);
 	if (token_type(parser->token) != TOKEN_DOT) {
-		path->inner_path.segments = vec_new(AstInnerPathSegment);
+        parser->skip_next = true;
 		return true;
 	}
 	return parse_inner_path(parser, &path->inner_path);
-
 }

@@ -123,6 +123,16 @@ SemaType *sema_resolve_path_type(SemaModule *sema, AstPath *path) {
     return sema_resolve_module_path(sema, path, 0);
 }
 */
+typedef enum {
+    SEMA_RESOLVE_PATH_META_TYPE,
+    SEMA_RESOLVE_PATH_META_VAR,
+    SEMA_RESOLVE_PATH_META_CONST,
+} SemaResolvedPathType;
+
+typedef struct {
+    SemaResolvedPathType kind;
+    SemaType *type;
+} SemaResolvedPath;
 
 SemaScopeDecl *sema_resolve_decl_path(SemaModule *sema, AstDeclPath *path) {
 	SemaModule *module = sema;
@@ -132,6 +142,10 @@ SemaScopeDecl *sema_resolve_decl_path(SemaModule *sema, AstDeclPath *path) {
 				sema_module_resolve_scope_decl :
 				sema_module_resolve_public_decl
 			)(module, &path->segments[i]);
+        if (!decl) {
+            sema_err("`{slice}` in `{ast::dpath}` was not defined", &path->segments[i], path);
+            return false;
+        }
 		if (i + 1 != vec_len(path->segments)) {
 			if (decl->type != SEMA_SCOPE_DECL_MODULE) {
 				sema_err("`{slice}` in `{ast::dpath}` is not a module", &path->segments[i], path);
@@ -140,16 +154,140 @@ SemaScopeDecl *sema_resolve_decl_path(SemaModule *sema, AstDeclPath *path) {
 			module = decl->module;
 		}
 	}
+    path->decl = decl;
 	assert(decl, "trying to resolve empty decl path");
 	return decl;
 }
 
-SemaType *_sema_resolve_inner_type_path(SemaModule *sema, SemaType *type, AstInnerPath *path, size_t segment_idx) {
+bool sema_resolve_inner_value_path(SemaModule *sema, SemaType *type, AstInnerPath *path, size_t segment_idx, SemaResolvedPath *output) {
+    if (vec_len(path->segments) == segment_idx) {
+        return type;
+    }
+	AstInnerPathSegment *segment = &path->segments[segment_idx];
+	bool is_last = segment_idx + 1 == vec_len(path->segments);
+	switch (segment->type) {
+		case AST_INNER_PATH_SEG_IDENT: {
+			if (type->type == SEMA_TYPE_STRUCT) {
+				for (size_t i = 0; i < vec_len(type->struct_type->members); i++) {
+                    AstStructMember *member = &type->struct_type->members[i];
+					if (slice_eq(&member->name, &segment->ident)) {
+                        segment->sema.type = SEMA_INNER_PATH_STRUCT_MEMBER;
+                        segment->sema.struct_member.idx = i;
+                        segment->sema.struct_member.of = type;
+                        SemaType *result = member->type->sema;
+						if (is_last) {
+                            output->kind = SEMA_RESOLVE_PATH_META_VAR;
+                            output->type = result;
+							return true;
+						}
+                        return sema_resolve_inner_value_path(sema, result, path, segment_idx + 1, output);
+					}
+				}
+                sema_err("{sema::type} has not a member {slice}", type, &segment->ident);
+                return false;
+			} else if (type->type == SEMA_TYPE_SLICE) {
+                Slice length = slice_from_const_cstr("length");
+                Slice raw = slice_from_const_cstr("raw");
+                segment->sema.slice_type = type;
+                if (slice_eq(&raw, &segment->ident)) {
+                    segment->sema.type = SEMA_INNER_PATH_SLICE_LEN;
+                    output->kind = SEMA_RESOLVE_PATH_META_CONST;
+                    output->type = &primitives[PRIMITIVE_I32];
+                    return true;
+                } else if (slice_eq(&length, &segment->ident)) {
+                    segment->sema.type = SEMA_INNER_PATH_SLICE_RAW;
+                    output->kind = SEMA_RESOLVE_PATH_META_CONST;
+                    output->type = sema_type_new_pointer(type->slice_of);
+                    return true;
+                } else {
+                    sema_err("{sema::type} has not member {slice}", type, &segment->ident);
+                    return false;
+                }
+            }
+			return false;
+		}
+	}
+	return false;
+}
+
+bool sema_resolve_inner_type_path(SemaModule *sema, SemaType *type, AstInnerPath *path, size_t segment_idx, SemaResolvedPath *output) {
+    if (vec_len(path->segments) == segment_idx) {
+        return type;
+    }
+	bool is_last = segment_idx + 1 == vec_len(path->segments);
 	AstInnerPathSegment *segment = &path->segments[segment_idx];
 	switch (segment->type) {
 		case AST_INNER_PATH_SEG_IDENT:
-			sema_err("cannot get a member `{slice}` from type `{sema::type}`", segment->ident, type);
-			return NULL;
+			break;
 	}
-	return NULL;
+	sema_err("cannot get a member `{slice}` from type `{sema::type}`", &segment->ident, type);
+	return false;
+}
+
+bool sema_resolve_path(SemaModule *sema, AstPath *path, SemaResolvedPath *output) {
+    SemaScopeDecl *decl = sema_resolve_decl_path(sema, &path->decl_path);
+    if (!decl) {
+        return false;
+    }
+    switch (decl->type) {
+        case SEMA_SCOPE_DECL_MODULE:
+            sema_err("cannot get members of module {ast::dpath}", &path->decl_path);
+            return false;
+        case SEMA_SCOPE_DECL_TYPE:
+            output->kind = SEMA_RESOLVE_PATH_META_TYPE;
+            output->type = decl->sema_type;
+            if (!sema_resolve_inner_type_path(sema, decl->sema_type, &path->inner_path, 0, output)) {
+                return false;
+            }
+            break;
+        case SEMA_SCOPE_DECL_VALUE:
+            output->kind = decl->value_decl.constant ?
+                SEMA_RESOLVE_PATH_META_CONST :
+                SEMA_RESOLVE_PATH_META_VAR;
+            output->type = decl->value_decl.type;
+            if (!sema_resolve_inner_value_path(sema, decl->value_decl.type, &path->inner_path, 0, output)) {
+                return false;
+            }
+            break;
+    }
+    return true;
+}
+
+SemaType *sema_resolve_type_path(SemaModule *sema, AstPath *path) {
+    SemaResolvedPath resolved = {
+        .kind = -1,
+        .type = NULL
+    };
+    if (!sema_resolve_path(sema, path, &resolved)) {
+        return NULL;
+    }
+    switch (resolved.kind) {
+        case SEMA_RESOLVE_PATH_META_VAR:
+        case SEMA_RESOLVE_PATH_META_CONST:
+            sema_err("{ast::path} is value, not type", path);
+            return NULL;
+        case SEMA_RESOLVE_PATH_META_TYPE:
+            break;
+    }
+    assert(resolved.kind != (SemaResolvedPathType)-1, "path was not resolved!");
+    return resolved.type;
+}
+SemaType *sema_resolve_value_path(SemaModule *sema, AstPath *path) {
+    SemaResolvedPath resolved = {
+        .kind = -1,
+        .type = NULL
+    };
+    if (!sema_resolve_path(sema, path, &resolved)) {
+        return NULL;
+    }
+    switch (resolved.kind) {
+        case SEMA_RESOLVE_PATH_META_VAR:
+        case SEMA_RESOLVE_PATH_META_CONST:
+            break;
+        case SEMA_RESOLVE_PATH_META_TYPE:
+            sema_err("{ast::path} is type, not value", path);
+            return false;
+    }
+    assert(resolved.kind != (SemaResolvedPathType)-1, "path was not resolved!");
+    return resolved.type;
 }

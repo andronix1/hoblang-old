@@ -39,7 +39,7 @@ void llvm_stmt_asm(LlvmBackend *llvm, AstInlineAsm *inline_asm) {
                     break;
 
                 case AST_ASM_ARG_EXPR: {
-                    LLVMValueRef value = llvm_expr(llvm, arg->expr);
+                    LLVMValueRef value = llvm_expr(llvm, arg->expr, true);
                     values = vec_push(values, &value);
                     LLVMTypeRef type = llvm_resolve_type(arg->expr->sema_type);
                     types = vec_push(types, &type);

@@ -8,7 +8,7 @@
 #define assert(ok, fmt, ...) \
 	do { \
 		if (!(ok)) { \
-			hob_log(LOGF, fmt, ##__VA_ARGS__); \
+			hob_log(LOGF, "assertion failed({cstr}:{int}): " fmt, __FILE__, __LINE__, ##__VA_ARGS__); \
 			VALGRIND_PRINTF_BACKTRACE("\n"); \
 			exit(1); \
 		} \

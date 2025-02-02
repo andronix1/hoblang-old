@@ -12,7 +12,7 @@ bool llvm_is_signed(SemaType *type) {
 LLVMValueRef llvm_call(LlvmBackend *llvm, AstCall *call) {
 	LLVMValueRef *params = alloca(sizeof(LLVMValueRef) * vec_len(call->args));
 	for (size_t i = 0; i < vec_len(call->args); i++) {
-		params[i] = llvm_expr(llvm, call->args[i]);
+		params[i] = llvm_expr(llvm, call->args[i], true);
 	}
 	return LLVMBuildCall2(
 		llvm->builder,
@@ -28,7 +28,7 @@ LLVMValueRef llvm_call(LlvmBackend *llvm, AstCall *call) {
 		""
 	);
 }
-
+/*
 LLVMValueRef llvm_get_local_value_path(LlvmBackend *llvm, AstPath *path) {
 	LLVMValueRef result = NULL;
 	for (size_t i = 0; i < vec_len(path->segments); i++) {
@@ -74,22 +74,33 @@ LLVMValueRef llvm_get_local_value_path(LlvmBackend *llvm, AstPath *path) {
 	assert(result, "path `{ast::path}` was not resolved!", path);
 	return result;
 }
-
-LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
+*/
+LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 	switch (expr->type) {
 		case AST_EXPR_GET_INNER_PATH:
 			assert(0, "NIY");
-		case AST_EXPR_GET_LOCAL_PATH: return llvm_get_local_value_path(llvm, &expr->get_local.path);
-		case AST_EXPR_NOT: return LLVMBuildNot(llvm->builder, llvm_expr(llvm, expr->not_expr), "");
+		case AST_EXPR_GET_LOCAL_PATH: {
+            LLVMValueRef value = llvm_resolve_path(llvm, &expr->get_local.path);
+            if (load) {
+                return LLVMBuildLoad2(
+                    llvm->builder,
+                    llvm_resolve_type(expr->sema_type),
+                    value,
+                    ""
+                );
+            }
+            return value;
+        }
+		case AST_EXPR_NOT: return LLVMBuildNot(llvm->builder, llvm_expr(llvm, expr->not_expr, true), "");
 		// case AST_EXPR_VALUE: return LLVMBuildLoad2(llvm->builder, llvm_resolve_type(expr->sema_type), llvm_value(llvm, &expr->value), "");
-		case AST_EXPR_REF: return llvm_expr(llvm, expr->ref_expr);
+		case AST_EXPR_REF: return llvm_expr(llvm, expr->ref_expr, false);
 		case AST_EXPR_INTEGER: return LLVMConstInt(llvm_resolve_type(expr->sema_type), expr->integer, false);
 		case AST_EXPR_BOOL: return LLVMConstInt(LLVMInt1Type(), expr->boolean, false);
 		case AST_EXPR_CHAR: return LLVMConstInt(LLVMInt8Type(), expr->character, false);
 		case AST_EXPR_STR: return llvm_slice_from_str(llvm, &expr->str);
 		case AST_EXPR_AS: {
 			LLVMTypeRef to_type = llvm_resolve_type(expr->as.type.sema);
-			LLVMValueRef value = llvm_expr(llvm, expr->as.expr);
+			LLVMValueRef value = llvm_expr(llvm, expr->as.expr, true);
 			switch (expr->as.conv_type) {
 				case SEMA_AS_CONV_EXTEND: return LLVMBuildZExt(llvm->builder, value, to_type, "");
 				case SEMA_AS_CONV_TRUNC: return LLVMBuildTrunc(llvm->builder, value, to_type, "");
@@ -108,15 +119,15 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 		}
 		case AST_EXPR_UNARY: {
 			switch (expr->unary.type) {
-				case AST_UNARY_MINUS: return LLVMBuildNeg(llvm->builder, llvm_expr(llvm, expr->unary.expr), "");
-				case AST_UNARY_BITNOT: return LLVMBuildNot(llvm->builder, llvm_expr(llvm, expr->unary.expr), "");
+				case AST_UNARY_MINUS: return LLVMBuildNeg(llvm->builder, llvm_expr(llvm, expr->unary.expr, true), "");
+				case AST_UNARY_BITNOT: return LLVMBuildNot(llvm->builder, llvm_expr(llvm, expr->unary.expr, true), "");
 			}
 			assert(0, "invalid unary {int}", expr->unary.type);
 			return NULL;
 		}
 		case AST_EXPR_BINOP: {
-			LLVMValueRef right = llvm_expr(llvm, expr->binop.right);
-			LLVMValueRef left = llvm_expr(llvm, expr->binop.left);
+			LLVMValueRef right = llvm_expr(llvm, expr->binop.right, true);
+			LLVMValueRef left = llvm_expr(llvm, expr->binop.left, true);
 			switch (expr->binop.type) {
 				case AST_BINOP_ADD: return LLVMBuildAdd(llvm->builder, left, right, "");
 				case AST_BINOP_XOR: return LLVMBuildXor(llvm->builder, left, right, "");
@@ -148,7 +159,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 				LLVMValueRef indices[1] = { LLVMConstInt(LLVMInt32Type(), i, false) };
 				LLVMBuildStore(
 					llvm->builder,
-					llvm_expr(llvm, expr->array[i]),
+					llvm_expr(llvm, expr->array[i], true),
 					LLVMBuildGEP2(llvm->builder, of, array, indices, 1, "arri")
 				);
 			}
