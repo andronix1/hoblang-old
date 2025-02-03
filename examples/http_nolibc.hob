@@ -25,7 +25,7 @@ fun main(): i32 {
 		} else {
 			var buf_slice = &buf as []u8;
 			while io::read_from(client, &buf_slice) == 5 {
-				io::print(&buf as []u8);
+				io::print(buf_slice);
 			}
 			io::write_to(client, "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n");
 			io::full_forward(file, client);

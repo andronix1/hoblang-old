@@ -29,5 +29,4 @@ void sema_stmt_var(SemaModule *sema, AstVar *var) {
 		}
 	}
 	var->decl = &sema_module_push_decl(sema, sema_scope_decl_new_value(var->name, var_type, false))->value_decl;
-	printf("SET %p\n", &var->decl);
 }

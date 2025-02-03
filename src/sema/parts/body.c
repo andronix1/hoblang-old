@@ -19,6 +19,7 @@ void sema_ast_body(SemaModule *sema, AstBody *body) {
 			case AST_STMT_ASSIGN: sema_stmt_assign(sema, &stmt->assign); break;
 			case AST_STMT_DEFER: sema_stmt_defer(sema, &stmt->defer); break;
 			case AST_STMT_INLINE_ASM: sema_stmt_inline_asm(sema, &stmt->inline_asm); break;
+			case AST_STMT_EXPR: sema_ast_expr_type(sema, stmt->expr, NULL); break;
 		}
 	}
 	body->defers = sema_module_resolve_defers(sema);

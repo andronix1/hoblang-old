@@ -64,7 +64,7 @@ typedef struct _AstExpr {
 } AstExpr;
 
 AstExpr *ast_expr_get_local_path(AstPath path);
-AstExpr *ast_expr_get_inner_path(AstExpr *of, AstPath path);
+AstExpr *ast_expr_get_inner_path(AstExpr *of, AstInnerPath path);
 AstExpr *ast_expr_integer(uint64_t value);
 AstExpr *ast_expr_char(char value);
 AstExpr *ast_expr_str(Slice value);

@@ -4,13 +4,13 @@ import "linux/net.hob" as net;
 type Socket = net::Socket;
 type Port = u16;
 
-type MyEnum = enum(i32) {
-    A = 2, B = 5, C = 6
-};
+# type MyEnum = enum(i32) {
+#     A = 2, B = 5, C = 6
+# };
 
 # TODO: err handling
 fun bind(port: Port, backlog: i32): Socket {
-    a::b::MyEnum.A
+    # a::b::MyEnum.A
     var result: Socket = net::socket(2, 1, 0);
 
     if result < 0 {

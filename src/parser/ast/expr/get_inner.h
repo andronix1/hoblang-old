@@ -5,5 +5,5 @@
 
 typedef struct {
     struct _AstExpr *of;
-    AstPath path;
+    AstInnerPath path;
 } AstExprGetInner;

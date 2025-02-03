@@ -8,11 +8,27 @@ SemaType *sema_ast_expr_int(SemaModule *sema, uint64_t integer, SemaType *expect
 
 SemaType *sema_ast_expr_type(SemaModule *sema, AstExpr *expr, SemaType *expectation) {
 	switch (expr->type) {
-		case AST_EXPR_GET_INNER_PATH:
-			assert(0, "NIY");
-            return NULL;
+		case AST_EXPR_GET_INNER_PATH: {
+			SemaType *of_type = sema_ast_expr_type(sema, expr->get_inner.of, NULL);
+			if (!of_type) {
+				return NULL;
+			}
+			SemaResolvedPath resolved;
+			if (!sema_resolve_inner_value_path(sema, of_type, &expr->get_inner.path, 0, &resolved)) {
+				return NULL;
+			}
+			switch (resolved.kind) {
+				case SEMA_RESOLVE_PATH_META_CONST:
+				case SEMA_RESOLVE_PATH_META_VAR:
+					return expr->sema_type = resolved.type;
+				case SEMA_RESOLVE_PATH_META_TYPE:
+					sema_err("inner path of expression must be value");
+					return NULL;
+			}
+			assert(0, "resolved type was not cought");
+			return NULL;
+		}
 		case AST_EXPR_GET_LOCAL_PATH:
-			print("LP {ast::path}!!!!\n", &expr->get_local.path);
 			return expr->sema_type = sema_resolve_value_path(sema, &expr->get_local.path);
 		case AST_EXPR_UNARY: {
 			SemaType *type = sema_ast_expr_type(sema, expr->unary.expr, expectation);

@@ -25,8 +25,12 @@ bool parse_stmt(Parser *parser, AstStmt *stmt) {
 					stmt->type = AST_STMT_ASSIGN;
 					stmt->assign.assign_expr = expr;
 					return (stmt->assign.expr = parse_expr(parser, token_semicolon_stop));
+				case TOKEN_SEMICOLON:
+					stmt->type = AST_STMT_EXPR;
+					stmt->expr = expr;
+					return true;
 				default:
-					parse_err("unexpected token `{tok}` after expression in statement");
+					parse_err("unexpected token `{tok}` after expression in statement", parser->token);
 					return false;
 			}
 		}

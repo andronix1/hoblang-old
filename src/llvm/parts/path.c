@@ -5,6 +5,14 @@ LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstI
     for (size_t i = 0; i < vec_len(path->segments); i++) {
         SemaInnerPath *segment = &path->segments[i].sema;
         switch (segment->type) {
+            case SEMA_INNER_PATH_DEREF:
+                value = LLVMBuildLoad2(
+                    llvm->builder,
+                    llvm_resolve_type(segment->deref_type),
+                    value,
+                    "deref"
+                );
+                break;
             case SEMA_INNER_PATH_STRUCT_MEMBER:
                 LLVMValueRef indices[] = {
                     LLVMConstInt(LLVMInt32Type(), 0, false),

@@ -11,7 +11,7 @@
 AstExpr *ast_expr_get_local_path(AstPath path) CONSTR(AST_EXPR_GET_LOCAL_PATH, {
     FIELD(get_local.path, path)
 })
-AstExpr *ast_expr_get_inner_path(AstExpr *of, AstPath path) CONSTR(AST_EXPR_GET_INNER_PATH, {
+AstExpr *ast_expr_get_inner_path(AstExpr *of, AstInnerPath path) CONSTR(AST_EXPR_GET_INNER_PATH, {
     FIELD(get_inner.of, of)
     FIELD(get_inner.path, path)
 })

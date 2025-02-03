@@ -1,12 +1,18 @@
-type MyStruct = struct {
+type MyStruct2 = struct {
     a: i32,
     b: i32
 };
 
-fun test(): MyStruct {
+type MyStruct = struct {
+    a: i32,
+    b: i32,
+    c: MyStruct2
+};
+
+fun test(b: i32): MyStruct {
     var a: MyStruct;
-    a.a = 1;
-    a.b = 2;
+    a.c.b = b;
+    a.a = 123;
     return a;
 }
 
@@ -16,6 +22,7 @@ fun main(): i32 {
     var a: i32 = 0;
     a = 123;
     ms.a = a;
-    var ms2 = test();
-    return a;
+    var ms2 = test(1);
+    a = ms2.b;
+    return test(99).c.b;
 }

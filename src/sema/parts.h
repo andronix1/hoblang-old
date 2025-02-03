@@ -11,3 +11,5 @@ SemaType *sema_ast_call(SemaModule *sema, AstCall *call);
 
 SemaType *sema_resolve_value_path(SemaModule *sema, AstPath *path);
 SemaType *sema_resolve_type_path(SemaModule *sema, AstPath *path);
+bool sema_resolve_inner_value_path(SemaModule *sema, SemaType *type, AstInnerPath *path, size_t segment_idx, SemaResolvedPath *output);
+bool sema_resolve_inner_type_path(SemaModule *sema, SemaType *type, AstInnerPath *path, size_t segment_idx, SemaResolvedPath *output);

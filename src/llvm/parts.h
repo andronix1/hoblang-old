@@ -11,3 +11,4 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load);
 LLVMValueRef llvm_call(LlvmBackend *llvm, AstCall *call);
 
 LLVMValueRef llvm_resolve_path(LlvmBackend *llvm, AstPath *path);
+LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstInnerPath *path);

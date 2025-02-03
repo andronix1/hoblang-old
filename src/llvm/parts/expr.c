@@ -17,13 +17,7 @@ LLVMValueRef llvm_call(LlvmBackend *llvm, AstCall *call) {
 	return LLVMBuildCall2(
 		llvm->builder,
 		llvm_sema_function_type(&call->callable->sema_type->func),
-		LLVMBuildLoad2(
-			llvm->builder,
-			llvm_resolve_type(call->callable->sema_type),
-			NULL, // TODO: expression
-			// llvm_value(llvm, &call->callable),
-			""
-		),
+		llvm_expr(llvm, call->callable, true),
 		params, vec_len(call->args),
 		""
 	);
@@ -77,11 +71,31 @@ LLVMValueRef llvm_get_local_value_path(LlvmBackend *llvm, AstPath *path) {
 */
 LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 	switch (expr->type) {
-		case AST_EXPR_GET_INNER_PATH:
-			assert(0, "NIY");
+		case AST_EXPR_GET_INNER_PATH: {
+			LLVMValueRef allocated_value = LLVMBuildAlloca(
+				llvm->builder,
+				llvm_resolve_type(expr->get_inner.of->sema_type),
+				""
+			);
+			LLVMBuildStore(llvm->builder, llvm_expr(llvm, expr->get_inner.of, true), allocated_value);
+			LLVMValueRef value = llvm_resolve_inner_path(
+				llvm,
+				allocated_value,
+				&expr->get_inner.path
+			);
+			if (load) {
+                return LLVMBuildLoad2(
+                    llvm->builder,
+                    llvm_resolve_type(expr->sema_type),
+                    value,
+                    ""
+                );
+            }
+			return value;
+		}
 		case AST_EXPR_GET_LOCAL_PATH: {
             LLVMValueRef value = llvm_resolve_path(llvm, &expr->get_local.path);
-            if (load) {
+            if (load && expr->get_local.path.resolved.kind == SEMA_RESOLVE_PATH_META_VAR) {
                 return LLVMBuildLoad2(
                     llvm->builder,
                     llvm_resolve_type(expr->sema_type),

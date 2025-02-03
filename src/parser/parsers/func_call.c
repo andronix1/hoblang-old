@@ -13,5 +13,6 @@ AstExpr **parse_call_args(Parser *parser) {
 		}
 		args = vec_push(args, &expr);
 	}
+	parser->skip_next = false;
 	return args;
 }

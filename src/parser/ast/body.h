@@ -16,6 +16,7 @@ typedef enum {
 	AST_STMT_WHILE,
 	AST_STMT_INLINE_ASM,
 	AST_STMT_DEFER,
+	AST_STMT_EXPR,
 	AST_STMT_ASSIGN
 } AstStmtType;
 
@@ -23,6 +24,7 @@ typedef struct {
 	AstStmtType type;
 	union {
 		AstVar var;
+		AstExpr *expr;
 		AstIfElse if_else;
 		AstReturn ret;
 		AstDefer defer;

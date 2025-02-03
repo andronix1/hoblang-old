@@ -23,6 +23,9 @@ bool parse_inner_path(Parser *parser, AstInnerPath *path) {
 				segment.type = AST_INNER_PATH_SEG_IDENT;
 				segment.ident = parser->token->ident;
 				break;
+			case TOKEN_MULTIPLY:
+				segment.type = AST_INNER_PATH_SEG_DEREF;
+				break;
 			default:
 				parse_err(EXPECTED("inner path segment"));
 				return false;

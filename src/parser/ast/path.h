@@ -13,10 +13,12 @@ typedef struct {
 } AstDeclPath;
 
 typedef enum {
-	AST_INNER_PATH_SEG_IDENT
+	AST_INNER_PATH_SEG_IDENT,
+	AST_INNER_PATH_SEG_DEREF,
 } AstInnerPathSegmentType;
 
 typedef enum {
+	SEMA_INNER_PATH_DEREF,
     SEMA_INNER_PATH_SLICE_LEN,
     SEMA_INNER_PATH_SLICE_RAW,
     SEMA_INNER_PATH_STRUCT_MEMBER,
@@ -31,6 +33,7 @@ typedef struct {
     SemaInnerPathType type;
     struct _SemaType *sema_type;
     union {
+        struct _SemaType *deref_type;
         struct _SemaType *slice_type;
         SemaInnerPathStructMember struct_member;
     };
@@ -52,7 +55,20 @@ typedef enum {
     AST_PATH_SEGMENT_IDENT
 } AstPathSegmentType;
 
+typedef enum {
+    SEMA_RESOLVE_PATH_META_TYPE,
+    SEMA_RESOLVE_PATH_META_VAR,
+    SEMA_RESOLVE_PATH_META_CONST,
+} SemaResolvedPathType;
+
+typedef struct {
+    SemaResolvedPathType kind;
+    struct _SemaType *type;
+} SemaResolvedPath;
+
 typedef struct {
 	AstDeclPath decl_path;
 	AstInnerPath inner_path;
+
+	SemaResolvedPath resolved;
 } AstPath;

@@ -129,12 +129,6 @@ AstExpr *parse_expr(Parser *parser, bool (*stop)(TokenType)) {
 						case TOKEN_OPENING_CIRCLE_BRACE:
 							expr = ast_expr_call(expr, NOT_NULL(parse_call_args(parser)));
 							break;
-						case TOKEN_DOT:
-							if (!parse_path(parser, &path)) {
-								return NULL;
-							}
-							expr = ast_expr_get_inner_path(expr, path);
-							break;
 						default:
 							parser->skip_next = true;
 							current_expr = expr;
@@ -142,7 +136,6 @@ AstExpr *parse_expr(Parser *parser, bool (*stop)(TokenType)) {
                             break;
 					}
 				}
-                printf("asd!\n");
 				break;
 			}
 			case TOKEN_NOT: 
@@ -214,6 +207,14 @@ AstExpr *parse_expr(Parser *parser, bool (*stop)(TokenType)) {
                     }
                     break;
                 }
+				case TOKEN_DOT: {
+					AstInnerPath path;
+					if (!parse_inner_path(parser, &path)) {
+						return NULL;
+					}
+					current_expr = ast_expr_get_inner_path(current_expr, path);
+					break;
+				}
                 default:
                     parser->skip_next = true;
                     reading = false;

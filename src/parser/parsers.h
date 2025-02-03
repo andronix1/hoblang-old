@@ -14,3 +14,5 @@ AstExpr **parse_call_args(Parser *parser);
 AstExpr *parse_expr(Parser *parser, bool (*stop)(TokenType));
 bool parse_type(Parser *parser, AstType *type);
 bool parse_path(Parser *parser, AstPath *path);
+bool parse_decl_path(Parser *parser, AstDeclPath *path);
+bool parse_inner_path(Parser *parser, AstInnerPath *path);

@@ -31,6 +31,9 @@ void print_ast_inner_path(FILE *stream, va_list list) {
 			case AST_INNER_PATH_SEG_IDENT:
 				print_to(stream, ".{slice}", &seg->ident);
 				break;
+			case AST_INNER_PATH_SEG_DEREF:
+				print_to(stream, ".*", &seg->ident);
+				break;
 		}
 	}
 }
