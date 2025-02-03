@@ -87,7 +87,6 @@ AstExpr *expr_make_unary(Parser *parser, AstUnaryType type, bool(*stop)(TokenTyp
 			PARSE_BINOP(binop_type); \
 		} \
 	} while (0)
-
 #define NOT_NULL(expr) ({typeof(expr) _expr = expr; if (!_expr) { return NULL; } _expr; })
 
 AstExpr *parse_expr(Parser *parser, bool (*stop)(TokenType)) {
@@ -96,17 +95,26 @@ AstExpr *parse_expr(Parser *parser, bool (*stop)(TokenType)) {
 	while (true) {
 		parser_next_token(parser);
 		if (stop(token_type(parser->token))) {
-			if (first) {
-				return NULL;
+            parser->skip_next = true;
+			if (!current_expr) {
+                parse_err("unexpected end of expression");
 			}
 			return current_expr;
 		}
 		
 		switch (token_type(parser->token)) {
-			case TOKEN_TRUE: case TOKEN_FALSE: return ast_expr_bool(parser->token->type == TOKEN_TRUE);
-			case TOKEN_CHAR: return ast_expr_char(parser->token->character);
-			case TOKEN_STR: return ast_expr_str(slice_new(parser->token->str, vec_len(parser->token->str)));
-			case TOKEN_INTEGER: return ast_expr_integer(parser->token->integer);
+			case TOKEN_TRUE: case TOKEN_FALSE:
+                current_expr = ast_expr_bool(parser->token->type == TOKEN_TRUE);
+                break;
+			case TOKEN_CHAR: 
+                current_expr = ast_expr_char(parser->token->character);
+                break;
+			case TOKEN_STR:
+                current_expr = ast_expr_str(slice_new(parser->token->str, vec_len(parser->token->str)));
+                break;
+			case TOKEN_INTEGER: 
+                current_expr = ast_expr_integer(parser->token->integer);
+                break;
 			case TOKEN_IDENT: {
 				parser->skip_next = true;
 				AstPath path;
@@ -114,7 +122,8 @@ AstExpr *parse_expr(Parser *parser, bool (*stop)(TokenType)) {
 					return NULL;
 				}
 				AstExpr *expr = ast_expr_get_local_path(path);
-				while (true) {
+                bool reading = true;
+				while (reading) {
 					parser_next_token(parser);
 					switch (token_type(parser->token)) {
 						case TOKEN_OPENING_CIRCLE_BRACE:
@@ -128,32 +137,20 @@ AstExpr *parse_expr(Parser *parser, bool (*stop)(TokenType)) {
 							break;
 						default:
 							parser->skip_next = true;
-							return expr;
+							current_expr = expr;
+                            reading = false;
+                            break;
 					}
 				}
-				// AstValue value;
-				// parser->skip_next = true;
-				// if (!parse_value(parser, &value)) {
-				// 	return NULL;
-				// }
-				// parser_next_token(parser);
-				// if (token_type(parser->token) != TOKEN_OPENING_CIRCLE_BRACE) {
-				// 	current_expr->type = AST_EXPR_VALUE;
-				// 	current_expr->value = value;
-				// 	parser->skip_next = true;
-				// 	break;
-				// }
-				// current_expr->type = AST_EXPR_FUNCALL;
-				// current_expr->func_call.value = value;
-				// if (!parse_func_call_args(parser, &current_expr->func_call)) {
-				// 	return NULL;
-				// }
+                printf("asd!\n");
 				break;
 			}
-			case TOKEN_NOT: return ast_expr_not(NOT_NULL(parse_expr(parser, stop)));
+			case TOKEN_NOT: 
+                current_expr = ast_expr_not(NOT_NULL(parse_expr(parser, stop)));
+                break;
 			case TOKEN_BITAND: {
 				if (first) {
-					return ast_expr_ref(NOT_NULL(parse_expr(parser, stop)));
+					current_expr = ast_expr_ref(NOT_NULL(parse_expr(parser, stop)));
 				} else {
 					PARSE_BINOP(AST_BINOP_BITAND);
 				}
@@ -163,7 +160,9 @@ AstExpr *parse_expr(Parser *parser, bool (*stop)(TokenType)) {
 			case TOKEN_AND: PARSE_BINOP(AST_BINOP_AND); break;
 			case TOKEN_XOR: PARSE_BINOP(AST_BINOP_XOR); break;
 			case TOKEN_BITOR: PARSE_BINOP(AST_BINOP_BITOR); break;
-			case TOKEN_BITNOT: return expr_make_unary(parser, AST_UNARY_BITNOT, stop); break;
+			case TOKEN_BITNOT: 
+                current_expr = expr_make_unary(parser, AST_UNARY_BITNOT, stop);
+                break;
 			case TOKEN_SHR: PARSE_BINOP(AST_BINOP_SHR); break;
 			case TOKEN_SHL: PARSE_BINOP(AST_BINOP_SHL); break;
 			case TOKEN_MINUS: PARSE_BINOP_MAYBE_UNARY(AST_UNARY_MINUS, AST_BINOP_SUB); break;
@@ -176,7 +175,9 @@ AstExpr *parse_expr(Parser *parser, bool (*stop)(TokenType)) {
 			case TOKEN_GREATER: PARSE_BINOP(AST_BINOP_GT); break;
 			case TOKEN_GREATER_OR_EQUALS: PARSE_BINOP(AST_BINOP_GE); break;
 			case TOKEN_OR: PARSE_BINOP(AST_BINOP_OR); break;
-			case TOKEN_OPENING_CIRCLE_BRACE: return parse_expr(parser, token_closing_circle_brace_stop);
+			case TOKEN_OPENING_CIRCLE_BRACE: 
+                current_expr = parse_expr(parser, token_closing_circle_brace_stop);
+                break;
 			case TOKEN_OPENING_FIGURE_BRACE:
 				AstExpr **values = vec_new(AstExpr*);
 				while (token_type(parser->token) != TOKEN_CLOSING_FIGURE_BRACE) {
@@ -195,22 +196,30 @@ AstExpr *parse_expr(Parser *parser, bool (*stop)(TokenType)) {
 				parse_err("unexpected token `{tok}` while parsing expression", parser->token);
 				return NULL;
 		}
-		parser_next_token(parser);	
-		switch (token_type(parser->token)) {
-			case TOKEN_AS: {
-				AstExpr *expr = malloc(sizeof(AstExpr));
-				expr->type = AST_EXPR_AS;
-				expr->as.expr = current_expr;
-				current_expr = expr;
-				if (!parse_type(parser, &current_expr->as.type)) {
-					return NULL;
-				}
-				break;
-			}
-			default:
-				parser->skip_next = true;
-				break;
-		}
-		first = false;
+        bool reading = true;
+        while (reading) {
+            parser_next_token(parser);	
+            if (stop(token_type(parser->token))) {
+                parser->skip_next = true;
+                break;
+            }
+            switch (token_type(parser->token)) {
+                case TOKEN_AS: {
+                    AstExpr *expr = malloc(sizeof(AstExpr));
+                    expr->type = AST_EXPR_AS;
+                    expr->as.expr = current_expr;
+                    current_expr = expr;
+                    if (!parse_type(parser, &current_expr->as.type)) {
+                        return NULL;
+                    }
+                    break;
+                }
+                default:
+                    parser->skip_next = true;
+                    reading = false;
+                    break;
+            }
+            first = false;
+        }
 	}
 }

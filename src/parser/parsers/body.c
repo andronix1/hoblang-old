@@ -26,7 +26,7 @@ bool parse_stmt(Parser *parser, AstStmt *stmt) {
 					stmt->assign.assign_expr = expr;
 					return (stmt->assign.expr = parse_expr(parser, token_semicolon_stop));
 				default:
-					parse_err("unexpected token `{tok}` after ident in statement");
+					parse_err("unexpected token `{tok}` after expression in statement");
 					return false;
 			}
 		}

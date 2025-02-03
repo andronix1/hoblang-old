@@ -16,6 +16,6 @@ fun main(): i32 {
     var a: i32 = 0;
     a = 123;
     ms.a = a;
-    # var ms2 = test();
+    var ms2 = test();
     return a;
 }
