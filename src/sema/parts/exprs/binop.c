@@ -1,6 +1,6 @@
 #include "../../parts.h"
 
-SemaType *sema_ast_expr_binop(SemaModule *sema, AstExprBinop *binop, SemaType *expectation) {
+bool sema_analyze_expr_binop(SemaModule *sema, AstExprBinop *binop, SemaType *expectation, SemaValue *value) { 
 	bool bool_binops = (
 			binop->type == AST_BINOP_OR ||
 			binop->type == AST_BINOP_AND
@@ -15,33 +15,33 @@ SemaType *sema_ast_expr_binop(SemaModule *sema, AstExprBinop *binop, SemaType *e
 			bool_binops
 		);
 	SemaType *expect = binary_binop ? (bool_binops ? &primitives[PRIMITIVE_BOOL] : NULL) : expectation;
-	SemaType *ltype = sema_ast_expr_type(sema, binop->left, expect);
+	SemaType *ltype = sema_value_expr_type(sema, binop->left, expect);
 	if (!ltype) {
-		return NULL;
+		return false;
 	}
 	if ((ltype->type != SEMA_TYPE_PRIMITIVE && ltype->type != SEMA_TYPE_POINTER) || ltype->primitive == PRIMITIVE_VOID) {
 		sema_err("cannot use binop for type {sema::type}", ltype);
-		return NULL;
+		return false;
 	}
 	if (binary_binop) {
 		expect = ltype;
 	}
-	SemaType *right_type = sema_ast_expr_type(sema, binop->right, expect);
+	SemaType *right_type = sema_value_expr_type(sema, binop->right, expect);
 	if (!right_type) {
-		return NULL;
+		return false;
 	}
 	if (bool_binops) {
 		if (!sema_types_equals(ltype, &primitives[PRIMITIVE_BOOL]) || !sema_types_equals(right_type, &primitives[PRIMITIVE_BOOL])) {
 			sema_err("boolean binops can only operate booleans");
-			return NULL;
+			return false;
 		}
 	}
 	if (!sema_types_equals(ltype, right_type)) {
 		sema_err("cannot use binop {ast::binop} for types {sema::type} and {sema::type}", binop->type, ltype, &right_type);
-		return NULL;
+		return false;
 	}
 	if (binary_binop) {
 		ltype = &primitives[PRIMITIVE_BOOL];
 	}
-	return ltype;
+	return sema_value_const(value, ltype);
 }

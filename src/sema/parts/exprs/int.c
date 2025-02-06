@@ -1,9 +1,10 @@
 #include "../../parts.h"
 
-SemaType *sema_ast_expr_int(SemaModule *sema __attribute__((unused)), uint64_t integer __attribute__((unused)), SemaType *expectation) {
+bool sema_analyze_expr_int(SemaModule *sema, uint64_t integer, SemaType *expectation, SemaValue *value) { 
 	if (expectation && expectation->type == SEMA_TYPE_PRIMITIVE && expectation->primitive != PRIMITIVE_VOID) {
-		return expectation;
+		return sema_value_const(value, expectation);
 	} else {
-		return &primitives[PRIMITIVE_I32];
+        // TODO: i32
+		return sema_value_const(value, &primitives[PRIMITIVE_I32]);
 	}
 }

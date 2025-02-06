@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/slice.h"
+#include "sema/value.h"
 
 typedef struct {
 	Slice *segments;
@@ -55,20 +56,9 @@ typedef enum {
     AST_PATH_SEGMENT_IDENT
 } AstPathSegmentType;
 
-typedef enum {
-    SEMA_RESOLVE_PATH_META_TYPE,
-    SEMA_RESOLVE_PATH_META_VAR,
-    SEMA_RESOLVE_PATH_META_CONST,
-} SemaResolvedPathType;
-
-typedef struct {
-    SemaResolvedPathType kind;
-    struct _SemaType *type;
-} SemaResolvedPath;
-
 typedef struct {
 	AstDeclPath decl_path;
 	AstInnerPath inner_path;
 
-	SemaResolvedPath resolved;
+	SemaValue value;
 } AstPath;

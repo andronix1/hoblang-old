@@ -95,7 +95,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 		}
 		case AST_EXPR_GET_LOCAL_PATH: {
             LLVMValueRef value = llvm_resolve_path(llvm, &expr->get_local.path);
-            if (load && expr->get_local.path.resolved.kind == SEMA_RESOLVE_PATH_META_VAR) {
+            if (load && expr->get_local.path.value.type == SEMA_VALUE_VAR) {
                 return LLVMBuildLoad2(
                     llvm->builder,
                     llvm_resolve_type(expr->sema_type),

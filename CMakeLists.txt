@@ -52,6 +52,11 @@ set(SOURCE_FILES
 	src/sema/parts/exprs/binop.c
 	src/sema/parts/exprs/call.c
 	src/sema/parts/exprs/int.c
+	src/sema/parts/exprs/not.c
+	src/sema/parts/exprs/ref.c
+	src/sema/parts/exprs/unary.c
+	src/sema/parts/exprs/get_local.c
+	src/sema/parts/exprs/get_inner.c
 	src/sema/parts/stmts/assign.c
 	src/sema/parts/stmts/asm.c
 	src/sema/parts/stmts/if_else.c
