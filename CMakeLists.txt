@@ -47,6 +47,7 @@ set(SOURCE_FILES
 	src/sema/module.c
 	src/sema/project.c
 	src/sema/type.c
+	src/sema/parts/expr/eval.c
 	src/sema/parts/exprs/array.c
 	src/sema/parts/exprs/as.c
 	src/sema/parts/exprs/binop.c

@@ -31,13 +31,28 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 			sema_module_push_public_decl(sema, sema_scope_decl_new_type(node->type_alias.alias, type));
 			break;
 		}
+		case AST_MODULE_NODE_CONST: {
+			SemaType *const_type = sema_ast_type(sema, &node->constant.type);
+
+			if (const_type) {
+				node->constant.value_decl = &sema_module_push_public_decl(sema, sema_scope_decl_new_value(
+					node->constant.name,
+					const_type,
+					true
+				))->value_decl;
+				node->constant.value_decl->integer_expr = node->constant.expr;
+			}
+			break;
+		}
+
 		case AST_MODULE_NODE_USE: {
-			// SemaModule *module = sema_resolve_path_module(sema, &node->use.path);
-			// if (!module) {
-			// 	break;
-			// }
-			// TODO: restore
-			// sema_module_push_public_decl(sema, sema_scope_decl_new_module(
+			SemaScopeDecl *decl = sema_resolve_decl_path(sema, &node->use.path);
+			if (!decl) {
+				break;
+			}
+			sema_module_push_public_decl(sema, decl);
+			// TODO: alias
+			//  sema_scope_decl_new_module(
 			// 	node->use.has_alias ? node->use.alias : *(Slice*)vec_top(node->use.path.segments),
 			// 	module
 			// ));
@@ -79,6 +94,10 @@ void sema_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 		case AST_MODULE_NODE_EXTERNAL_FUNC:
 		case AST_MODULE_NODE_USE:
 		case AST_MODULE_NODE_IMPORT:
+			break;
+
+		case AST_MODULE_NODE_CONST:
+			sema_const_expr_type(sema, node->constant.expr, sema_expr_ctx_default_of(node->constant.type.sema));
 			break;
 
 		case AST_MODULE_NODE_FUNC:

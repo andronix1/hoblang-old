@@ -4,28 +4,23 @@ import "linux/net.hob" as net;
 type Socket = net::Socket;
 type Port = u16;
 
-# type MyEnum = enum(i32) {
-#     A = 2, B = 5, C = 6
-# };
-
 # TODO: err handling
 fun bind(port: Port, backlog: i32) -> Socket {
-    # a::b::MyEnum.A
-    var result: Socket = net::socket(2, 1, 0);
+    var result: Socket = net::socket(net::AF_INET, net::SOCK_STREAM, 0);
 
     if result < 0 {
         return -1;
     }
 
     var reuse: i32 = 1;
-    if net::setsockopt(result, 1, 2, (&reuse) as *void, 4) == -1 {
+    if net::setsockopt(result, net::SOL_SOCKET, net::SO_REUSEADDR, (&reuse) as *void, 4) == -1 {
         return -1;
     }
 
     var server_address: net::AddressIn;
-    server_address.family = 2;
+    server_address.family = net::AF_INET as u16;
     server_address.port = net::htons(port);
-    server_address.in_addr = 0;
+    server_address.in_addr = net::INADDR_ANY as i32;
     server_address._reserved = 0;
 
     if net::bind(result, (&server_address) as *void, 16) == -1 {

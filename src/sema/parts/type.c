@@ -47,7 +47,7 @@ SemaType *sema_ast_type(SemaModule *sema, AstType *type) {
 			if (!array_of) {
 				return NULL;
 			}
-			type->sema = sema_type_new_array(type->array.length, array_of);
+			type->sema = sema_type_new_array(sema_eval_int_expr(sema, type->array.length), array_of);
 			break;
 		}
 		case AST_TYPE_SLICE: {

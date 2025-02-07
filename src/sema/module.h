@@ -17,7 +17,10 @@ typedef enum {
 
 typedef struct _SemaScopeValueDecl {
     SemaType *type;
+    // TODO: abstract const value
+    AstExpr *integer_expr;
     
+    // sema
     bool constant;
     LLVMValueRef llvm_value;
 } SemaScopeValueDecl;

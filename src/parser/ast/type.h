@@ -30,7 +30,7 @@ typedef struct {
 
 typedef struct {
 	struct _AstType *of;
-	size_t length;
+	struct _AstExpr *length;
 } AstArrayType;
 
 typedef struct _AstType {

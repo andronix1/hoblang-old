@@ -72,3 +72,16 @@ fun arg5(num: i64, a: i64, b: i64, c: i64, d: i64, e: i64) -> i64 {
 	}
 	return res;
 }
+
+const READ: i64 = 0;
+const WRITE: i64 = 1;
+const OPEN: i64 = 2;
+const CLOSE: i64 = 3;
+const SEEK: i64 = 8;
+const SENDFILE: i64 = 40;
+const SOCKET: i64 = 41;
+const ACCEPT: i64 = 43;
+const BIND: i64 = 49;
+const LISTEN: i64 = 50;
+const SETSOCKOPT: i64 = 54;
+const EXIT: i64 = 60;

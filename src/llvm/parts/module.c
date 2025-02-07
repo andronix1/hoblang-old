@@ -5,7 +5,11 @@ void llvm_module_node(LlvmBackend *llvm, AstModuleNode *node) {
 		case AST_MODULE_NODE_USE:
 		case AST_MODULE_NODE_TYPE_ALIAS:
 		case AST_MODULE_NODE_IMPORT:
-		case AST_MODULE_NODE_EXTERNAL_FUNC: 
+		case AST_MODULE_NODE_EXTERNAL_FUNC:
+			break;
+			
+		case AST_MODULE_NODE_CONST:
+			node->constant.value_decl->llvm_value = llvm_expr(llvm, node->constant.expr, true);
 			break;
 
 		case AST_MODULE_NODE_FUNC: {
@@ -34,6 +38,7 @@ void llvm_module_init(LlvmBackend *llvm, AstModule *module) {
 			case AST_MODULE_NODE_USE:
 			case AST_MODULE_NODE_TYPE_ALIAS:
 			case AST_MODULE_NODE_IMPORT:
+			case AST_MODULE_NODE_CONST:
 				break;
 			case AST_MODULE_NODE_EXTERNAL_FUNC:
 			case AST_MODULE_NODE_FUNC:

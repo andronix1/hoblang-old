@@ -3,6 +3,11 @@ import "std/tcp.hob" as tcp;
 import "std/io.hob" as io;
 import "std/fs.hob" as fs;
 
+const PORT: u16 = 8080;
+const BACKLOG: i32 = 16;
+
+const BUFFER_SIZE: i32 = 10;
+
 fun main() -> i32 {
 	var filename = "test.html\0";
 	var file = fs::open_read(filename);
@@ -11,12 +16,12 @@ fun main() -> i32 {
 		return 1;
 	}
 
-	var server = tcp::bind(8080, 16);
+	var server = tcp::bind(PORT, BACKLOG);
 	if server < 0 {
 		io::println("cannot bind a socket :(");
 		return 1;
 	}
-	var buf: [5]u8;
+	var buf: [BUFFER_SIZE]u8;
 	while true {
 		var client = tcp::accept(server);
 		io::println("yay, new connection!");
@@ -24,7 +29,7 @@ fun main() -> i32 {
 			io::println("cannot accept a socket :(");
 		} else {
 			var buf_slice = (&buf) as []u8;
-			while io::read_from(client, &buf_slice) == 5 {
+			while io::read_from(client, &buf_slice) as i32 == BUFFER_SIZE {
 				io::print(buf_slice);
 			}
 			io::write_to(client, "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n");

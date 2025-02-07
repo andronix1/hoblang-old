@@ -3,25 +3,31 @@ import "syscall.hob" as syscall;
 type Fd = i32;
 
 fun write(fd: Fd, buf: *u8, len: i64) ->i64 {
-	return syscall::arg3(1, fd as i64, buf as i64, len);
+	return syscall::arg3(syscall::WRITE, fd as i64, buf as i64, len);
 }
 
 fun read(fd: Fd, buf: *u8, len: i64) ->i64 {
-	return syscall::arg3(0, fd as i64, buf as i64, len);
+	return syscall::arg3(syscall::READ, fd as i64, buf as i64, len);
 }
 
 fun open(filename: *u8, flags: i64, mode: i64) ->Fd {
-	return syscall::arg3(2, filename as i64, flags, mode) as Fd;
+	return syscall::arg3(syscall::OPEN, filename as i64, flags, mode) as Fd;
 }
 
 fun close(fd: Fd) ->i64 {
-	return syscall::arg1(3, fd as i64);
+	return syscall::arg1(syscall::CLOSE, fd as i64);
 }
 
 fun sendfile(to: Fd, from: Fd, offset: *i64, len: i64) ->i64 {
-	return syscall::arg4(40, to as i64, from as i64, offset as i64, len);
+	return syscall::arg4(syscall::SENDFILE, to as i64, from as i64, offset as i64, len);
 }
 
 fun lseek(fd: Fd, offset: i64, whence: i64) ->i64 {
-	return syscall::arg3(8, fd as i64, offset as i64, whence);
+	return syscall::arg3(syscall::SEEK, fd as i64, offset as i64, whence);
 }
+
+const SEEK_END: i64 = 2;
+const SEEK_CUR: i64 = 1;
+const SEEK_SET: i64 = 0;
+
+const FD_STDOUT: Fd = 0;

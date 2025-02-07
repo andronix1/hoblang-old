@@ -59,26 +59,41 @@ bool parse_module_node(Parser *parser, AstModuleNode *node) {
 			node->import.as = parser->token->ident;
 			parse_exp_next(TOKEN_SEMICOLON, "semicolon");
 			return true;
-		// case TOKEN_USE:
-		// 	node->type = AST_MODULE_NODE_USE;
-		// 	if (!parse_mod_path(parser, &node->use.path)) {
-		// 		return false;
-		// 	}
-		// 	parser_next_token(parser);
-		// 	node->use.has_alias = false;
-		// 	switch (token_type(parser->token)) {
-		// 		case TOKEN_SEMICOLON: break;
-		// 		case TOKEN_AS:
-		// 			parse_exp_next(TOKEN_IDENT, "alias");
-		// 			node->use.has_alias = true;
-		// 			node->use.alias = parser->token->ident;
-		// 			parse_exp_next(TOKEN_SEMICOLON, "semicolon");
-		// 			break;
-		// 		default:
-		// 			parse_err("expected alias or end of use statement got {tok}", parser->token);
-		// 			return false;
-		// 	}
-		// 	return true;
+		case TOKEN_USE:
+			node->type = AST_MODULE_NODE_USE;
+			if (!parse_decl_path(parser, &node->use.path)) {
+				return false;
+			}
+			parser_next_token(parser);
+			node->use.has_alias = false;
+			switch (token_type(parser->token)) {
+				case TOKEN_SEMICOLON: break;
+				case TOKEN_AS:
+					parse_exp_next(TOKEN_IDENT, "alias");
+					node->use.has_alias = true;
+					node->use.alias = parser->token->ident;
+					parse_exp_next(TOKEN_SEMICOLON, "semicolon");
+					break;
+				default:
+					parse_err("expected alias or end of use statement got {tok}", parser->token);
+					return false;
+			}
+			return true;
+		case TOKEN_CONST:
+			parse_exp_next(TOKEN_IDENT, "name");
+			node->type = AST_MODULE_NODE_CONST;
+			node->constant.name = parser->token->ident;
+			parse_exp_next(TOKEN_COLON, "colon");
+			if (!parse_type(parser, &node->constant.type)) {
+				return false;
+			}
+			parse_exp_next(TOKEN_ASSIGN, "assign");
+			node->constant.expr = parse_expr(parser, token_semicolon_stop);
+			if (!node->constant.expr) {
+				return false;
+			}
+			parse_exp_next(TOKEN_SEMICOLON, "semicolon");
+			return true;
 		case TOKEN_TYPE:
 			node->type = AST_MODULE_NODE_TYPE_ALIAS;
 			parse_exp_next(TOKEN_IDENT, "alias");

@@ -31,6 +31,16 @@ SemaValue *sema_expr(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) {
 	assert(0, "invalid ast expr type: {int}", expr->type);
 }
 
+SemaType *sema_const_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) {
+    if (!sema_expr(sema, expr, ctx)) {
+        return NULL;
+    }
+    if (expr->value->type != SEMA_VALUE_CONST) {
+        sema_err("`{ast::expr}` is not a const", expr);
+    }
+    return expr->value->sema_type;
+}
+
 SemaType *sema_var_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) {
     if (!sema_expr(sema, expr, ctx)) {
         return NULL;

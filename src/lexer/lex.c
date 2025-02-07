@@ -59,6 +59,7 @@ bool lex_next(Lexer *lexer) {
 	SYMBOL_TRIAL('<', '<', '=', TOKEN_LESS, TOKEN_SHL, TOKEN_LESS_OR_EQUALS);
 	SYMBOL_DUAL('!', '=', TOKEN_NOT, TOKEN_NOT_EQUALS);
 	KEYWORD("asm", TOKEN_ASM);
+	KEYWORD("const", TOKEN_CONST);
 	KEYWORD("volatile", TOKEN_VOLATILE);
 	KEYWORD("var", TOKEN_VAR);
 	KEYWORD("asm", TOKEN_ASM);

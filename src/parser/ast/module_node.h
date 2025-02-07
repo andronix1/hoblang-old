@@ -12,7 +12,15 @@ typedef struct {
 } AstTypeAlias;
 
 typedef struct {
-	AstPath path;
+	AstType type;
+	Slice name;
+	AstExpr *expr;
+
+	struct _SemaScopeValueDecl *value_decl;
+} AstConst;
+
+typedef struct {
+	AstDeclPath path;
 	bool has_alias;
 	Slice alias;
 } AstUse;
@@ -33,6 +41,7 @@ typedef struct {
 } AstExtFuncDecl;
 
 typedef enum {
+	AST_MODULE_NODE_CONST,
 	AST_MODULE_NODE_FUNC,
 	AST_MODULE_NODE_EXTERNAL_FUNC,
 	AST_MODULE_NODE_USE,
@@ -47,6 +56,7 @@ typedef struct {
 		AstExtFuncDecl ext_func_decl;		
 		AstImport import;	
 		AstTypeAlias type_alias;	
+		AstConst constant;	
 		AstUse use;	
 	};
 } AstModuleNode;

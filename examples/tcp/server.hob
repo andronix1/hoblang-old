@@ -25,6 +25,7 @@ fun stop(server: *TcpServer) ->void {
 #   }
 #   return ...; # how to return an error?
 # }
+
 fun init(server: *TcpServer, input_port: TcpPort) ->bool {
     var break: bool = true;
     server.*.socket = socket::new(2, 1, 0);
