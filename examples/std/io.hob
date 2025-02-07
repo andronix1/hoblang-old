@@ -18,8 +18,7 @@ fun write_to(fd: io::Fd, str: []u8) -> void {
 }
 
 fun read_from(fd: io::Fd, output: *[]u8) -> i64 {
-    var output_deref = output.*; # TODO: len(inner_path.segments) > 2
-    return io::read(fd, output_deref.raw, output_deref.length as i64);
+    return io::read(fd, output.*.raw, output.*.length as i64);
 }
 
 fun print(str: []u8) -> void {

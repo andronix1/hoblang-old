@@ -163,7 +163,10 @@ bool sema_resolve_inner_value_path(SemaModule *sema, SemaType *type, AstInnerPat
             }
             segment->sema.type = SEMA_INNER_PATH_DEREF;
             segment->sema.deref_type = type->ptr_to;
-            return sema_value_var(value, type->ptr_to);
+            if (is_last) {
+                return sema_value_var(value, type->ptr_to);
+            }
+            return sema_resolve_inner_value_path(sema, type->ptr_to, path, segment_idx + 1, value);
         }
 		case AST_INNER_PATH_SEG_IDENT: {
 			if (type->type == SEMA_TYPE_STRUCT) {
@@ -188,10 +191,17 @@ bool sema_resolve_inner_value_path(SemaModule *sema, SemaType *type, AstInnerPat
                 segment->sema.slice_type = type;
                 if (slice_eq(&raw, &segment->ident)) {
                     segment->sema.type = SEMA_INNER_PATH_SLICE_RAW;
-                    return sema_value_var(value, sema_type_new_pointer(type->slice_of));
+                    SemaType *output_type = sema_type_new_pointer(type->slice_of);
+                    if (is_last) {
+                        return sema_value_var(value, output_type);
+                    }
+                    return sema_resolve_inner_value_path(sema, output_type, path, segment_idx + 1, value);
                 } else if (slice_eq(&length, &segment->ident)) {
                     segment->sema.type = SEMA_INNER_PATH_SLICE_LEN;
-                    return sema_value_var(value, &primitives[PRIMITIVE_I32]);
+                    if (is_last) {
+                        return sema_value_var(value, &primitives[PRIMITIVE_I32]);
+                    }
+                    return sema_resolve_inner_value_path(sema, &primitives[PRIMITIVE_I32], path, segment_idx + 1, value);
                 } else {
                     sema_err("{sema::type} has not member {slice}", type, &segment->ident);
                     return false;
