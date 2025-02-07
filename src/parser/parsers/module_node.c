@@ -41,7 +41,7 @@ bool parse_func_info(Parser *parser, AstFuncInfo *info) {
 		}
 	}
 
-	parse_exp_next(TOKEN_COLON, "returning type");
+	parse_exp_next(TOKEN_FUNC_RETURNS, "returning type");
 	parse_type(parser, &info->returning);
 	return true;
 }

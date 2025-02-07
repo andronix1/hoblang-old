@@ -9,20 +9,21 @@ type MyStruct = struct {
     c: MyStruct2
 };
 
-fun test(b: i32): MyStruct {
+fun test(b: i32) -> MyStruct {
     var a: MyStruct;
     a.c.b = b;
     a.a = 123;
     return a;
 }
 
-fun main(): i32 {
+fun main() -> i32 {
     var ms: MyStruct;
+	var testf: fun (i32) -> MyStruct = test;
     ms.a = 0;
     var a: i32 = 0;
     a = 123;
     ms.a = a;
     var ms2 = test(1);
     a = ms2.b;
-    return test(99).c.b;
+    return testf(99).c.b;
 }

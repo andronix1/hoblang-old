@@ -134,7 +134,7 @@ SemaScopeDecl *sema_resolve_decl_path(SemaModule *sema, AstDeclPath *path) {
 			)(module, &path->segments[i]);
         if (!decl) {
             sema_err("`{slice}` in `{ast::dpath}` was not defined", &path->segments[i], path);
-            return false;
+            return NULL;
         }
 		if (i + 1 != vec_len(path->segments)) {
 			if (decl->type != SEMA_SCOPE_DECL_MODULE) {
