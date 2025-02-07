@@ -59,6 +59,4 @@ typedef enum {
 typedef struct {
 	AstDeclPath decl_path;
 	AstInnerPath inner_path;
-
-	SemaValue value;
 } AstPath;

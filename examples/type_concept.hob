@@ -23,7 +23,7 @@ type IntegerVariantAlt = struct {
 	value: IntegerUnion
 }
 
-fun main(): void {
+fun main() ->void {
     var v1 = enum IntegerVariant.Byte(1);
     var v2 = struct IntegerVariantAlt {
         kind: IntegerKind.Byte,

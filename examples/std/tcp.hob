@@ -9,7 +9,7 @@ type Port = u16;
 # };
 
 # TODO: err handling
-fun bind(port: Port, backlog: i32): Socket {
+fun bind(port: Port, backlog: i32) -> Socket {
     # a::b::MyEnum.A
     var result: Socket = net::socket(2, 1, 0);
 
@@ -18,7 +18,8 @@ fun bind(port: Port, backlog: i32): Socket {
     }
 
     var reuse: i32 = 1;
-    if net::setsockopt(result, 1, 2, &reuse as *void, 4) == -1 {
+    var reuse_ref = &reuse;  # TODO: unary operators priority
+    if net::setsockopt(result, 1, 2, reuse_ref as *void, 4) == -1 {
         return -1;
     }
 
@@ -28,7 +29,9 @@ fun bind(port: Port, backlog: i32): Socket {
     server_address.in_addr = 0;
     server_address._reserved = 0;
 
-    if net::bind(result, &server_address as *void, 16) == -1 {
+    var server_address_ref = &server_address; # TODO: unary operators priority
+
+    if net::bind(result, server_address_ref as *void, 16) == -1 {
         return -1;
     }
 
@@ -39,12 +42,13 @@ fun bind(port: Port, backlog: i32): Socket {
     return result;
 }
 
-fun accept(socket: Socket): Socket {
+fun accept(socket: Socket) -> Socket {
     var client_address: net::AddressIn;
     var client_addr_size: i32 = 16;
-    return net::accept(socket, &client_address as *void, &client_addr_size);
+    var client_address_ref = &client_address; # TODO: unary operators priority
+    return net::accept(socket, client_address_ref as *void, &client_addr_size);
 }
 
-fun close(socket: Socket): void {
+fun close(socket: Socket) -> void {
     io::close(socket);
 }

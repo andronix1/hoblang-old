@@ -3,7 +3,7 @@ import "std/tcp.hob" as tcp;
 import "std/io.hob" as io;
 import "std/fs.hob" as fs;
 
-fun main(): i32 {
+fun main() -> i32 {
 	var filename = "test.html\0";
 	var file = fs::open_read(filename);
 	if file < 0 {
@@ -23,7 +23,8 @@ fun main(): i32 {
 		if client < 0 {
 			io::println("cannot accept a socket :(");
 		} else {
-			var buf_slice = &buf as []u8;
+			var buf_ref = &buf;
+			var buf_slice = buf_ref as []u8; # TODO: unary operators priority
 			while io::read_from(client, &buf_slice) == 5 {
 				io::print(buf_slice);
 			}
@@ -36,6 +37,6 @@ fun main(): i32 {
 	return 0;
 }
 
-fun _start(): void {
+fun _start() -> void {
 	process::exit(main());
 }

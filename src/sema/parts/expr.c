@@ -13,6 +13,7 @@ bool sema_analyze_expr_get_inner(SemaModule *sema, AstExprGetInner *get_inner, S
 bool sema_analyze_expr_get_local(SemaModule *sema, AstExprGetLocal *get_local, SemaExprCtx ctx);
 
 bool sema_expr(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) {
+    ctx.value = &expr->value;
     switch (expr->type) {
 		case AST_EXPR_UNARY: return sema_analyze_expr_unary(sema, &expr->unary, ctx);
 		case AST_EXPR_GET_INNER_PATH: return sema_analyze_expr_get_inner(sema, &expr->get_inner, ctx);

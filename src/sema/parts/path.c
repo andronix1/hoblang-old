@@ -187,10 +187,10 @@ bool sema_resolve_inner_value_path(SemaModule *sema, SemaType *type, AstInnerPat
                 Slice raw = slice_from_const_cstr("raw");
                 segment->sema.slice_type = type;
                 if (slice_eq(&raw, &segment->ident)) {
-                    segment->sema.type = SEMA_INNER_PATH_SLICE_LEN;
+                    segment->sema.type = SEMA_INNER_PATH_SLICE_RAW;
                     return sema_value_var(value, sema_type_new_pointer(type->slice_of));
                 } else if (slice_eq(&length, &segment->ident)) {
-                    segment->sema.type = SEMA_INNER_PATH_SLICE_RAW;
+                    segment->sema.type = SEMA_INNER_PATH_SLICE_LEN;
                     return sema_value_var(value, &primitives[PRIMITIVE_I32]);
                 } else {
                     sema_err("{sema::type} has not member {slice}", type, &segment->ident);
@@ -249,11 +249,12 @@ bool sema_resolve_path(SemaModule *sema, AstPath *path, SemaValue *value) {
 }
 
 SemaType *sema_resolve_type_path(SemaModule *sema, AstPath *path) {
-    path->value.sema_type = NULL;
-    if (!sema_resolve_path(sema, path, &path->value)) {
+    SemaValue value;
+    value.sema_type = NULL;
+    if (!sema_resolve_path(sema, path, &value)) {
         return NULL;
     }
-    switch (path->value.type) {
+    switch (value.type) {
         case SEMA_VALUE_VAR:
         case SEMA_VALUE_CONST:
         case SEMA_VALUE_MODULE:
@@ -262,13 +263,14 @@ SemaType *sema_resolve_type_path(SemaModule *sema, AstPath *path) {
         case SEMA_VALUE_TYPE:
             break;
     }
-    return path->value.sema_type;
+    return value.sema_type;
 }
 SemaType *sema_resolve_value_path(SemaModule *sema, AstPath *path) {
-    if (!sema_resolve_path(sema, path, &path->value)) {
+    SemaValue value;
+    if (!sema_resolve_path(sema, path, &value)) {
         return false;
     }
-    switch (path->value.type) {
+    switch (value.type) {
         case SEMA_VALUE_VAR:
         case SEMA_VALUE_CONST:
             break;
@@ -277,5 +279,5 @@ SemaType *sema_resolve_value_path(SemaModule *sema, AstPath *path) {
             sema_err("{ast::path} is type, not value", path);
             return false;
     }
-    return path->value.sema_type;
+    return value.sema_type;
 }

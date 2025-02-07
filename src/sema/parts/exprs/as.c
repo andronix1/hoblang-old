@@ -107,7 +107,7 @@ void sema_conv_primitive(
 
 				case SEMA_TYPE_POINTER: {
 					if (primitive != PRIMITIVE_I64 && primitive != PRIMITIVE_U64) {
-						sema_err("only 64-bit values can be casted to pointer");
+						sema_err("only 64-bit values(not {sema::type}) can be casted to pointer", source);
 						break;
 					}
 					*type = SEMA_AS_CONV_INT_TO_PTR;

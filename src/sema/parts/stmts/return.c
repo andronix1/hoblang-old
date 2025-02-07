@@ -2,7 +2,7 @@
 
 void sema_stmt_return(SemaModule *sema, AstReturn *ret) {
 	if (ret->has_value) {
-		SemaType *type = sema_value_expr_type(sema, ret->expr, sema->returning);
+		SemaType *type = sema_value_expr_type(sema, ret->expr, sema_expr_ctx_default_of(sema->returning));
 		if (!type) {
 			return;
 		}

@@ -8,7 +8,7 @@ LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstI
             case SEMA_INNER_PATH_DEREF:
                 value = LLVMBuildLoad2(
                     llvm->builder,
-                    llvm_resolve_type(segment->deref_type),
+                    LLVMPointerType(llvm_resolve_type(segment->deref_type), 0),
                     value,
                     "deref"
                 );

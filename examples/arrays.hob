@@ -1,8 +1,8 @@
 # import "libc/io.hob" as io;
 
-extern(puts) fun puts(str: *u8): void
+extern(puts) fun puts(str: *u8) ->void
 
-fun main(): void {
+fun main() ->void {
 	var a: [3]u8 = { 1, 2, 3 };
 	var b = &a as []u8;
 	b[0] = 2;

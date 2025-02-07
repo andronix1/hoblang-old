@@ -9,7 +9,7 @@ type String = struct {
 	capacity: i32
 };
 
-fun new(): String {
+fun new() ->String {
     var result: String;
 	result.data = 0 as *u8;
 	result.length = 0;
@@ -17,13 +17,13 @@ fun new(): String {
     return result;
 }
 
-fun free(self: *String): void {
+fun free(self: *String) ->void {
 	if self.*.data != (0 as *u8) { # TODO: null
 		mem::free(self.*.data as *void);
 	}
 }
 
-fun reserve(self: *String, size: i32): void {
+fun reserve(self: *String, size: i32) ->void {
 	if self.*.capacity > size {
 		return;
 	}
@@ -35,7 +35,7 @@ fun reserve(self: *String, size: i32): void {
 	self.*.capacity = size;
 }
 
-fun from_mem(ptr: *u8, size: i32): String {
+fun from_mem(ptr: *u8, size: i32) ->String {
     var result = new();
     reserve(&result, size);
     var i = 0;
@@ -46,13 +46,13 @@ fun from_mem(ptr: *u8, size: i32): String {
     return result;
 }
 
-fun push(self: *String, c: u8): void {
+fun push(self: *String, c: u8) ->void {
 	reserve(self, self.*.length + 1);
 	self.*.length = self.*.length + 1;
 	self.*.data[self.*.length - 1] = c;
 }
 
-fun append(self: *String, other: *String): void {
+fun append(self: *String, other: *String) ->void {
 	if other.*.length == 0 {
 		return;
 	}
@@ -66,7 +66,7 @@ fun append(self: *String, other: *String): void {
 	self.*.length = self.*.length + other.*.length;
 }
 
-fun print(self: *String): void {
+fun print(self: *String) ->void {
 	var i = 0;
 	while i < self.*.length {
 		io::put_char(self.*.data[i]);

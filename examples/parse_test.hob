@@ -1,29 +1,38 @@
-type MyStruct2 = struct {
-    a: i32,
-    b: i32
-};
-
-type MyStruct = struct {
-    a: i32,
-    b: i32,
-    c: MyStruct2
-};
-
-fun test(b: i32) -> MyStruct {
-    var a: MyStruct;
-    a.c.b = b;
-    a.a = 123;
-    return a;
+fun arg1(num: i64, a: i64) -> i64 {
+    var res: i64;
+	asm (rax, rdi, rcx, r11) {
+		mov $rax, num;
+		mov $rdi, a;
+		syscall;
+		mov [res], $rax;
+	}
+	return res;
 }
 
-fun main() -> i32 {
-    var ms: MyStruct;
-	var testf: fun (i32) -> MyStruct = test;
-    ms.a = 0;
-    var a: i32 = 0;
-    a = 123;
-    ms.a = a;
-    var ms2 = test(1);
-    a = ms2.b;
-    return testf(99).c.b;
+fun arg3(num: i64, a: i64, b: i64, c: i64) -> i64 {
+    var res: i64;
+	asm (rax, rdi, rsi, rdx, rcx, r11) {
+		mov $rax, num;
+		mov $rdi, a;
+		mov $rsi, b;
+		mov $rdx, c;
+		syscall;
+		mov [res], $rax;
+	}
+	return res;
+}
+
+fun exit(status: i64) -> void {
+	arg1(60, status);
+}
+
+fun write_to(fd: i32, str: []u8) -> i64 {
+    var str_ptr = str.raw;
+    var str_ptr_conv = str_ptr as i64;
+    return arg3(1, fd as i64, str_ptr_conv, str.length as i64);
+}
+
+fun _start() -> void {
+    write_to(0, "hello, world!\n");
+    exit(123);
 }

@@ -41,7 +41,7 @@ void llvm_stmt_asm(LlvmBackend *llvm, AstInlineAsm *inline_asm) {
                 case AST_ASM_ARG_EXPR: {
                     LLVMValueRef value = llvm_expr(llvm, arg->expr, true);
                     values = vec_push(values, &value);
-                    LLVMTypeRef type = llvm_resolve_type(arg->expr->sema_type);
+                    LLVMTypeRef type = llvm_resolve_type(arg->expr->value.sema_type);
                     types = vec_push(types, &type);
                     APPEND_ASM("$%lu", args_count++);
                     APPEND_CONSTR("rim");
@@ -50,8 +50,7 @@ void llvm_stmt_asm(LlvmBackend *llvm, AstInlineAsm *inline_asm) {
                 case AST_ASM_ARG_ADDRESS: {
                     LLVMValueRef value = LLVMBuildPtrToInt(
                         llvm->builder,
-                        NULL, // TODO: address
-                        // llvm_value(llvm, &arg->value),
+                        llvm_expr(llvm, arg->expr, false),
                         LLVMInt64Type(),
                         ""
                     );

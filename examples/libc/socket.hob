@@ -5,8 +5,8 @@ type Type = i32;
 type Protocol = i32;
 type Socket = io::Fd;
 
-extern(socket) fun new(domain: Domain, typ: Type, protocol: Protocol): Socket
-extern(listen) fun listen(socket: Socket, backlog: i32): i32
+extern(socket) fun new(domain: Domain, typ: Type, protocol: Protocol) ->Socket
+extern(listen) fun listen(socket: Socket, backlog: i32) ->i32
 
 type AddressFamily = u16;
 type AddressPort = u16;
@@ -17,12 +17,12 @@ type AddressIn = struct {
     in_addr: AddressInAddr,
     _reserved: u64
 };
-extern(bind) fun bind(socket: Socket, addr: *AddressIn, size: u32): Socket
-extern(accept) fun accept(socket: Socket, addr: *AddressIn, size: *u64): Socket
-extern(send) fun send(socket: Socket, buf: *u8, size: u64, flags: i32): i64 
+extern(bind) fun bind(socket: Socket, addr: *AddressIn, size: u32) ->Socket
+extern(accept) fun accept(socket: Socket, addr: *AddressIn, size: *u64) ->Socket
+extern(send) fun send(socket: Socket, buf: *u8, size: u64, flags: i32) ->i64 
 
 type Level = i32;
 type OptionName = i32;
 type OptionValue = void;
 type OptionSize = i32;
-extern(setsockopt) fun set_options(socket: Socket, level: Level, name: OptionName, value: *OptionValue, size: OptionSize): i32
+extern(setsockopt) fun set_options(socket: Socket, level: Level, name: OptionName, value: *OptionValue, size: OptionSize) ->i32

@@ -7,7 +7,7 @@ void sema_stmt_var(SemaModule *sema, AstVar *var) {
 			return;
 		}
 		if (var->initializes) {
-			SemaType *type = sema_value_expr_type(sema, var->expr, var_type);
+			SemaType *type = sema_value_expr_type(sema, var->expr, sema_expr_ctx_default_of(var_type));
 			if (!type) {
 				return;
 			}
@@ -18,7 +18,7 @@ void sema_stmt_var(SemaModule *sema, AstVar *var) {
 		}
 	} else {
 		if (var->initializes) {
-			if (!(var_type = sema_value_expr_type(sema, var->expr, NULL))) {
+			if (!(var_type = sema_value_expr_type(sema, var->expr, sema_expr_ctx_default_of(NULL)))) {
 				return;
 			}
 			var->typed = true;

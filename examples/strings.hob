@@ -2,7 +2,7 @@ import "str.hob" as str;
 
 type String = str::String;
 
-fun main(): void {
+fun main() ->void {
 	var str = str::new();
 	defer str::free(&str);
 	str::push(&str, '#');
