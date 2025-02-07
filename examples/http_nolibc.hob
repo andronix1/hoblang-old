@@ -23,8 +23,7 @@ fun main() -> i32 {
 		if client < 0 {
 			io::println("cannot accept a socket :(");
 		} else {
-			var buf_ref = &buf;
-			var buf_slice = buf_ref as []u8; # TODO: unary operators priority
+			var buf_slice = (&buf) as []u8;
 			while io::read_from(client, &buf_slice) == 5 {
 				io::print(buf_slice);
 			}

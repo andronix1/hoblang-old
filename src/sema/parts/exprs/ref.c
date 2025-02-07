@@ -5,6 +5,6 @@ bool sema_analyze_expr_ref(SemaModule *sema, AstExpr *ref_expr, SemaExprCtx ctx)
     if (!type) {
         return false;
     }
-    return sema_value_var(ctx.value, sema_type_new_pointer(type));
+    return sema_value_const(ctx.value, sema_type_new_pointer(type));
 }
 

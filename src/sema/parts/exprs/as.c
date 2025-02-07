@@ -149,5 +149,7 @@ bool sema_analyze_expr_as(SemaModule *sema, AstExprAs *as, SemaExprCtx ctx) {
 			sema_err("unknown conversion from {sema::type} to {sema::type}", expr_type, as_type);
 			return false;
 	}
-	return sema_value_const(ctx.value, as_type);
+	*ctx.value = as->expr->value;
+	ctx.value->sema_type = as_type;
+	return true;//sema_value_const(ctx.value, as_type);
 }

@@ -168,8 +168,9 @@ AstExpr *parse_expr(Parser *parser, bool (*stop)(TokenType)) {
 			case TOKEN_GREATER: PARSE_BINOP(AST_BINOP_GT); break;
 			case TOKEN_GREATER_OR_EQUALS: PARSE_BINOP(AST_BINOP_GE); break;
 			case TOKEN_OR: PARSE_BINOP(AST_BINOP_OR); break;
-			case TOKEN_OPENING_CIRCLE_BRACE: 
+			case TOKEN_OPENING_CIRCLE_BRACE:
                 current_expr = parse_expr(parser, token_closing_circle_brace_stop);
+				parse_exp_next(TOKEN_CLOSING_CIRCLE_BRACE, "scope close");
                 break;
 			case TOKEN_OPENING_FIGURE_BRACE:
 				AstExpr **values = vec_new(AstExpr*);
