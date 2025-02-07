@@ -45,19 +45,37 @@ fun main() -> void {
 }
 */
 
-static inline bool sema_value_const(SemaValue *value, struct _SemaType *type) {
-    value->type = SEMA_VALUE_CONST;
-    value->sema_type = type;
-    return true;
-}
+#define SEMA_VALUE_CONSTRUCTOR(name, value_type) \
+	static inline SemaValue *name(struct _SemaType *type) { \
+		SemaValue *result = malloc(sizeof(SemaValue)); \
+		result->type = value_type; \
+		result->sema_type = type; \
+		return result; \
+	}
 
-static inline bool sema_value_type(SemaValue *value, struct _SemaType *type) {
-    value->type = SEMA_VALUE_TYPE;
-    value->sema_type = type;
-    return true;
+SEMA_VALUE_CONSTRUCTOR(sema_value_const, SEMA_VALUE_CONST);
+SEMA_VALUE_CONSTRUCTOR(sema_value_type, SEMA_VALUE_TYPE);
+SEMA_VALUE_CONSTRUCTOR(sema_value_var, SEMA_VALUE_VAR);
+
+static inline SemaValue *sema_value_with_type(SemaValue *value, struct _SemaType *type) {
+	SemaValue *result = malloc(sizeof(SemaValue));
+	memcpy(result, value, sizeof(SemaValue));
+	result->sema_type = type;
+	return result;
 }
-static inline bool sema_value_var(SemaValue *value, struct _SemaType *type) {
-    value->type = SEMA_VALUE_VAR;
-    value->sema_type = type;
-    return true;
-}
+// static inline bool sema_value_const(SemaValue *value, struct _SemaType *type) {
+//     value->type = ;
+//     value->sema_type = type;
+//     return true;
+// }
+
+// static inline bool sema_value_type(SemaValue *value, struct _SemaType *type) {
+//     value->type = SEMA_VALUE_TYPE;
+//     value->sema_type = type;
+//     return true;
+// }
+// static inline bool sema_value_var(SemaValue *value, struct _SemaType *type) {
+//     value->type = SEMA_VALUE_VAR;
+//     value->sema_type = type;
+//     return true;
+// }

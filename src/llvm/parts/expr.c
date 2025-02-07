@@ -14,11 +14,11 @@ LLVMValueRef llvm_call(LlvmBackend *llvm, AstCall *call) {
 	for (size_t i = 0; i < vec_len(call->args); i++) {
 		params[i] = llvm_expr(llvm, call->args[i], true);
 	}
-	SemaType *returning = call->callable->value.sema_type->func.returning;
+	SemaType *returning = call->callable->value->sema_type->func.returning;
 	bool is_void = returning->type == SEMA_TYPE_PRIMITIVE && returning->primitive == PRIMITIVE_VOID;
 	LLVMValueRef call_result = LLVMBuildCall2(
 		llvm->builder,
-		llvm_sema_function_type(&call->callable->value.sema_type->func),
+		llvm_sema_function_type(&call->callable->value->sema_type->func),
 		llvm_expr(llvm, call->callable, true),
 		params, vec_len(call->args),
 		is_void ? "" : "call_result"
@@ -96,7 +96,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 			if (load) {
                 return LLVMBuildLoad2(
                     llvm->builder,
-                    llvm_resolve_type(expr->value.sema_type),
+                    llvm_resolve_type(expr->value->sema_type),
                     value,
                     ""
                 );
@@ -105,10 +105,10 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 		}
 		case AST_EXPR_GET_LOCAL_PATH: {
             LLVMValueRef value = llvm_resolve_path(llvm, &expr->get_local.path);
-            if (load && expr->value.type != SEMA_VALUE_CONST) {
+            if (load && expr->value->type != SEMA_VALUE_CONST) {
                 return LLVMBuildLoad2(
                     llvm->builder,
-                    llvm_resolve_type(expr->value.sema_type),
+                    llvm_resolve_type(expr->value->sema_type),
                     value,
                     ""
                 );
@@ -117,7 +117,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
         }
 		case AST_EXPR_NOT: return LLVMBuildNot(llvm->builder, llvm_expr(llvm, expr->not_expr, true), "");
 		case AST_EXPR_REF: return llvm_expr(llvm, expr->ref_expr, false);
-		case AST_EXPR_INTEGER: return LLVMConstInt(llvm_resolve_type(expr->value.sema_type), expr->integer, false);
+		case AST_EXPR_INTEGER: return LLVMConstInt(llvm_resolve_type(expr->value->sema_type), expr->integer, false);
 		case AST_EXPR_BOOL: return LLVMConstInt(LLVMInt1Type(), expr->boolean, false);
 		case AST_EXPR_CHAR: return LLVMConstInt(LLVMInt8Type(), expr->character, false);
 		case AST_EXPR_STR: return llvm_slice_from_str(llvm, &expr->str);
@@ -132,9 +132,9 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 				case SEMA_AS_CONV_INT_TO_PTR: return LLVMBuildIntToPtr(llvm->builder, value, to_type, "");
 				case SEMA_AS_CONV_ARR_PTR_TO_SLICE: return llvm_slice_from_array_ptr(
 					llvm,
-					llvm_resolve_type(expr->as.expr->value.sema_type->array.of),
+					llvm_resolve_type(expr->as.expr->value->sema_type->array.of),
 					value,
-					expr->as.expr->value.sema_type->array.length
+					expr->as.expr->value->sema_type->array.length
 				);
 				case SEMA_AS_CONV_SLICE_TO_PTR: return LLVMBuildExtractValue( llvm->builder, value, 1, "");
 			}
@@ -178,7 +178,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 			if (load) {
 				return LLVMBuildLoad2(
 					llvm->builder,
-					llvm_resolve_type(expr->value.sema_type),
+					llvm_resolve_type(expr->value->sema_type),
 					value,
 					""
 				);
@@ -186,7 +186,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 			return value;
 		}
 		case AST_EXPR_ARRAY: {
-			LLVMTypeRef of = llvm_resolve_type(expr->value.sema_type->array.of);
+			LLVMTypeRef of = llvm_resolve_type(expr->value->sema_type->array.of);
 			LLVMTypeRef type = LLVMArrayType(of, vec_len(expr->array));
 			LLVMValueRef array = LLVMBuildAlloca(llvm->builder, type, "new_arr");
 			for (size_t i = 0; i < vec_len(expr->array); i++) {

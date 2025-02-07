@@ -59,7 +59,7 @@ typedef struct _AstExpr {
 		bool boolean;
 	};
 	// for sema
-	SemaValue value;
+	SemaValue *value;
 } AstExpr;
 
 AstExpr *ast_expr_get_local_path(AstPath path);

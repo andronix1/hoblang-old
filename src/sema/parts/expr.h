@@ -4,7 +4,6 @@
 
 typedef struct {
 	SemaType *expectation;
-	SemaValue *value;
 } SemaExprCtx;
 
 inline static SemaExprCtx sema_expr_ctx_default() {
