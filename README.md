@@ -11,7 +11,7 @@ gcc <output> -o <binary-output>
 ./<binary-output>
 ```
 ## Syntax
-Multithreaded HTTP example(`examples/cstest.hob`)
+Multithreaded HTTP example(`examples/htto_nolibc.hob`)
 ```
 import "std/process.hob" as process;
 import "std/tcp.hob" as tcp;
