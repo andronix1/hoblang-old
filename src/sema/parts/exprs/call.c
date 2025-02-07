@@ -1,7 +1,7 @@
 #include "../../parts.h"
 
-bool sema_analyze_expr_call(SemaModule *sema, AstCall *call, SemaType *expectation, SemaValue *value) { 
-	SemaType *type = sema_value_expr_type(sema, call->callable, NULL);
+bool sema_analyze_expr_call(SemaModule *sema, AstCall *call, SemaExprCtx ctx) { 
+	SemaType *type = sema_value_expr_type(sema, call->callable, sema_expr_ctx_expect(ctx, NULL));
 	if (!type) {
 		return false;
 	}
@@ -14,7 +14,7 @@ bool sema_analyze_expr_call(SemaModule *sema, AstCall *call, SemaType *expectati
 		return false;
 	}
 	for (size_t i = 0; i < vec_len(call->args); i++) {
-        SemaType *arg_type = sema_value_expr_type(sema, call->args[i], type->func.args[i]);
+        SemaType *arg_type = sema_value_expr_type(sema, call->args[i], sema_expr_ctx_expect(ctx, type->func.args[i]));
 		if (!arg_type) {
 			return false;
 		}
@@ -23,5 +23,5 @@ bool sema_analyze_expr_call(SemaModule *sema, AstCall *call, SemaType *expectati
 			return false;
 		}
 	}
-	return sema_value_const(value, type->func.returning);
+	return sema_value_const(ctx.value, type->func.returning);
 }

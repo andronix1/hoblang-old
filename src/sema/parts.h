@@ -1,6 +1,7 @@
 #pragma once
 
 #include "parser/ast.h"
+#include "parts/expr.h"
 #include "value.h"
 #include "module.h"
 #include "project.h"
@@ -14,5 +15,5 @@ SemaType *sema_resolve_type_path(SemaModule *sema, AstPath *path);
 
 bool sema_resolve_inner_value_path(SemaModule *sema, SemaType *type, AstInnerPath *path, size_t segment_idx, SemaValue *value);
 bool sema_resolve_path(SemaModule *sema, AstPath *path, SemaValue *value);
-SemaType *sema_value_expr_type(SemaModule *sema, AstExpr *expr, SemaType *expectation);
-SemaType *sema_var_expr_type(SemaModule *sema, AstExpr *expr, SemaType *expectation);
+SemaType *sema_value_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx);
+SemaType *sema_var_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx);

@@ -22,11 +22,11 @@ void sema_stmt_inline_asm(SemaModule *sema, AstInlineAsm *inline_asm) {
                 }
 
                 case AST_ASM_ARG_EXPR: {
-                    sema_value_expr_type(sema, arg->expr, NULL);
+                    sema_value_expr_type(sema, arg->expr, sema_expr_ctx_default());
                     break;
                 }
                 case AST_ASM_ARG_ADDRESS: {
-                    sema_value_expr_type(sema, arg->expr, NULL); // TODO: check assignable
+                    sema_var_expr_type(sema, arg->expr, sema_expr_ctx_default());
                     break;
                 }
             }

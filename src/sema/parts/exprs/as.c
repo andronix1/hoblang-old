@@ -129,12 +129,12 @@ void sema_conv_primitive(
 	}
 }
 
-bool sema_analyze_expr_as(SemaModule *sema, AstExprAs *as, SemaType *expectation, SemaValue *value) { 
+bool sema_analyze_expr_as(SemaModule *sema, AstExprAs *as, SemaExprCtx ctx) { 
 	SemaType *as_type = sema_ast_type(sema, &as->type);
 	if (!as_type) {
 		return false;
 	}
-	SemaType *expr_type = sema_value_expr_type(sema, as->expr, false);
+	SemaType *expr_type = sema_value_expr_type(sema, as->expr, ctx);
 	if (!expr_type) {
 		return false;
 	}
@@ -149,5 +149,5 @@ bool sema_analyze_expr_as(SemaModule *sema, AstExprAs *as, SemaType *expectation
 			sema_err("unknown conversion from {sema::type} to {sema::type}", expr_type, as_type);
 			return false;
 	}
-	return sema_value_const(value, as_type);
+	return sema_value_const(ctx.value, as_type);
 }

@@ -22,7 +22,7 @@ void sema_stmt_var(SemaModule *sema, AstVar *var) {
 				return;
 			}
 			var->typed = true;
-			var->type.sema = var->expr->sema_type; 
+			var->type.sema = var->expr->value.sema_type; 
 		} else {
 			sema_err("variable type must be specified or initializer must present");
 			return;

@@ -1,26 +1,26 @@
 #include "../../parts.h"
 
-bool sema_analyze_expr_array(SemaModule *sema, AstExpr **array, SemaType *expectation, SemaValue *value) {
+bool sema_analyze_expr_array(SemaModule *sema, AstExpr **array, SemaExprCtx ctx) {
 	SemaType *expect = false;
-	if (expectation && expectation->type == SEMA_TYPE_ARRAY) {
-		expect = expectation->array.of;
+	if (ctx.expectation && ctx.expectation->type == SEMA_TYPE_ARRAY) {
+		expect = ctx.expectation->array.of;
 	}
 	if (vec_len(array) > 0) {
-		if (!(expect = sema_value_expr_type(sema, array[0], expect))) {
+		if (!(expect = sema_value_expr_type(sema, array[0], sema_expr_ctx_expect(ctx, expect)))) {
 			return false;
 		}
-	} else if (!expectation) {
+	} else if (!ctx.expectation) {
 		sema_err("cannot infer array type");
 		return false;
 	} else {
-		if (expectation->type != SEMA_TYPE_POINTER) {
-			sema_err("expected ptr but got {sema::type}", expectation);
+		if (ctx.expectation->type != SEMA_TYPE_POINTER) {
+			sema_err("expected ptr but got {sema::type}", ctx.expectation);
 			return false;
 		}
-		expect = expectation->ptr_to;
+		expect = ctx.expectation->ptr_to;
 	}
 	for (size_t i = 1; i < vec_len(array); i++) {
-		SemaType *stype = sema_value_expr_type(sema, array[i], expect);	
+		SemaType *stype = sema_value_expr_type(sema, array[i], sema_expr_ctx_expect(ctx, expect));
 		if (!stype) {
 			return false;
 		}
@@ -29,5 +29,5 @@ bool sema_analyze_expr_array(SemaModule *sema, AstExpr **array, SemaType *expect
 			return false;
 		}
 	}
-	return sema_value_const(value, sema_type_new_array(vec_len(array), expect));
+	return sema_value_const(ctx.value, sema_type_new_array(vec_len(array), expect));
 }

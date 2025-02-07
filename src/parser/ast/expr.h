@@ -60,7 +60,6 @@ typedef struct _AstExpr {
 	};
 	// for sema
 	SemaValue value;
-	struct _SemaType *sema_type; 
 } AstExpr;
 
 AstExpr *ast_expr_get_local_path(AstPath path);
