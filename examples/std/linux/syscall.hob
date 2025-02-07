@@ -84,4 +84,5 @@ const ACCEPT: i64 = 43;
 const BIND: i64 = 49;
 const LISTEN: i64 = 50;
 const SETSOCKOPT: i64 = 54;
+const FORK: i64 = 57;
 const EXIT: i64 = 60;

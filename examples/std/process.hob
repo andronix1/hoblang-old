@@ -1,5 +1,9 @@
 import "linux/process.hob" as process;
 
+fun fork() -> process::Pid {
+    return process::fork();
+}
+
 fun exit(status: i32) -> void {
     process::exit(status as i64);
 }

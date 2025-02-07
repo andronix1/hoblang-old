@@ -1,5 +1,11 @@
 import "syscall.hob" as syscall;
 
+type Pid = i64;
+
+fun fork() -> Pid {
+	return syscall::arg0(syscall::FORK);
+}
+
 fun exit(status: i64) -> void {
 	syscall::arg1(syscall::EXIT, status);
 }

@@ -13,70 +13,58 @@ gcc <output> -o <binary-output>
 ## Syntax
 Multithreaded HTTP example(`examples/cstest.hob`)
 ```
-import "tcp/lib.hob" as tcp;
-import "libc/lib.hob" as c;
-import "pthread/lib.hob" as pthread;
+import "std/process.hob" as process;
+import "std/tcp.hob" as tcp;
+import "std/io.hob" as io;
+import "std/fs.hob" as fs;
 
-use c::mem;
-use c::io;
-use c::process;
-use pthread::thread;
+const PORT: u16 = 8080;
+const BACKLOG: i32 = 16;
 
-fun handle_conn(handle: *tcp::handle::TcpClientHandle): void {
-	defer mem::free(handle as *void);
-	defer tcp::handle::close(handle);
+const BUFFER_SIZE: i32 = 10;
 
-	io::puts("new connection!\0");
-	var buf = [0 as u8, 0, 0, 0, 0];
-	while tcp::handle::read(handle, buf, 5) == 5 { }
-
-	var fd = io::open("test.html\0", 0);
-	if fd < 0 {
-		io::puts("failed to open a file test.html\0");
-		return;
-	}
-	defer io::close(fd);
-
-	var stat: io::FileStatus;
-	if io::file_status(fd, &stat) != 0 {
-		io::puts("failed to get file status!\0");
+fun handle_conn(client: tcp::Socket) -> void {
+	var filename = "test.html\0";
+	var file = fs::open_read(filename);
+	if file < 0 {
+		io::println("cannot open file `test.hml`");
 		return;
 	}
 
-	tcp::handle::send(handle, "HTTP/1.1 200 OK\r\n", 17);
-	tcp::handle::send(handle, "Content-Type: text/html\r\n", 25);
-	tcp::handle::send(handle, "\r\n", 2);
-	if io::send_file(handle.*.socket, fd, 0, stat.size) < 0 {
-		io::puts("failed to send file!\0");
-		return;
+	var buf: [BUFFER_SIZE]u8;
+	var buf_slice = (&buf) as []u8;
+	while io::read_from(client, &buf_slice) as i32 == BUFFER_SIZE {
+		# io::print(buf_slice);
 	}
-	
-	io::puts("connection closed!\0");
+	io::write_to(client, "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n");
+	io::full_forward(file, client);
+	tcp::close(client);
+	io::println("wow, closed the connection!");
 }
 
-fun main(): i32 {
-    var server: tcp::server::TcpServer;
-    if !tcp::server::init(&server, 9000) {
-        return 1;
-    }
-    defer tcp::server::stop(&server);
-
-	var func = handle_conn;
-
+fun main() -> i32 {
+	var server = tcp::bind(PORT, BACKLOG);
+	if server < 0 {
+		io::println("cannot bind a socket :(");
+		return 1;
+	}
+	# unnecessary but.. why not?)
+	var handle_func: fun (tcp::Socket) -> void = handle_conn;
 	while true {
-		var client = mem::malloc(20) as *tcp::handle::TcpClientHandle;
-		if !tcp::server::accept(&server, client) {
-			return 1;
-		}
-		var t: thread::Thread;
-		if thread::create(&t, 0 as *pthread::attr::Attr, func as fun (*void) -> *void, client as *void) != 0 {
-			io::puts("failed to create the thread!\0");
-		}
-		if thread::detach(t) != 0 {
-			io::puts("failed to detach thread!\0");
+		var client = tcp::accept(server);
+		if client < 0 {
+			io::println("cannot accept a socket :(");
+		} else {
+			if process::fork() != 0 {
+				handle_func(client);
+			}
 		}
 	}
-    return 0;
+	return 0;
+}
+
+fun _start() -> void {
+	process::exit(main());
 }
 ```
 ### To compile
