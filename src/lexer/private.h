@@ -3,10 +3,10 @@
 #include "api.h"
 #include "core/slice.h"
 
-const char *lexer_str(Lexer *lexer);
+const char *lexer_str(const Lexer *lexer);
 char lexer_next_char(Lexer *lexer);
 bool lexer_next_escaped(Lexer *lexer, char stop, char *output);
-char lexer_future_char(Lexer *lexer);
+char lexer_future_char(const Lexer *lexer);
 void lexer_skip_whitespace(Lexer *lexer);
 void lexer_fail(Lexer *lexer);
 

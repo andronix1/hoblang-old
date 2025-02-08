@@ -38,7 +38,7 @@ bool lexer_next_escaped(Lexer *lexer, char stop, char *output) {
 	}
 }
 
-const char *lexer_str(Lexer *lexer) {
+const char *lexer_str(const Lexer *lexer) {
 	return lexer->remain.str - 1;
 }
 
@@ -60,7 +60,7 @@ char lexer_next_char(Lexer *lexer) {
 	return c;
 }
 
-char lexer_future_char(Lexer *lexer) {
+char lexer_future_char(const Lexer *lexer) {
 	if (lexer_finished(lexer)) {
 		return EOF;
 	}

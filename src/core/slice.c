@@ -6,15 +6,15 @@ bool slice_read_from_file(Slice *output, const char *path) {
 		return false;
 	}
 	fseek(file, 0, SEEK_END);
-	output->len = ftell(file);
+	size_t len = ftell(file);
 	fseek(file, 0, SEEK_SET);
-	output->str = malloc(output->len);
-	if (fread((char*)output->str, 1, output->len, file) != output->len) {
+	output->str = malloc(len);
+	if (fread((char*)output->str, 1, len, file) != len) {
 		free((char*)output->str);
-		output->len = 0;
 		fclose(file);
 		return false;
 	}
+	output->len = len;
 	return true;
 }
 
