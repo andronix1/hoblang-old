@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <linux/limits.h>
 #include "core/path.h"
-#include "lexer/lexer.h"
+#include "lexer/api.h"
 #include "parser/parsers.h"
 #include "module.h"
 

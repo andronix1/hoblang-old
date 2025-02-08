@@ -1,11 +1,12 @@
-#include "lex.h"
+#include "../parts.h"
+#include "impl.h"
 
 #define TOKEN_PARSE(expr) \
 	do { \
-		LexOneErr err = (expr); \
+		LexPartErr err = (expr); \
 		if (!err) return true; \
 		lexer_rollback(lexer); \
-		if (err == LEX_ONE_ERR) return true; \
+		if (err == LEX_PART_ERR) return true; \
 	} while(0)
 
 #define SYMBOL(c, type) TOKEN_PARSE(lex_symbol(lexer, c, type));

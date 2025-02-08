@@ -12,7 +12,6 @@ SemaModule *sema_project_add_module_at(SemaProject *project, const char *path) {
 			return project->modules[i].module;
 		}
 	}
-	Lexer lexer;
 	char *dir, *filename;
 	path_split_filename_dir(strdup(path), &dir, &filename);
 	char cwd[PATH_MAX];
@@ -20,18 +19,19 @@ SemaModule *sema_project_add_module_at(SemaProject *project, const char *path) {
 	if (dir) {
 		chdir(dir);
 	}
-	if (!lexer_init(&lexer, filename)) {
+	Lexer *lexer = lexer_from_file(filename);
+	if (!lexer) {
 		chdir(cwd);
 		return NULL;
 	}
 	Parser parser;
-	if (!parser_init(&parser, &lexer)) {
+	if (!parser_init(&parser, lexer)) {
 		chdir(cwd);
 		return NULL;
 	}
 	AstModule *module = malloc(sizeof(AstModule));
 	parse_module(&parser, module);
-	if (lexer.failed || parser.failed) {
+	if (lexer_failed(lexer) || parser.failed) {
 		chdir(cwd);
 		return NULL;
 	}

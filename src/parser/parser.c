@@ -15,7 +15,7 @@ void parser_next_token(Parser *parser) {
 	if (!lex_next(parser->lexer)) {
 		parser->token = NULL;
 	} else {
-		parser->token = &parser->lexer->token;
+		parser->token = lexer_token(parser->lexer);
 	}
 }
 

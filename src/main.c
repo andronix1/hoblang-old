@@ -3,7 +3,7 @@
 #include <string.h>
 #include <errno.h>
 #include "print.h"
-#include "lexer/lex.h"
+#include "lexer/api.h"
 #include "parser/parsers.h"
 #include "sema/parts.h"
 #include "llvm/parts.h"

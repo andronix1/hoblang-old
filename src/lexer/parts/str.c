@@ -1,20 +1,20 @@
-#include "../parsers.h"
-#include "core/vec.h"
+#include "../part.h"
 
-LexOneErr lex_str(Lexer *lexer) {
+LexPartErr lex_str(Lexer *lexer) {
 	if (lexer_next_char(lexer) != '"') {
-		return LEX_ONE_MISSMATCH;
+		return LEX_PART_MISSMATCH;
 	}
 	char *result = vec_new(char);
 	char c;
 	while ((c = lexer_future_char(lexer)) != '"' && c != (char)EOF) {
 		if (!lexer_next_escaped(lexer, '"', &c)) {
-			return LEX_ONE_ERR;
+			return LEX_PART_ERR;
 		}
 		result = vec_push(result, &c);
 	}
 	lexer_next_char(lexer);
-	lexer->token.type = TOKEN_STR;
-	lexer->token.str = result;
-	return LEX_ONE_OK;
+	Token *token = lexer_token(lexer);
+	token->type = TOKEN_STR;
+	token->str = result;
+	return LEX_PART_OK;
 }

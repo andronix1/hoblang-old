@@ -1,8 +1,13 @@
 #pragma once
 
-#include "lexer/lex.h"
+#include "lexer/api.h"
 
-#define parse_log(level, fmt, ...) hob_log_at(level, parser->lexer->file, parser->lexer->location, fmt, ##__VA_ARGS__)
+#define parse_log(level, fmt, ...) \
+	do { \
+		LexerPosition position = lexer_position(parser->lexer); \
+		hob_log_at(level, position.file, position.location, fmt, ##__VA_ARGS__); \
+	} while (0)
+
 #define parse_err(fmt, ...) \
 	do { \
 		parse_log(LOGE, fmt, ##__VA_ARGS__); \

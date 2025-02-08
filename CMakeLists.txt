@@ -15,14 +15,15 @@ set(SOURCE_FILES
 	src/core/log.c
 
 	src/lexer/tokens.c
-	src/lexer/lexer.c
-	src/lexer/lex.c
-	src/lexer/parsers/char.c
-	src/lexer/parsers/ident.c
-	src/lexer/parsers/integer.c
-	src/lexer/parsers/keyword.c
-	src/lexer/parsers/symbol.c
-	src/lexer/parsers/str.c
+	src/lexer/impl/api.c
+	src/lexer/impl/next.c
+	src/lexer/impl/private.c
+	src/lexer/parts/char.c
+	src/lexer/parts/ident.c
+	src/lexer/parts/integer.c
+	src/lexer/parts/keyword.c
+	src/lexer/parts/symbol.c
+	src/lexer/parts/str.c
 
 	src/parser/parser.c
 	src/parser/print/expr.c

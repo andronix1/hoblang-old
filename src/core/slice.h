@@ -11,6 +11,7 @@ typedef struct {
 } Slice;
 
 Slice slice_from_cstr(const char *cstr);
+bool slice_read_from_file(Slice *output, const char *path);
 Slice slice_new(const char *ptr, size_t len);
 size_t slice_write_to(const Slice *slice, FILE *stream);
 char *slice_to_cstr(const Slice *slice);
