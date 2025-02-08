@@ -13,7 +13,7 @@ fun bind(port: Port, backlog: i32) -> Socket {
     }
 
     var reuse: i32 = 1;
-    if net::setsockopt(result, net::SOL_SOCKET, net::SO_REUSEADDR, (&reuse) as *void, 4) == -1 {
+    if net::setsockopt(result, net::SOL_SOCKET, net::SO_REUSEADDR, &reuse as *void, 4) == -1 {
         return -1;
     }
 
@@ -23,7 +23,7 @@ fun bind(port: Port, backlog: i32) -> Socket {
     server_address.in_addr = net::INADDR_ANY as i32;
     server_address._reserved = 0;
 
-    if net::bind(result, (&server_address) as *void, 16) == -1 {
+    if net::bind(result, &server_address as *void, 16) == -1 {
         return -1;
     }
 
@@ -37,7 +37,7 @@ fun bind(port: Port, backlog: i32) -> Socket {
 fun accept(socket: Socket) -> Socket {
     var client_address: net::AddressIn;
     var client_addr_size: i32 = 16;
-    return net::accept(socket, (&client_address) as *void, &client_addr_size);
+    return net::accept(socket, &client_address as *void, &client_addr_size);
 }
 
 fun close(socket: Socket) -> void {

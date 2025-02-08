@@ -112,7 +112,7 @@ AstExpr **parse_call_args(Parser *parser) {
 	}
 }
 
-AstExpr *parse_expr(Parser *parser, bool (*stop)(TokenType)) {
+AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 	bool first = true;
 	AstExpr *current_expr = NULL;
 	while (true) {
@@ -156,7 +156,7 @@ AstExpr *parse_expr(Parser *parser, bool (*stop)(TokenType)) {
                 break;
 			case TOKEN_BITAND: {
 				if (first) {
-					current_expr = ast_expr_ref(NOT_NULL(parse_expr(parser, stop)));
+					current_expr = ast_expr_ref(NOT_NULL(_parse_expr(parser, stop, false)));
 				} else {
 					PARSE_BINOP(AST_BINOP_BITAND);
 				}
@@ -212,6 +212,10 @@ AstExpr *parse_expr(Parser *parser, bool (*stop)(TokenType)) {
             }
             switch (token->type) {
                 case TOKEN_AS: {
+					if (!post_parse) {
+						parser_skip_next(parser);
+						return current_expr;
+					}
                     AstExpr *expr = malloc(sizeof(AstExpr));
                     expr->type = AST_EXPR_AS;
                     expr->as.expr = current_expr;
@@ -237,4 +241,8 @@ AstExpr *parse_expr(Parser *parser, bool (*stop)(TokenType)) {
             first = false;
         }
 	}
+}
+
+AstExpr *parse_expr(Parser *parser, bool (*stop)(TokenType)) {
+	return _parse_expr(parser, stop, true);
 }

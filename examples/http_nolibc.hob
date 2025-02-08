@@ -13,7 +13,7 @@ const BUFFER_SIZE: i32 = 10;
 
 fun handle_conn(client: Socket, file: File) -> void {
 	var buf: [BUFFER_SIZE]u8;
-	var buf_slice = (&buf) as []u8;
+	var buf_slice = &buf as []u8;
 	while io::read_from(client, &buf_slice) as i32 == BUFFER_SIZE {
 		io::print(buf_slice);
 	}
