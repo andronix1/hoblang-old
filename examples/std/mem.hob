@@ -1,0 +1,31 @@
+import "linux/mem.hob" as mem;
+
+type Page = struct {
+    ptr: *void,
+    size: u32
+};
+
+fun is_page_invalid(page: *Page) -> bool {
+    return page.*.ptr == 0 as i64 as *void;
+}
+
+fun pages_alloc(size: u32) -> Page {
+    var page: Page;
+    page.ptr = mem::mmap(0 as i64 as *void, size as i64, mem::PROT_READ | mem::PROT_WRITE, mem::MAP_ANON | mem::MAP_SHARED, -1, 0);
+    page.size = size;
+    return page;
+}
+
+fun page_free(page: *Page) -> bool {
+    return mem::munmap(page.*.ptr, page.*.size as i64) != -1;
+}
+
+fun copy(src: *void, dst: *void, size: u32) -> void {
+    var csrc: *u8 = src as *u8;
+    var cdst: *u8 = dst as *u8;
+    var end = csrc as i64 + size as i64;
+    while csrc as i64 < end {
+        csrc.* = cdst.*;
+        csrc = (csrc as i64 + (1 as i64)) as *u8;
+    }
+}

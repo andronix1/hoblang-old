@@ -1,0 +1,22 @@
+import "std/process.hob" as process;
+import "std/salloc.hob" as salloc;
+import "std/io.hob" as io;
+
+fun die(msg: []u8) -> void {
+    io::println(msg);
+    process::exit(1);
+}
+
+fun _start() -> void {
+    var ptr = salloc::allocate(4096 * 2 - 5);
+    if ptr == 0 as i64 as *void { # TODO: `as i64 as *void` fix
+        die("failed to allocate memory!");
+    }
+    ptr = salloc::reallocate(ptr, 4096 * 3 - 5);
+    if ptr == 0 as i64 as *void {
+        die("failed to reallocate memory!");
+    }
+    salloc::free(ptr);
+    io::println("yay, cool!");
+    process::exit(0);
+}

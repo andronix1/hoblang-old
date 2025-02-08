@@ -73,11 +73,29 @@ fun arg5(num: i64, a: i64, b: i64, c: i64, d: i64, e: i64) -> i64 {
 	return res;
 }
 
+fun arg6(num: i64, a: i64, b: i64, c: i64, d: i64, e: i64, f: i64) -> i64 {
+    var res: i64;
+	asm (rax, rdi, rsi, rdx, r10, r9, rcx, r11) {
+		mov $rax, num;
+		mov $rdi, a;
+		mov $rsi, b;
+		mov $rdx, c;
+		mov $r10, d;
+        mov $r8, e;
+        mov $r9, f;
+		syscall;
+		mov [res], $rax;
+	}
+	return res;
+}
+
 const READ: i64 = 0;
 const WRITE: i64 = 1;
 const OPEN: i64 = 2;
 const CLOSE: i64 = 3;
 const SEEK: i64 = 8;
+const MMAP: i64 = 9;
+const MUNMAP: i64 = 11;
 const SENDFILE: i64 = 40;
 const SOCKET: i64 = 41;
 const ACCEPT: i64 = 43;

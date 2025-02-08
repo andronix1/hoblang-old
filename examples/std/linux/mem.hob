@@ -1,0 +1,21 @@
+import "syscall.hob" as syscall;
+import "io.hob" as io;
+
+fun mmap(addr: *void, len: i64, prot: i64, flags: i64, fd: io::Fd, offset: i64) -> *void {
+	return syscall::arg6(syscall::MMAP, addr as i64, len, prot, flags, fd as i64, offset) as *void;
+}
+
+fun munmap(addr: *void, len: i64) -> i64 {
+	return syscall::arg2(syscall::MUNMAP, addr as i64, len);
+}
+
+const PROT_READ: i64 = 0x1;
+const PROT_WRITE: i64 = 0x2;
+const PROT_EXEC: i64 = 0x4;
+
+const MAP_SHARED: i64 = 0x1;
+const MAP_PRIVATE: i64 = 0x2;
+const MAP_FIXED: i64 = 0x10;
+const MAP_ANON: i64 = 0x20;
+
+const PAGE_SIZE: i64 = 0x1000;
