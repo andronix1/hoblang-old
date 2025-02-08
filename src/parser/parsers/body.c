@@ -10,17 +10,17 @@ bool parse_asm_body(Parser *parser, AstInlineAsm *inline_asm);
 static inline bool token_stmt_stop(TokenType type) { return type == TOKEN_ASSIGN || type == TOKEN_SEMICOLON; }
 
 bool parse_stmt(Parser *parser, AstStmt *stmt) {
-	parser_next_token(parser);
-	switch (token_type(parser->token)) {
+	Token *token = parser_next(parser);
+	switch (token->type) {
 		case TOKEN_IDENT:
 		case TOKEN_OPENING_CIRCLE_BRACE: {
-			parser->skip_next = true;
+			parser_skip_next(parser);
 			AstExpr *expr = parse_expr(parser, token_stmt_stop);
 			if (!expr) {
 				return false;
 			}
-			parser_next_token(parser);
-			switch (token_type(parser->token)) {
+			parser_step(parser);
+			switch (token->type) {
 				case TOKEN_ASSIGN:
 					stmt->type = AST_STMT_ASSIGN;
 					stmt->assign.assign_expr = expr;
@@ -30,7 +30,7 @@ bool parse_stmt(Parser *parser, AstStmt *stmt) {
 					stmt->expr = expr;
 					return true;
 				default:
-					parse_err("unexpected token `{tok}` after expression in statement", parser->token);
+					PARSE_ERROR("unexpected token `{tok}` after expression in statement", token);
 					return false;
 			}
 		}
@@ -53,20 +53,20 @@ bool parse_stmt(Parser *parser, AstStmt *stmt) {
 			stmt->type = AST_STMT_INLINE_ASM;
 			return parse_asm_body(parser, &stmt->inline_asm);
 		default:
-			parse_err("unexpected `{tok}` while parsing statement", parser->token);
+			PARSE_ERROR("unexpected `{tok}` while parsing statement", parser_token(parser));
 			return false;
 	}
 }
 
 bool parse_body_maybe_ola(Parser *parser, AstBody *body, bool one_line_allowed) {
 	body->stmts = vec_new(AstStmt);
-	parser_next_token(parser);
-	switch (token_type(parser->token)) {
+	parser_step(parser);
+	switch (parser_token(parser)->type) {
 		case TOKEN_OPENING_FIGURE_BRACE: break;
 		default: {
-			parser->skip_next = true;
+			parser_skip_next(parser);
 			if (!one_line_allowed) {
-				parse_err(EXPECTED("body open"));
+				PARSE_ERROR(EXPECTED("body open"));
 				return false;
 			}
 			AstStmt stmt;
@@ -78,17 +78,17 @@ bool parse_body_maybe_ola(Parser *parser, AstBody *body, bool one_line_allowed) 
 		}
 	}
 	while (true) {
-		parser_next_token(parser);
-		switch (token_type(parser->token)) {
+		parser_step(parser);
+		switch (parser_token(parser)->type) {
 			case TOKEN_SEMICOLON:
 				break;
 			case TOKEN_CLOSING_FIGURE_BRACE:
 				return true;
 			case TOKEN_EOI:
-				parse_err("EOI while parsing body");
+				PARSE_ERROR("EOI while parsing body");
 				return false;
 			default: {
-				parser->skip_next = true;
+				parser_skip_next(parser);
 				AstStmt stmt;
 				if (parse_stmt(parser, &stmt)) {
 					body->stmts = vec_push(body->stmts, &stmt);
@@ -97,7 +97,7 @@ bool parse_body_maybe_ola(Parser *parser, AstBody *body, bool one_line_allowed) 
 			}
 		}
 	}
-	parse_exp_next(TOKEN_CLOSING_FIGURE_BRACE, "body closing");
+	PARSER_EXPECT_NEXT(TOKEN_CLOSING_FIGURE_BRACE, "body closing");
 	return false;
 }
 

@@ -93,5 +93,4 @@ typedef struct {
 	size_t len;
 } TokensSlice;
 
-TokenType token_type(Token *token);
 void print_token(FILE *stream, va_list list);

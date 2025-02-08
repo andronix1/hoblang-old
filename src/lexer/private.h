@@ -12,7 +12,7 @@ void lexer_fail(Lexer *lexer);
 
 #define lex_log(level, fmt, ...) \
     do { \
-        LexerPosition position = lexer_position(lexer); \
+        InFilePosition position = lexer_position(lexer); \
         hob_log_at((level), position.file, position.location, fmt, ##__VA_ARGS__); \
     } while (0)
 

@@ -69,10 +69,10 @@ AstExpr *expr_make_unary(Parser *parser, AstUnaryType type, bool(*stop)(TokenTyp
 	return result;
 }
 
-#define AST_EXPR_PARSE_SKIP_NESTED() do { if (stop(token_type(parser->token))) return current_expr; } while (0)
+#define AST_EXPR_PARSE_SKIP_NESTED() do { if (stop(parser_token(parser)->type)) return current_expr; } while (0)
 #define PARSE_BINOP(type) do { \
 		if (first) { \
-			parse_err("binary operator without left hand expression"); \
+			PARSE_ERROR("binary operator without left hand expression"); \
 			return NULL; \
 		} \
 		if (!expr_make_binop(parser, type, &current_expr, stop)) { \
@@ -93,49 +93,39 @@ AstExpr *parse_expr(Parser *parser, bool (*stop)(TokenType)) {
 	bool first = true;
 	AstExpr *current_expr = NULL;
 	while (true) {
-		parser_next_token(parser);
-		if (stop(token_type(parser->token))) {
-            parser->skip_next = true;
+		Token *token = parser_next(parser);
+		if (stop(token->type)) {
+            parser_skip_next(parser);
 			if (!current_expr) {
-                parse_err("unexpected end of expression");
+                PARSE_ERROR("unexpected end of expression");
 			}
 			return current_expr;
 		}
 		
-		switch (token_type(parser->token)) {
+		switch (token->type) {
 			case TOKEN_TRUE: case TOKEN_FALSE:
-                current_expr = ast_expr_bool(parser->token->type == TOKEN_TRUE);
+                current_expr = ast_expr_bool(token->type == TOKEN_TRUE);
                 break;
 			case TOKEN_CHAR: 
-                current_expr = ast_expr_char(parser->token->character);
+                current_expr = ast_expr_char(token->character);
                 break;
 			case TOKEN_STR:
-                current_expr = ast_expr_str(slice_new(parser->token->str, vec_len(parser->token->str)));
+                current_expr = ast_expr_str(slice_new(token->str, vec_len(token->str)));
                 break;
 			case TOKEN_INTEGER: 
-                current_expr = ast_expr_integer(parser->token->integer);
+                current_expr = ast_expr_integer(token->integer);
                 break;
 			case TOKEN_IDENT: {
-				parser->skip_next = true;
+				parser_skip_next(parser);
 				AstPath path;
 				if (!parse_path(parser, &path)) {
 					return NULL;
 				}
 				AstExpr *expr = ast_expr_get_local_path(path);
-                bool reading = true;
-				while (reading) {
-					parser_next_token(parser);
-					switch (token_type(parser->token)) {
-						case TOKEN_OPENING_CIRCLE_BRACE:
-							expr = ast_expr_call(expr, NOT_NULL(parse_call_args(parser)));
-							break;
-						default:
-							parser->skip_next = true;
-							current_expr = expr;
-                            reading = false;
-                            break;
-					}
+				while (parser_next_is(parser, TOKEN_OPENING_CIRCLE_BRACE)) {
+					expr = ast_expr_call(expr, NOT_NULL(parse_call_args(parser)));
 				}
+				current_expr = expr;
 				break;
 			}
 			case TOKEN_NOT: 
@@ -170,11 +160,11 @@ AstExpr *parse_expr(Parser *parser, bool (*stop)(TokenType)) {
 			case TOKEN_OR: PARSE_BINOP(AST_BINOP_OR); break;
 			case TOKEN_OPENING_CIRCLE_BRACE:
                 current_expr = parse_expr(parser, token_closing_circle_brace_stop);
-				parse_exp_next(TOKEN_CLOSING_CIRCLE_BRACE, "scope close");
+				PARSER_EXPECT_NEXT(TOKEN_CLOSING_CIRCLE_BRACE, "scope close");
                 break;
 			case TOKEN_OPENING_FIGURE_BRACE:
 				AstExpr **values = vec_new(AstExpr*);
-				while (token_type(parser->token) != TOKEN_CLOSING_FIGURE_BRACE) {
+				while (token->type != TOKEN_CLOSING_FIGURE_BRACE) {
 					AstExpr *expr = parse_expr(parser, token_array_arg_stop);
 					if (!expr) {
 						return NULL;
@@ -184,20 +174,20 @@ AstExpr *parse_expr(Parser *parser, bool (*stop)(TokenType)) {
 				current_expr = ast_expr_array(values);
 				break;
 			case TOKEN_EOI:
-				parse_err("EOI while parsing expression");
+				PARSE_ERROR("EOI while parsing expression");
 				return NULL;
 			default:
-				parse_err("unexpected token `{tok}` while parsing expression", parser->token);
+				PARSE_ERROR("unexpected token `{tok}` while parsing expression", parser_token(parser));
 				return NULL;
 		}
         bool reading = true;
         while (reading) {
-            parser_next_token(parser);	
-            if (stop(token_type(parser->token))) {
-                parser->skip_next = true;
+            Token *token = parser_next(parser);	
+            if (stop(token->type)) {
+                parser_skip_next(parser);
                 break;
             }
-            switch (token_type(parser->token)) {
+            switch (token->type) {
                 case TOKEN_AS: {
                     AstExpr *expr = malloc(sizeof(AstExpr));
                     expr->type = AST_EXPR_AS;
@@ -217,7 +207,7 @@ AstExpr *parse_expr(Parser *parser, bool (*stop)(TokenType)) {
 					break;
 				}
                 default:
-                    parser->skip_next = true;
+                    parser_skip_next(parser);
                     reading = false;
                     break;
             }

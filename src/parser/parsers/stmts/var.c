@@ -1,11 +1,9 @@
 #include "../../parsers.h"
 
 bool parse_var(Parser *parser, AstVar *var) {
-	parse_exp_next(TOKEN_IDENT, "variable name");
-	var->name = parser->token->ident;
-	parser_next_token(parser);
+	var->name = PARSER_EXPECT_NEXT(TOKEN_IDENT, "variable name")->ident;
 	var->typed = false;
-	switch (token_type(parser->token)) {
+	switch (parser_next(parser)->type) {
 		case TOKEN_SEMICOLON:
 			return true;
 		case TOKEN_ASSIGN:
@@ -21,11 +19,10 @@ bool parse_var(Parser *parser, AstVar *var) {
 			}
 			break;
 		default:
-			parse_err("expected type or assign but got `{tok}`", parser->token);
+			PARSE_ERROR("expected type or assign but got `{tok}`", parser_token(parser));
 			return false;
 	}
-	parser_next_token(parser);
-	switch (token_type(parser->token)) {
+	switch (parser_next(parser)->type) {
 		case TOKEN_ASSIGN:
 			var->initializes = true;
 			if (!(var->expr = parse_expr(parser, token_semicolon_stop))) {
@@ -36,7 +33,7 @@ bool parse_var(Parser *parser, AstVar *var) {
 			var->initializes = false;
 			return true;
 		default:
-			parse_err("expected initilizer or end but got `{tok}`", parser->token);
+			PARSE_ERROR("expected initilizer or end but got `{tok}`", parser_token(parser));
 			return false;
 	}
 }

@@ -4,7 +4,7 @@ bool parse_if_else_body(Parser *parser, AstIfBody *body) {
 	if (!(body->expr = parse_expr(parser, token_opening_figure_brace_stop))) {
 		return false;
 	}
-	parser->skip_next = true;
+	parser_skip_next(parser);
 	return parse_body(parser, body->body = malloc(sizeof(AstBody)));
 }
 
@@ -14,10 +14,8 @@ bool parse_if_else(Parser *parser, AstIfElse *if_else) {
 	if (!parse_if_else_body(parser, &if_else->main)) {
 		return false;
 	}
-	parser_next_token(parser);
-	while (token_type(parser->token) == TOKEN_ELSE) {
-		parser_next_token(parser);
-		switch (token_type(parser->token)) {
+	while (parser_next_is(parser, TOKEN_ELSE)) {
+		switch (parser_next(parser)->type) {
 			case TOKEN_IF: {
 				AstIfBody body;
 				if (!parse_if_else_body(parser, &body)) {
@@ -27,18 +25,17 @@ bool parse_if_else(Parser *parser, AstIfElse *if_else) {
 				break;
 			}
 			case TOKEN_OPENING_FIGURE_BRACE:
-				parser->skip_next = true;
+				parser_skip_next(parser);
 				if (!parse_body(parser, if_else->else_body = malloc(sizeof(AstBody)))) {
 					return false;
 				}
 				if_else->has_else = true;
 				return true;
 			default:
-				parse_err("expected else if or else body but got `{tok}`", parser->token);
+				PARSE_ERROR("expected else if or else body but got `{tok}`", parser_token(parser));
 				return false;
 		}
-		parser_next_token(parser);
+		parser_step(parser);
 	}
-	parser->skip_next = true;
 	return true;
 }

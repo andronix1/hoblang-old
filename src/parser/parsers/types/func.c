@@ -1,7 +1,7 @@
 #include "../../parsers.h"
 
 bool parse_ast_func_type(Parser *parser, AstFunctionType *func_type) {
-	parse_exp_next(TOKEN_OPENING_CIRCLE_BRACE, "function args");
+	PARSER_EXPECT_NEXT(TOKEN_OPENING_CIRCLE_BRACE, "function args");
 	func_type->args = vec_new(AstType);
 	while (true) {
 		AstType type;
@@ -9,15 +9,14 @@ bool parse_ast_func_type(Parser *parser, AstFunctionType *func_type) {
 			return false;
 		}
 		func_type->args = vec_push(func_type->args, &type);
-		parser_next_token(parser);
-		switch (token_type(parser->token)) {
+		switch (parser_next(parser)->type) {
 			case TOKEN_CLOSING_CIRCLE_BRACE:
-				parse_exp_next(TOKEN_FUNC_RETURNS, "function returning type");
+				PARSER_EXPECT_NEXT(TOKEN_FUNC_RETURNS, "function returning type");
 				return parse_type(parser, func_type->returns = malloc(sizeof(AstType)));
 			case TOKEN_COMMA:
 				break;
 			default:
-				parse_err(EXPECTED("argument type"));
+				PARSE_ERROR(EXPECTED("argument type"));
 				return false;
 		}
 	}

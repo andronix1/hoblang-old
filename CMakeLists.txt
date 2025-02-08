@@ -25,7 +25,8 @@ set(SOURCE_FILES
 	src/lexer/parts/symbol.c
 	src/lexer/parts/str.c
 
-	src/parser/parser.c
+	src/parser/impl/api.c
+	src/parser/impl/private.c
 	src/parser/print/expr.c
 	src/parser/print/type.c
 	src/parser/ast/expr.c
@@ -91,7 +92,7 @@ include_directories(${LLVM_INCLUDE_DIRS})
 link_directories(${LLVM_LIBRARY_DIRS})
 add_executable(hoblang ${SOURCE_FILES})
 target_compile_options(hoblang PRIVATE 
-    -g -ggdb
+    -O3 # -g -ggdb
 	-Wall -Wextra -Werror
 	-Wno-format
 	-Wno-error=unused-parameter -Wno-error=unused-variable

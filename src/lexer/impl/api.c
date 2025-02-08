@@ -41,8 +41,8 @@ Token *lexer_token(Lexer *lexer) {
 	return &lexer->token;
 }
 
-LexerPosition lexer_position(const Lexer *lexer) {
-    LexerPosition result;
+InFilePosition lexer_position(const Lexer *lexer) {
+    InFilePosition result;
     result.file = lexer->file;
     result.location = lexer->location;
     return result;

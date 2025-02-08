@@ -19,19 +19,14 @@ SemaModule *sema_project_add_module_at(SemaProject *project, const char *path) {
 	if (dir) {
 		chdir(dir);
 	}
-	Lexer *lexer = lexer_from_file(filename);
-	if (!lexer) {
-		chdir(cwd);
-		return NULL;
-	}
-	Parser parser;
-	if (!parser_init(&parser, lexer)) {
+	Parser *parser = parser_from_file(filename);
+	if (!parser) {
 		chdir(cwd);
 		return NULL;
 	}
 	AstModule *module = malloc(sizeof(AstModule));
-	parse_module(&parser, module);
-	if (lexer_failed(lexer) || parser.failed) {
+	parse_module(parser, module);
+	if (parser_failed(parser)) {
 		chdir(cwd);
 		return NULL;
 	}

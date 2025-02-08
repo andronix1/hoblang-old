@@ -45,25 +45,24 @@ bool parse_func_info(Parser *parser, AstFuncInfo *info) {
 }
 
 bool parse_module_node(Parser *parser, AstModuleNode *node) {
-	Token *token = parser_next(parser);
-	switch (token->type) {
-		case TOKEN_IMPORT: {
-			Token *path_token = PARSER_EXPECT_NEXT(TOKEN_STR, "file path");
+	parser_step(parser);
+	switch (parser_token(parser)->type) {
+		case TOKEN_IMPORT:
 			node->type = AST_MODULE_NODE_IMPORT;
 			char c0 = '\0';
-			node->import.path = path_token->str = vec_push(path_token->str, &c0);
+			node->import.path = PARSER_EXPECT_NEXT(TOKEN_STR, "file path")->str = vec_push(parser_token(parser)->str, &c0);
 			PARSER_EXPECT_NEXT(TOKEN_AS, "module name");
 			node->import.as = PARSER_EXPECT_NEXT(TOKEN_IDENT, "module name")->ident;
 			PARSER_EXPECT_NEXT(TOKEN_SEMICOLON, "semicolon");
 			return true;
-		}
 		case TOKEN_USE:
 			node->type = AST_MODULE_NODE_USE;
 			if (!parse_decl_path(parser, &node->use.path)) {
 				return false;
 			}
+			parser_step(parser);
 			node->use.has_alias = false;
-			switch (parser_next(parser)->type) {
+			switch (parser_token(parser)->type) {
 				case TOKEN_SEMICOLON: break;
 				case TOKEN_AS:
 					node->use.has_alias = true;

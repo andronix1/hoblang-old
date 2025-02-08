@@ -3,12 +3,12 @@
 #include "types/func.c"
 
 bool parse_type(Parser *parser, AstType *type) {
-	parser_next_token(parser);
 	type->sema = NULL;
-	switch (token_type(parser->token)) {
+	Token *token = parser_next(parser);
+	switch (token->type) {
 		case TOKEN_IDENT:
 			type->type = AST_TYPE_PATH;
-			parser->skip_next = true;
+			parser_skip_next(parser);
 			return parse_path(parser, &type->path);
 		case TOKEN_MULTIPLY: {
 			type->type = AST_TYPE_POINTER;
@@ -23,22 +23,20 @@ bool parse_type(Parser *parser, AstType *type) {
 			return parse_ast_func_type(parser, &type->func);
 		}
 		case TOKEN_OPENING_SQUARE_BRACE: {
-			parser_next_token(parser);
-			if (token_type(parser->token) == TOKEN_CLOSING_SQUARE_BRACE) {
+			if (parser_next_is(parser, TOKEN_CLOSING_SQUARE_BRACE)) {
 				type->type = AST_TYPE_SLICE;
 				return parse_type(parser, type->slice_of = malloc(sizeof(AstType)));
 			}
-			parser->skip_next = true;
 			type->type = AST_TYPE_ARRAY;
 			type->array.length = parse_expr(parser, token_idx_stop);
 			if (!type->array.length) {
 				return false;
 			}
-			parse_exp_next(TOKEN_CLOSING_SQUARE_BRACE, "array length closing brace");
+			PARSER_EXPECT_NEXT(TOKEN_CLOSING_SQUARE_BRACE, "array length closing brace");
 			return parse_type(parser, type->array.of = malloc(sizeof(AstType)));
 		}
 		default:
-			parse_err(EXPECTED("type"));
+			PARSE_ERROR(EXPECTED("type"));
 			return false;
 	}
 }
