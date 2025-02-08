@@ -88,9 +88,21 @@ LLVMValueRef llvm_get_local_value_path(LlvmBackend *llvm, AstPath *path) {
 LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 	switch (expr->type) {
 		case AST_EXPR_GET_INNER_PATH: {
+			LLVMValueRef allocated_expr = LLVMBuildAlloca(
+				llvm->builder,
+				llvm_resolve_type(expr->value->sema_type),
+				"allocated_expr"
+			);
+
+			LLVMBuildStore(
+				llvm->builder,
+				llvm_expr(llvm, expr->get_inner.of, true),
+				allocated_expr
+			);
+			
 			LLVMValueRef value = llvm_resolve_inner_path(
 				llvm,
-				llvm_expr(llvm, expr->get_inner.of, false),
+				allocated_expr,
 				&expr->get_inner.path
 			);
 			if (load) {
