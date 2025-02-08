@@ -4,7 +4,7 @@
 #include <stdarg.h>
 #include "core/slice.h"
 #include "core/vec.h"
-#include "parser/ast.h"
+#include "parser/api.h"
 
 typedef struct {
 	struct _SemaType **args;

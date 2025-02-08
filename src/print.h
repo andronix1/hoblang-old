@@ -1,6 +1,5 @@
 #include <string.h>
 #include <errno.h>
-#include "parser/ast.h"
 #include "parser/print.h"
 #include "lexer/tokens.h"
 #include "core/print.h"

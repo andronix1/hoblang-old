@@ -1,4 +1,6 @@
-#include "../../parsers.h"
+#include "../../parts.h"
+#include "../body.h"
+#include "func_info.h"
 
 bool parse_func_decl(Parser *parser, AstFuncDecl *decl) {
 	if (!parse_func_info(parser, &decl->info)) {

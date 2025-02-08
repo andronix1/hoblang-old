@@ -1,4 +1,4 @@
-#include "../parsers.h"
+#include "path.h"
 
 bool parse_decl_path(Parser *parser, AstDeclPath *path) {
     path->segments = vec_new(Slice);

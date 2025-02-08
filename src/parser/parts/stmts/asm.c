@@ -1,4 +1,5 @@
-#include "../../parsers.h"
+#include "../../parts.h"
+#include "../expr.h"
 
 bool token_is_asm_arg_end(TokenType type) {
     return type == TOKEN_COMMA || type == TOKEN_SEMICOLON;

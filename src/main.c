@@ -4,7 +4,7 @@
 #include <errno.h>
 #include "print.h"
 #include "lexer/api.h"
-#include "parser/parsers.h"
+#include "parser/api.h"
 #include "sema/parts.h"
 #include "llvm/parts.h"
 

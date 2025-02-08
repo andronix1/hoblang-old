@@ -1,4 +1,5 @@
-#include "../../parsers.h"
+#include "../../parts.h"
+#include "../expr.h"
 
 bool parse_return(Parser *parser, AstReturn *ret) {
 	if (parser_next_is(parser, TOKEN_SEMICOLON)) {

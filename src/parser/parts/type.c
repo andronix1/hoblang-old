@@ -1,6 +1,8 @@
-#include "../parsers.h"
+#include "type.h"
 #include "types/struct.c"
 #include "types/func.c"
+#include "expr.h"
+#include "path.h"
 
 bool parse_type(Parser *parser, AstType *type) {
 	type->sema = NULL;

@@ -1,4 +1,5 @@
-#include "../parsers.h"
+#include "../parts.h"
+#include "module_node.h"
 
 bool parse_module(Parser *parser, AstModule *module) {
 	module->nodes = vec_new(AstModuleNode);

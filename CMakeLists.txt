@@ -30,21 +30,20 @@ set(SOURCE_FILES
 	src/parser/print/expr.c
 	src/parser/print/type.c
 	src/parser/ast/expr.c
-	src/parser/parsers/stmts/var.c
-	src/parser/parsers/stmts/return.c
-	src/parser/parsers/stmts/while.c
-	src/parser/parsers/stmts/defer.c
-	src/parser/parsers/stmts/if_else.c
-	src/parser/parsers/stmts/asm.c
-	src/parser/parsers/decls/ext_func.c
-	src/parser/parsers/decls/func.c
-	src/parser/parsers/module.c
-	src/parser/parsers/module_node.c
-	src/parser/parsers/type.c
-	src/parser/parsers/func_call.c
-	src/parser/parsers/expr.c
-	src/parser/parsers/path.c
-	src/parser/parsers/body.c
+	src/parser/parts/stmts/var.c
+	src/parser/parts/stmts/return.c
+	src/parser/parts/stmts/while.c
+	src/parser/parts/stmts/defer.c
+	src/parser/parts/stmts/if_else.c
+	src/parser/parts/stmts/asm.c
+	src/parser/parts/decls/ext_func.c
+	src/parser/parts/decls/func.c
+	src/parser/parts/module.c
+	src/parser/parts/module_node.c
+	src/parser/parts/type.c
+	src/parser/parts/expr.c
+	src/parser/parts/path.c
+	src/parser/parts/body.c
 
 	src/sema/module.c
 	src/sema/project.c

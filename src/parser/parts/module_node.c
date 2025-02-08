@@ -1,4 +1,7 @@
-#include "../parsers.h"
+#include "module_node.h"
+#include "type.h"
+#include "path.h"
+#include "expr.h"
 
 bool parse_ext_func_decl(Parser *parser, AstExtFuncDecl *info);
 bool parse_func_decl(Parser *parser, AstFuncDecl *decl);

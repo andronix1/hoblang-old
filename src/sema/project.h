@@ -4,7 +4,7 @@
 #include <linux/limits.h>
 #include "core/path.h"
 #include "lexer/api.h"
-#include "parser/parsers.h"
+#include "parser/api.h"
 #include "module.h"
 
 typedef struct {

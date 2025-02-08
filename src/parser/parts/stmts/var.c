@@ -1,4 +1,6 @@
-#include "../../parsers.h"
+#include "../../parts.h"
+#include "../expr.h"
+#include "../type.h"
 
 bool parse_var(Parser *parser, AstVar *var) {
 	var->name = PARSER_EXPECT_NEXT(TOKEN_IDENT, "variable name")->ident;

@@ -5,7 +5,7 @@
 #include <llvm-c/Analysis.h>
 #include "core/log.h"
 #include "core/assert.h"
-#include "parser/ast.h"
+#include "parser/api.h"
 #include "sema/type.h"
 #include "sema/module.h"
 
