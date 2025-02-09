@@ -26,6 +26,6 @@ fun copy(src: *void, dst: *void, size: u32) -> void {
     var end = csrc as i64 + size as i64;
     while csrc as i64 < end {
         csrc.* = cdst.*;
-        csrc = (csrc as i64 + (1 as i64)) as *u8;
+        csrc = (csrc as i64 + 1) as *u8;
     }
 }
