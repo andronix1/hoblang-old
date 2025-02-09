@@ -148,7 +148,8 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 					value,
 					expr->as.expr->value->sema_type->ptr_to->array.length
 				);
-				case SEMA_AS_CONV_SLICE_TO_PTR: return LLVMBuildExtractValue( llvm->builder, value, 1, "");
+				case SEMA_AS_CONV_SLICE_TO_PTR: return LLVMBuildExtractValue(llvm->builder, value, 1, "");
+				case SEMA_AS_CONV_IGNORE: return value;
 			}
 			break;
 		}

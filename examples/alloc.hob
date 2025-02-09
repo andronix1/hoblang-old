@@ -9,11 +9,11 @@ fun die(msg: []u8) -> void {
 
 fun _start() -> void {
     var ptr = salloc::allocate(4096 * 2 - 5);
-    if ptr == 0 as i64 as *void { # TODO: `as i64 as *void` fix
+    if ptr == 0 as *void { # TODO: `as *void` fix
         die("failed to allocate memory!");
     }
     ptr = salloc::reallocate(ptr, 4096 * 3 - 5);
-    if ptr == 0 as i64 as *void {
+    if ptr == 0 as *void {
         die("failed to reallocate memory!");
     }
     salloc::free(ptr);

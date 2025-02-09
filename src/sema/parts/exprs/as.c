@@ -134,20 +134,24 @@ SemaValue *sema_analyze_expr_as(SemaModule *sema, AstExprAs *as, SemaExprCtx ctx
 	if (!as_type) {
 		return false;
 	}
-	SemaType *expr_type = sema_value_expr_type(sema, as->expr, ctx);
+	SemaType *expr_type = sema_value_expr_type(sema, as->expr, sema_expr_ctx_expect(ctx, &primitives[PRIMITIVE_I64]));
 	if (!expr_type) {
 		return false;
 	}
-	switch (expr_type->type) {
-		case SEMA_TYPE_PRIMITIVE: sema_conv_primitive(sema, expr_type, as_type, &as->conv_type); break;
-		case SEMA_TYPE_ARRAY: sema_conv_array(sema, expr_type, as_type, &as->conv_type); break;
-		case SEMA_TYPE_POINTER: sema_conv_pointer(sema, expr_type, as_type, &as->conv_type); break;
-		case SEMA_TYPE_SLICE: sema_conv_slice(sema, expr_type, as_type, &as->conv_type); break;
+	if (sema_types_equals(as_type, expr_type)) {
+		as->conv_type = SEMA_AS_CONV_IGNORE;
+	} else {
+		switch (expr_type->type) {
+			case SEMA_TYPE_PRIMITIVE: sema_conv_primitive(sema, expr_type, as_type, &as->conv_type); break;
+			case SEMA_TYPE_ARRAY: sema_conv_array(sema, expr_type, as_type, &as->conv_type); break;
+			case SEMA_TYPE_POINTER: sema_conv_pointer(sema, expr_type, as_type, &as->conv_type); break;
+			case SEMA_TYPE_SLICE: sema_conv_slice(sema, expr_type, as_type, &as->conv_type); break;
 
-		case SEMA_TYPE_FUNCTION:
-		case SEMA_TYPE_STRUCT:
-			sema_err("unknown conversion from {sema::type} to {sema::type}", expr_type, as_type);
-			return false;
+			case SEMA_TYPE_FUNCTION:
+			case SEMA_TYPE_STRUCT:
+				sema_err("unknown conversion from {sema::type} to {sema::type}", expr_type, as_type);
+				return false;
+		}
 	}
 	return sema_value_with_type(as->expr->value, as_type);
 }

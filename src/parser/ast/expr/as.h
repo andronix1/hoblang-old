@@ -12,6 +12,8 @@ typedef enum {
 
 	SEMA_AS_CONV_ARR_PTR_TO_SLICE,
 	SEMA_AS_CONV_SLICE_TO_PTR,
+
+	SEMA_AS_CONV_IGNORE,
 } SemaAsConvType;
 
 typedef struct {

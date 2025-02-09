@@ -6,7 +6,7 @@ fun allocate(size: u32) -> *void {
     var page = mem::pages_alloc(size + (4 as u32));
     var result = page.ptr;
     if result as i64 == 0 {
-        return 0 as i64 as *void;
+        return 0 as *void;
     }
     (result as *u32).* = size;
     return (result as i64 + (4 as i64)) as *void;
@@ -24,8 +24,8 @@ fun page_from_ptr(src: *void) -> Page {
 fun reallocate(src: *void, size: u32) -> *void {
     var old_page = page_from_ptr(src);
     var result = allocate(old_page.size);
-    if result == 0 as i64 as *void {
-        return 0 as i64 as *void;
+    if result == 0 as *void {
+        return 0 as *void;
     }
     # mem::copy(src, result, old_page.size); # TODO: SEGFAULT ON MEMCPY
     mem::page_free(&old_page);
