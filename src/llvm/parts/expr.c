@@ -99,13 +99,18 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 				llvm_expr(llvm, expr->get_inner.of, true),
 				allocated_expr
 			);
-			
+			// str_ptr: *void
+			// EXPR: (str_ptr as *u8).*
+
+			// **void alloca_src_ptr
+			// *u8 src_ptr_as_u8
+			// *u8 src_ptr_as_u8
 			LLVMValueRef value = llvm_resolve_inner_path(
 				llvm,
-				allocated_expr,
+				allocated_expr, //llvm_expr(llvm, expr->get_inner.of, false),
 				&expr->get_inner.path
 			);
-			if (load) {
+			if (load && expr->value->type == SEMA_VALUE_VAR) {
                 return LLVMBuildLoad2(
                     llvm->builder,
                     llvm_resolve_type(expr->value->sema_type),
@@ -117,7 +122,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 		}
 		case AST_EXPR_GET_LOCAL_PATH: {
             LLVMValueRef value = llvm_resolve_path(llvm, &expr->get_local.path);
-            if (load && expr->value->type != SEMA_VALUE_CONST) {
+            if (load && expr->value->type == SEMA_VALUE_VAR) {
                 return LLVMBuildLoad2(
                     llvm->builder,
                     llvm_resolve_type(expr->value->sema_type),

@@ -16,7 +16,9 @@ fun _start() -> void {
     if ptr == 0 as *void {
         die("failed to reallocate memory!");
     }
-    salloc::free(ptr);
+    if !salloc::free(ptr) {
+        die("failed to free memory!");
+    }
     io::println("yay, cool!");
     process::exit(0);
 }

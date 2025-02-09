@@ -21,18 +21,18 @@ fun page_from_ptr(src: *void) -> Page {
     return page;
 }
 
-fun reallocate(src: *void, size: u32) -> *void {
-    var old_page = page_from_ptr(src);
+fun reallocate(ptr: *void, size: u32) -> *void {
+    var old_page = page_from_ptr(ptr);
     var result = allocate(old_page.size);
     if result == 0 as *void {
         return 0 as *void;
     }
-    # mem::copy(src, result, old_page.size); # TODO: SEGFAULT ON MEMCPY
+    mem::copy(ptr, result, old_page.size);
     mem::page_free(&old_page);
     return result;
 }
 
-fun free(ptr: *void) -> void {
+fun free(ptr: *void) -> bool {
     var page = page_from_ptr(ptr);
-    mem::page_free(&page);
+    return mem::page_free(&page);
 }

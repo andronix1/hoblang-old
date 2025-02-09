@@ -153,5 +153,5 @@ SemaValue *sema_analyze_expr_as(SemaModule *sema, AstExprAs *as, SemaExprCtx ctx
 				return false;
 		}
 	}
-	return sema_value_with_type(as->expr->value, as_type);
+	return sema_value_const(as_type);
 }

@@ -58,7 +58,7 @@ void print_ast_expr(FILE *stream, va_list list) {
 			break;
 		}
 		case AST_EXPR_GET_INNER_PATH: {
-			print_to(stream, "{ast::expr}.{ast::path}", expr->get_inner.of, &expr->get_inner.path); break;
+			print_to(stream, "({ast::expr}){ast::ipath}", expr->get_inner.of, &expr->get_inner.path); break;
 			break;
 		}
 		case AST_EXPR_UNARY: {
