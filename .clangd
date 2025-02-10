@@ -1,0 +1,5 @@
+CompileFlags:
+  Add: 
+    - "-I/home/andronix1/Projects/hoblang/src"
+    - "-I/usr/include/llvm-c-14"
+    - "-I/usr/include/llvm-14"

@@ -1,6 +1,8 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.19)
 project(hoblang)
 
+set(CMAKE_FIND_PACKAGE_SORT_ORDER NATURAL)
+set(CMAKE_FIND_PACKAGE_SORT_DIRECTION DEC)
 find_package(LLVM REQUIRED)
 
 message(STATUS "LLVM version: ${LLVM_PACKAGE_VERSION}")
