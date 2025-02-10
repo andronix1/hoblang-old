@@ -26,12 +26,13 @@ set(SOURCE_FILES
 	src/lexer/parts/keyword.c
 	src/lexer/parts/symbol.c
 	src/lexer/parts/str.c
+	
+    src/ast/expr.c
+	src/ast/print/expr.c
+	src/ast/print/type.c
 
 	src/parser/impl/api.c
 	src/parser/impl/private.c
-	src/parser/print/expr.c
-	src/parser/print/type.c
-	src/parser/ast/expr.c
 	src/parser/parts/stmts/var.c
 	src/parser/parts/stmts/return.c
 	src/parser/parts/stmts/while.c

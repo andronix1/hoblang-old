@@ -16,11 +16,6 @@ typedef struct {
 	LLVMBuilderRef builder;
 } LlvmBackend;
 
-// TODO: compile time expr execution
-LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load);
-// ---------------------------------
-
-
 bool llvm_init(LlvmBackend *llvm);
 LLVMTypeRef llvm_sema_function_type(SemaFunction *func);
 LLVMTypeRef llvm_resolve_type(SemaType *type);
