@@ -2,14 +2,15 @@
 
 #include "core/slice.h"
 #include "sema/value.h"
+#include "sema/module/ast.h"
 
 typedef struct {
 	Slice *segments;
 
 	union {
-		struct _SemaModule *module;
-		struct _SemaScopeDecl *decl;
-		struct _SemaType *type;
+		SemaModule *module;
+		SemaScopeDecl *decl;
+    	SemaType *type;
 	};
 } AstDeclPath;
 
@@ -27,15 +28,15 @@ typedef enum {
 
 typedef struct {
     size_t idx;
-    struct _SemaType *of;
+    SemaType *of;
 } SemaInnerPathStructMember;
 
 typedef struct {
     SemaInnerPathType type;
-    struct _SemaType *sema_type;
+    SemaType *sema_type;
     union {
-        struct _SemaType *deref_type;
-        struct _SemaType *slice_type;
+        SemaType *deref_type;
+        SemaType *slice_type;
         SemaInnerPathStructMember struct_member;
     };
 } SemaInnerPath;

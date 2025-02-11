@@ -1,4 +1,4 @@
-#include "../../parts.h"
+#include "exprs.h"
 
 void sema_conv_pointer(
 	SemaModule *sema,

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sema/module/ast.h"
 #include "core/vec.h"
 #include "core/slice.h"
 #include "type.h"
@@ -8,7 +9,7 @@ typedef struct {
 	AstType type;
 	Slice name;
 
-	struct _SemaScopeValueDecl *decl;
+	SemaScopeValueDecl *decl;
 } AstFuncArg;
 
 typedef struct _AstFuncInfo {
@@ -17,7 +18,7 @@ typedef struct _AstFuncInfo {
 	AstFuncArg *args;
 	
 	Slice public_name;
-	struct _SemaScopeValueDecl *decl;
+	SemaScopeValueDecl *decl;
 } AstFuncInfo;
 
 void print_ast_func_info(FILE *stream, va_list *list);

@@ -1,12 +1,14 @@
 #pragma once
 
 #include <llvm-c/Core.h>
-#include "type.h"
+#include "core/slice.h"
+#include "../type/api.h"
+#include "api.h"
 
 #define sema_err(fmt, ...) \
 	do { \
 		hob_log(LOGE, fmt, ##__VA_ARGS__); \
-		sema->failed = true; \
+		sema_module_fail(sema); \
 	} while (0)
 
 typedef enum {
@@ -15,47 +17,27 @@ typedef enum {
     SEMA_SCOPE_DECL_VALUE,
 } SemaScopeDeclType;
 
-typedef struct _SemaScopeValueDecl {
+typedef struct SemaScopeValueDecl {
     SemaType *type;
     // TODO: abstract const value
     AstExpr *integer_expr;
     
     // sema
     bool constant;
-    LLVMValueRef llvm_value;
+    LLVMValueRef llvm_value; // TODO: i don't like it)
 } SemaScopeValueDecl;
 
-typedef struct _SemaScopeDecl {
+typedef struct SemaScopeDecl {
     SemaScopeDeclType type;
     Slice name;
     union {
         SemaType *sema_type;
         SemaScopeValueDecl value_decl;
-        struct _SemaModule *module;
+        SemaModule *module;
     };
 } SemaScopeDecl;
 
 
-typedef struct {
-    SemaScopeDecl **decls;
-	AstDefer **defers;
-} SemaScope;
-
-typedef struct _SemaModule {
-	AstModule *ast;
-	struct _SemaProject *project;
-	bool failed;
-
-    // internal
-    SemaScopeDecl **public_decls;
-	SemaScope *scopes;
-	SemaType *returning;
-} SemaModule;
-
-SemaModule *sema_module_new(struct _SemaProject *project, AstModule *module);
-
-void sema_module_read(SemaModule *sema);
-void sema_module(SemaModule *sema);
 SemaScopeDecl *sema_module_resolve_scope_decl(SemaModule *sema, Slice *name);
 SemaScopeDecl *sema_module_resolve_public_decl(SemaModule *sema, Slice *name);
 void sema_module_push_defer(SemaModule *sema, AstDefer *defer);
@@ -71,3 +53,7 @@ SemaScopeDecl *sema_scope_decl_new_value(Slice name, SemaType *type, bool consta
 SemaScopeDecl *sema_scope_decl_new_module(Slice name, SemaModule *module);
 
 AstDefer **sema_module_resolve_defers(SemaModule *sema);
+
+void sema_module_fail(SemaModule *sema);
+void sema_module_set_returns(SemaModule *sema, SemaType *returns);
+SemaType *sema_module_returns(SemaModule *sema);

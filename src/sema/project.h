@@ -5,14 +5,14 @@
 #include "core/path.h"
 #include "lexer/api.h"
 #include "parser/api.h"
-#include "module.h"
+#include "module/api.h"
 
 typedef struct {
     SemaModule *module;
     Slice path;
 } SemaProjectModule;
 
-typedef struct _SemaProject {
+typedef struct SemaProject {
     SemaProjectModule *modules;
 } SemaProject;
 

@@ -1,4 +1,4 @@
-#include "../../parts.h"
+#include "exprs.h"
 
 SemaValue *sema_analyze_expr_not(SemaModule *sema, AstExpr *not_expr, SemaExprCtx ctx) { 
     SemaType *type = sema_value_expr_type(sema, not_expr, sema_expr_ctx_expect(ctx, &primitives[PRIMITIVE_BOOL]));

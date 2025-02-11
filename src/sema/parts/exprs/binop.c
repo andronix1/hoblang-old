@@ -1,4 +1,4 @@
-#include "../../parts.h"
+#include "exprs.h"
 
 SemaValue *sema_analyze_expr_binop(SemaModule *sema, AstExprBinop *binop, SemaExprCtx ctx) { 
 	bool bool_binops = (

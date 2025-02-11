@@ -1,4 +1,4 @@
-#include "../../parts.h"
+#include "exprs.h"
 
 SemaValue *sema_analyze_expr_array(SemaModule *sema, AstExpr **array, SemaExprCtx ctx) {
 	SemaType *expect = false;

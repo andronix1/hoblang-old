@@ -18,7 +18,7 @@ typedef enum {
 
 typedef struct {
 	AstType type;
-	struct _AstExpr *expr;
+	AstExpr *expr;
 
 	SemaAsConvType conv_type;
 } AstExprAs;

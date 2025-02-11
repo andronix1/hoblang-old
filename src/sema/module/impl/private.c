@@ -1,14 +1,7 @@
-#include "module.h"
-
-SemaModule *sema_module_new(struct _SemaProject *project, AstModule *module) {
-	SemaModule *result = malloc(sizeof(SemaModule));
-	result->ast = module;
-	result->project = project;
-	result->public_decls = vec_new(SemaScopeDecl*);
-	result->scopes = vec_new(SemaScope);
-	result->failed = false;
-	return result;
-}
+#include "impl.h"
+#include "core/vec.h"
+#include "sema/type/private.h"
+#include "sema/module/private.h"
 
 SemaScopeDecl *sema_scope_decl_new_type(Slice name, SemaType *sema_type) {
     SemaScopeDecl *result = malloc(sizeof(SemaScopeDecl));
@@ -117,4 +110,16 @@ AstDefer **sema_module_resolve_defers(SemaModule *sema) {
         }
     }
     return result;
+}
+
+void sema_module_set_returns(SemaModule *sema, SemaType *returns) {
+    sema->returning = returns;
+}
+
+SemaType *sema_module_returns(SemaModule *sema) {
+    return sema->returning;
+}
+
+void sema_module_fail(SemaModule *sema) {
+    sema->failed = true;
 }

@@ -32,9 +32,9 @@ SemaModule *sema_project_add_module_at(SemaProject *project, const char *path) {
 	}
 	hob_log(LOGD, "reading module `{cstr}`...", filename);
 	SemaModule *sema = sema_module_new(project, module);
-	sema->project = project;
-	sema_module_read(sema);
-	if (sema->failed) {
+    //sema->project = project;
+	sema_module_read_decls(sema);
+	if (sema_module_failed(sema)) {
 		chdir(cwd);
 		return NULL;
 	}
@@ -59,8 +59,8 @@ bool sema_project_analyze(SemaProject *project) {
 	for (size_t i = 0; i < vec_len(project->modules); i++) {
 		SemaProjectModule *module = &project->modules[i];
 		hob_log(LOGD, "analyzing module `{slice}`...", &module->path);
-		sema_module(module->module);
-		if (module->module->failed) {
+		sema_module_analyze(module->module);
+		if (sema_module_failed(module->module)) {
 			success = false;
 		}
 	}

@@ -3,7 +3,7 @@
 #include "parser/print.h"
 #include "lexer/tokens.h"
 #include "core/print.h"
-#include "sema/type.h"
+#include "sema/type/api.h"
 
 void print_slice(FILE *stream, va_list list) {
 	slice_write_to(va_arg(list, Slice*), stream);

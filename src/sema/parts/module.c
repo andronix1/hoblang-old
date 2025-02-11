@@ -1,4 +1,6 @@
 #include "../parts.h"
+#include "sema/module/private.h"
+#include "sema/type/private.h"
 
 void sema_add_ast_func_info(SemaModule *sema, AstFuncInfo *info) {	
 	SemaType *returning = sema_ast_type(sema, &info->returning);
@@ -60,7 +62,7 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 		}
 
 		case AST_MODULE_NODE_IMPORT: {
-			SemaModule *module = sema_project_add_module_at(sema->project, node->import.path);
+			SemaModule *module = sema_project_add_module_at(sema_module_project(sema), node->import.path);
 			if (!module) {
 				break;
 			}
@@ -102,24 +104,26 @@ void sema_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 
 		case AST_MODULE_NODE_FUNC:
 			sema_push_ast_func_info(sema, &node->func_decl.info);
-			sema->returning = node->func_decl.info.returning.sema;
+			sema_module_set_returns(sema, node->func_decl.info.returning.sema);
 			sema_ast_body(sema, &node->func_decl.body);
 			break;	
 	}
 	sema_module_pop_scope(sema);
 }
 
-void sema_module_read(SemaModule *sema) {
+void sema_module_read_decls(SemaModule *sema) {
 	sema_module_push_scope(sema);
 	sema_module_push_primitives(sema);
-	for (size_t i = 0; i < vec_len(sema->ast->nodes); i++) {
-		sema_push_ast_module_node(sema, &sema->ast->nodes[i]);
+    AstModule *module = sema_module_of(sema);
+	for (size_t i = 0; i < vec_len(module->nodes); i++) {
+		sema_push_ast_module_node(sema, &module->nodes[i]);
 	}
 }
 
-void sema_module(SemaModule *sema) {
-	for (size_t i = 0; i < vec_len(sema->ast->nodes); i++) {
-		sema_ast_module_node(sema, &sema->ast->nodes[i]);
+void sema_module_analyze(SemaModule *sema) {
+    AstModule *module = sema_module_of(sema);
+	for (size_t i = 0; i < vec_len(module->nodes); i++) {
+		sema_ast_module_node(sema, &module->nodes[i]);
 	}
 	sema_module_pop_scope(sema);
 }

@@ -1,7 +1,9 @@
 #pragma once
 
 #include "core/slice.h"
+#include "sema/type/api.h"
 #include "path.h"
+#include "api.h"
 
 typedef enum {
 	AST_TYPE_PATH,
@@ -28,7 +30,7 @@ typedef struct {
 
 typedef struct {
 	struct _AstType *of;
-	struct _AstExpr *length;
+	AstExpr *length;
 } AstArrayType;
 
 typedef struct _AstType {
@@ -42,5 +44,5 @@ typedef struct _AstType {
 		AstArrayType array;
 	};
 	
-    struct _SemaType *sema;
+    SemaType *sema;
 } AstType;

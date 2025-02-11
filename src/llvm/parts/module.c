@@ -1,4 +1,5 @@
 #include "../parts.h"
+#include "sema/module/private.h"
 
 void llvm_module_node(LlvmBackend *llvm, AstModuleNode *node) {
 	switch (node->type) {

@@ -1,5 +1,7 @@
 #include "../parts.h"
 #include "../utils/slices.h"
+#include "ast/path.h"
+#include "sema/module/private.h"
 
 LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstInnerPath *path) {
     for (size_t i = 0; i < vec_len(path->segments); i++) {

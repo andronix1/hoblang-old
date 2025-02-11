@@ -1,5 +1,5 @@
 #include "core/slice.h"
-#include "../../../type.h"
+#include "sema/type/private.h"
 
 typedef struct {
     Slice name;

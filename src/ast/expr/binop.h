@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ast/api.h"
+
 typedef enum {
 	AST_BINOP_AND,
 	AST_BINOP_ADD,
@@ -23,5 +25,5 @@ typedef enum {
 
 typedef struct {
 	AstBinopType type;
-	struct _AstExpr *left, *right;
+	AstExpr *left, *right;
 } AstExprBinop;

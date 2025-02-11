@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../type.h"
+#include "../type/api.h"
+#include "sema/type/private.h"
 
 typedef struct {
 	SemaType *expectation;

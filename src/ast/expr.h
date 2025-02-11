@@ -39,18 +39,18 @@ typedef enum {
 	AST_EXPR_REF,
 } AstExprType;
 
-struct _SemaType;
+typedef struct AstExpr AstExpr;
 
-typedef struct _AstExpr {
+typedef struct AstExpr {
 	AstExprType type;
 	union {
 		AstExprBinop binop;
 		AstCall call;
 		AstExprUnary unary;
 		AstExprAs as;
-		struct _AstExpr **array;
-		struct _AstExpr *ref_expr;
-		struct _AstExpr *not_expr;
+		AstExpr **array;
+		AstExpr *ref_expr;
+		AstExpr *not_expr;
 		AstExprGetLocal get_local;
 		AstExprGetInner get_inner;
 		Slice str;

@@ -3,7 +3,7 @@
 #include "parser/api.h"
 #include "parts/expr.h"
 #include "value.h"
-#include "module.h"
+#include "module/private.h"
 #include "project.h"
 
 void sema_ast_body(SemaModule *sema, AstBody *body);

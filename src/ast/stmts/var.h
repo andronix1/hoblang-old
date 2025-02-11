@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sema/module/ast.h"
 #include "../type.h"
 #include "../expr.h"
 
@@ -9,5 +10,5 @@ typedef struct {
 	AstExpr *expr;
 	bool initializes, typed;
 	
-	struct _SemaScopeValueDecl *decl;
+	SemaScopeValueDecl *decl;
 } AstVar;

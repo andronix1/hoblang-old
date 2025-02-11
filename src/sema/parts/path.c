@@ -1,4 +1,5 @@
 #include "../parts.h"
+#include "sema/type/private.h"
 
 /*
 path - const / var

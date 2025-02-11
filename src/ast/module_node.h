@@ -16,7 +16,7 @@ typedef struct {
 	Slice name;
 	AstExpr *expr;
 
-	struct _SemaScopeValueDecl *value_decl;
+	SemaScopeValueDecl *value_decl;
 } AstConst;
 
 typedef struct {

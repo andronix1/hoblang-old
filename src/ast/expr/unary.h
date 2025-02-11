@@ -1,3 +1,5 @@
+#include "ast/expr.h"
+
 typedef enum {
     AST_UNARY_MINUS,
 	AST_UNARY_BITNOT,
@@ -5,5 +7,5 @@ typedef enum {
 
 typedef struct {
     AstUnaryType type;
-    struct _AstExpr *expr;
+    AstExpr *expr;
 } AstExprUnary;

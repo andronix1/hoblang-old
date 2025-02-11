@@ -1,19 +1,6 @@
-#include "type.h"
-
-#define TYPE_PRIMITIVE(kind) [kind] = { .type = SEMA_TYPE_PRIMITIVE, .primitive = kind }
-
-SemaType primitives[] = {
-	TYPE_PRIMITIVE(PRIMITIVE_U8),
-	TYPE_PRIMITIVE(PRIMITIVE_U16),
-	TYPE_PRIMITIVE(PRIMITIVE_U32),
-	TYPE_PRIMITIVE(PRIMITIVE_U64),
-	TYPE_PRIMITIVE(PRIMITIVE_I8),
-	TYPE_PRIMITIVE(PRIMITIVE_I16),
-	TYPE_PRIMITIVE(PRIMITIVE_I32),
-	TYPE_PRIMITIVE(PRIMITIVE_I64),
-	TYPE_PRIMITIVE(PRIMITIVE_BOOL),
-	TYPE_PRIMITIVE(PRIMITIVE_VOID),
-};
+#include "api.h"
+#include "core/vec.h"
+#include "private.h"
 
 bool sema_types_equals(SemaType *type, SemaType *other) {
 	if (type == other) {
@@ -117,32 +104,3 @@ void print_sema_type(FILE* stream, va_list list) {
 	}
 }
 
-SemaType *sema_type_new_array(size_t length, SemaType *of) {
-	SemaType *result = malloc(sizeof(SemaType));
-	result->type = SEMA_TYPE_ARRAY;
-	result->array.of = of;
-	result->array.length = length;
-	return result;
-}
-
-SemaType *sema_type_new_slice(SemaType *of) {
-	SemaType *result = malloc(sizeof(SemaType));
-	result->type = SEMA_TYPE_SLICE;
-	result->slice_of = of;
-	return result;
-}
-
-SemaType *sema_type_new_pointer(SemaType *to) {
-	SemaType *result = malloc(sizeof(SemaType));
-	result->type = SEMA_TYPE_POINTER;
-	result->ptr_to = to;
-	return result;
-}
-
-SemaType *sema_type_new_func(SemaType *returning, SemaType **args) {
-	SemaType *result = malloc(sizeof(SemaType));
-	result->type = SEMA_TYPE_FUNCTION;
-	result->func.returning = returning;
-	result->func.args = args;
-	return result;
-}

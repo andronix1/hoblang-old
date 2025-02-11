@@ -6,8 +6,8 @@
 #include "core/log.h"
 #include "core/assert.h"
 #include "parser/api.h"
-#include "sema/type.h"
-#include "sema/module.h"
+#include "sema/type/api.h"
+#include "sema/api.h"
 
 typedef struct {
 	LLVMTargetMachineRef machine;

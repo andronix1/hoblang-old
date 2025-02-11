@@ -1,4 +1,5 @@
 #include "../../parts.h"
+#include "sema/module/private.h"
 
 void llvm_stmt_var(LlvmBackend *llvm, AstVar *var) {
 	LLVMTypeRef type = llvm_resolve_type(var->type.sema);

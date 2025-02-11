@@ -1,9 +1,10 @@
 #pragma once
 
+#include "ast/api.h"
 #include "core/slice.h"
 #include "../path.h"
 
 typedef struct {
-    struct _AstExpr *of;
+    AstExpr *of;
     AstInnerPath path;
 } AstExprGetInner;

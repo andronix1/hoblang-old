@@ -1,4 +1,4 @@
-#include "../../parts.h"
+#include "exprs.h"
 
 SemaValue *sema_analyze_expr_int(SemaModule *sema, uint64_t integer, SemaType *expectation) { 
 	if (expectation && expectation->type == SEMA_TYPE_PRIMITIVE && expectation->primitive != PRIMITIVE_VOID) {

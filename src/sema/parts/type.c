@@ -1,4 +1,5 @@
 #include "../parts.h"
+#include "sema/type/private.h"
 
 SemaType *sema_ast_type(SemaModule *sema, AstType *type) {
 	if (type->sema) {

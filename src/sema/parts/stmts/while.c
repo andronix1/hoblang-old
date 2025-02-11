@@ -1,4 +1,5 @@
 #include "../../parts.h"
+#include "sema/type/private.h"
 
 void sema_stmt_while_loop(SemaModule *sema, AstWhile *while_loop) {
 	SemaType *type = sema_value_expr_type(sema, while_loop->expr, sema_expr_ctx_default_of(&primitives[PRIMITIVE_BOOL]));
