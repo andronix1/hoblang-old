@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sema/type/api.h"
+#include "sema/type/type.h"
 
 typedef enum {
     SEMA_VALUE_CONST = 1 << 0,

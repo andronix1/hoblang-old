@@ -1,19 +1,25 @@
 #include "core/slice.h"
-#include "sema/type/private.h"
+
+typedef enum {
+    X86_REG_8BIT,
+    X86_REG_16BIT,
+    X86_REG_32BIT,
+    X86_REG_64BIT,
+} X86RegSize;
 
 typedef struct {
     Slice name;
     bool is_64_bit;
-    SemaType *type;
+    X86RegSize size;
 } X86RegInfo;
 
-#define X86(_name, prim) { .name = slice_from_const_cstr(_name), .is_64_bit = false, .type = &primitives[prim] }
-#define X64(_name, prim) { .name = slice_from_const_cstr(_name), .is_64_bit = true, .type = &primitives[prim] }
+#define X86(_name, _size) { .name = slice_from_const_cstr(_name), .is_64_bit = false, .size = _size }
+#define X64(_name, _size) { .name = slice_from_const_cstr(_name), .is_64_bit = true, .size = _size }
 
-#define R8(name) X86(name, PRIMITIVE_I8)
-#define R16(name) X86(name, PRIMITIVE_I16)
-#define R32(name) X86(name, PRIMITIVE_I32)
-#define R64(name) X64(name, PRIMITIVE_I64)
+#define R8(name) X86(name, X86_REG_8BIT)
+#define R16(name) X86(name, X86_REG_16BIT)
+#define R32(name) X86(name, X86_REG_32BIT)
+#define R64(name) X64(name, X86_REG_64BIT)
 
 const X86RegInfo regs[] = {
     R64("rax"), R64("rbx"), R64("rcx"), R64("rdx"), R64("rsp"), R64("rbp"), R64("rsi"), R64("rdi"), R64("r8"), R64("r9"), R64("r10"), R64("r11"), R64("r12"), R64("r13"), R64("r14"), R64("r15"),

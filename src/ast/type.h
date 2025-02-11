@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/slice.h"
-#include "sema/type/api.h"
+#include "sema/type/type.h"
 #include "path.h"
 #include "api.h"
 

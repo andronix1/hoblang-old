@@ -1,4 +1,5 @@
 #include "exprs.h"
+#include "sema/type/private.h"
 
 SemaValue *sema_analyze_expr_binop(SemaModule *sema, AstExprBinop *binop, SemaExprCtx ctx) { 
 	bool bool_binops = (
@@ -14,7 +15,7 @@ SemaValue *sema_analyze_expr_binop(SemaModule *sema, AstExprBinop *binop, SemaEx
 			binop->type == AST_BINOP_LE ||
 			bool_binops
 		);
-	SemaType *expect = binary_binop ? (bool_binops ? &primitives[PRIMITIVE_BOOL] : NULL) : ctx.expectation;
+	SemaType *expect = binary_binop ? (bool_binops ? sema_type_primitive_bool() : NULL) : ctx.expectation;
 	SemaType *ltype = sema_value_expr_type(sema, binop->left, sema_expr_ctx_expect(ctx, expect));
 	if (!ltype) {
 		return NULL;
@@ -31,7 +32,7 @@ SemaValue *sema_analyze_expr_binop(SemaModule *sema, AstExprBinop *binop, SemaEx
 		return NULL;
 	}
 	if (bool_binops) {
-		if (!sema_types_equals(ltype, &primitives[PRIMITIVE_BOOL]) || !sema_types_equals(right_type, &primitives[PRIMITIVE_BOOL])) {
+		if (!sema_types_equals(ltype, sema_type_primitive_bool()) || !sema_types_equals(right_type, sema_type_primitive_bool())) {
 			sema_err("boolean binops can only operate booleans");
 			return NULL;
 		}
@@ -41,7 +42,7 @@ SemaValue *sema_analyze_expr_binop(SemaModule *sema, AstExprBinop *binop, SemaEx
 		return NULL;
 	}
 	if (binary_binop) {
-		ltype = &primitives[PRIMITIVE_BOOL];
+		ltype = sema_type_primitive_bool();
 	}
 	return sema_value_const(ltype);
 }

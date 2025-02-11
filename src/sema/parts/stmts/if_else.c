@@ -1,12 +1,11 @@
 #include "../../parts.h"
-#include "sema/type/private.h"
 
 void sema_if_else_body(SemaModule *sema, AstIfBody *if_body) {
-	SemaType *type = sema_value_expr_type(sema, if_body->expr, sema_expr_ctx_default_of(&primitives[PRIMITIVE_BOOL]));
+	SemaType *type = sema_value_expr_type(sema, if_body->expr, sema_expr_ctx_default_of(sema_type_primitive_bool()));
 	if (!type) {
 		return;
 	}
-	if (!sema_types_equals(type, &primitives[PRIMITIVE_BOOL])) {
+	if (!sema_types_equals(type, sema_type_primitive_bool())) {
 		sema_err("if condition expression must be boolean, not {sema::type}", type);
 	}
 	sema_ast_body(sema, if_body->body);

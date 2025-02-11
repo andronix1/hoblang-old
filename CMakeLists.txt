@@ -52,6 +52,7 @@ set(SOURCE_FILES
 	src/sema/module/impl/private.c
 	src/sema/project.c
     src/sema/type/api.c
+    src/sema/type/print.c
     src/sema/type/private.c
 	src/sema/parts/expr/eval.c
 	src/sema/parts/exprs/array.c

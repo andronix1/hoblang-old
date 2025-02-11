@@ -8,6 +8,7 @@
 #include "parser/api.h"
 #include "sema/type/api.h"
 #include "sema/api.h"
+#include "sema/type/private.h"
 
 typedef struct {
 	LLVMTargetMachineRef machine;

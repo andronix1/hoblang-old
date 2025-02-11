@@ -1,5 +1,6 @@
 #include "../parts.h"
 #include "sema/module/private.h"
+#include "sema/type/private.h"
 
 void llvm_module_node(LlvmBackend *llvm, AstModuleNode *node) {
 	switch (node->type) {
@@ -24,7 +25,7 @@ void llvm_module_node(LlvmBackend *llvm, AstModuleNode *node) {
 			if (llvm_body(llvm, &node->func_decl.body)) {
 				llvm_body_break(llvm, &node->func_decl.body);
 			}
-			if (sema_types_equals(node->func_decl.info.returning.sema, &primitives[PRIMITIVE_VOID])) {
+			if (sema_type_is_primitive(node->func_decl.info.returning.sema, PRIMITIVE_VOID)) {
 				LLVMBuildRetVoid(llvm->builder);
 			}
 			break;

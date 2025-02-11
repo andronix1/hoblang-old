@@ -19,9 +19,9 @@ SemaValue *sema_expr(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) {
 		case AST_EXPR_GET_LOCAL_PATH: return expr->value = sema_analyze_expr_get_local(sema, &expr->get_local, ctx);
 		case AST_EXPR_REF: return expr->value = sema_analyze_expr_ref(sema, expr->ref_expr, ctx);
 		case AST_EXPR_NOT: return expr->value = sema_analyze_expr_not(sema, expr->not_expr, ctx);
-		case AST_EXPR_STR: return expr->value = sema_value_const(sema_type_new_slice(&primitives[PRIMITIVE_U8]));
-		case AST_EXPR_CHAR: return expr->value = sema_value_const(&primitives[PRIMITIVE_U8]);
-		case AST_EXPR_BOOL: return expr->value = sema_value_const(&primitives[PRIMITIVE_BOOL]);
+		case AST_EXPR_STR: return expr->value = sema_value_const(sema_type_new_slice(sema_type_primitive_u8()));
+		case AST_EXPR_CHAR: return expr->value = sema_value_const(sema_type_primitive_u8());
+		case AST_EXPR_BOOL: return expr->value = sema_value_const(sema_type_primitive_bool());
 		case AST_EXPR_ARRAY: return expr->value = sema_analyze_expr_array(sema, expr->array, ctx);
 		case AST_EXPR_BINOP: return expr->value = sema_analyze_expr_binop(sema, &expr->binop, ctx);
 		case AST_EXPR_AS: return expr->value = sema_analyze_expr_as(sema, &expr->as, ctx);

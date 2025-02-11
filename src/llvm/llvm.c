@@ -1,5 +1,4 @@
 #include "llvm.h"
-#include "sema/type/private.h"
 
 bool llvm_init(LlvmBackend *llvm) {
 	llvm->builder = LLVMCreateBuilder();

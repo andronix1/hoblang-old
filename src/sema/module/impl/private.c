@@ -88,17 +88,10 @@ void sema_module_pop_scope(SemaModule *sema) {
 }
 
 void sema_module_push_primitives(SemaModule *sema) {
-    #define PP(name, type) sema_module_push_decl(sema, sema_scope_decl_new_type(slice_from_cstr(name), &primitives[type]));
-	PP("i8", PRIMITIVE_I8);
-    PP("i16", PRIMITIVE_I16);
-    PP("i32", PRIMITIVE_I32);
-    PP("i64", PRIMITIVE_I64);
-    PP("u8", PRIMITIVE_U8);
-    PP("u16", PRIMITIVE_U16);
-    PP("u32", PRIMITIVE_U32);
-    PP("u64", PRIMITIVE_U64);
-	PP("bool", PRIMITIVE_BOOL);
-	PP("void", PRIMITIVE_VOID);
+    #define PP(name) sema_module_push_decl(sema, sema_scope_decl_new_type(slice_from_cstr(#name), sema_type_primitive_##name()));
+	PP(i8); PP(i16); PP(i32); PP(i64);
+    PP(u8); PP(u16); PP(u32); PP(u64);
+	PP(bool); PP(void);
 }
 
 AstDefer **sema_module_resolve_defers(SemaModule *sema) {

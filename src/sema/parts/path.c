@@ -197,9 +197,9 @@ SemaValue *sema_resolve_inner_value_path(SemaModule *sema, SemaType *type, AstIn
                 } else if (slice_eq(&length, &segment->ident)) {
                     segment->sema.type = SEMA_INNER_PATH_SLICE_LEN;
                     if (is_last) {
-                        return sema_value_var(&primitives[PRIMITIVE_I32]);
+                        return sema_value_var(sema_type_primitive_i32());
                     }
-                    return sema_resolve_inner_value_path(sema, &primitives[PRIMITIVE_I32], path, segment_idx + 1);
+                    return sema_resolve_inner_value_path(sema, sema_type_primitive_i32(), path, segment_idx + 1);
                 } else {
                     sema_err("{sema::type} has not member {slice}", type, &segment->ident);
                     return false;

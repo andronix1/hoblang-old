@@ -13,7 +13,7 @@ void sema_stmt_return(SemaModule *sema, AstReturn *ret) {
 			return;
 		}
 	} else {
-		if (!sema_types_equals(returns, &primitives[PRIMITIVE_VOID])) {
+		if (!sema_types_equals(returns, sema_type_primitive_void())) {
 			sema_err("expected to return `{sema::type}` but got nothing");
 			return;
 		}

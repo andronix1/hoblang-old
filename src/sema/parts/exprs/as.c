@@ -15,7 +15,7 @@ void sema_conv_pointer(
 		*type = SEMA_AS_CONV_BITCAST;
 		return;
 	}
-	if (sema_types_equals(dest, &primitives[PRIMITIVE_I64])) {
+	if (sema_types_equals(dest, sema_type_primitive_i64())) {
 		*type = SEMA_AS_CONV_PTR_TO_INT;
 		return;
 	}
@@ -134,7 +134,7 @@ SemaValue *sema_analyze_expr_as(SemaModule *sema, AstExprAs *as, SemaExprCtx ctx
 	if (!as_type) {
 		return false;
 	}
-	SemaType *expr_type = sema_value_expr_type(sema, as->expr, sema_expr_ctx_expect(ctx, &primitives[PRIMITIVE_I64]));
+	SemaType *expr_type = sema_value_expr_type(sema, as->expr, sema_expr_ctx_expect(ctx, sema_type_primitive_i64()));
 	if (!expr_type) {
 		return false;
 	}
