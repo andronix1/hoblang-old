@@ -2,7 +2,7 @@
 
 #include <string.h>
 #include <malloc.h>
-#include "assert.h"
+#include "core/assert.h"
 
 typedef struct {
 	size_t len, cap, esize;

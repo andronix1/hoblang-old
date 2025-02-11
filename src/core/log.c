@@ -1,4 +1,4 @@
-#include "log.h"
+#include "core/log.h"
 
 #define ANSI(cmd) "\033[" #cmd "m"
 #define ANSI_RESET ANSI(0)

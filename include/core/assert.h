@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 #include <valgrind/valgrind.h>
-#include "log.h"
+#include "core/log.h"
 
 #undef assert
 #define assert(ok, fmt, ...) \
