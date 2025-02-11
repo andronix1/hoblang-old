@@ -1,4 +1,7 @@
-#include "vec.h"
+#include "core/vec.h"
+#include "core/assert.h"
+#include <malloc.h>
+#include <string.h>
 
 VecHeader *vec_header(void *vec) {
 	assert(((VecHeader*)vec)[-1].esize != 0, "looks like header is not initialized!");

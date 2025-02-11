@@ -1,4 +1,6 @@
-#include "path.h"
+#include "core/path.h"
+#include <stddef.h>
+#include <string.h>
 
 void path_split_filename_dir(char *source, char **dir, char **filename) {
 	*filename = source;

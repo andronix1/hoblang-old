@@ -1,7 +1,6 @@
 #pragma once
 
-#include <string.h>
-#include <malloc.h>
+#include <stddef.h>
 #include "core/assert.h"
 
 typedef struct {
@@ -35,3 +34,4 @@ void vec_free(void *vec);
 	assert(sizeof(*ptr) == vec_header(vec)->esize, "trying to append vector with esize {long} by pointer with size {long}", sizeof(*ptr), vec_header(vec)->esize); \
 	(typeof(vec))_vec_append_raw((vec), ptr, len); \
 })
+
