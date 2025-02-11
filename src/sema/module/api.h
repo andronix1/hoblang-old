@@ -1,11 +1,8 @@
 #pragma once
 
+#include "module.h"
+#include "sema/project/project.h"
 #include "ast/api.h"
-
-typedef struct SemaModule SemaModule;
-
-// TODO: API
-typedef struct SemaProject SemaProject;
 
 SemaModule *sema_module_new(SemaProject *project, AstModule *module);
 AstModule *sema_module_of(SemaModule *module);

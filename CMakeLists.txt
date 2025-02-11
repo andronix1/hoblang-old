@@ -48,12 +48,12 @@ set(SOURCE_FILES
 	src/parser/parts/path.c
 	src/parser/parts/body.c
 
-	src/sema/module/impl/api.c
-	src/sema/module/impl/private.c
-	src/sema/project.c
+	src/sema/project/impl/api.c
     src/sema/type/api.c
     src/sema/type/print.c
     src/sema/type/private.c
+	src/sema/module/impl/api.c
+	src/sema/module/impl/private.c
 	src/sema/module/parts/expr/eval.c
 	src/sema/module/parts/exprs/array.c
 	src/sema/module/parts/exprs/as.c

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "llvm.h"
-#include "sema/project.h"
 
 void llvm_module(LlvmBackend *llvm, AstModule *module);
 void llvm_body_break(LlvmBackend *llvm, AstBody *body);

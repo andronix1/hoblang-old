@@ -1,4 +1,5 @@
 #include "parts.h"
+#include "sema/project/api.h"
 #include "sema/module/private.h"
 #include "sema/type/private.h"
 

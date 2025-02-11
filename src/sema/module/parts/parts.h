@@ -4,7 +4,6 @@
 #include "expr.h"
 #include "sema/value.h"
 #include "sema/module/private.h"
-#include "sema/project.h"
 
 void sema_ast_body(SemaModule *sema, AstBody *body);
 SemaType *sema_ast_type(SemaModule *sema, AstType *type);

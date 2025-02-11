@@ -41,13 +41,16 @@ int main(int argc, char **argv) {
 		if (!llvm_init(&llvm)) {
 			return 1;
 		}
-		for (size_t i = 0; i < vec_len(project->modules); i++) {
-			hob_log(LOGD, "compiling {slice}", &project->modules[i].path);
-			llvm_module_init(&llvm, sema_module_of(project->modules[i].module));
+        SemaProjectModule **modules = sema_project_modules(project);
+		for (size_t i = 0; i < vec_len(modules); i++) {
+            Slice path = sema_project_module_path(modules[i]);
+			hob_log(LOGD, "compiling {slice}", &path);
+			llvm_module_init(&llvm, sema_module_of(sema_project_module_inner(modules[i])));
 		}
-		for (size_t i = 0; i < vec_len(project->modules); i++) {
-			hob_log(LOGD, "compiling {slice}", &project->modules[i].path);
-			llvm_module(&llvm, sema_module_of(project->modules[i].module));
+		for (size_t i = 0; i < vec_len(modules); i++) {
+            Slice path = sema_project_module_path(modules[i]);
+			hob_log(LOGD, "compiling {slice}", &path);
+			llvm_module(&llvm, sema_module_of(sema_project_module_inner(modules[i])));
 		}
 		llvm_write_module(&llvm, output_path);
 		hob_log(LOGI, "finished!");

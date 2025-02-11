@@ -1,4 +1,11 @@
-#include "project.h"
+#include <unistd.h>
+#include <linux/limits.h>
+#include "core/path.h"
+#include "lexer/api.h"
+#include "parser/api.h"
+#include "sema/module/api.h"
+#include <linux/limits.h>
+#include "impl.h"
 
 SemaModule *sema_project_add_module_at(SemaProject *project, const char *path) {
     const char *full_path = realpath(path, NULL);
@@ -8,8 +15,9 @@ SemaModule *sema_project_add_module_at(SemaProject *project, const char *path) {
 	}
 	Slice slice_path = slice_from_cstr(full_path);
 	for (size_t i = 0; i < vec_len(project->modules); i++) {
-		if (slice_eq(&slice_path, &project->modules[i].path)) {
-			return project->modules[i].module;
+        Slice path = sema_project_module_path(project->modules[i]);
+		if (slice_eq(&slice_path, &path)) {
+			return sema_project_module_inner(project->modules[i]);
 		}
 	}
 	char *dir, *filename;
@@ -38,10 +46,10 @@ SemaModule *sema_project_add_module_at(SemaProject *project, const char *path) {
 		chdir(cwd);
 		return NULL;
 	}
-	SemaProjectModule project_module = {
-		.module = sema,
-		.path = slice_path
-	};
+    // TODO: constructor
+	SemaProjectModule *project_module = malloc(sizeof(SemaProjectModule));
+    project_module->module = sema;
+	project_module->path = slice_path;
 	project->modules = vec_push(project->modules, &project_module);
     chdir(cwd);
 	return sema;
@@ -49,7 +57,7 @@ SemaModule *sema_project_add_module_at(SemaProject *project, const char *path) {
 
 SemaProject *sema_project_new() {
 	SemaProject *project = malloc(sizeof(SemaProject));
-	project->modules = vec_new(SemaProjectModule);
+	project->modules = vec_new(SemaProjectModule*);
 	return project;
 }
 
@@ -57,7 +65,7 @@ bool sema_project_analyze(SemaProject *project) {
 	assert(vec_len(project->modules) > 0, "cannot analyze an empty project");
 	bool success = true;
 	for (size_t i = 0; i < vec_len(project->modules); i++) {
-		SemaProjectModule *module = &project->modules[i];
+		SemaProjectModule *module = project->modules[i];
 		hob_log(LOGD, "analyzing module `{slice}`...", &module->path);
 		sema_module_analyze(module->module);
 		if (sema_module_failed(module->module)) {
@@ -65,4 +73,16 @@ bool sema_project_analyze(SemaProject *project) {
 		}
 	}
 	return success;
+}
+
+SemaProjectModule **sema_project_modules(SemaProject *project) {
+    return project->modules;
+}
+
+SemaModule *sema_project_module_inner(SemaProjectModule *module) {
+    return module->module;
+}
+
+Slice sema_project_module_path(SemaProjectModule *module) {
+    return module->path;
 }
