@@ -1,4 +1,4 @@
-#include "../../parts.h"
+#include "../parts.h"
 
 void sema_stmt_assign(SemaModule *sema, AstAssign *assign) {
 	SemaType *assign_type = sema_var_expr_type(sema, assign->assign_expr, sema_expr_ctx_default());

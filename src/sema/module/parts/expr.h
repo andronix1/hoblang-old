@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../type/api.h"
+#include "sema/type/api.h"
 #include "sema/type/private.h"
 
 typedef struct {

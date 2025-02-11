@@ -1,4 +1,4 @@
-#include "../parts.h"
+#include "parts.h"
 #include "sema/module/private.h"
 #include "sema/type/private.h"
 

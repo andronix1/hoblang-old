@@ -1,4 +1,4 @@
-#include "../../parts.h"
+#include "../parts.h"
 #include "sema/type/private.h"
 
 void sema_stmt_while_loop(SemaModule *sema, AstWhile *while_loop) {

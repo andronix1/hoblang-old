@@ -54,29 +54,29 @@ set(SOURCE_FILES
     src/sema/type/api.c
     src/sema/type/print.c
     src/sema/type/private.c
-	src/sema/parts/expr/eval.c
-	src/sema/parts/exprs/array.c
-	src/sema/parts/exprs/as.c
-	src/sema/parts/exprs/binop.c
-	src/sema/parts/exprs/call.c
-	src/sema/parts/exprs/int.c
-	src/sema/parts/exprs/not.c
-	src/sema/parts/exprs/ref.c
-	src/sema/parts/exprs/unary.c
-	src/sema/parts/exprs/get_local.c
-	src/sema/parts/exprs/get_inner.c
-	src/sema/parts/stmts/assign.c
-	src/sema/parts/stmts/asm.c
-	src/sema/parts/stmts/if_else.c
-	src/sema/parts/stmts/return.c
-	src/sema/parts/stmts/defer.c
-	src/sema/parts/stmts/var.c
-	src/sema/parts/stmts/while.c
-	src/sema/parts/module.c
-	src/sema/parts/path.c
-	src/sema/parts/type.c
-	src/sema/parts/body.c
-	src/sema/parts/expr.c
+	src/sema/module/parts/expr/eval.c
+	src/sema/module/parts/exprs/array.c
+	src/sema/module/parts/exprs/as.c
+	src/sema/module/parts/exprs/binop.c
+	src/sema/module/parts/exprs/call.c
+	src/sema/module/parts/exprs/int.c
+	src/sema/module/parts/exprs/not.c
+	src/sema/module/parts/exprs/ref.c
+	src/sema/module/parts/exprs/unary.c
+	src/sema/module/parts/exprs/get_local.c
+	src/sema/module/parts/exprs/get_inner.c
+	src/sema/module/parts/stmts/assign.c
+	src/sema/module/parts/stmts/asm.c
+	src/sema/module/parts/stmts/if_else.c
+	src/sema/module/parts/stmts/return.c
+	src/sema/module/parts/stmts/defer.c
+	src/sema/module/parts/stmts/var.c
+	src/sema/module/parts/stmts/while.c
+	src/sema/module/parts/module.c
+	src/sema/module/parts/path.c
+	src/sema/module/parts/type.c
+	src/sema/module/parts/body.c
+	src/sema/module/parts/expr.c
 
 	src/llvm/llvm.c
 	src/llvm/utils/slices.c

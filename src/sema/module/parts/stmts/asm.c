@@ -1,4 +1,4 @@
-#include "../../parts.h"
+#include "../parts.h"
 #include "asm/x86.h"
 
 void sema_stmt_inline_asm(SemaModule *sema, AstInlineAsm *inline_asm) {
