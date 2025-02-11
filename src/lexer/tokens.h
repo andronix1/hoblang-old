@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/slice/io.h"
 #include <stdbool.h>
 #include <printf.h>
 #include <stdint.h>

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string.h>
+#include <malloc.h>
 #include "sema/type/type.h"
 
 typedef enum {

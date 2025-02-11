@@ -1,4 +1,5 @@
 #include "core/slice.h"
+#include "core/slice/api.h"
 
 typedef enum {
     X86_REG_8BIT,

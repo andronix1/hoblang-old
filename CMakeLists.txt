@@ -9,10 +9,15 @@ message(STATUS "LLVM version: ${LLVM_PACKAGE_VERSION}")
 
 set(SOURCE_FILES
     src/main.c
+    src/print.c
+
+    src/print/base.c
+
+	src/core/slice/api.c
+	src/core/slice/io.c
 
 	src/core/path.c
 	src/core/vec.c
-	src/core/slice.c
 	src/core/print.c
 	src/core/log.c
 
@@ -104,3 +109,4 @@ target_compile_options(hoblang PRIVATE
 )
 target_link_libraries(hoblang PRIVATE LLVM)
 target_include_directories(hoblang PRIVATE src)
+target_include_directories(hoblang PRIVATE include)

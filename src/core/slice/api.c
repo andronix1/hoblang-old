@@ -1,22 +1,6 @@
-#include "slice.h"
-
-bool slice_read_from_file(Slice *output, const char *path) {
-	FILE *file = fopen(path, "r");
-	if (!file) {
-		return false;
-	}
-	fseek(file, 0, SEEK_END);
-	size_t len = ftell(file);
-	fseek(file, 0, SEEK_SET);
-	output->str = malloc(len);
-	if (fread((char*)output->str, 1, len, file) != len) {
-		free((char*)output->str);
-		fclose(file);
-		return false;
-	}
-	output->len = len;
-	return true;
-}
+#include "core/slice/api.h"
+#include <string.h>
+#include <malloc.h>
 
 Slice slice_from_cstr(const char *cstr) {
 	Slice result = {
@@ -39,10 +23,6 @@ char *slice_to_cstr(const Slice *slice) {
 	memcpy(result, slice->str, slice->len);
 	result[slice->len] = 0;
 	return result;
-}
-
-size_t slice_write_to(const Slice *slice, FILE *stream) {
-	return fwrite(slice->str, 1, slice->len, stream);
 }
 
 bool slice_eq(const Slice *slice, const Slice *other) {

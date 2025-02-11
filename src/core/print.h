@@ -2,7 +2,8 @@
 
 #include <stdarg.h>
 #include <stdio.h>
-#include "slice.h"
+#include "core/slice.h"
+#include "core/slice/api.h"
 
 typedef void(*PrintFunc)(FILE* stream, va_list args);
 
