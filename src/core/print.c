@@ -1,6 +1,12 @@
+#include "core/print.h"
 #include "core/slice/io.h"
-#include "print.h"
-#include "vec.h"
+#include "core/vec.h"
+
+typedef struct {
+	Slice name;
+	size_t size;
+	PrintFunc func;
+} PrintInfo;
 
 PrintInfo *print_infos;
 

@@ -2,7 +2,7 @@
 
 #include <stdarg.h>
 #include <stdio.h>
-#include "print.h"
+#include "core/print.h"
 #include "location.h"
 
 typedef enum { LOGF, LOGE, LOGW, LOGI, LOGD } LogLevel;
