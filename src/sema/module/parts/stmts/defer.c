@@ -1,4 +1,5 @@
 #include "../parts.h"
+#include "../body.h"
 
 void sema_stmt_defer(SemaModule *sema, AstDefer *defer) {
 	sema_ast_body(sema, defer->body);

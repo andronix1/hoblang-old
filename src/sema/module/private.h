@@ -1,6 +1,7 @@
 #pragma once
 
 #include <llvm-c/Core.h>
+#include "core/log.h"
 #include "core/slice.h"
 #include "../type/api.h"
 #include "api.h"

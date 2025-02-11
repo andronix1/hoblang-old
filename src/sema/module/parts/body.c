@@ -1,4 +1,7 @@
 #include "parts.h"
+#include "expr.h"
+#include "ast/body.h"
+#include "core/vec.h"
 
 void sema_stmt_assign(SemaModule *sema, AstAssign *assign);
 void sema_stmt_defer(SemaModule *sema, AstDefer *defer);

@@ -1,4 +1,8 @@
+#include "ast/stmts/if_else.h"
+#include "core/vec.h"
 #include "../parts.h"
+#include "../body.h"
+#include "../expr.h"
 
 void sema_if_else_body(SemaModule *sema, AstIfBody *if_body) {
 	SemaType *type = sema_value_expr_type(sema, if_body->expr, sema_expr_ctx_default_of(sema_type_primitive_bool()));

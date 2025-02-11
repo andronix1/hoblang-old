@@ -2,6 +2,12 @@
 #include "sema/project/api.h"
 #include "sema/module/private.h"
 #include "sema/type/private.h"
+#include "core/vec.h"
+#include "ast/module.h"
+#include "path.h"
+#include "body.h"
+#include "expr.h"
+#include "type.h"
 
 void sema_add_ast_func_info(SemaModule *sema, AstFuncInfo *info) {	
 	SemaType *returning = sema_ast_type(sema, &info->returning);

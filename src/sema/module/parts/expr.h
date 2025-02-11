@@ -1,11 +1,17 @@
 #pragma once
 
+#include "ast/expr.h"
+#include "sema/type/type.h"
 #include "sema/type/api.h"
 #include "sema/type/private.h"
 
 typedef struct {
 	SemaType *expectation;
 } SemaExprCtx;
+
+SemaType *sema_value_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx);
+SemaType *sema_var_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx);
+SemaType *sema_const_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx);
 
 inline static SemaExprCtx sema_expr_ctx_default() {
 	SemaExprCtx ctx = {

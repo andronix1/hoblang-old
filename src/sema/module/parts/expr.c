@@ -1,5 +1,6 @@
 #include "parts.h"
 #include "expr.h"
+#include "core/assert.h"
 
 SemaValue *sema_analyze_expr_array(SemaModule *sema, AstExpr **array, SemaExprCtx ctx);
 SemaValue *sema_analyze_expr_as(SemaModule *sema, AstExprAs *as, SemaExprCtx ctx);

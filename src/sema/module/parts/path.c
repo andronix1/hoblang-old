@@ -1,4 +1,5 @@
 #include "parts.h"
+#include "core/vec.h"
 #include "sema/type/private.h"
 
 /*

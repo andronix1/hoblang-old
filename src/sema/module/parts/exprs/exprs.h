@@ -1,5 +1,5 @@
 #pragma once
 
 #include "../parts.h"
-#include "ast/expr.h"
-#include "sema/type/private.h"
+#include "../expr.h"
+#include "sema/type/type.h"

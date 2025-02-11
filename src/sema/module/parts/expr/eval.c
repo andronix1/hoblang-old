@@ -1,4 +1,6 @@
 #include "eval.h"
+#include "core/vec.h"
+#include "core/assert.h"
 #include "sema/type/private.h"
 
 uint64_t sema_eval_int_expr(SemaModule *sema, AstExpr *expr) {

@@ -1,4 +1,7 @@
+#include "ast/stmts/var.h"
 #include "../parts.h"
+#include "../expr.h"
+#include "../type.h"
 
 void sema_stmt_var(SemaModule *sema, AstVar *var) {
 	SemaType *var_type;

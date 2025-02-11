@@ -1,4 +1,6 @@
 #include "exprs.h"
+#include "core/assert.h"
+#include "../type.h"
 
 void sema_conv_pointer(
 	SemaModule *sema,
