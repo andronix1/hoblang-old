@@ -1,7 +1,8 @@
 #pragma once 
 
+#include <stdbool.h>
 #include "core/slice.h"
-#include "../expr.h"
+#include "ast/api/expr.h"
 
 typedef enum {
     AST_ASM_ARG_REGISTER,

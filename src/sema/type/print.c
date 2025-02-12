@@ -1,4 +1,5 @@
 #include "print.h"
+#include "ast/private/type.h"
 #include "private.h"
 #include "core/vec.h"
 

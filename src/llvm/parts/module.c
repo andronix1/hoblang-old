@@ -1,6 +1,8 @@
 #include "../parts.h"
 #include "sema/module/private.h"
 #include "sema/type/private.h"
+#include "ast/private/module_node.h"
+#include "ast/private/module.h"
 
 void llvm_module_node(LlvmBackend *llvm, AstModuleNode *node) {
 	switch (node->type) {

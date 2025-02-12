@@ -1,4 +1,5 @@
 #include "../../parts.h"
+#include "ast/private/module_node.h"
 #include "func_info.h"
 
 bool parse_ext_func_decl(Parser *parser, AstExtFuncDecl *info) {

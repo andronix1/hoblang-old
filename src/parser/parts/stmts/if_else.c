@@ -1,6 +1,8 @@
 #include "../../parts.h"
 #include "../expr.h"
 #include "../body.h"
+#include "ast/private/stmts/if_else.h"
+#include "ast/private/body.h"
 
 bool parse_if_else_body(Parser *parser, AstIfBody *body) {
 	if (!(body->expr = parse_expr(parser, token_opening_figure_brace_stop))) {

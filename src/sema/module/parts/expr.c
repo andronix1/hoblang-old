@@ -1,4 +1,5 @@
 #include "parts.h"
+#include "ast/private/expr.h"
 #include "expr.h"
 #include "core/assert.h"
 

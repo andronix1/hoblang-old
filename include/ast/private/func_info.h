@@ -12,7 +12,7 @@ typedef struct {
 	SemaScopeValueDecl *decl;
 } AstFuncArg;
 
-typedef struct _AstFuncInfo {
+typedef struct AstFuncInfo {
 	Slice name;
 	AstType returning;
 	AstFuncArg *args;
@@ -20,5 +20,3 @@ typedef struct _AstFuncInfo {
 	Slice public_name;
 	SemaScopeValueDecl *decl;
 } AstFuncInfo;
-
-void print_ast_func_info(FILE *stream, va_list *list);

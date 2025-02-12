@@ -1,5 +1,6 @@
 #include "../../parts.h"
 #include "../expr.h"
+#include "ast/private/stmts/asm.h"
 
 bool token_is_asm_arg_end(TokenType type) {
     return type == TOKEN_COMMA || type == TOKEN_SEMICOLON;

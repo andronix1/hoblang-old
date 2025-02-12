@@ -1,7 +1,7 @@
 #pragma once
 
+#include "ast/api/defer.h"
 #include "../private.h"
-#include "ast/api.h"
 
 typedef struct SemaScope {
     SemaScopeDecl **decls;

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ast/api.h"
+#include "ast/api/expr.h"
 
-typedef struct {
+typedef struct AstCall {
 	AstExpr *callable;
 	AstExpr **args;
 } AstCall;

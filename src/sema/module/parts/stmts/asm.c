@@ -1,4 +1,4 @@
-#include "ast/stmts/asm.h"
+#include "ast/private/stmts/asm.h"
 #include "core/vec.h"
 #include "../parts.h"
 #include "asm/x86.h"

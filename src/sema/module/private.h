@@ -3,6 +3,8 @@
 #include <llvm-c/Core.h>
 #include "core/log.h"
 #include "core/slice.h"
+#include "ast/api/expr.h"
+#include "ast/api/defer.h"
 #include "../type/api.h"
 #include "api.h"
 

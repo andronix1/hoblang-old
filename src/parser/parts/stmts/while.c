@@ -1,5 +1,7 @@
 #include "../../parts.h"
 #include "../expr.h"
+#include "ast/private/stmts/while.h"
+#include "ast/private/body.h"
 #include "../body.h"
 
 bool parse_while(Parser *parser, AstWhile *while_loop) {

@@ -1,6 +1,10 @@
 #pragma once
 
 #include "llvm.h"
+#include "ast/api/module.h"
+#include "ast/api/body.h"
+#include "ast/api/expr.h"
+#include "ast/api/path.h"
 
 void llvm_module(LlvmBackend *llvm, AstModule *module);
 void llvm_body_break(LlvmBackend *llvm, AstBody *body);

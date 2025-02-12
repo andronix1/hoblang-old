@@ -1,4 +1,4 @@
-#include "ast/stmts/if_else.h"
+#include "ast/private/stmts/if_else.h"
 #include "core/vec.h"
 #include "../parts.h"
 #include "../body.h"

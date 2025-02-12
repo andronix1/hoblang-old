@@ -2,8 +2,9 @@
 
 #include "core/slice.h"
 #include "sema/type/type.h"
+#include "ast/api/type.h"
 #include "path.h"
-#include "api.h"
+#include "ast/api/expr.h"
 
 typedef enum {
 	AST_TYPE_PATH,
@@ -15,34 +16,33 @@ typedef enum {
 } AstTypeKind;
 
 typedef struct {
-	struct _AstType *args;
-	struct _AstType *returns;
+	AstType *args;
+	AstType *returns;
 } AstFunctionType;
 
 typedef struct {
 	Slice name;
-	struct _AstType *type;
+	AstType *type;
 } AstStructMember;
 
-typedef struct {
+typedef struct AstStructType {
 	AstStructMember *members;
 } AstStructType;
 
 typedef struct {
-	struct _AstType *of;
+	AstType *of;
 	AstExpr *length;
 } AstArrayType;
 
-typedef struct _AstType {
+typedef struct AstType {
 	AstTypeKind type;
 	union {
 		AstPath path;
 		AstStructType struct_type;
 		AstFunctionType func;
-		struct _AstType *ptr_to;
-		struct _AstType *slice_of;
+		AstType *ptr_to;
+		AstType *slice_of;
 		AstArrayType array;
 	};
-	
-    SemaType *sema;
+	SemaType *sema;
 } AstType;

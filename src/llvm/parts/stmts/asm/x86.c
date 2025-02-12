@@ -1,4 +1,6 @@
 #include "../../../parts.h"
+#include "ast/private/stmts/asm.h"
+#include "ast/private/expr.h"
 
 void llvm_stmt_asm(LlvmBackend *llvm, AstInlineAsm *inline_asm) {
     #define APPEND_ASM_PTR(ptr, len) do { assembly = vec_append_raw(assembly, ptr, len); } while (0)

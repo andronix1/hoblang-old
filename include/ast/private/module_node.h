@@ -4,8 +4,6 @@
 #include "func_info.h"
 #include "body.h"
 
-struct _AstModule;
-
 typedef struct {
 	AstType type;
 	Slice alias;
@@ -49,7 +47,7 @@ typedef enum {
 	AST_MODULE_NODE_TYPE_ALIAS,
 } AstModuleNodeType;
 
-typedef struct {
+typedef struct AstModuleNode {
 	AstModuleNodeType type;
 	union {
 		AstFuncDecl func_decl;		

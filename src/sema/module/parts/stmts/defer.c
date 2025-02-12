@@ -1,3 +1,4 @@
+#include "ast/private/stmts/defer.h"
 #include "../parts.h"
 #include "../body.h"
 

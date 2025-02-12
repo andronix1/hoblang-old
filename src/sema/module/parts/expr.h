@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ast/expr.h"
+#include "ast/api/expr.h"
 #include "sema/type/type.h"
 #include "sema/type/api.h"
 #include "sema/type/private.h"

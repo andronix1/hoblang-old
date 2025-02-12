@@ -1,4 +1,5 @@
 #include "module_node.h"
+#include "ast/private/module_node.h"
 #include "type.h"
 #include "path.h"
 #include "expr.h"

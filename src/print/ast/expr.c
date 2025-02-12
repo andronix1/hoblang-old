@@ -1,5 +1,7 @@
 #include <stdarg.h>
-#include "../module.h"
+#include "ast/private/expr.h"
+#include "core/vec.h"
+#include "core/print.h"
 
 void print_ast_binop_type(FILE *stream, va_list list) {
 	AstBinopType binop = va_arg(list, AstBinopType);

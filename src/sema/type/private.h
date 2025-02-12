@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stddef.h>
-#include "ast/type.h"
+#include "ast/api/type.h"
 #include "api.h"
 
 typedef struct SemaType SemaType;

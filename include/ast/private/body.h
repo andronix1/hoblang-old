@@ -34,11 +34,9 @@ typedef struct {
 	};
 } AstStmt;
 
-typedef struct _AstBody {
+typedef struct AstBody {
 	AstStmt *stmts;
 
 	// sema
 	AstDefer **defers;
 } AstBody;
-
-void print_ast_body(FILE *stream, va_list *list);

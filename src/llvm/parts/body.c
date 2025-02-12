@@ -1,4 +1,5 @@
 #include "../parts.h"
+#include "ast/private/body.h"
 
 void llvm_stmt_assign(LlvmBackend *llvm, AstAssign *assign);
 void llvm_stmt_if(LlvmBackend *llvm, AstIfElse *if_else);

@@ -4,7 +4,7 @@
 #include "sema/value.h"
 #include "sema/module/ast.h"
 
-typedef struct {
+typedef struct AstDeclPath {
 	Slice *segments;
 
 	union {
@@ -49,7 +49,7 @@ typedef struct {
     SemaInnerPath sema;
 } AstInnerPathSegment;
 
-typedef struct {
+typedef struct AstInnerPath {
 	AstInnerPathSegment *segments;
 } AstInnerPath;
 
@@ -57,7 +57,7 @@ typedef enum {
     AST_PATH_SEGMENT_IDENT
 } AstPathSegmentType;
 
-typedef struct {
+typedef struct AstPath {
 	AstDeclPath decl_path;
 	AstInnerPath inner_path;
 } AstPath;

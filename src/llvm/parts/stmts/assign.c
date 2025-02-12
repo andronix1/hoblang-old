@@ -1,4 +1,5 @@
 #include "../../parts.h"
+#include "ast/private/stmts/assign.h"
 
 void llvm_stmt_assign(LlvmBackend *llvm, AstAssign *assign) {
 	LLVMBuildStore(

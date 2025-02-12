@@ -1,4 +1,5 @@
-#include "ast/stmts/var.h"
+#include "ast/private/stmts/var.h"
+#include "ast/private/expr.h"
 #include "../parts.h"
 #include "../expr.h"
 #include "../type.h"

@@ -1,4 +1,5 @@
 #include "../../parts.h"
+#include "ast/private/module_node.h"
 #include "../body.h"
 #include "func_info.h"
 

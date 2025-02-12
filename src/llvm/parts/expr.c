@@ -1,5 +1,6 @@
 #include "../parts.h"
 #include "../utils/slices.h"
+#include "ast/private/expr.h"
 
 bool llvm_is_signed(SemaType *type) {
 	return

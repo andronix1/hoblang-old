@@ -1,5 +1,7 @@
 #include <stdarg.h>
-#include "../module.h"
+#include "ast/private/type.h"
+#include "core/vec.h"
+#include "core/print.h"
 
 void print_ast_type(FILE *stream, va_list list) {
 	AstType *type = va_arg(list, AstType*);

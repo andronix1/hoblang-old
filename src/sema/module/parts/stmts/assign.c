@@ -1,5 +1,5 @@
-#include "ast/api.h" // TODO: refactor ast
-#include "ast/stmts/assign.h"
+#include "ast/private/stmts/assign.h" // TODO: refactor ast
+#include "ast/private/expr.h" // TODO: refactor ast
 #include "../parts.h"
 #include "../expr.h"
 

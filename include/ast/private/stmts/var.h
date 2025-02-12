@@ -1,8 +1,9 @@
 #pragma once
 
+#include <stdbool.h>
 #include "sema/module/ast.h"
 #include "../type.h"
-#include "../expr.h"
+#include "ast/api/expr.h"
 
 typedef struct {
 	Slice name;

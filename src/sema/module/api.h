@@ -2,7 +2,7 @@
 
 #include "module.h"
 #include "sema/project/project.h"
-#include "ast/api.h"
+#include "ast/api/module.h"
 
 SemaModule *sema_module_new(SemaProject *project, AstModule *module);
 AstModule *sema_module_of(SemaModule *module);

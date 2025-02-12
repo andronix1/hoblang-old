@@ -1,3 +1,5 @@
+#include "ast/private/path.h"
+#include "ast/private/type.h"
 #include "parts.h"
 #include "core/vec.h"
 #include "sema/type/private.h"

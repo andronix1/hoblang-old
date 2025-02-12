@@ -1,4 +1,5 @@
 #include "func_info.h"
+#include "ast/private/func_info.h"
 
 bool parse_func_info(Parser *parser, AstFuncInfo *info) {
 	info->name = PARSER_EXPECT_NEXT(TOKEN_IDENT, "function name")->ident;

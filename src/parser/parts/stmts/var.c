@@ -1,3 +1,4 @@
+#include "ast/private/stmts/var.h"
 #include "../../parts.h"
 #include "../expr.h"
 #include "../type.h"

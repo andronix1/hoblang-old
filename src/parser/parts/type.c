@@ -1,4 +1,5 @@
 #include "type.h"
+#include "ast/private/type.h"
 #include "types/struct.c"
 #include "types/func.c"
 #include "expr.h"

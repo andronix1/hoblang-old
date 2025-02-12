@@ -1,3 +1,4 @@
+#include "ast/private/path.h"
 #include "path.h"
 
 bool parse_decl_path(Parser *parser, AstDeclPath *path) {

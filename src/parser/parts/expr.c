@@ -1,5 +1,6 @@
 #include "expr.h"
 #include "type.h"
+#include "ast/private/expr.h"
 #include "path.h"
 
 void expr_push_down(AstExpr *expr) {

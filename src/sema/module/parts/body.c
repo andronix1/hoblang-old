@@ -1,6 +1,6 @@
 #include "parts.h"
 #include "expr.h"
-#include "ast/body.h"
+#include "ast/private/body.h"
 #include "core/vec.h"
 
 void sema_stmt_assign(SemaModule *sema, AstAssign *assign);

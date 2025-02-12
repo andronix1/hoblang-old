@@ -1,10 +1,12 @@
 #include <unistd.h>
+#include <string.h>
 #include <linux/limits.h>
 #include "core/path.h"
 #include "lexer/api.h"
 #include "parser/api.h"
 #include "sema/module/api.h"
 #include <linux/limits.h>
+#include "ast/private/module.h"
 #include "impl.h"
 
 SemaModule *sema_project_add_module_at(SemaProject *project, const char *path) {

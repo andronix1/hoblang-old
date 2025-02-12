@@ -1,7 +1,7 @@
 #include "sema/type/type.h"
 #include "sema/module/private.h"
 #include "sema/value.h"
-#include "ast/path.h"
+#include "ast/api/path.h"
 
 SemaType *sema_resolve_value_path(SemaModule *sema, AstPath *path);
 SemaType *sema_resolve_type_path(SemaModule *sema, AstPath *path);

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ast/api/body.h"
+
 typedef struct AstDefer {
-	struct _AstBody *body;
+	AstBody *body;
 } AstDefer;

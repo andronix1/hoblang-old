@@ -1,4 +1,5 @@
 #include "api.h"
+#include "ast/private/type.h"
 #include "core/vec.h"
 #include "private.h"
 

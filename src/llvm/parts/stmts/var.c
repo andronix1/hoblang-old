@@ -1,4 +1,5 @@
 #include "../../parts.h"
+#include "ast/private/stmts/var.h"
 #include "sema/module/private.h"
 
 void llvm_stmt_var(LlvmBackend *llvm, AstVar *var) {

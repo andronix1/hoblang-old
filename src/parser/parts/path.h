@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ast/api/path.h"
 #include "../parts.h"
 
 bool parse_path(Parser *parser, AstPath *path);

@@ -1,4 +1,6 @@
 #include "../parts.h"
+#include "ast/private/module_node.h"
+#include "ast/private/module.h"
 #include "module_node.h"
 
 bool parse_module(Parser *parser, AstModule *module) {

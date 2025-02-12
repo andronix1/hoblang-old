@@ -1,4 +1,5 @@
 #include "../../parts.h"
+#include "ast/private/stmts/while.h"
 
 void llvm_stmt_while(LlvmBackend *llvm, AstWhile *while_loop) {
 	LLVMBasicBlockRef cond_block = LLVMAppendBasicBlock(llvm->func, "");

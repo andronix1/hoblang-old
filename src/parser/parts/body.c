@@ -1,4 +1,5 @@
 #include "body.h"
+#include "ast/private/body.h"
 #include "expr.h"
 
 bool parse_defer(Parser *parser, AstDefer *defer);

@@ -1,6 +1,5 @@
-#include "ast/api.h" // TODO: refactor ast
+#include "ast/private/stmts/return.h" // TODO: refactor ast
 #include <stdbool.h> // TODO: refactor ast
-#include "ast/stmts/return.h"
 #include "../parts.h"
 #include "sema/type/private.h"
 #include "../expr.h"

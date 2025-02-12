@@ -1,4 +1,5 @@
 #include "../../parts.h"
+#include "ast/private/stmts/if_else.h"
 
 void llvm_stmt_if(LlvmBackend *llvm, AstIfElse *if_else) {
 	LLVMBasicBlockRef if_block = LLVMAppendBasicBlock(llvm->func, "");

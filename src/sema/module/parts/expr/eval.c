@@ -1,4 +1,5 @@
 #include "eval.h"
+#include "ast/private/expr.h"
 #include "core/vec.h"
 #include "core/assert.h"
 #include "sema/type/private.h"

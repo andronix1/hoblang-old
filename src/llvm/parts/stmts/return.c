@@ -1,4 +1,5 @@
 #include "../../parts.h"
+#include "ast/private/stmts/return.h"
 
 void llvm_stmt_return(LlvmBackend *llvm, AstReturn *ret, AstBody *body) {
 	llvm_body_break(llvm, body);

@@ -1,4 +1,5 @@
 #include "../parts.h"
+#include "ast/private/stmts/while.h"
 #include "sema/type/api.h"
 #include "../body.h"
 #include "../expr.h"

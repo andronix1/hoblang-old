@@ -13,6 +13,8 @@ set(SOURCE_FILES
 
     src/print/base.c
     src/print/lexer.c
+	src/print/ast/expr.c
+	src/print/ast/type.c
 
 	src/core/slice/api.c
 	src/core/slice/io.c
@@ -31,8 +33,6 @@ set(SOURCE_FILES
 	src/lexer/parts/str.c
 	
     src/ast/expr.c
-	src/ast/print/expr.c
-	src/ast/print/type.c
 
 	src/parser/impl/api.c
 	src/parser/impl/private.c

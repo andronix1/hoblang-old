@@ -3,7 +3,7 @@
 #include "sema/module/private.h"
 #include "sema/type/private.h"
 #include "core/vec.h"
-#include "ast/module.h"
+#include "ast/private/module.h"
 #include "path.h"
 #include "body.h"
 #include "expr.h"

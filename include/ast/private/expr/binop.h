@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ast/api.h"
+#include "ast/api/expr.h"
 
 typedef enum {
 	AST_BINOP_AND,
