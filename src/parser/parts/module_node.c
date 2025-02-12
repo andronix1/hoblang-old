@@ -1,8 +1,9 @@
-#include "module_node.h"
 #include "ast/private/module_node.h"
-#include "type.h"
-#include "path.h"
-#include "expr.h"
+#include "parser/parts/type.h"
+#include "parser/parts/path.h"
+#include "parser/parts/expr.h"
+#include "parser/private.h"
+#include "parser/token_stops.h"
 
 bool parse_ext_func_decl(Parser *parser, AstExtFuncDecl *info);
 bool parse_func_decl(Parser *parser, AstFuncDecl *decl);
@@ -87,7 +88,7 @@ bool parse_module_node(Parser *parser, AstModuleNode *node) {
 				return false;
 			}
 			PARSER_EXPECT_NEXT(TOKEN_ASSIGN, "assign");
-			node->constant.expr = parse_expr(parser, token_semicolon_stop);
+			node->constant.expr = parse_expr(parser, token_stop_semicolon);
 			if (!node->constant.expr) {
 				return false;
 			}

@@ -1,9 +1,10 @@
-#include "type.h"
 #include "ast/private/type.h"
-#include "types/struct.c"
-#include "types/func.c"
-#include "expr.h"
-#include "path.h"
+#include "parser/private.h"
+#include "parser/token_stops.h"
+#include "parser/parts/type.h"
+#include "parser/parts/expr.h"
+#include "parser/parts/path.h"
+#include "parser/parts/types.h"
 
 bool parse_type(Parser *parser, AstType *type) {
 	type->sema = NULL;
@@ -31,7 +32,7 @@ bool parse_type(Parser *parser, AstType *type) {
 				return parse_type(parser, type->slice_of = malloc(sizeof(AstType)));
 			}
 			type->type = AST_TYPE_ARRAY;
-			type->array.length = parse_expr(parser, token_idx_stop);
+			type->array.length = parse_expr(parser, token_stop_idx);
 			if (!type->array.length) {
 				return false;
 			}

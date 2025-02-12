@@ -1,5 +1,6 @@
-#include "../../parts.h"
-#include "../expr.h"
+#include "parser/private.h"
+#include "parser/token_stops.h"
+#include "parser/parts/expr.h"
 #include "ast/private/stmts/asm.h"
 
 bool token_is_asm_arg_end(TokenType type) {

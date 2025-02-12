@@ -1,5 +1,8 @@
-#include "func_info.h"
 #include "ast/private/func_info.h"
+#include "parser/parts/func_info.h"
+#include "lexer/token.h"
+#include "parser/private.h"
+#include "parser/token_stops.h"
 
 bool parse_func_info(Parser *parser, AstFuncInfo *info) {
 	info->name = PARSER_EXPECT_NEXT(TOKEN_IDENT, "function name")->ident;

@@ -1,7 +1,9 @@
-#include "expr.h"
-#include "type.h"
 #include "ast/private/expr.h"
-#include "path.h"
+#include "parser/parts/expr.h"
+#include "parser/parts/type.h"
+#include "parser/parts/path.h"
+#include "parser/private.h"
+#include "parser/token_stops.h"
 
 void expr_push_down(AstExpr *expr) {
 	static int priority[] = {
@@ -98,7 +100,7 @@ AstExpr **parse_call_args(Parser *parser) {
 		return args;
 	}
 	while (true) {
-		AstExpr *expr = parse_expr(parser, token_funcall_arg_stop);
+		AstExpr *expr = parse_expr(parser, token_stop_funcall_arg);
 		if (!expr) {
 			return false;
 		}
@@ -183,13 +185,13 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 			case TOKEN_GREATER_OR_EQUALS: PARSE_BINOP(AST_BINOP_GE); break;
 			case TOKEN_OR: PARSE_BINOP(AST_BINOP_OR); break;
 			case TOKEN_OPENING_CIRCLE_BRACE:
-                current_expr = parse_expr(parser, token_closing_circle_brace_stop);
+                current_expr = parse_expr(parser, token_stop_closing_circle_brace);
 				PARSER_EXPECT_NEXT(TOKEN_CLOSING_CIRCLE_BRACE, "scope close");
                 break;
 			case TOKEN_OPENING_FIGURE_BRACE:
 				AstExpr **values = vec_new(AstExpr*);
 				while (token->type != TOKEN_CLOSING_FIGURE_BRACE) {
-					AstExpr *expr = parse_expr(parser, token_array_arg_stop);
+					AstExpr *expr = parse_expr(parser, token_stop_array_arg);
 					if (!expr) {
 						return NULL;
 					}

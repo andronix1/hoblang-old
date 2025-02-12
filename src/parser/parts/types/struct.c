@@ -1,4 +1,6 @@
-#include "../../parts.h"
+#include "parser/private.h"
+#include "parser/parts/type.h"
+#include "ast/private/type.h"
 
 bool parse_ast_struct_member(Parser *parser, AstStructMember *member) {
 	member->name = PARSER_EXPECT_NEXT(TOKEN_IDENT, "struct member name")->ident;

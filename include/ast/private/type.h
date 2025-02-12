@@ -15,7 +15,7 @@ typedef enum {
 	AST_TYPE_POINTER
 } AstTypeKind;
 
-typedef struct {
+typedef struct AstFunctionType {
 	AstType *args;
 	AstType *returns;
 } AstFunctionType;

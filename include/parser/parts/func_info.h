@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../../parts.h"
+#include <stdbool.h>
+#include "parser/parser.h"
 #include "ast/api/func_info.h"
 
 bool parse_func_info(Parser *parser, AstFuncInfo *info);

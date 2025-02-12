@@ -34,8 +34,10 @@ set(SOURCE_FILES
 	
     src/ast/expr.c
 
-	src/parser/impl/api.c
-	src/parser/impl/private.c
+	src/parser/api.c
+	src/parser/private.c
+	src/parser/parts/types/func.c
+	src/parser/parts/types/struct.c
 	src/parser/parts/stmts/var.c
 	src/parser/parts/stmts/return.c
 	src/parser/parts/stmts/while.c

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "lexer/api.h"
+#include "lexer/lexer.h"
+#include "lexer/token.h"
 
 typedef struct Parser {
 	Lexer *lexer;

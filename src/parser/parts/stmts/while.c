@@ -1,11 +1,12 @@
-#include "../../parts.h"
-#include "../expr.h"
+#include "parser/private.h"
+#include "parser/token_stops.h"
+#include "parser/parts/expr.h"
 #include "ast/private/stmts/while.h"
 #include "ast/private/body.h"
-#include "../body.h"
+#include "parser/parts/body.h"
 
 bool parse_while(Parser *parser, AstWhile *while_loop) {
-	if (!(while_loop->expr = parse_expr(parser, token_opening_figure_brace_stop))) {
+	if (!(while_loop->expr = parse_expr(parser, token_stop_opening_figure_brace))) {
 		return false;
 	}
 	parser_skip_next(parser);

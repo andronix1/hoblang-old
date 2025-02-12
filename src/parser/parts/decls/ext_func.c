@@ -1,6 +1,7 @@
-#include "../../parts.h"
+#include "parser/private.h"
+#include "parser/token_stops.h"
 #include "ast/private/module_node.h"
-#include "func_info.h"
+#include "parser/parts/func_info.h"
 
 bool parse_ext_func_decl(Parser *parser, AstExtFuncDecl *info) {
 	PARSER_EXPECT_NEXT(TOKEN_OPENING_CIRCLE_BRACE, "external name opening");

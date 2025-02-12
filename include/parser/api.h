@@ -1,9 +1,8 @@
 #pragma once
 
-#include "lexer/api.h"
+#include "parser.h"
+#include "lexer/lexer.h"
 #include "ast/api/module.h"
-
-typedef struct Parser Parser;
 
 Parser *parser_from_file(const char *path);
 Parser *parser_new(Lexer *lexer);

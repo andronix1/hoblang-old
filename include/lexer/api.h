@@ -5,11 +5,6 @@
 #include "lexer.h"
 #include "token.h"
 
-typedef struct {
-    const char *file;
-    FileLocation location;
-} InFilePosition;
-
 Lexer *lexer_from_file(const char *path);
 Lexer *lexer_new(Slice content, const char *path);
 

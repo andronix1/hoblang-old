@@ -1,5 +1,5 @@
 #include "ast/private/path.h"
-#include "path.h"
+#include "parser/private.h"
 
 bool parse_decl_path(Parser *parser, AstDeclPath *path) {
     path->segments = vec_new(Slice);

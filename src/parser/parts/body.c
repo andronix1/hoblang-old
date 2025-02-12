@@ -1,6 +1,7 @@
-#include "body.h"
 #include "ast/private/body.h"
-#include "expr.h"
+#include "parser/parts/expr.h"
+#include "parser/private.h"
+#include "parser/token_stops.h"
 
 bool parse_defer(Parser *parser, AstDefer *defer);
 bool parse_if_else(Parser *parser, AstIfElse *if_else);
@@ -9,7 +10,7 @@ bool parse_var(Parser *parser, AstVar *var);
 bool parse_while(Parser *parser, AstWhile *while_loop);
 bool parse_asm_body(Parser *parser, AstInlineAsm *inline_asm);
 
-static inline bool token_stmt_stop(TokenType type) { return type == TOKEN_ASSIGN || type == TOKEN_SEMICOLON; }
+static inline bool token_stop_stmt(TokenType type) { return type == TOKEN_ASSIGN || type == TOKEN_SEMICOLON; }
 
 bool parse_stmt(Parser *parser, AstStmt *stmt) {
 	Token *token = parser_next(parser);
@@ -17,7 +18,7 @@ bool parse_stmt(Parser *parser, AstStmt *stmt) {
 		case TOKEN_IDENT:
 		case TOKEN_OPENING_CIRCLE_BRACE: {
 			parser_skip_next(parser);
-			AstExpr *expr = parse_expr(parser, token_stmt_stop);
+			AstExpr *expr = parse_expr(parser, token_stop_stmt);
 			if (!expr) {
 				return false;
 			}
@@ -26,7 +27,7 @@ bool parse_stmt(Parser *parser, AstStmt *stmt) {
 				case TOKEN_ASSIGN:
 					stmt->type = AST_STMT_ASSIGN;
 					stmt->assign.assign_expr = expr;
-					return (stmt->assign.expr = parse_expr(parser, token_semicolon_stop));
+					return (stmt->assign.expr = parse_expr(parser, token_stop_semicolon));
 				case TOKEN_SEMICOLON:
 					stmt->type = AST_STMT_EXPR;
 					stmt->expr = expr;

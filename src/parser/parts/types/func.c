@@ -1,4 +1,6 @@
-#include "../../parts.h"
+#include "parser/private.h"
+#include "parser/parts/type.h"
+#include "ast/private/type.h"
 
 bool parse_ast_func_type(Parser *parser, AstFunctionType *func_type) {
 	PARSER_EXPECT_NEXT(TOKEN_OPENING_CIRCLE_BRACE, "function args");

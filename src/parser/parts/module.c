@@ -1,7 +1,8 @@
-#include "../parts.h"
+#include "parser/private.h"
+#include "parser/token_stops.h"
 #include "ast/private/module_node.h"
 #include "ast/private/module.h"
-#include "module_node.h"
+#include "parser/parts/module_node.h"
 
 bool parse_module(Parser *parser, AstModule *module) {
 	module->nodes = vec_new(AstModuleNode);

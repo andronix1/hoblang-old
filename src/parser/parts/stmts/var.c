@@ -1,7 +1,8 @@
 #include "ast/private/stmts/var.h"
-#include "../../parts.h"
-#include "../expr.h"
-#include "../type.h"
+#include "parser/private.h"
+#include "parser/token_stops.h"
+#include "parser/parts/expr.h"
+#include "parser/parts/type.h"
 
 bool parse_var(Parser *parser, AstVar *var) {
 	var->name = PARSER_EXPECT_NEXT(TOKEN_IDENT, "variable name")->ident;
@@ -11,7 +12,7 @@ bool parse_var(Parser *parser, AstVar *var) {
 			return true;
 		case TOKEN_ASSIGN:
 			var->initializes = true;
-			if (!(var->expr = parse_expr(parser, token_semicolon_stop))) {
+			if (!(var->expr = parse_expr(parser, token_stop_semicolon))) {
 				return false;
 			}
 			return true;
@@ -28,7 +29,7 @@ bool parse_var(Parser *parser, AstVar *var) {
 	switch (parser_next(parser)->type) {
 		case TOKEN_ASSIGN:
 			var->initializes = true;
-			if (!(var->expr = parse_expr(parser, token_semicolon_stop))) {
+			if (!(var->expr = parse_expr(parser, token_stop_semicolon))) {
 				return false;
 			}
 			return true;

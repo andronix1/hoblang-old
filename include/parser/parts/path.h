@@ -1,7 +1,8 @@
 #pragma once
 
+#include <stdbool.h>
 #include "ast/api/path.h"
-#include "../parts.h"
+#include "parser/parser.h"
 
 bool parse_path(Parser *parser, AstPath *path);
 bool parse_decl_path(Parser *parser, AstDeclPath *path);

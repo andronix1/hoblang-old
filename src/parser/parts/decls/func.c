@@ -1,7 +1,8 @@
-#include "../../parts.h"
+#include "parser/private.h"
+#include "parser/token_stops.h"
 #include "ast/private/module_node.h"
-#include "../body.h"
-#include "func_info.h"
+#include "parser/parts/body.h"
+#include "parser/parts/func_info.h"
 
 bool parse_func_decl(Parser *parser, AstFuncDecl *decl) {
 	if (!parse_func_info(parser, &decl->info)) {
