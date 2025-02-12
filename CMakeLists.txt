@@ -12,19 +12,17 @@ set(SOURCE_FILES
     src/print.c
 
     src/print/base.c
+    src/print/lexer.c
 
 	src/core/slice/api.c
 	src/core/slice/io.c
-
 	src/core/path.c
 	src/core/vec.c
 	src/core/print.c
 	src/core/log.c
 
-	src/lexer/tokens.c
-	src/lexer/impl/api.c
-	src/lexer/impl/next.c
-	src/lexer/impl/private.c
+	src/lexer/api.c
+	src/lexer/private.c
 	src/lexer/parts/char.c
 	src/lexer/parts/ident.c
 	src/lexer/parts/integer.c

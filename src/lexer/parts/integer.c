@@ -1,4 +1,6 @@
-#include "../part.h"
+#include "lexer/private.h"
+#include "lexer/part.h"
+#include "core/chars.h"
 
 int char_to_digit10(char c) { return c - '0'; }
 

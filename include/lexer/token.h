@@ -93,5 +93,3 @@ typedef struct {
 	const Token *tokens;
 	size_t len;
 } TokensSlice;
-
-void print_token(FILE *stream, va_list list);

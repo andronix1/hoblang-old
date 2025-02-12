@@ -1,4 +1,6 @@
-#include "../part.h"
+#include "lexer/private.h"
+#include "lexer/part.h"
+#include "core/chars.h"
 
 LexPartErr lex_keyword(Lexer *lexer, const char *keyword, TokenType type) {
 	for (size_t i = 0; keyword[i] != '\0'; i++) {

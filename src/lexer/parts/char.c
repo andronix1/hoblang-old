@@ -1,4 +1,5 @@
-#include "../part.h"
+#include "lexer/private.h"
+#include "lexer/part.h"
 
 LexPartErr lex_char(Lexer *lexer) {
 	if (lexer_next_char(lexer) != '\'') {

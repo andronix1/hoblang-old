@@ -6,16 +6,11 @@ inline Token *parser_token(const Parser *parser) {
 }
 
 inline void parser_step(Parser *parser) {
-    static Token eoi = { .type = TOKEN_EOI };
 	if (parser->skip_next) {
 		parser->skip_next = false;
 		return;
 	}
-	if (!lex_next(parser->lexer)) {
-		parser->token = &eoi;
-	} else {
-		parser->token = lexer_token(parser->lexer);
-	}
+    parser->token = lexer_next(parser->lexer);
 }
 
 inline Token *parser_next(Parser *parser) {

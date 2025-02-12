@@ -1,4 +1,7 @@
-#include "symbol.h"
+#include "lexer/private.h"
+#include "lexer/part.h"
+#include "lexer/parts/symbol.h"
+#include "core/chars.h"
 
 LexPartErr lex_symbol_alt(Lexer *lexer, LexSymbolAlt *symbols, size_t len) {
 	assert(len, "symbols len must be non-zero");

@@ -1,4 +1,4 @@
-#include "tokens.h"
+#include "lexer/token.h"
 
 void print_token(FILE *stream, va_list list) {	
 	const Token *token = va_arg(list, Token*);
@@ -75,5 +75,6 @@ void print_token(FILE *stream, va_list list) {
 			fprintf(stream, "`");
 			return;
 	}
-	fprintf(stream, "<unknown token id %lx>", token->type);
+	fprintf(stream, "<unknown token id %x>", token->type);
 }
+

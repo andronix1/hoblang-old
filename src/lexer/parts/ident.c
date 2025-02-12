@@ -1,4 +1,6 @@
-#include "../part.h"
+#include "lexer/private.h"
+#include "lexer/part.h"
+#include "core/chars.h"
 
 LexPartErr lex_ident(Lexer *lexer) {
 	if (!char_is_ident_start(lexer_next_char(lexer))) {

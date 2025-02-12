@@ -1,4 +1,21 @@
-#include "impl.h"
+#include "lexer/api.h"
+#include "lexer/impl.h"
+
+InFilePosition lexer_position(const Lexer *lexer) {
+    InFilePosition result;
+    result.file = lexer->file;
+    result.location = lexer->location;
+    return result;
+}
+
+bool lexer_failed(const Lexer *lexer) {
+	return lexer->failed;
+}
+
+Token *lexer_next(Lexer *lexer) {
+    while (!lexer_try_next(lexer));
+    return &lexer->token;
+}
 
 Lexer *lexer_from_file(const char *path) {
 	Slice content;
@@ -37,17 +54,4 @@ bool lexer_finished(const Lexer *lexer) {
 	return lexer->remain.len == 0;
 }
 
-Token *lexer_token(Lexer *lexer) {
-	return &lexer->token;
-}
 
-InFilePosition lexer_position(const Lexer *lexer) {
-    InFilePosition result;
-    result.file = lexer->file;
-    result.location = lexer->location;
-    return result;
-}
-
-bool lexer_failed(const Lexer *lexer) {
-	return lexer->failed;
-}

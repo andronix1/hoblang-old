@@ -1,7 +1,8 @@
 #pragma once
 
-#include "../private.h"
-#include "../tokens.h"
+#include "lexer/api.h"
+#include "lexer/private.h"
+#include "lexer/token.h"
 
 typedef struct Lexer {
 	const char *file;
