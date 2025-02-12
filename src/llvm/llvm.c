@@ -1,4 +1,5 @@
 #include "llvm.h"
+#include "core/vec.h"
 #include "ast/private/type.h"
 #include "sema/type/private.h"
 

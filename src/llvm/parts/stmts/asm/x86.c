@@ -1,4 +1,5 @@
 #include "../../../parts.h"
+#include "core/vec.h"
 #include "ast/private/stmts/asm.h"
 #include "ast/private/expr.h"
 

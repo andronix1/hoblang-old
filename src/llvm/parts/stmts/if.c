@@ -1,4 +1,5 @@
 #include "../../parts.h"
+#include "core/vec.h"
 #include "ast/private/stmts/if_else.h"
 
 void llvm_stmt_if(LlvmBackend *llvm, AstIfElse *if_else) {

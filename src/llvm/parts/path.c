@@ -1,4 +1,5 @@
 #include "../parts.h"
+#include "core/vec.h"
 #include "../utils/slices.h"
 #include "ast/private/path.h"
 #include "sema/module/private.h"
