@@ -6,7 +6,8 @@
 #include "lexer/api.h"
 #include "parser/api.h"
 #include "sema/project/api.h"
-#include "llvm/parts.h"
+#include "sema/module/api.h"
+#include "llvm/api.h"
 
 char *args_shift(int *argc, char ***argv) {
     *argc -= 1;
@@ -37,22 +38,22 @@ int main(int argc, char **argv) {
 			return 1;
 		}
 		hob_log(LOGD, "analyzed successfully!");
-		LlvmBackend llvm;
-		if (!llvm_init(&llvm)) {
+		LlvmBackend *llvm = llvm_create();
+		if (!llvm) {
 			return 1;
 		}
         SemaProjectModule **modules = sema_project_modules(project);
 		for (size_t i = 0; i < vec_len(modules); i++) {
             Slice path = sema_project_module_path(modules[i]);
 			hob_log(LOGD, "compiling {slice}", &path);
-			llvm_module_init(&llvm, sema_module_of(sema_project_module_inner(modules[i])));
+			llvm_module_init(llvm, sema_module_of(sema_project_module_inner(modules[i])));
 		}
 		for (size_t i = 0; i < vec_len(modules); i++) {
             Slice path = sema_project_module_path(modules[i]);
 			hob_log(LOGD, "compiling {slice}", &path);
-			llvm_module(&llvm, sema_module_of(sema_project_module_inner(modules[i])));
+			llvm_module(llvm, sema_module_of(sema_project_module_inner(modules[i])));
 		}
-		llvm_write_module(&llvm, output_path);
+		llvm_write_module(llvm, output_path);
 		hob_log(LOGI, "finished!");
     } else {
 		usage();

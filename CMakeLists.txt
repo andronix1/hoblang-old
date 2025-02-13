@@ -83,9 +83,11 @@ set(SOURCE_FILES
 	src/sema/module/parts/body.c
 	src/sema/module/parts/expr.c
 
-	src/llvm/llvm.c
-	src/llvm/utils/slices.c
+	src/llvm/private.c
+	src/llvm/api.c
+	src/llvm/parts/types/slice.c
 	src/llvm/parts/path.c
+	src/llvm/parts/type.c
 	src/llvm/parts/module.c
 	src/llvm/parts/body.c
 	src/llvm/parts/stmts/asm/x86.c

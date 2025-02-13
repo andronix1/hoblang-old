@@ -1,4 +1,7 @@
-#include "../parts.h"
+#include <llvm-c/Core.h>
+#include "llvm/llvm.h"
+#include <stdbool.h>
+#include "core/slice.h"
 
 LLVMTypeRef llvm_slice_type(LLVMTypeRef of);
 LLVMValueRef llvm_slice_len(LlvmBackend *llvm, LLVMTypeRef type, LLVMValueRef slice);

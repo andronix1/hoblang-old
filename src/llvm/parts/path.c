@@ -1,9 +1,11 @@
-#include "../parts.h"
+#include <llvm-c/Core.h>
+#include "llvm/private.h"
 #include "core/vec.h"
-#include "../utils/slices.h"
 #include "ast/private/path.h"
 #include "sema/module/private.h"
 #include "sema/module/decls/impl.h"
+#include "llvm/parts/type.h"
+#include "llvm/parts/types/slice.h"
 
 LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstInnerPath *path) {
     for (size_t i = 0; i < vec_len(path->segments); i++) {
@@ -11,25 +13,26 @@ LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstI
         switch (segment->type) {
             case SEMA_INNER_PATH_DEREF:
                 value = LLVMBuildLoad2(
-                    llvm->builder,
+                    llvm_builder(llvm),
                     LLVMPointerType(llvm_resolve_type(segment->deref_type), 0),
                     value,
                     "deref"
                 );
                 break;
-            case SEMA_INNER_PATH_STRUCT_MEMBER:
+            case SEMA_INNER_PATH_STRUCT_MEMBER: {
                 LLVMValueRef indices[] = {
                     LLVMConstInt(LLVMInt32Type(), 0, false),
                     LLVMConstInt(LLVMInt32Type(), segment->struct_member.idx, false)
                 };
                 value = LLVMBuildGEP2(
-                    llvm->builder,
+                    llvm_builder(llvm),
                     llvm_resolve_type(segment->struct_member.of),
                     value,
                     indices, 2,
                     "struct_member"
                 );
                 break;
+            }
             case SEMA_INNER_PATH_SLICE_RAW:
                 value = llvm_slice_ptr(llvm, llvm_resolve_type(segment->slice_type), value);
                 break;

@@ -1,4 +1,6 @@
-#include "../parts.h"
+#include "llvm/private.h"
+#include "llvm/parts/body.h"
+#include "llvm/parts/expr.h"
 #include "core/vec.h"
 #include "ast/private/body.h"
 

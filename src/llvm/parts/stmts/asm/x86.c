@@ -1,4 +1,7 @@
-#include "../../../parts.h"
+#include "llvm/private.h"
+#include "llvm/parts/type.h"
+#include "llvm/parts/expr.h"
+#include "llvm/impl.h"
 #include "core/vec.h"
 #include "ast/private/stmts/asm.h"
 #include "ast/private/expr.h"

@@ -1,4 +1,5 @@
-#include "slices.h"
+#include "llvm/impl.h"
+#include "llvm/parts/types/slice.h"
 
 LLVMTypeRef llvm_slice_type(LLVMTypeRef of) {
     LLVMTypeRef fields[2] = { LLVMInt64Type(), LLVMPointerType(of, 0) };
