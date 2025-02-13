@@ -5,9 +5,9 @@
 #include "lexer/api.h"
 #include "parser/api.h"
 #include "sema/module/api.h"
-#include <linux/limits.h>
 #include "ast/private/module.h"
-#include "impl.h"
+#include "sema/project/impl.h"
+#include "sema/project/api.h"
 
 SemaModule *sema_project_add_module_at(SemaProject *project, const char *path) {
     const char *full_path = realpath(path, NULL);

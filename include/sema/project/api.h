@@ -1,8 +1,9 @@
 #pragma once
 
 #include <stdbool.h>
-#include "project.h"
-#include "sema/module/module.h"
+#include "sema/project.h"
+#include "sema/module.h"
+#include "sema/project/module.h"
 #include "core/slice.h"
 
 SemaProject *sema_project_new();

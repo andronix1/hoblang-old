@@ -53,7 +53,7 @@ set(SOURCE_FILES
 	src/parser/parts/path.c
 	src/parser/parts/body.c
 
-	src/sema/project/impl/api.c
+	src/sema/project/api.c
     src/sema/type/api.c
     src/sema/type/print.c
     src/sema/type/private.c
