@@ -9,6 +9,7 @@
 #include "expr/call.h"
 #include "expr/get_local.h"
 #include "expr/get_inner.h"
+#include "expr/idx.h"
 
 /*
 7 * a.b.c(1, 2).a
@@ -27,6 +28,7 @@ MUL(
 typedef enum {
 	AST_EXPR_GET_LOCAL_PATH,
 	AST_EXPR_GET_INNER_PATH,
+	AST_EXPR_IDX,
 	AST_EXPR_INTEGER,
 	AST_EXPR_CHAR,
 	AST_EXPR_STR,
@@ -49,6 +51,7 @@ typedef struct AstExpr {
 		AstCall call;
 		AstExprUnary unary;
 		AstExprAs as;
+		AstExprIdx idx;
 		AstExpr **array;
 		AstExpr *ref_expr;
 		AstExpr *not_expr;
@@ -65,6 +68,7 @@ typedef struct AstExpr {
 
 AstExpr *ast_expr_get_local_path(AstPath path);
 AstExpr *ast_expr_get_inner_path(AstExpr *of, AstInnerPath path);
+AstExpr *ast_expr_idx(AstExpr *of, AstExpr *idx);
 AstExpr *ast_expr_integer(uint64_t value);
 AstExpr *ast_expr_char(char value);
 AstExpr *ast_expr_str(Slice value);

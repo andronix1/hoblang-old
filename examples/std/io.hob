@@ -27,7 +27,36 @@ fun print(str: []u8) -> void {
     write_to(io::FD_STDOUT, str);
 }
 
+fun print_char(char: u8) -> void {
+    io::write(io::FD_STDOUT, &char, 1);
+}
+
 fun println(str: []u8) -> void {
     print(str);
     print("\n");
+}
+
+const PRINT_U64_BUF_SIZE: i32 = 32;
+
+fun print_u64(value: u64) -> void {
+    var buf: [PRINT_U64_BUF_SIZE]u8;
+    var buf_slice = &buf as []u8;
+    
+    var i = PRINT_U64_BUF_SIZE - 1;
+    while value > 0 {
+        buf_slice[i] = '0' + (value - (value / 10 as u64) * 10 as u64) as u8;
+        i = i - 1;
+        value = value / 10;
+    }
+    buf_slice.raw = (buf_slice.raw as i64 + i as i64 + 1) as *u8;
+    buf_slice.length = buf_slice.length - i - 1;
+    print(buf_slice);
+}
+
+fun get_char() -> u8 {
+    var res: u8;
+    if io::read(io::FD_STDIN, &res, 1) != 1 {
+        return '!';
+    }
+    return res;
 }

@@ -1,4 +1,5 @@
 import "linux/mem.hob" as mem;
+import "io.hob" as io;
 
 type Page = struct {
     ptr: *void,
@@ -16,6 +17,13 @@ fun pages_alloc(size: u32) -> Page {
     return page;
 }
 
+fun pages_realloc(page: *Page, size: u32) -> Page {
+    var new_page: Page;
+    new_page.ptr = mem::mremap(page.*.ptr, page.*.size as i64, size as i64, mem::MREMAP_MAYMOVE) as *void;
+    new_page.size = size;
+    return new_page;
+}
+
 fun page_free(page: *Page) -> bool {
     return mem::munmap(page.*.ptr, page.*.size as i64) == 0;
 }
@@ -23,7 +31,7 @@ fun page_free(page: *Page) -> bool {
 fun copy(src: *void, dst: *void, size: u32) -> void {
     var end = src as i64 + size as i64;
     while src as i64 < end {
-        # (src as *u8).* = (dst as *u8).*;
+        (src as *u8).* = (dst as *u8).*;
         src = (src as i64 + 1) as *void;
     }
 }

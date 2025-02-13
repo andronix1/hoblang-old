@@ -6,6 +6,10 @@ fun fork() -> Pid {
 	return syscall::arg0(syscall::FORK);
 }
 
+fun getpid() -> Pid {
+	return syscall::arg0(syscall::GETPID);
+}
+
 fun exit(status: i64) -> void {
 	syscall::arg1(syscall::EXIT, status);
 }

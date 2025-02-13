@@ -3,22 +3,24 @@
 #include "core/vec.h"
 #include "ast/private/path.h"
 #include "sema/module/private.h"
+#include "sema/value/private.h"
 #include "sema/module/decls/impl.h"
 #include "llvm/parts/type.h"
 #include "llvm/parts/types/slice.h"
 
 LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstInnerPath *path) {
-    // TODO: load depends on SemaValue
     for (size_t i = 0; i < vec_len(path->segments); i++) {
         SemaInnerPath *segment = &path->segments[i].sema;
         switch (segment->type) {
             case SEMA_INNER_PATH_DEREF:
-                value = LLVMBuildLoad2(
-                    llvm_builder(llvm),
-                    LLVMPointerType(llvm_resolve_type(segment->deref_type), 0),
-                    value,
-                    "deref"
-                );
+                if (segment->value->type != SEMA_VALUE_CONST) {
+                    value = LLVMBuildLoad2(
+                        llvm_builder(llvm),
+                        LLVMPointerType(llvm_resolve_type(segment->deref_type), 0),
+                        value,
+                        "deref"
+                    );
+                }
                 break;
             case SEMA_INNER_PATH_STRUCT_MEMBER: {
                 LLVMValueRef indices[] = {

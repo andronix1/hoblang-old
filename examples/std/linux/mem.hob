@@ -9,6 +9,10 @@ fun munmap(addr: *void, len: i64) -> i64 {
 	return syscall::arg2(syscall::MUNMAP, addr as i64, len);
 }
 
+fun mremap(addr: *void, old_len: i64, new_len: i64, flags: i64) -> i64 {
+	return syscall::arg4(syscall::MREMAP, addr as i64, old_len, new_len, flags);
+}
+
 const PROT_READ: i64 = 0x1;
 const PROT_WRITE: i64 = 0x2;
 const PROT_EXEC: i64 = 0x4;
@@ -19,3 +23,5 @@ const MAP_FIXED: i64 = 0x10;
 const MAP_ANON: i64 = 0x20;
 
 const PAGE_SIZE: i64 = 0x1000;
+
+const MREMAP_MAYMOVE: i64 = 1;

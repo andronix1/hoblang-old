@@ -2,14 +2,12 @@ import "mem.hob" as mem;
 
 use mem::Page;
 
-fun allocate(size: u32) -> *void {
-    var page = mem::pages_alloc(size + 4);
-    var result = page.ptr;
-    if result as i64 == 0 {
+fun page_to_ptr(page: *Page) -> *void {
+    if mem::is_page_invalid(page) {
         return 0 as *void;
     }
-    (result as *u32).* = size;
-    return (result as i64 + 4) as *void;
+    (page.*.ptr as *u32).* = page.*.size;
+    return (page.*.ptr as i64 + 4) as *void;
 }
 
 fun page_from_ptr(src: *void) -> Page {
@@ -21,15 +19,15 @@ fun page_from_ptr(src: *void) -> Page {
     return page;
 }
 
+fun allocate(size: u32) -> *void {
+    var page = mem::pages_alloc(size + 4);
+    return page_to_ptr(&page);
+}
+
 fun reallocate(ptr: *void, size: u32) -> *void {
     var old_page = page_from_ptr(ptr);
-    var result = allocate(old_page.size);
-    if result == 0 as *void {
-        return 0 as *void;
-    }
-    mem::copy(ptr, result, old_page.size);
-    mem::page_free(&old_page);
-    return result;
+    var new_page = mem::pages_realloc(&old_page, size + 4);
+    return page_to_ptr(&new_page);
 }
 
 fun free(ptr: *void) -> bool {

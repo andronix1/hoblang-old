@@ -62,6 +62,7 @@ set(SOURCE_FILES
 	src/sema/module/parts/expr/eval.c
 	src/sema/module/parts/exprs/array.c
 	src/sema/module/parts/exprs/as.c
+	src/sema/module/parts/exprs/idx.c
 	src/sema/module/parts/exprs/binop.c
 	src/sema/module/parts/exprs/call.c
 	src/sema/module/parts/exprs/int.c

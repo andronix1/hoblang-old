@@ -62,7 +62,7 @@ SemaValue *sema_resolve_inner_value_path(SemaModule *sema, SemaValue *from, AstI
             }
             segment->sema.type = SEMA_INNER_PATH_DEREF;
             segment->sema.deref_type = from->sema_type->ptr_to;
-            return sema_value_with_type(from, from->sema_type->ptr_to);
+            return sema_value_var(from->sema_type->ptr_to);
         }
 		case AST_INNER_PATH_SEG_IDENT: {
 			if (from->sema_type->type == SEMA_TYPE_STRUCT) {

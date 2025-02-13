@@ -4,6 +4,10 @@ fun fork() -> process::Pid {
     return process::fork();
 }
 
+fun get_pid() -> i64 {
+    return process::getpid();
+}
+
 fun exit(status: i32) -> void {
     process::exit(status as i64);
 }

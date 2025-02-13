@@ -20,6 +20,7 @@ void usage() {
 	printf("hoblang compile <source> <output> - compile source file to machine code\n");
 }
 
+
 int main(int argc, char **argv) {
 	print_setup();
 

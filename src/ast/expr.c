@@ -9,6 +9,10 @@
         return result; \
     }
 
+AstExpr *ast_expr_idx(AstExpr *of, AstExpr *idx) CONSTR(AST_EXPR_IDX, {
+    FIELD(idx.of, of)
+    FIELD(idx.idx, idx)
+})
 AstExpr *ast_expr_get_local_path(AstPath path) CONSTR(AST_EXPR_GET_LOCAL_PATH, {
     FIELD(get_local.path, path)
 })

@@ -86,26 +86,9 @@ LLVMValueRef llvm_get_local_value_path(LlvmBackend *llvm, AstPath *path) {
 LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 	switch (expr->type) {
 		case AST_EXPR_GET_INNER_PATH: {
-			LLVMValueRef allocated_expr = LLVMBuildAlloca(
-				llvm_builder(llvm),
-				llvm_resolve_type(expr->value->sema_type),
-				"allocated_expr"
-			);
-
-			LLVMBuildStore(
-				llvm_builder(llvm),
-				llvm_expr(llvm, expr->get_inner.of, true),
-				allocated_expr
-			);
-			// str_ptr: *void
-			// EXPR: (str_ptr as *u8).*
-
-			// **void alloca_src_ptr
-			// *u8 src_ptr_as_u8
-			// *u8 src_ptr_as_u8
 			LLVMValueRef value = llvm_resolve_inner_path(
 				llvm,
-				allocated_expr, //llvm_expr(llvm, expr->get_inner.of, false),
+				llvm_expr(llvm, expr->get_inner.of, false),
 				&expr->get_inner.path
 			);
 			if (load && expr->value->type == SEMA_VALUE_VAR) {
@@ -136,6 +119,36 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 		case AST_EXPR_BOOL: return LLVMConstInt(LLVMInt1Type(), expr->boolean, false);
 		case AST_EXPR_CHAR: return LLVMConstInt(LLVMInt8Type(), expr->character, false);
 		case AST_EXPR_STR: return llvm_slice_from_str(llvm, &expr->str);
+		case AST_EXPR_IDX: {
+			LLVMValueRef indices[] = {
+				llvm_expr(llvm, expr->idx.idx, true)
+			};
+			LLVMValueRef value = LLVMBuildGEP2(
+				llvm_builder(llvm),
+				llvm_resolve_type(expr->value->sema_type),
+				LLVMBuildLoad2(
+					llvm_builder(llvm),
+					LLVMPointerType(llvm_resolve_type(expr->value->sema_type), 0),
+					llvm_slice_ptr(
+						llvm,
+						llvm_resolve_type(expr->idx.of->value->sema_type),
+						llvm_expr(llvm, expr->idx.of, false)
+					),
+					"slice_ptr123"
+				),
+				indices, 1,
+				"idx_element_ptr"
+			);
+			if (load) {
+				return LLVMBuildLoad2(
+					llvm_builder(llvm),
+					llvm_resolve_type(expr->value->sema_type),
+					value, 
+					"loaded_idx"
+				);
+			}
+			return value;
+		}
 		case AST_EXPR_AS: {
 			LLVMTypeRef to_type = llvm_resolve_type(expr->as.type.sema);
 			LLVMValueRef value = llvm_expr(llvm, expr->as.expr, true);

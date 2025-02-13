@@ -13,11 +13,13 @@ SemaValue *sema_analyze_expr_int(SemaModule *sema, uint64_t integer, SemaExprCtx
 SemaValue *sema_analyze_expr_ref(SemaModule *sema, AstExpr *ref_expr, SemaExprCtx ctx);
 SemaValue *sema_analyze_expr_not(SemaModule *sema, AstExpr *not_expr, SemaExprCtx ctx);
 SemaValue *sema_analyze_expr_unary(SemaModule *sema, AstExprUnary *unary, SemaExprCtx ctx);
+SemaValue *sema_analyze_expr_idx(SemaModule *sema, AstExprIdx *idx, SemaExprCtx ctx);
 SemaValue *sema_analyze_expr_get_inner(SemaModule *sema, AstExprGetInner *get_inner, SemaExprCtx ctx);
 SemaValue *sema_analyze_expr_get_local(SemaModule *sema, AstExprGetLocal *get_local, SemaExprCtx ctx);
 
 SemaValue *sema_expr(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) {
     switch (expr->type) {
+		case AST_EXPR_IDX: return expr->value = sema_analyze_expr_idx(sema, &expr->idx, ctx);
 		case AST_EXPR_UNARY: return expr->value = sema_analyze_expr_unary(sema, &expr->unary, ctx);
 		case AST_EXPR_GET_INNER_PATH: return expr->value = sema_analyze_expr_get_inner(sema, &expr->get_inner, ctx);
 		case AST_EXPR_GET_LOCAL_PATH: return expr->value = sema_analyze_expr_get_local(sema, &expr->get_local, ctx);

@@ -138,7 +138,17 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 			case TOKEN_STR:
                 current_expr = ast_expr_str(slice_new(token->str, vec_len(token->str)));
                 break;
-			case TOKEN_INTEGER: 
+			case TOKEN_OPENING_SQUARE_BRACE:
+				if (!current_expr) {
+					PARSE_ERROR("expected expression before index expression");
+				}
+                current_expr = ast_expr_idx(current_expr, parse_expr(parser, token_stop_idx));
+				if (!current_expr) {
+					return NULL;
+				}
+				PARSER_EXPECT_NEXT(TOKEN_CLOSING_SQUARE_BRACE, "index closing brace");
+				break;
+			case TOKEN_INTEGER:
                 current_expr = ast_expr_integer(token->integer);
                 break;
 			case TOKEN_IDENT: {

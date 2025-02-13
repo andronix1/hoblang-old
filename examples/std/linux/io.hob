@@ -30,4 +30,5 @@ const SEEK_END: i64 = 2;
 const SEEK_CUR: i64 = 1;
 const SEEK_SET: i64 = 0;
 
-const FD_STDOUT: Fd = 0;
+const FD_STDIN: Fd = 0;
+const FD_STDOUT: Fd = 1;

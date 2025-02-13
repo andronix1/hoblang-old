@@ -9,9 +9,11 @@ LexPartErr lex_char(Lexer *lexer) {
 	if (!lexer_next_escaped(lexer, '\'', &nextc)) {
 		return LEX_PART_ERR;
 	}
-	if (nextc != '\'') {
+	if (lexer_next_char(lexer) != '\'') {
 		lex_err("expected break");
 	}
-	lexer_token(lexer)->type = TOKEN_CHAR;
+	Token *token = lexer_token(lexer);
+	token->type = TOKEN_CHAR;
+	token->character = nextc;
 	return LEX_PART_OK;
 }

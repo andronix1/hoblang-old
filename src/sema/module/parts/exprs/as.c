@@ -94,7 +94,7 @@ void sema_conv_primitive(
 				case SEMA_TYPE_PRIMITIVE: {
 					if (dest->primitive == PRIMITIVE_VOID) {
 						sema_err("{sema::type} cannot be casted to void", source);
-					break;
+						break;
 					}
 					int src_size = sizes[primitive];
 					int dst_size = sizes[dest->primitive];
