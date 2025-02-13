@@ -59,16 +59,20 @@ fun main() -> i32 {
 	# tcp::set_non_blocking(server);
 	# unnecessary but.. why not?)
 	var handle_func: fun (Socket, []u8) -> void = handle_conn;
+
+	# TODO: fix memory leaks (PHI)
 	while true {
 		var client = -1;
 		while client < 0 {
 			client = tcp::accept(server);
 		}
-		# var pid = process::fork();
-		# if pid == 0 {
+		var pid = process::fork();
+		if pid == 0 {
 			handle_func(client, content);
-			# process::exit(0);
-		# }
+			process::exit(0);
+		} else {
+			io::close(client);
+		}
 	}
 	return 0;
 }
