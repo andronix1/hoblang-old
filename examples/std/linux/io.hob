@@ -6,8 +6,15 @@ fun write(fd: Fd, buf: *u8, len: i64) ->i64 {
 	return syscall::arg3(syscall::WRITE, fd as i64, buf as i64, len);
 }
 
-fun read(fd: Fd, buf: *u8, len: i64) ->i64 {
+fun read(fd: Fd, buf: *u8, len: i64) -> i64 {
 	return syscall::arg3(syscall::READ, fd as i64, buf as i64, len);
+}
+
+const FCNTL_SET_FLAG: i64 = 4;
+const O_NONBLOCK: i64 = 00004000;
+
+fun fcntl_set_flag(fd: Fd, flags: i64) -> i64 {
+	return syscall::arg3(syscall::FCNTL, fd as i64, FCNTL_SET_FLAG, flags);
 }
 
 fun open(filename: *u8, flags: i64, mode: i64) ->Fd {

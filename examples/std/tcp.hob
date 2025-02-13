@@ -34,6 +34,10 @@ fun bind(port: Port, backlog: i32) -> Socket {
     return result;
 }
 
+fun set_non_blocking(socket: Socket) -> void {
+    io::fcntl_set_flag(socket, io::O_NONBLOCK);
+}
+
 fun accept(socket: Socket) -> Socket {
     var client_address: net::AddressIn;
     var client_addr_size: i32 = 16;

@@ -23,6 +23,10 @@ fun read_from(fd: io::Fd, output: *[]u8) -> i64 {
     return io::read(fd, output.*.raw, output.*.length as i64);
 }
 
+fun close(fd: io::Fd) -> void {
+    io::close(fd);
+}
+
 fun print(str: []u8) -> void {
     write_to(io::FD_STDOUT, str);
 }

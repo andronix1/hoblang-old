@@ -6,6 +6,22 @@ fun fork() -> Pid {
 	return syscall::arg0(syscall::FORK);
 }
 
+fun vfork() -> Pid {
+	return syscall::arg0(syscall::VFORK);
+}
+
+type IdType = i64;
+type SigInfo = struct {
+	signo: i32,
+	errno: i32,
+	code: i32,
+	_pad: [29]i32
+};
+
+fun waitid(id_type: IdType, pid: Pid, info: *SigInfo, options: i64) -> void {
+	syscall::arg4(syscall::WAIT_ID, id_type, pid, info as i64, options);
+}
+
 fun getpid() -> Pid {
 	return syscall::arg0(syscall::GETPID);
 }
@@ -13,3 +29,40 @@ fun getpid() -> Pid {
 fun exit(status: i64) -> void {
 	syscall::arg1(syscall::EXIT, status);
 }
+
+const P_ALL: IdType = 0;
+const P_PID: IdType = 1;
+const P_PGID: IdType = 2;
+const P_PIDF: IdType = 3;
+
+const WNOHANG: i64 = 1;
+const WSTOPPED: i64 = 2;
+const WEXITED: i64 = 4;
+const WCONTINUED: i64 = 8;
+const WNOWAIT: i64 = 0x01000000;
+
+const CLONE_VM: i64 = 0x00000100;
+const CLONE_FS: i64 = 0x00000200;
+const CLONE_FILES: i64 = 0x00000400;
+const CLONE_SIGHAND: i64 = 0x00000800;
+const CLONE_PIDFD: i64 = 0x00001000;
+const CLONE_PTRACE: i64 = 0x00002000;
+const CLONE_VFORK: i64 = 0x00004000;
+const CLONE_PARENT: i64 = 0x00008000;
+const CLONE_THREAD: i64 = 0x00010000;
+const CLONE_NEWNS: i64 = 0x00020000;
+const CLONE_SYSVSEM: i64 = 0x00040000;
+const CLONE_SETTLS: i64 = 0x00080000;
+const CLONE_PARENT_SETTID: i64 = 0x00100000;
+const CLONE_CHILD_CLEARTID: i64 = 0x00200000;
+const CLONE_DETACHED: i64 = 0x00400000;
+const CLONE_UNTRACED: i64 = 0x00800000;
+const CLONE_CHILD_SETTID: i64 = 0x01000000;
+const CLONE_NEWCGROUP: i64 = 0x02000000;
+const CLONE_NEWUTS: i64 = 0x04000000;
+const CLONE_NEWIPC: i64 = 0x08000000;
+const CLONE_NEWUSER: i64 = 0x10000000;
+const CLONE_NEWPID: i64 = 0x20000000;
+const CLONE_NEWNET: i64 = 0x40000000;
+const CLONE_IO: i64 = 0x80000000;
+

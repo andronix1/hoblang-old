@@ -8,6 +8,11 @@ fun get_pid() -> i64 {
     return process::getpid();
 }
 
+fun wait_for(pid: process::Pid) -> void {
+    var info: process::SigInfo;
+    process::waitid(process::P_PID, pid, &info, process::WEXITED | process::WNOWAIT);
+}
+
 fun exit(status: i32) -> void {
     process::exit(status as i64);
 }

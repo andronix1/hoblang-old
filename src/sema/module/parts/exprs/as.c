@@ -43,6 +43,28 @@ void sema_conv_slice(
 	sema_err("{sema::type} cannot be casted to {sema::type}", source, dest);
 }
 
+void sema_conv_function(
+	SemaModule *sema,
+	SemaType *source,
+	SemaType *dest,
+	SemaAsConvType *type
+) {
+	assert(source->type == SEMA_TYPE_FUNCTION, "passed non-function type {sema::type}", source);
+	if (sema_types_equals(dest, sema_type_primitive_i64())) {
+		*type = SEMA_AS_CONV_PTR_TO_INT;
+		return;
+	}
+	if (dest->type == SEMA_TYPE_POINTER && sema_types_equals(dest->ptr_to, sema_type_primitive_void())) {
+		if (!sema_types_equals(source->slice_of, dest->ptr_to)) {
+			sema_err("cannot cast {sema::type} to {sema::type} because of different inner types", source, dest);
+			return;
+		}
+		*type = SEMA_AS_CONV_BITCAST;
+		return;
+	}
+	sema_err("{sema::type} cannot be casted to {sema::type}", source, dest);
+}
+
 void sema_conv_array(
 	SemaModule *sema,
 	SemaType *source,
@@ -150,7 +172,7 @@ SemaValue *sema_analyze_expr_as(SemaModule *sema, AstExprAs *as, SemaExprCtx ctx
 			case SEMA_TYPE_POINTER: sema_conv_pointer(sema, expr_type, as_type, &as->conv_type); break;
 			case SEMA_TYPE_SLICE: sema_conv_slice(sema, expr_type, as_type, &as->conv_type); break;
 
-			case SEMA_TYPE_FUNCTION:
+			case SEMA_TYPE_FUNCTION: sema_conv_function(sema, expr_type, as_type, &as->conv_type); break;
 			case SEMA_TYPE_STRUCT:
 				sema_err("unknown conversion from {sema::type} to {sema::type}", expr_type, as_type);
 				return false;
