@@ -1,4 +1,4 @@
-#include "private.h"
+#include "sema/type/private.h"
 #include <malloc.h>
 
 SemaType *sema_type_new_array(size_t length, SemaType *of) {

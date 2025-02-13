@@ -1,7 +1,6 @@
-#include "api.h"
 #include "ast/private/type.h"
 #include "core/vec.h"
-#include "private.h"
+#include "sema/type/private.h"
 
 bool sema_types_equals(SemaType *type, SemaType *other) {
 	if (type == other) {

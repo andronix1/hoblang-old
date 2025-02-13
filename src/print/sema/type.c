@@ -1,6 +1,6 @@
 #include "print.h"
 #include "ast/private/type.h"
-#include "private.h"
+#include "sema/type/private.h"
 #include "core/vec.h"
 
 void print_sema_type(FILE* stream, va_list list) {

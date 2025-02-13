@@ -2,7 +2,8 @@
 
 #include <stddef.h>
 #include "ast/api/type.h"
-#include "api.h"
+#include "sema/type/api.h"
+#include "sema/type.h"
 
 typedef struct SemaType SemaType;
 

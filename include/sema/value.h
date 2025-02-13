@@ -16,39 +16,6 @@ typedef struct {
     SemaType *sema_type;
 } SemaValue;
 
-/*
-// test.hob
-type Test = enum {
-	Super,
-	Duper,
-	Cool
-};
-// TODO: think about syntax
-fun print(self: Test, prefix: []u8) -> void {
-	io::print(prefix);
-	if self == Test.Super {
-		io::println("super!");
-	} else if test == Test.Duper {
-		io::println("dooooper!");
-	} else if test == Test.Cool {
-		io::println("COOOOOOOOL!!!!");
-	} else {
-		io::println("UNKNOWNWNWNOWNOWNOWNo");
-	}
-}
-
-// main.hob
-use test;
-
-fun main() -> void {
-	test::Test.Cool.print("this is so ")	
-	| module
-	      | type
-		       | const
-			        | ext_func + const
-}
-*/
-
 #define SEMA_VALUE_CONSTRUCTOR(name, value_type) \
 	static inline SemaValue *name(SemaType *type) { \
 		SemaValue *result = malloc(sizeof(SemaValue)); \

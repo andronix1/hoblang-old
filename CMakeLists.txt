@@ -15,6 +15,7 @@ set(SOURCE_FILES
     src/print/lexer.c
 	src/print/ast/expr.c
 	src/print/ast/type.c
+	src/print/sema/type.c
 
 	src/core/slice/api.c
 	src/core/slice/io.c
@@ -55,7 +56,6 @@ set(SOURCE_FILES
 
 	src/sema/project/api.c
     src/sema/type/api.c
-    src/sema/type/print.c
     src/sema/type/private.c
 	src/sema/module/api.c
 	src/sema/module/private.c
