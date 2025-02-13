@@ -6,6 +6,7 @@
 #include "sema/type/private.h"
 #include "sema/module/private.h"
 #include "sema/module/parts/path.h"
+#include "sema/value/private.h"
 
 uint64_t sema_eval_int_expr(SemaModule *sema, AstExpr *expr) {
     switch (expr->type) {
@@ -30,15 +31,15 @@ uint64_t sema_eval_int_expr(SemaModule *sema, AstExpr *expr) {
                 sema_err("only decl path constant expr are supported");
                 return 0;
             }
-            SemaScopeDecl *decl = sema_resolve_decl_path(sema, &expr->get_local.path.decl_path);
+            SemaValue *decl = sema_resolve_decl_path(sema, &expr->get_local.path.decl_path);
             if (!decl) {
                 return 0;
             }
-            if (decl->type != SEMA_SCOPE_DECL_VALUE || !decl->value_decl.constant || decl->value_decl.type->type != SEMA_TYPE_PRIMITIVE) {
+            if (decl->type != SEMA_VALUE_CONST || decl->sema_type->type != SEMA_TYPE_PRIMITIVE) {
                 sema_err("decl is not a constant integer");
                 return 0;
             }
-            return sema_eval_int_expr(sema, decl->value_decl.integer_expr);
+            return sema_eval_int_expr(sema, decl->integer_expr);
         }
     }
     assert(0, "invalid expr type {int}", expr->type);

@@ -8,6 +8,7 @@
 #include "llvm/parts/types/slice.h"
 
 LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstInnerPath *path) {
+    // TODO: load depends on SemaValue
     for (size_t i = 0; i < vec_len(path->segments); i++) {
         SemaInnerPath *segment = &path->segments[i].sema;
         switch (segment->type) {

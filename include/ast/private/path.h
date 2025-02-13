@@ -4,6 +4,8 @@
 #include "sema/value.h"
 #include "sema/module/decls.h"
 #include "sema/module.h"
+#include "sema/type.h"
+#include "sema/value.h"
 
 typedef struct AstDeclPath {
 	Slice *segments;
@@ -34,7 +36,7 @@ typedef struct {
 
 typedef struct {
     SemaInnerPathType type;
-    SemaType *sema_type;
+    SemaValue *value;
     union {
         SemaType *deref_type;
         SemaType *slice_type;

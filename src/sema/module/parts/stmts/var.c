@@ -4,6 +4,7 @@
 #include "sema/module/private.h"
 #include "sema/module/parts/expr.h"
 #include "sema/module/parts/type.h"
+#include "sema/value/private.h"
 #include "sema/type/api.h"
 
 void sema_stmt_var(SemaModule *sema, AstVar *var) {

@@ -56,7 +56,7 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 		}
 
 		case AST_MODULE_NODE_USE: {
-			SemaScopeDecl *decl = sema_resolve_decl_path(sema, &node->use.path);
+			SemaScopeDecl *decl = sema_resolve_decl_path_raw(sema, &node->use.path);
 			if (!decl) {
 				break;
 			}

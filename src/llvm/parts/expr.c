@@ -3,6 +3,7 @@
 #include "llvm/parts/type.h"
 #include "llvm/parts/path.h"
 #include "llvm/parts/types/slice.h"
+#include "sema/value/private.h"
 #include "core/vec.h"
 #include "ast/private/expr.h"
 
