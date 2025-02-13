@@ -14,27 +14,13 @@ LLVMValueRef llvm_call(LlvmBackend *llvm, AstCall *call) {
 	}
 	SemaType *returning = call->callable->value->sema_type->func.returning;
 	bool is_void = returning->type == SEMA_TYPE_PRIMITIVE && returning->primitive == PRIMITIVE_VOID;
-	LLVMValueRef call_result = LLVMBuildCall2(
+	return LLVMBuildCall2(
 		llvm_builder(llvm),
 		llvm_sema_function_type(&call->callable->value->sema_type->func),
 		llvm_expr(llvm, call->callable, true),
 		params, vec_len(call->args),
 		is_void ? "" : "call_result"
 	);
-	if (is_void) {
-		return call_result;
-	}
-	LLVMValueRef value = LLVMBuildAlloca(
-		llvm_builder(llvm),
-		llvm_resolve_type(returning),
-		"alloca_call_result"
-	);
-	LLVMBuildStore(
-		llvm_builder(llvm), 
-		call_result,
-		value
-	);
-	return value;
 }
 /*
 LLVMValueRef llvm_get_local_value_path(LlvmBackend *llvm, AstPath *path) {
@@ -203,16 +189,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 			return NULL;
 		}
 		case AST_EXPR_CALL: {
-			LLVMValueRef value = llvm_call(llvm, &expr->call);
-			if (load) {
-				return LLVMBuildLoad2(
-					llvm_builder(llvm),
-					llvm_resolve_type(expr->value->sema_type),
-					value,
-					""
-				);
-			}
-			return value;
+			return llvm_call(llvm, &expr->call);
 		}
 		case AST_EXPR_ARRAY: {
 			LLVMTypeRef of = llvm_resolve_type(expr->value->sema_type->array.of);
