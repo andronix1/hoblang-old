@@ -2,7 +2,7 @@
 
 #include <string.h>
 #include <malloc.h>
-#include "sema/type/type.h"
+#include "sema/type.h"
 
 typedef enum {
     SEMA_VALUE_CONST = 1 << 0,
