@@ -24,9 +24,9 @@ typedef struct {
 		return result; \
 	}
 
-SEMA_VALUE_CONSTRUCTOR(sema_value_const, SEMA_VALUE_CONST);
-SEMA_VALUE_CONSTRUCTOR(sema_value_type, SEMA_VALUE_TYPE);
-SEMA_VALUE_CONSTRUCTOR(sema_value_var, SEMA_VALUE_VAR);
+SEMA_VALUE_CONSTRUCTOR(sema_value_const, SEMA_VALUE_CONST)
+SEMA_VALUE_CONSTRUCTOR(sema_value_type, SEMA_VALUE_TYPE)
+SEMA_VALUE_CONSTRUCTOR(sema_value_var, SEMA_VALUE_VAR)
 
 static inline SemaValue *sema_value_with_type(SemaValue *value, SemaType *type) {
 	SemaValue *result = malloc(sizeof(SemaValue));

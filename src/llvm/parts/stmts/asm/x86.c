@@ -1,7 +1,6 @@
 #include "llvm/private.h"
 #include "llvm/parts/type.h"
 #include "llvm/parts/expr.h"
-#include "llvm/impl.h"
 #include "core/vec.h"
 #include "ast/private/stmts/asm.h"
 #include "ast/private/expr.h"
@@ -55,7 +54,7 @@ void llvm_stmt_asm(LlvmBackend *llvm, AstInlineAsm *inline_asm) {
                 }
                 case AST_ASM_ARG_ADDRESS: {
                     LLVMValueRef value = LLVMBuildPtrToInt(
-                        llvm->builder,
+                        llvm_builder(llvm),
                         llvm_expr(llvm, arg->expr, false),
                         LLVMInt64Type(),
                         ""
@@ -92,5 +91,5 @@ void llvm_stmt_asm(LlvmBackend *llvm, AstInlineAsm *inline_asm) {
         false
     );
     LLVMSetVolatile(call, inline_asm->is_volatile);
-    LLVMBuildCall2(llvm->builder, LLVMFunctionType(LLVMVoidType(), types, vec_len(types), false), call, values, vec_len(values), "");
+    LLVMBuildCall2(llvm_builder(llvm), LLVMFunctionType(LLVMVoidType(), types, vec_len(types), false), call, values, vec_len(values), "");
 }
