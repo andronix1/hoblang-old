@@ -1,4 +1,5 @@
 #include "exprs.h"
+#include "sema/type/private.h"
 
 SemaValue *sema_analyze_expr_not(SemaModule *sema, AstExpr *not_expr, SemaExprCtx ctx) { 
     SemaType *type = sema_value_expr_type(sema, not_expr, sema_expr_ctx_expect(ctx, sema_type_primitive_bool()));

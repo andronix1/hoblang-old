@@ -2,7 +2,8 @@
 
 #include "core/slice.h"
 #include "sema/value.h"
-#include "sema/module/ast.h"
+#include "sema/module/decls.h"
+#include "sema/module.h"
 
 typedef struct AstDeclPath {
 	Slice *segments;

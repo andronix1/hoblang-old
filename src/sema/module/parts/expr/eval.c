@@ -1,8 +1,11 @@
+#include "sema/module/decls/impl.h"
 #include "eval.h"
 #include "ast/private/expr.h"
 #include "core/vec.h"
 #include "core/assert.h"
 #include "sema/type/private.h"
+#include "sema/module/private.h"
+#include "sema/module/parts/path.h"
 
 uint64_t sema_eval_int_expr(SemaModule *sema, AstExpr *expr) {
     switch (expr->type) {

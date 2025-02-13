@@ -1,7 +1,8 @@
-#include "impl.h"
+#include "sema/module/impl.h"
 #include "core/vec.h"
 #include "sema/type/private.h"
 #include "sema/module/private.h"
+#include "sema/module/decls/impl.h"
 
 SemaScopeDecl *sema_scope_decl_new_type(Slice name, SemaType *sema_type) {
     SemaScopeDecl *result = malloc(sizeof(SemaScopeDecl));

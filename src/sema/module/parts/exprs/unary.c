@@ -1,4 +1,5 @@
 #include "exprs.h"
+#include "sema/type/private.h"
 #include "core/assert.h"
 
 SemaValue *sema_analyze_expr_unary(SemaModule *sema, AstExprUnary *unary, SemaExprCtx ctx) { 

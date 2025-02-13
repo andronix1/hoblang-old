@@ -1,5 +1,5 @@
-#include "parts.h"
-#include "expr.h"
+#include "sema/module/private.h"
+#include "sema/module/parts/expr.h"
 #include "ast/private/body.h"
 #include "core/vec.h"
 

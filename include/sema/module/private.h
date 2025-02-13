@@ -1,45 +1,18 @@
 #pragma once
 
-#include <llvm-c/Core.h>
+#include <stdbool.h>
 #include "core/log.h"
 #include "core/slice.h"
-#include "ast/api/expr.h"
 #include "ast/api/defer.h"
-#include "../type/api.h"
-#include "api.h"
+#include "sema/type.h"
+#include "sema/module/decls.h"
+#include "sema/module.h"
 
 #define sema_err(fmt, ...) \
 	do { \
 		hob_log(LOGE, fmt, ##__VA_ARGS__); \
 		sema_module_fail(sema); \
 	} while (0)
-
-typedef enum {
-    SEMA_SCOPE_DECL_TYPE,
-    SEMA_SCOPE_DECL_MODULE,
-    SEMA_SCOPE_DECL_VALUE,
-} SemaScopeDeclType;
-
-typedef struct SemaScopeValueDecl {
-    SemaType *type;
-    // TODO: abstract const value
-    AstExpr *integer_expr;
-    
-    // sema
-    bool constant;
-    LLVMValueRef llvm_value; // TODO: i don't like it)
-} SemaScopeValueDecl;
-
-typedef struct SemaScopeDecl {
-    SemaScopeDeclType type;
-    Slice name;
-    union {
-        SemaType *sema_type;
-        SemaScopeValueDecl value_decl;
-        SemaModule *module;
-    };
-} SemaScopeDecl;
-
 
 SemaScopeDecl *sema_module_resolve_scope_decl(SemaModule *sema, Slice *name);
 SemaScopeDecl *sema_module_resolve_public_decl(SemaModule *sema, Slice *name);
@@ -60,3 +33,4 @@ AstDefer **sema_module_resolve_defers(SemaModule *sema);
 void sema_module_fail(SemaModule *sema);
 void sema_module_set_returns(SemaModule *sema, SemaType *returns);
 SemaType *sema_module_returns(SemaModule *sema);
+

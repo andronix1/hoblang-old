@@ -5,7 +5,7 @@
 #include "print.h"
 #include "lexer/api.h"
 #include "parser/api.h"
-#include "sema/api.h"
+#include "sema/project/api.h"
 #include "llvm/parts.h"
 
 char *args_shift(int *argc, char ***argv) {

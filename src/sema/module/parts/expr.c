@@ -1,6 +1,7 @@
-#include "parts.h"
+#include "sema/module/private.h"
+#include "sema/module/parts/expr.h"
+#include "sema/type/private.h"
 #include "ast/private/expr.h"
-#include "expr.h"
 #include "core/assert.h"
 
 SemaValue *sema_analyze_expr_array(SemaModule *sema, AstExpr **array, SemaExprCtx ctx);

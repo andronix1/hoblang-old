@@ -1,13 +1,14 @@
-#include "parts.h"
 #include "sema/project/api.h"
 #include "sema/module/private.h"
+#include "sema/module/api.h"
+#include "sema/module/decls/impl.h"
 #include "sema/type/private.h"
 #include "core/vec.h"
 #include "ast/private/module.h"
-#include "path.h"
-#include "body.h"
-#include "expr.h"
-#include "type.h"
+#include "sema/module/parts/path.h"
+#include "sema/module/parts/body.h"
+#include "sema/module/parts/expr.h"
+#include "sema/module/parts/type.h"
 
 void sema_add_ast_func_info(SemaModule *sema, AstFuncInfo *info) {	
 	SemaType *returning = sema_ast_type(sema, &info->returning);

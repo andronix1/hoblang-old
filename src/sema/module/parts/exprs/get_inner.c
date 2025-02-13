@@ -1,5 +1,5 @@
 #include "exprs.h"
-#include "../path.h"
+#include "sema/module/parts/path.h"
 
 SemaValue *sema_analyze_expr_get_inner(SemaModule *sema, AstExprGetInner *get_inner, SemaExprCtx ctx) { 
     SemaType *of_type = sema_value_expr_type(sema, get_inner->of, sema_expr_ctx_expect(ctx, NULL));

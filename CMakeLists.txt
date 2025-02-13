@@ -57,8 +57,8 @@ set(SOURCE_FILES
     src/sema/type/api.c
     src/sema/type/print.c
     src/sema/type/private.c
-	src/sema/module/impl/api.c
-	src/sema/module/impl/private.c
+	src/sema/module/api.c
+	src/sema/module/private.c
 	src/sema/module/parts/expr/eval.c
 	src/sema/module/parts/exprs/array.c
 	src/sema/module/parts/exprs/as.c

@@ -1,8 +1,9 @@
 #include "ast/private/path.h"
 #include "ast/private/type.h"
-#include "parts.h"
 #include "core/vec.h"
 #include "sema/type/private.h"
+#include "sema/module/private.h"
+#include "sema/module/decls/impl.h"
 
 /*
 path - const / var

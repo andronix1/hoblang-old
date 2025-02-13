@@ -1,7 +1,10 @@
 #pragma once
 
+#include <stdbool.h>
 #include "ast/api/defer.h"
-#include "../private.h"
+#include "ast/api/module.h"
+#include "sema/module/private.h"
+#include "sema/project.h"
 
 typedef struct SemaScope {
     SemaScopeDecl **decls;
@@ -13,7 +16,7 @@ typedef struct SemaModule {
 	bool failed;
 
     // internal
-    struct SemaProject *project; // TODO: API
+    SemaProject *project; // TODO: API
     SemaScopeDecl **public_decls;
 	SemaScope *scopes;
 	SemaType *returning;

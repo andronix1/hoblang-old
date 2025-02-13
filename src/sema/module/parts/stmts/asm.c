@@ -1,8 +1,8 @@
 #include "ast/private/stmts/asm.h"
 #include "core/vec.h"
-#include "../parts.h"
+#include "sema/module/parts/expr.h"
+#include "sema/module/private.h"
 #include "asm/x86.h"
-#include "../expr.h"
 
 void sema_stmt_inline_asm(SemaModule *sema, AstInlineAsm *inline_asm) {
     for (size_t i = 0; i < vec_len(inline_asm->mnems); i++) {

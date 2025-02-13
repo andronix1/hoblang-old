@@ -1,4 +1,5 @@
 #include "core/vec.h"
+#include "sema/type/private.h"
 #include "exprs.h"
 
 SemaValue *sema_analyze_expr_array(SemaModule *sema, AstExpr **array, SemaExprCtx ctx) {

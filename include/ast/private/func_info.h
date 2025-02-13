@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sema/module/ast.h"
+#include "sema/module/decls.h"
 #include "core/vec.h"
 #include "core/slice.h"
 #include "type.h"

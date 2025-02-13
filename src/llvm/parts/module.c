@@ -1,4 +1,5 @@
 #include "../parts.h"
+#include "sema/module/decls/impl.h"
 #include "sema/module/private.h"
 #include "sema/type/private.h"
 #include "ast/private/module_node.h"

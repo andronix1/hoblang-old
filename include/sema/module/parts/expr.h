@@ -1,9 +1,9 @@
 #pragma once
 
+#include <stddef.h>
 #include "ast/api/expr.h"
 #include "sema/type/type.h"
-#include "sema/type/api.h"
-#include "sema/type/private.h"
+#include "sema/module.h"
 
 typedef struct {
 	SemaType *expectation;

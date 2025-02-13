@@ -1,4 +1,5 @@
 #include "../../parts.h"
+#include "sema/module/decls/impl.h"
 #include "ast/private/stmts/var.h"
 #include "sema/module/private.h"
 

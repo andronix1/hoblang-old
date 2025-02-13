@@ -1,5 +1,6 @@
 #include "exprs.h"
 #include "core/vec.h"
+#include "sema/type/private.h"
 
 SemaValue *sema_analyze_expr_call(SemaModule *sema, AstCall *call, SemaExprCtx ctx) { 
 	SemaType *type = sema_value_expr_type(sema, call->callable, sema_expr_ctx_expect(ctx, NULL));

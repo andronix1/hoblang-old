@@ -3,6 +3,7 @@
 #include "../utils/slices.h"
 #include "ast/private/path.h"
 #include "sema/module/private.h"
+#include "sema/module/decls/impl.h"
 
 LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstInnerPath *path) {
     for (size_t i = 0; i < vec_len(path->segments); i++) {

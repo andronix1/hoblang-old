@@ -1,7 +1,8 @@
-#include "parts.h"
 #include "ast/private/type.h"
 #include "sema/type/private.h"
-#include "path.h"
+#include "sema/module/private.h"
+#include "sema/module/parts/type.h"
+#include "sema/module/parts/path.h"
 #include "expr/eval.h"
 #include "core/vec.h"
 

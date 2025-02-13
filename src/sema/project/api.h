@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdbool.h>
 #include "project.h"
 #include "sema/module/module.h"
 #include "core/slice.h"

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
-#include "sema/module/ast.h"
+#include "sema/module/decls.h"
 #include "../type.h"
 #include "ast/api/expr.h"
 

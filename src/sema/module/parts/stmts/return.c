@@ -1,8 +1,8 @@
 #include "ast/private/stmts/return.h" // TODO: refactor ast
 #include <stdbool.h> // TODO: refactor ast
-#include "../parts.h"
+#include "sema/module/private.h"
 #include "sema/type/private.h"
-#include "../expr.h"
+#include "sema/module/parts/expr.h"
 
 void sema_stmt_return(SemaModule *sema, AstReturn *ret) {
     SemaType *returns = sema_module_returns(sema);

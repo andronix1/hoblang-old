@@ -1,4 +1,5 @@
-#include "impl.h"
+#include "sema/project.h"
+#include "sema/module/impl.h"
 #include "core/vec.h"
 
 SemaModule *sema_module_new(SemaProject *project, AstModule *module) {
