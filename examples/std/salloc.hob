@@ -16,11 +16,11 @@ fun page_to_ptr(page: *Page) -> *void {
 }
 
 fun page_from_ptr(src: *void) -> Page {
-    var page_ptr = (src as i64 - 4) as *void;
-    var size = (page_ptr as *u32).*;
+    var page_ptr = (src as i64 - PageMeta.sizeof as i64) as *void;
+    var meta = page_ptr as *PageMeta;
     var page: Page;
     page.ptr = page_ptr;
-    page.size = size + PageMeta.sizeof as u32;
+    page.size = meta.*.size + PageMeta.sizeof as u32;
     return page;
 }
 
@@ -31,7 +31,7 @@ fun allocate(size: u32) -> *void {
 
 fun reallocate(ptr: *void, size: u32) -> *void {
     var old_page = page_from_ptr(ptr);
-    var new_page = mem::pages_realloc(&old_page, size + 4);
+    var new_page = mem::pages_realloc(&old_page, size + PageMeta.sizeof as u32);
     return page_to_ptr(&new_page);
 }
 
