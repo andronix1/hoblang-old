@@ -8,5 +8,6 @@ typedef struct LlvmBackend {
 	LLVMModuleRef module;
 	LLVMValueRef func;
 	LLVMBuilderRef builder;
+	LLVMBasicBlockRef code_block, definitions_block;
 } LlvmBackend;
 

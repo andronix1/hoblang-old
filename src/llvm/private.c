@@ -19,3 +19,19 @@ void llvm_set_current_func(LlvmBackend *llvm, LLVMValueRef func) {
 LLVMBuilderRef llvm_builder(LlvmBackend *llvm) {
     return llvm->builder;
 }
+
+LLVMBasicBlockRef llvm_code_block(LlvmBackend *llvm) {
+    return llvm->code_block;
+}
+
+LLVMBasicBlockRef llvm_definitions_block(LlvmBackend *llvm) {
+    return llvm->definitions_block;
+}
+
+void llvm_set_code_block(LlvmBackend *llvm, LLVMBasicBlockRef block) {
+    llvm->code_block = block;
+}
+
+void llvm_set_definitions_block(LlvmBackend *llvm, LLVMBasicBlockRef block) {
+    llvm->definitions_block = block;
+}

@@ -1,3 +1,5 @@
+#include "llvm-c/Core.h"
+#include "llvm-c/Types.h"
 #include "llvm/private.h"
 #include "llvm/parts/type.h"
 #include "llvm/parts/expr.h"
@@ -22,18 +24,28 @@ void llvm_module_node(LlvmBackend *llvm, AstModuleNode *node) {
 
 		case AST_MODULE_NODE_FUNC: {
 			llvm_set_current_func(llvm, node->ext_func_decl.info.decl->llvm_value);
-            LLVMPositionBuilderAtEnd(llvm_builder(llvm), LLVMAppendBasicBlock(llvm_current_func(llvm), "entry"));
+            LLVMBasicBlockRef entry = LLVMAppendBasicBlock(llvm_current_func(llvm), "entry");
+            LLVMBasicBlockRef code = LLVMAppendBasicBlock(llvm_current_func(llvm), "code");
+
+            LLVMPositionBuilderAtEnd(llvm_builder(llvm), entry);
+            llvm_set_definitions_block(llvm, entry);
 			for (size_t i = 0; i < vec_len(node->func_decl.info.args); i++) {
 				AstFuncArg *arg = &node->func_decl.info.args[i];
-				LLVMValueRef value = arg->decl->llvm_value = LLVMBuildAlloca(llvm_builder(llvm), llvm_resolve_type(arg->type.sema), "");
+				LLVMValueRef value = arg->decl->llvm_value = LLVMBuildAlloca(llvm_builder(llvm), llvm_resolve_type(arg->type.sema), slice_to_cstr(&arg->name));
 				LLVMBuildStore(llvm_builder(llvm), LLVMGetParam(llvm_current_func(llvm), i), value);
 			}
+
+            LLVMPositionBuilderAtEnd(llvm_builder(llvm), code);
+            llvm_set_code_block(llvm, code);
 			if (llvm_body(llvm, &node->func_decl.body)) {
 				llvm_body_break(llvm, &node->func_decl.body);
 			}
 			if (sema_type_is_primitive(node->func_decl.info.returning.sema, PRIMITIVE_VOID)) {
 				LLVMBuildRetVoid(llvm_builder(llvm));
 			}
+
+            LLVMPositionBuilderAtEnd(llvm_builder(llvm), entry);
+            LLVMBuildBr(llvm_builder(llvm), code);
 			break;
 		}
 	}
