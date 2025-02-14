@@ -85,7 +85,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 								llvm_resolve_type(expr->idx.of->value->sema_type),
 								llvm_expr(llvm, expr->idx.of, false)
 							),
-							"slice_ptr123"
+							"slice_ptr"
 						),
 						indices, 1,
 						"idx_element_ptr"
@@ -107,12 +107,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 					LLVMValueRef value = LLVMBuildGEP2(
 						llvm_builder(llvm),
 						llvm_resolve_type(expr->value->sema_type),
-						LLVMBuildLoad2(
-							llvm_builder(llvm),
-							llvm_resolve_type(expr->value->sema_type),
-							llvm_expr(llvm, expr->idx.of, false),
-							"slice_ptr123"
-						),
+                        llvm_expr(llvm, expr->idx.of, false),
 						indices, 1,
 						"idx_element_ptr"
 					);
