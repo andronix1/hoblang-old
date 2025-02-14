@@ -1,5 +1,6 @@
 #include <stdarg.h>
 #include "ast/private/expr.h"
+#include "ast/private/path.h"
 #include "core/vec.h"
 #include "core/print.h"
 
@@ -32,6 +33,9 @@ void print_ast_inner_path(FILE *stream, va_list list) {
 		switch (seg->type) {
 			case AST_INNER_PATH_SEG_IDENT:
 				print_to(stream, ".{slice}", &seg->ident);
+				break;
+			case AST_INNER_PATH_SEG_SIZEOF:
+				print_to(stream, ".sizeof");
 				break;
 			case AST_INNER_PATH_SEG_DEREF:
 				print_to(stream, ".*", &seg->ident);

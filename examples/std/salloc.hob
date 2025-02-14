@@ -2,12 +2,17 @@ import "mem.hob" as mem;
 
 use mem::Page;
 
+type PageMeta = struct {
+    size: u32
+};
+
 fun page_to_ptr(page: *Page) -> *void {
     if mem::is_page_invalid(page) {
         return 0 as *void;
     }
-    (page.*.ptr as *u32).* = page.*.size;
-    return (page.*.ptr as i64 + 4) as *void;
+    var meta = page.*.ptr as *PageMeta;
+    meta.*.size = page.*.size;
+    return (page.*.ptr as i64 + PageMeta.sizeof as i64) as *void;
 }
 
 fun page_from_ptr(src: *void) -> Page {
@@ -15,7 +20,7 @@ fun page_from_ptr(src: *void) -> Page {
     var size = (page_ptr as *u32).*;
     var page: Page;
     page.ptr = page_ptr;
-    page.size = size + 4;
+    page.size = size + PageMeta.sizeof as u32;
     return page;
 }
 

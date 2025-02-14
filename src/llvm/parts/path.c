@@ -12,6 +12,9 @@ LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstI
     for (size_t i = 0; i < vec_len(path->segments); i++) {
         SemaInnerPath *segment = &path->segments[i].sema;
         switch (segment->type) {
+            case SEMA_INNER_PATH_SIZEOF:
+                value = llvm_type_sizeof(llvm, llvm_resolve_type(segment->sizeof_type));
+                break;
             case SEMA_INNER_PATH_DEREF:
                 if (segment->value->type != SEMA_VALUE_CONST) {
                     value = LLVMBuildLoad2(
@@ -47,16 +50,15 @@ LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstI
     return value;
 }
 
-LLVMValueRef llvm_resolve_decl_path(LlvmBackend *llvm, AstDeclPath *path) {
+LLVMValueRef llvm_resolve_value_decl_path(LlvmBackend *llvm, AstDeclPath *path) {
 	LLVMValueRef result = path->decl->value_decl.llvm_value;
-	assert(result, "llvm_value is not mapped in {ast::dpath}", path);
 	return result;
 }
 
 LLVMValueRef llvm_resolve_path(LlvmBackend *llvm, AstPath *path) {
     return llvm_resolve_inner_path(
         llvm,
-        llvm_resolve_decl_path(llvm, &path->decl_path),
+        llvm_resolve_value_decl_path(llvm, &path->decl_path),
         &path->inner_path
     );
 }

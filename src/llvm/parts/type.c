@@ -2,7 +2,10 @@
 #include <alloca.h>
 #include "sema/type/private.h"
 #include "ast/private/type.h"
+#include "llvm-c/Types.h"
+#include "llvm/llvm.h"
 #include "llvm/parts/type.h"
+#include "llvm/private.h"
 #include "core/vec.h"
 
 LLVMTypeRef llvm_sema_function_type(SemaFunction *func) {
@@ -58,4 +61,20 @@ LLVMTypeRef llvm_resolve_type(SemaType *type) {
 	assert(0, "invalid type {int}", type->type);
 }
 
-
+LLVMValueRef llvm_type_sizeof(LlvmBackend *llvm, LLVMTypeRef type) {
+    LLVMValueRef indices[] = {
+        LLVMConstInt(LLVMInt32Type(), 1, false)
+    };
+    return LLVMBuildPtrToInt(
+        llvm_builder(llvm),
+        LLVMBuildGEP2(
+            llvm_builder(llvm),
+            type,
+            LLVMConstPointerNull(LLVMPointerType(type, 0)),
+            indices, 1,
+            "sizeof.gep"
+        ),
+        LLVMInt32Type(),
+        "sizeof.int"
+    );
+}

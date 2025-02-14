@@ -1,4 +1,5 @@
 #include "ast/private/path.h"
+#include "lexer/token.h"
 #include "parser/private.h"
 
 bool parse_decl_path(Parser *parser, AstDeclPath *path) {
@@ -24,6 +25,9 @@ bool parse_inner_path(Parser *parser, AstInnerPath *path) {
 				segment.type = AST_INNER_PATH_SEG_IDENT;
 				segment.ident = token->ident;
 				break;
+            case TOKEN_SIZEOF:
+				segment.type = AST_INNER_PATH_SEG_SIZEOF;
+                break;
 			case TOKEN_MULTIPLY:
 				segment.type = AST_INNER_PATH_SEG_DEREF;
 				break;

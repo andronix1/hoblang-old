@@ -55,6 +55,11 @@ SemaValue *sema_resolve_decl_path(SemaModule *sema, AstDeclPath *path) {
 SemaValue *sema_resolve_inner_value_path(SemaModule *sema, SemaValue *from, AstInnerPathSegment *segment) {
     segment->sema.value = from;
 	switch (segment->type) {
+        case AST_INNER_PATH_SEG_SIZEOF: {
+            segment->sema.type = SEMA_INNER_PATH_SIZEOF;
+            segment->sema.sizeof_type = from->sema_type;
+            return sema_value_const(sema_type_primitive_i32());
+        }
         case AST_INNER_PATH_SEG_DEREF: {
             if (from->sema_type->type != SEMA_TYPE_POINTER) {
                 sema_err("only pointers can be dereferenced, not {sema::type}\n", from->sema_type);
@@ -102,6 +107,10 @@ SemaValue *sema_resolve_inner_value_path(SemaModule *sema, SemaValue *from, AstI
 
 SemaValue *sema_resolve_inner_type_path(SemaModule *sema, SemaValue *from, AstInnerPathSegment *segment) {
     switch (segment->type) {
+        case AST_INNER_PATH_SEG_SIZEOF:
+            segment->sema.type = SEMA_INNER_PATH_SIZEOF;
+            segment->sema.sizeof_type = from->sema_type;
+            return sema_value_const(sema_type_primitive_i32());
         case AST_INNER_PATH_SEG_IDENT:
             sema_err("cannot get a member `{slice}` from type `{sema::type}`", &segment->ident, from->sema_type);
             break;

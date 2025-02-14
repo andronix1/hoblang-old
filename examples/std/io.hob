@@ -45,8 +45,14 @@ const PRINT_U64_BUF_SIZE: i32 = 32;
 fun print_u64(value: u64) -> void {
     var buf: [PRINT_U64_BUF_SIZE]u8;
     var buf_slice = &buf as []u8;
-    
+
     var i = PRINT_U64_BUF_SIZE - 1;
+    
+    if value == 0 {
+        buf_slice[i] = '0';
+        i = i - 1;
+    }
+
     while value > 0 {
         buf_slice[i] = '0' + (value - (value / 10 as u64) * 10 as u64) as u8;
         i = i - 1;

@@ -40,6 +40,12 @@ fun read_file(fd: File) -> []u8 {
 	return content;
 }
 
+type Test = struct {
+    a: u64,
+    b: u64,
+    c: i32
+};
+
 fun main() -> i32 {
 	var filename = "test.jpg\0";
 	var file = fs::open_read(filename);
