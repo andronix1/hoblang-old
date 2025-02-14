@@ -31,6 +31,13 @@ SemaType *sema_type_new_func(SemaType *returning, SemaType **args) {
 	return result;
 }
 
+SemaType *sema_type_new_struct(AstStructDef *struct_def) {
+	SemaType *result = malloc(sizeof(SemaType));
+	result->type = SEMA_TYPE_STRUCT;
+	result->struct_def = struct_def;
+	return result;
+}
+
 #define SEMA_TYPE_PRIMITIVE_IMPL(name, kind) \
     SemaType *sema_type_primitive_##name() { \
         static SemaType result = { .type = SEMA_TYPE_PRIMITIVE, .primitive = kind }; \

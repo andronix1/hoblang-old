@@ -1,6 +1,7 @@
 #include "parser/private.h"
 #include "parser/parts/type.h"
 #include "ast/private/type.h"
+#include "ast/private/module_node.h"
 
 bool parse_ast_struct_member(Parser *parser, AstStructMember *member) {
 	member->name = PARSER_EXPECT_NEXT(TOKEN_IDENT, "struct member name")->ident;
@@ -8,7 +9,8 @@ bool parse_ast_struct_member(Parser *parser, AstStructMember *member) {
 	return parse_type(parser, member->type = malloc(sizeof(AstType)));
 }
 
-bool parse_ast_struct_type(Parser *parser, AstStructType *struct_type) {
+bool parse_ast_struct_def(Parser *parser, AstStructDef *struct_type) {
+	struct_type->name = PARSER_EXPECT_NEXT(TOKEN_IDENT, "struct content open")->ident;
 	PARSER_EXPECT_NEXT(TOKEN_OPENING_FIGURE_BRACE, "struct content open");
 	struct_type->members = vec_new(AstStructMember);
 	while (true) {

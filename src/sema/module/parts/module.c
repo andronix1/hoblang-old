@@ -41,6 +41,20 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 			sema_module_push_public_decl(sema, sema_scope_decl_new_type(node->type_alias.alias, type));
 			break;
 		}
+		case AST_MODULE_NODE_STRUCT_DEF: {
+			for (size_t i = 0; i < vec_len(node->struct_def.members); i++) {
+				AstStructMember *member = &node->struct_def.members[i];
+				for (size_t j = 0; j < i; j++) {
+					AstStructMember *jmember = &node->struct_def.members[j];
+					if (slice_eq(&member->name, &jmember->name)) {
+						sema_err("field {slice} duplicated", &member->name);
+					}
+				}
+				sema_ast_type(sema, member->type);
+			}
+			sema_module_push_public_decl(sema, sema_scope_decl_new_type(node->struct_def.name, sema_type_new_struct(&node->struct_def)));
+			break;
+		}
 		case AST_MODULE_NODE_CONST: {
 			SemaType *const_type = sema_ast_type(sema, &node->constant.type);
 
@@ -104,6 +118,7 @@ void sema_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 		case AST_MODULE_NODE_EXTERNAL_FUNC:
 		case AST_MODULE_NODE_USE:
 		case AST_MODULE_NODE_IMPORT:
+		case AST_MODULE_NODE_STRUCT_DEF:
 			break;
 
 		case AST_MODULE_NODE_CONST:

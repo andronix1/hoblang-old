@@ -2,6 +2,7 @@
 #include <alloca.h>
 #include "sema/type/private.h"
 #include "ast/private/type.h"
+#include "ast/private/module_node.h"
 #include "llvm-c/Types.h"
 #include "llvm/llvm.h"
 #include "llvm/parts/type.h"
@@ -20,11 +21,11 @@ LLVMTypeRef llvm_resolve_type(SemaType *type) {
 	assert(type, "type is unresolved");
 	switch (type->type) {
 		case SEMA_TYPE_STRUCT: {
-			LLVMTypeRef *elements = alloca(sizeof(LLVMTypeRef) * vec_len(type->struct_type->members));
-			for (size_t i = 0; i < vec_len(type->struct_type->members); i++) {
-				elements[i] = llvm_resolve_type(type->struct_type->members[i].type->sema);
+			LLVMTypeRef *elements = alloca(sizeof(LLVMTypeRef) * vec_len(type->struct_def->members));
+			for (size_t i = 0; i < vec_len(type->struct_def->members); i++) {
+				elements[i] = llvm_resolve_type(type->struct_def->members[i].type->sema);
 			}
-			return LLVMStructType(elements, vec_len(type->struct_type->members), false);
+			return LLVMStructType(elements, vec_len(type->struct_def->members), false);
 		}
 		case SEMA_TYPE_PRIMITIVE:
 			switch (type->primitive) {

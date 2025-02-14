@@ -18,10 +18,6 @@ bool parse_type(Parser *parser, AstType *type) {
 			type->type = AST_TYPE_POINTER;
 			return parse_type(parser, type->ptr_to = malloc(sizeof(AstType)));
 		}
-		case TOKEN_STRUCT: {
-			type->type = AST_TYPE_STRUCT;
-			return parse_ast_struct_type(parser, &type->struct_type);
-		}
 		case TOKEN_FUN: {
 			type->type = AST_TYPE_FUNCTION;
 			return parse_ast_func_type(parser, &type->func);

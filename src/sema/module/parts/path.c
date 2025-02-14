@@ -1,5 +1,6 @@
 #include "ast/private/path.h"
 #include "ast/private/type.h"
+#include "ast/private/module_node.h"
 #include "core/vec.h"
 #include "sema/type/private.h"
 #include "sema/module/private.h"
@@ -71,8 +72,8 @@ SemaValue *sema_resolve_inner_value_path(SemaModule *sema, SemaValue *from, AstI
         }
 		case AST_INNER_PATH_SEG_IDENT: {
 			if (from->sema_type->type == SEMA_TYPE_STRUCT) {
-				for (size_t i = 0; i < vec_len(from->sema_type->struct_type->members); i++) {
-                    AstStructMember *member = &from->sema_type->struct_type->members[i];
+				for (size_t i = 0; i < vec_len(from->sema_type->struct_def->members); i++) {
+                    AstStructMember *member = &from->sema_type->struct_def->members[i];
 					if (slice_eq(&member->name, &segment->ident)) {
                         segment->sema.type = SEMA_INNER_PATH_STRUCT_MEMBER;
                         segment->sema.struct_member.idx = i;
@@ -170,6 +171,7 @@ SemaType *sema_resolve_type_path(SemaModule *sema, AstPath *path) {
         case SEMA_VALUE_TYPE:
             break;
     }
+    assert(value->sema_type, "sema type of value was not mapped");
     return value->sema_type;
 }
 SemaType *sema_resolve_value_path(SemaModule *sema, AstPath *path) {
@@ -186,5 +188,6 @@ SemaType *sema_resolve_value_path(SemaModule *sema, AstPath *path) {
             sema_err("{ast::path} is type, not value", path);
             return false;
     }
+    assert(value->sema_type, "sema type of value was not mapped");
     return value->sema_type;
 }

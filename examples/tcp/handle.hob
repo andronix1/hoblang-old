@@ -3,7 +3,7 @@ import "../libc/lib.hob" as c;
 use c::socket;
 use c::io;
 
-type TcpClientHandle = struct {
+struct TcpClientHandle {
     address: socket::AddressIn,
     socket: socket::Socket
 };

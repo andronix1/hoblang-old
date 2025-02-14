@@ -1,10 +1,10 @@
 import "linux/mem.hob" as mem;
 import "io.hob" as io;
 
-type Page = struct {
+struct Page {
     ptr: *void,
     size: u32
-};
+}
 
 fun is_page_invalid(page: *Page) -> bool {
     return page.*.ptr == 0 as *void;

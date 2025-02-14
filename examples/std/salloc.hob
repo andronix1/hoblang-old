@@ -2,9 +2,9 @@ import "mem.hob" as mem;
 
 use mem::Page;
 
-type PageMeta = struct {
+struct PageMeta {
     size: u32
-};
+}
 
 fun page_to_ptr(page: *Page) -> *void {
     if mem::is_page_invalid(page) {

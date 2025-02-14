@@ -38,13 +38,13 @@ set(SOURCE_FILES
 	src/parser/api.c
 	src/parser/private.c
 	src/parser/parts/types/func.c
-	src/parser/parts/types/struct.c
 	src/parser/parts/stmts/var.c
 	src/parser/parts/stmts/return.c
 	src/parser/parts/stmts/while.c
 	src/parser/parts/stmts/defer.c
 	src/parser/parts/stmts/if_else.c
 	src/parser/parts/stmts/asm.c
+	src/parser/parts/decls/struct.c
 	src/parser/parts/decls/ext_func.c
 	src/parser/parts/decls/func.c
 	src/parser/parts/module.c

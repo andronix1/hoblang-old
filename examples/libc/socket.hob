@@ -11,7 +11,7 @@ extern(listen) fun listen(socket: Socket, backlog: i32) ->i32
 type AddressFamily = u16;
 type AddressPort = u16;
 type AddressInAddr = i32;
-type AddressIn = struct {
+struct AddressIn {
     family: AddressFamily,
     port: AddressPort,
     in_addr: AddressInAddr,

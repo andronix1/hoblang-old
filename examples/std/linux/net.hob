@@ -10,12 +10,12 @@ fun socket(domain: i64, socket_type: i64, protocol: i64) ->Socket {
 type Family = u16;
 type Port = u16;
 type InAddr = i32;
-type AddressIn = struct {
+struct AddressIn {
     family: Family,
     port: Port,
     in_addr: InAddr,
     _reserved: u64
-};
+}
 
 fun bind(fd: Socket, addr: *void, size: i64) ->Socket {
 	return syscall::arg3(syscall::BIND, fd as i64, addr as i64, size) as Socket;

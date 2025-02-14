@@ -1,4 +1,5 @@
 #include "ast/private/type.h"
+#include "ast/private/module_node.h"
 #include "sema/type/private.h"
 #include "sema/module/private.h"
 #include "sema/module/parts/type.h"
@@ -24,23 +25,6 @@ SemaType *sema_ast_type(SemaModule *sema, AstType *type) {
 			stype->type = SEMA_TYPE_FUNCTION;
 			stype->func.args = args;
 			stype->func.returning = sema_ast_type(sema, type->func.returns);
-			type->sema = stype;
-			break;
-		}
-		case AST_TYPE_STRUCT: {
-			for (size_t i = 0; i < vec_len(type->struct_type.members); i++) {
-				AstStructMember *member = &type->struct_type.members[i];
-				for (size_t j = 0; j < i; j++) {
-					AstStructMember *jmember = &type->struct_type.members[j];
-					if (slice_eq(&member->name, &jmember->name)) {
-						sema_err("field {slice} duplicated", &member->name);
-					}
-				}
-				sema_ast_type(sema, member->type);
-			}
-			SemaType *stype = malloc(sizeof(SemaType));
-			stype->type = SEMA_TYPE_STRUCT;
-			stype->struct_type = &type->struct_type;
 			type->sema = stype;
 			break;
 		}

@@ -11,12 +11,12 @@ fun vfork() -> Pid {
 }
 
 type IdType = i64;
-type SigInfo = struct {
+struct SigInfo {
 	signo: i32,
 	errno: i32,
 	code: i32,
 	_pad: [29]i32
-};
+}
 
 fun waitid(id_type: IdType, pid: Pid, info: *SigInfo, options: i64) -> void {
 	syscall::arg4(syscall::WAIT_ID, id_type, pid, info as i64, options);

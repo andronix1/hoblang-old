@@ -38,6 +38,16 @@ typedef struct {
 	Slice ext_name;
 } AstExtFuncDecl;
 
+typedef struct AstStructMember {
+	Slice name;
+	AstType *type;
+} AstStructMember;
+
+typedef struct AstStructDef {
+	Slice name;
+	AstStructMember *members;
+} AstStructDef;
+
 typedef enum {
 	AST_MODULE_NODE_CONST,
 	AST_MODULE_NODE_FUNC,
@@ -45,6 +55,7 @@ typedef enum {
 	AST_MODULE_NODE_USE,
 	AST_MODULE_NODE_IMPORT,
 	AST_MODULE_NODE_TYPE_ALIAS,
+	AST_MODULE_NODE_STRUCT_DEF,
 } AstModuleNodeType;
 
 typedef struct AstModuleNode {
@@ -53,7 +64,8 @@ typedef struct AstModuleNode {
 		AstFuncDecl func_decl;		
 		AstExtFuncDecl ext_func_decl;		
 		AstImport import;	
-		AstTypeAlias type_alias;	
+		AstTypeAlias type_alias;
+		AstStructDef struct_def;
 		AstConst constant;	
 		AstUse use;	
 	};

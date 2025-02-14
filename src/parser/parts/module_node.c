@@ -1,4 +1,5 @@
 #include "ast/private/module_node.h"
+#include "parser/parts/module_node.h"
 #include "parser/parts/type.h"
 #include "parser/parts/path.h"
 #include "parser/parts/expr.h"
@@ -61,6 +62,10 @@ bool parse_module_node(Parser *parser, AstModuleNode *node) {
 			node->import.as = PARSER_EXPECT_NEXT(TOKEN_IDENT, "module name")->ident;
 			PARSER_EXPECT_NEXT(TOKEN_SEMICOLON, "semicolon");
 			return true;
+		}
+		case TOKEN_STRUCT: {
+			node->type = AST_MODULE_NODE_STRUCT_DEF;
+			return parse_ast_struct_def(parser, &node->struct_def);
 		}
 		case TOKEN_USE:
 			node->type = AST_MODULE_NODE_USE;

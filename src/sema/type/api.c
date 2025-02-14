@@ -1,4 +1,5 @@
 #include "ast/private/type.h"
+#include "ast/private/module_node.h"
 #include "core/vec.h"
 #include "sema/type/private.h"
 
@@ -11,12 +12,12 @@ bool sema_types_equals(SemaType *type, SemaType *other) {
 	}
 	switch (type->type) {
 		case SEMA_TYPE_STRUCT:
-			if (vec_len(type->struct_type->members) != vec_len(other->struct_type->members)) {
+			if (vec_len(type->struct_def->members) != vec_len(other->struct_def->members)) {
 				return false;
 			}
-			for (size_t i = 0; i < vec_len(type->struct_type->members); i++) {
-				AstStructMember *a = &type->struct_type->members[i],
-								*b = &other->struct_type->members[i];
+			for (size_t i = 0; i < vec_len(type->struct_def->members); i++) {
+				AstStructMember *a = &type->struct_def->members[i],
+								*b = &other->struct_def->members[i];
 				if (!slice_eq(&a->name, &b->name) || !sema_types_equals(a->type->sema, b->type->sema)) {
 					return false;
 				}

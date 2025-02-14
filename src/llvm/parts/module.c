@@ -16,6 +16,7 @@ void llvm_module_node(LlvmBackend *llvm, AstModuleNode *node) {
 		case AST_MODULE_NODE_TYPE_ALIAS:
 		case AST_MODULE_NODE_IMPORT:
 		case AST_MODULE_NODE_EXTERNAL_FUNC:
+		case AST_MODULE_NODE_STRUCT_DEF:
 			break;
 			
 		case AST_MODULE_NODE_CONST:
@@ -59,6 +60,7 @@ void llvm_module_init(LlvmBackend *llvm, AstModule *module) {
 			case AST_MODULE_NODE_TYPE_ALIAS:
 			case AST_MODULE_NODE_IMPORT:
 			case AST_MODULE_NODE_CONST:
+			case AST_MODULE_NODE_STRUCT_DEF:
 				break;
 			case AST_MODULE_NODE_EXTERNAL_FUNC:
 			case AST_MODULE_NODE_FUNC: {

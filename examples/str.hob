@@ -3,7 +3,7 @@ import "libc/lib.hob" as c;
 use c::mem;
 use c::io;
 
-type String = struct {
+struct String {
 	data: *u8,
 	length: i32,
 	capacity: i32

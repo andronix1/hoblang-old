@@ -18,7 +18,7 @@ type IntegerVariant = variant {
 	Quad { quad: u8 },
 };
 
-type IntegerVariantAlt = struct {
+struct IntegerVariantAlt {
 	kind: IntegerKind,
 	value: IntegerUnion
 }

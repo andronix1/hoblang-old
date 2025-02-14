@@ -4,7 +4,7 @@ import "handle.hob" as handle;
 use c::socket;
 use c::io;
 
-type TcpServer = struct {
+struct TcpServer {
     socket: socket::Socket
 };
 

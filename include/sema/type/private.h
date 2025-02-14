@@ -2,6 +2,7 @@
 
 #include <stddef.h>
 #include "ast/api/type.h"
+#include "ast/api/module_node.h"
 #include "sema/type/api.h"
 #include "sema/type.h"
 
@@ -33,7 +34,7 @@ typedef struct SemaType {
 		SemaFunction func;
 		SemaType *ptr_to;
 		SemaType *slice_of;
-		AstStructType *struct_type;
+		AstStructDef *struct_def;
 		SemaArrayType array;
 	};
 } SemaType;
@@ -42,6 +43,7 @@ SemaType *sema_type_new_array(size_t length, SemaType *of);
 SemaType *sema_type_new_slice(SemaType *of);
 SemaType *sema_type_new_pointer(SemaType *to); 
 SemaType *sema_type_new_func(SemaType *returning, SemaType **args);
+SemaType *sema_type_new_struct(AstStructDef *struct_def);
 
 #define SEMA_TYPE_PRIMITIVE(name, kind) \
     SemaType *sema_type_primitive_##name();

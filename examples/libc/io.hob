@@ -12,7 +12,7 @@ extern(close) fun close(fd: Fd) -> i32
 
 type File = *void;
 
-type FileStatus = struct {
+struct FileStatus {
     a: u64, b: u64, c: u64, d: u64, e: u64, f: u64, size: u64,
     g: u64, h: u64, i: u64, j: u64, k: u64, l: u64, m: u64, n: u64, o: u64, p: u64, q: u64
 };
