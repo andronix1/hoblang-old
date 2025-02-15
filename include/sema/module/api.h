@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdbool.h>
 #include "ast/api/module.h"
 #include "sema/project.h"
 #include "module.h"
