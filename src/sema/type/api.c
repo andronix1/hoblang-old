@@ -30,6 +30,8 @@ bool sema_types_equals(SemaType *type, SemaType *other) {
 			switch (type->primitive.type) {
 				case SEMA_PRIMITIVE_INT:
 					return type->primitive.integer == other->primitive.integer;
+				case SEMA_PRIMITIVE_FLOAT:
+					return type->primitive.float_type == other->primitive.float_type;
 				case SEMA_PRIMITIVE_BOOL:
 				case SEMA_PRIMITIVE_VOID:
 					return true;
@@ -62,4 +64,8 @@ bool sema_types_equals(SemaType *type, SemaType *other) {
 
 bool sema_type_is_int(SemaType *type) {
 	return type->type == SEMA_TYPE_PRIMITIVE && type->primitive.type == SEMA_PRIMITIVE_INT;
+}
+
+bool sema_type_is_float(SemaType *type) {
+	return type->type == SEMA_TYPE_PRIMITIVE && type->primitive.type == SEMA_PRIMITIVE_FLOAT;
 }

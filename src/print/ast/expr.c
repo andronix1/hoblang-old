@@ -67,6 +67,10 @@ void print_ast_expr(FILE *stream, va_list list) {
 			print_to(stream, "({ast::expr}){ast::ipath}", expr->get_inner.of, &expr->get_inner.path); break;
 			break;
 		}
+		case AST_EXPR_FLOAT: {
+			fprintf(stream, "%Lf", expr->float_value); break;
+			break;
+		}
 		case AST_EXPR_IDX: {
 			print_to(stream, "({ast::expr})[ast::expr]", expr->idx.of, &expr->idx.idx); break;
 			break;

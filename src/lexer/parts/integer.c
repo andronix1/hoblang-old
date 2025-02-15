@@ -29,13 +29,27 @@ LexPartErr lex_integer(Lexer *lexer) {
 			return LEX_PART_ERR;
 		}
 	}
-	uint64_t result = convert(c);
+	uint64_t left = convert(c);
 	while (is_right(c = lexer_future_char(lexer))) {
 		lexer_next_char(lexer);
-		result = result * base + convert(c);
+		left = left * base + convert(c);
+	}
+	if (c != '.') {
+		Token *token = lexer_token(lexer);
+		token->type = TOKEN_INTEGER;
+		token->integer = left;
+		return LEX_PART_OK;
+	}
+	lexer_next_char(lexer);
+	long double rdel = 1;
+	uint64_t right = 0;
+	while (is_right(c = lexer_future_char(lexer))) {
+		lexer_next_char(lexer);
+		right = right * base + convert(c);
+		rdel /= base;
 	}
 	Token *token = lexer_token(lexer);
-	token->type = TOKEN_INTEGER;
-	token->integer = result;
+	token->type = TOKEN_FLOAT;
+	token->float_value = left + right * rdel;
 	return LEX_PART_OK;
 }

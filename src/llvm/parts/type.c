@@ -31,6 +31,12 @@ LLVMTypeRef llvm_resolve_type(SemaType *type) {
 			switch (type->primitive.type) {
 				case SEMA_PRIMITIVE_BOOL: return LLVMInt1Type();
 				case SEMA_PRIMITIVE_VOID: return LLVMVoidType();
+				case SEMA_PRIMITIVE_FLOAT:
+					switch (type->primitive.float_type) {
+						case SEMA_PRIMITIVE_FLOAT32: return LLVMFloatType();
+						case SEMA_PRIMITIVE_FLOAT64: return LLVMDoubleType();
+					}
+					break;
 				case SEMA_PRIMITIVE_INT:
 					switch (type->primitive.integer) {
 						case SEMA_PRIMITIVE_INT8: case SEMA_PRIMITIVE_UINT8: return LLVMInt8Type();
@@ -38,6 +44,7 @@ LLVMTypeRef llvm_resolve_type(SemaType *type) {
 						case SEMA_PRIMITIVE_INT32: case SEMA_PRIMITIVE_UINT32: return LLVMInt32Type();
 						case SEMA_PRIMITIVE_INT64: case SEMA_PRIMITIVE_UINT64: return LLVMInt64Type();
 					}
+					break;
 			}
 			assert(0, "invalid primitive {int}", type->primitive);
 		case SEMA_TYPE_FUNCTION: {

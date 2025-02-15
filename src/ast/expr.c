@@ -23,6 +23,9 @@ AstExpr *ast_expr_get_inner_path(AstExpr *of, AstInnerPath path) CONSTR(AST_EXPR
 AstExpr *ast_expr_integer(uint64_t value) CONSTR(AST_EXPR_INTEGER, {
     FIELD(integer, value)
 })
+AstExpr *ast_expr_float(long double value) CONSTR(AST_EXPR_FLOAT, {
+    FIELD(float_value, value)
+})
 AstExpr *ast_expr_char(char value) CONSTR(AST_EXPR_CHAR, {
     FIELD(character, value)
 })

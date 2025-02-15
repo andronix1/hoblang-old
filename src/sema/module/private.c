@@ -92,6 +92,7 @@ void sema_module_push_primitives(SemaModule *sema) {
     #define PP(name) sema_module_push_decl(sema, sema_scope_decl_new_type(slice_from_cstr(#name), sema_type_primitive_##name()));
 	PP(i8); PP(i16); PP(i32); PP(i64);
     PP(u8); PP(u16); PP(u32); PP(u64);
+    PP(f32); PP(f64);
 	PP(bool); PP(void);
 }
 

@@ -73,6 +73,7 @@ typedef enum {
 
     TOKEN_CHAR,
     TOKEN_INTEGER,
+    TOKEN_FLOAT,
     TOKEN_IDENT,
     TOKEN_STR,
 	
@@ -85,6 +86,7 @@ typedef struct {
     union {
         Slice ident;
         uint64_t integer;
+        long double float_value;
 		char character;
         char *str;
     };

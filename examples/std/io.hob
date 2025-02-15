@@ -47,12 +47,6 @@ fun print_u64(value: u64) -> void {
     var buf_slice = &buf as []u8;
 
     var i = PRINT_U64_BUF_SIZE - 1;
-    
-    if value == 0 {
-        buf_slice[i] = '0';
-        i = i - 1;
-    }
-
     while value > 0 {
         buf_slice[i] = '0' + (value - (value / 10 as u64) * 10 as u64) as u8;
         i = i - 1;
@@ -61,6 +55,15 @@ fun print_u64(value: u64) -> void {
     buf_slice.raw = (buf_slice.raw as i64 + i as i64 + 1) as *u8;
     buf_slice.length = buf_slice.length - i - 1;
     print(buf_slice);
+}
+
+# TODO
+fun print_f64(value: f64) -> void {
+    var casted = (&value as *i64).*;
+    if casted & (1 << 31) as i64 != 0 {
+        print_char('-');
+    }
+    print_u64((casted & (0xffffff - (1 << 23))) as u64);
 }
 
 fun get_char() -> u8 {

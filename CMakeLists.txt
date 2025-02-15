@@ -68,6 +68,7 @@ set(SOURCE_FILES
 	src/sema/module/parts/exprs/binop.c
 	src/sema/module/parts/exprs/call.c
 	src/sema/module/parts/exprs/int.c
+	src/sema/module/parts/exprs/float.c
 	src/sema/module/parts/exprs/not.c
 	src/sema/module/parts/exprs/ref.c
 	src/sema/module/parts/exprs/unary.c

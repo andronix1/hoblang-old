@@ -61,6 +61,7 @@ void print_token(FILE *stream, va_list list) {
     	case TOKEN_GREATER_OR_EQUALS: fprintf(stream, ">="); return;
     	case TOKEN_SHR: fprintf(stream, ">>"); return;
     	case TOKEN_INTEGER: fprintf(stream, "integer %ld", token->integer); return;
+    	case TOKEN_FLOAT: fprintf(stream, "float %Lf", token->float_value); return;
     	case TOKEN_CHAR: fprintf(stream, "char '%c'", token->character); return;
     	case TOKEN_STR: {
 			Slice str = {

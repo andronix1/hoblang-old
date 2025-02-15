@@ -20,6 +20,7 @@ uint64_t sema_eval_int_expr(SemaModule *sema, AstExpr *expr) {
         case AST_EXPR_UNARY:
         case AST_EXPR_ARRAY:
         case AST_EXPR_IDX:
+        case AST_EXPR_FLOAT:
         case AST_EXPR_REF:
             sema_err("cannot use {ast::expr} in constant int expr", expr);
             return 0;

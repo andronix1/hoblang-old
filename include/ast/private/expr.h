@@ -30,6 +30,7 @@ typedef enum {
 	AST_EXPR_GET_INNER_PATH,
 	AST_EXPR_IDX,
 	AST_EXPR_INTEGER,
+	AST_EXPR_FLOAT,
 	AST_EXPR_CHAR,
 	AST_EXPR_STR,
 	AST_EXPR_BOOL,
@@ -59,6 +60,7 @@ typedef struct AstExpr {
 		AstExprGetInner get_inner;
 		Slice str;
 		uint64_t integer;
+		long double float_value;
 		char character;
 		bool boolean;
 	};
@@ -70,6 +72,7 @@ AstExpr *ast_expr_get_local_path(AstPath path);
 AstExpr *ast_expr_get_inner_path(AstExpr *of, AstInnerPath path);
 AstExpr *ast_expr_idx(AstExpr *of, AstExpr *idx);
 AstExpr *ast_expr_integer(uint64_t value);
+AstExpr *ast_expr_float(long double value);
 AstExpr *ast_expr_char(char value);
 AstExpr *ast_expr_str(Slice value);
 AstExpr *ast_expr_bool(bool value);

@@ -64,6 +64,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 		case AST_EXPR_NOT: return LLVMBuildNot(llvm_builder(llvm), llvm_expr(llvm, expr->not_expr, true), "");
 		case AST_EXPR_REF: return llvm_expr(llvm, expr->ref_expr, false);
 		case AST_EXPR_INTEGER: return LLVMConstInt(llvm_resolve_type(expr->value->sema_type), expr->integer, false);
+		case AST_EXPR_FLOAT: return LLVMConstReal(llvm_resolve_type(expr->value->sema_type), expr->float_value);
 		case AST_EXPR_BOOL: return LLVMConstInt(LLVMInt1Type(), expr->boolean, false);
 		case AST_EXPR_CHAR: return LLVMConstInt(LLVMInt8Type(), expr->character, false);
 		case AST_EXPR_STR: return llvm_slice_from_str(llvm, &expr->str);
@@ -103,9 +104,15 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 			switch (expr->as.conv_type) {
 				case SEMA_AS_CONV_EXTEND: return LLVMBuildZExt(llvm_builder(llvm), value, to_type, "");
 				case SEMA_AS_CONV_TRUNC: return LLVMBuildTrunc(llvm_builder(llvm), value, to_type, "");
+				case SEMA_AS_CONV_FEXTEND: return LLVMBuildFPExt(llvm_builder(llvm), value, to_type, "");
+				case SEMA_AS_CONV_FTRUNC: return LLVMBuildFPTrunc(llvm_builder(llvm), value, to_type, "");
 				case SEMA_AS_CONV_BITCAST: return LLVMBuildBitCast(llvm_builder(llvm), value, to_type, "");
 				case SEMA_AS_CONV_PTR_TO_INT: return LLVMBuildPtrToInt(llvm_builder(llvm), value, to_type, "");
 				case SEMA_AS_CONV_INT_TO_PTR: return LLVMBuildIntToPtr(llvm_builder(llvm), value, to_type, "");
+				case SEMA_AS_CONV_INT_TO_FLOAT: return LLVMBuildSIToFP(llvm_builder(llvm), value, to_type, "");
+				case SEMA_AS_CONV_UINT_TO_FLOAT: return LLVMBuildUIToFP(llvm_builder(llvm), value, to_type, "");
+				case SEMA_AS_CONV_FLOAT_TO_INT: return LLVMBuildFPToSI(llvm_builder(llvm), value, to_type, "");
+				case SEMA_AS_CONV_FLOAT_TO_UINT: return LLVMBuildFPToUI(llvm_builder(llvm), value, to_type, "");
 				case SEMA_AS_CONV_ARR_PTR_TO_SLICE: return llvm_slice_from_array_ptr(
 					llvm,
 					llvm_resolve_type(expr->as.expr->value->sema_type->array.of),
@@ -118,32 +125,37 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 			break;
 		}
 		case AST_EXPR_UNARY: {
+			bool is_float = sema_type_is_float(expr->unary.expr->value->sema_type);
 			switch (expr->unary.type) {
-				case AST_UNARY_MINUS: return LLVMBuildNeg(llvm_builder(llvm), llvm_expr(llvm, expr->unary.expr, true), "");
+				case AST_UNARY_MINUS: return (is_float ? LLVMBuildFNeg : LLVMBuildNeg)(llvm_builder(llvm), llvm_expr(llvm, expr->unary.expr, true), "");
 				case AST_UNARY_BITNOT: return LLVMBuildNot(llvm_builder(llvm), llvm_expr(llvm, expr->unary.expr, true), "");
 			}
 			assert(0, "invalid unary {int}", expr->unary.type);
 			return NULL;
 		}
 		case AST_EXPR_BINOP: {
+			bool is_float = sema_type_is_float(expr->binop.left->value->sema_type);
 			LLVMValueRef right = llvm_expr(llvm, expr->binop.right, true);
 			LLVMValueRef left = llvm_expr(llvm, expr->binop.left, true);
 			switch (expr->binop.type) {
-				case AST_BINOP_ADD: return LLVMBuildAdd(llvm_builder(llvm), left, right, "");
+				case AST_BINOP_ADD: return (is_float ? LLVMBuildFAdd : LLVMBuildAdd)(llvm_builder(llvm), left, right, "");
+				case AST_BINOP_SUB: return (is_float ? LLVMBuildFSub : LLVMBuildSub)(llvm_builder(llvm), left, right, "");
+				case AST_BINOP_MUL: return (is_float ? LLVMBuildFMul : LLVMBuildMul)(llvm_builder(llvm), left, right, "");
+				case AST_BINOP_DIV: return (is_float ? LLVMBuildFDiv : LLVMBuildSDiv)(llvm_builder(llvm), left, right, "");
 				case AST_BINOP_XOR: return LLVMBuildXor(llvm_builder(llvm), left, right, "");
 				case AST_BINOP_BITAND: return LLVMBuildAnd(llvm_builder(llvm), left, right, "");
 				case AST_BINOP_BITOR: return LLVMBuildOr(llvm_builder(llvm), left, right, "");
 				case AST_BINOP_SHR: return LLVMBuildLShr(llvm_builder(llvm), left, right, "");
 				case AST_BINOP_SHL: return LLVMBuildShl(llvm_builder(llvm), left, right, "");
-				case AST_BINOP_SUB: return LLVMBuildSub(llvm_builder(llvm), left, right, "");
-				case AST_BINOP_MUL: return LLVMBuildMul(llvm_builder(llvm), left, right, "");
-				case AST_BINOP_DIV: return LLVMBuildSDiv(llvm_builder(llvm), left, right, "");
-				case AST_BINOP_EQ: return LLVMBuildICmp(llvm_builder(llvm), LLVMIntEQ, left, right, "");
-				case AST_BINOP_NEQ: return LLVMBuildICmp(llvm_builder(llvm), LLVMIntNE, left, right, "");
-				case AST_BINOP_GT: return LLVMBuildICmp(llvm_builder(llvm), LLVMIntSGT, left, right, "");
-				case AST_BINOP_GE: return LLVMBuildICmp(llvm_builder(llvm), LLVMIntSGE, left, right, "");
-				case AST_BINOP_LT: return LLVMBuildICmp(llvm_builder(llvm), LLVMIntSLT, left, right, "");
-				case AST_BINOP_LE: return LLVMBuildICmp(llvm_builder(llvm), LLVMIntSLE, left, right, "");
+				#define CMP(itype, ftype) (is_float ? \
+					LLVMBuildFCmp(llvm_builder(llvm), ftype, left, right, "") : \
+					LLVMBuildICmp(llvm_builder(llvm), itype, left, right, ""))
+				case AST_BINOP_EQ: return CMP(LLVMIntEQ, LLVMRealOEQ);
+				case AST_BINOP_NEQ: return CMP(LLVMIntNE, LLVMRealONE);
+				case AST_BINOP_GT: return CMP(LLVMIntSGT, LLVMRealOGT);
+				case AST_BINOP_GE: return CMP(LLVMIntSGE, LLVMRealOGE);
+				case AST_BINOP_LT: return CMP(LLVMIntSLT, LLVMRealOLT);
+				case AST_BINOP_LE: return CMP(LLVMIntSLE, LLVMRealOLE);
 				case AST_BINOP_AND: return LLVMBuildAnd(llvm_builder(llvm), left, right, "");
 				case AST_BINOP_OR: return LLVMBuildOr(llvm_builder(llvm), left, right, "");
 			}

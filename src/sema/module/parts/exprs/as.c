@@ -83,6 +83,14 @@ void sema_conv_array(
 	sema_err("{sema::type} cannot be casted to {sema::type}", source, dest);
 }
 
+bool sema_int_is_signed(SemaPrimitiveIntType type) {
+	return
+		type == SEMA_PRIMITIVE_INT8 ||
+		type == SEMA_PRIMITIVE_INT16 ||
+		type == SEMA_PRIMITIVE_INT32 ||
+		type == SEMA_PRIMITIVE_INT64;
+}
+
 void sema_conv_primitive(
 	SemaModule *sema,
 	SemaType *source,
@@ -90,32 +98,72 @@ void sema_conv_primitive(
 	SemaAsConvType *type
 ) {
 	assert(source->type == SEMA_TYPE_PRIMITIVE, "passed non-primitive type {sema::type}", source);
-	const int sizes[] = {
-		[SEMA_PRIMITIVE_INT8] = 1,
-		[SEMA_PRIMITIVE_INT16] = 2,
-		[SEMA_PRIMITIVE_INT32] = 3,
-		[SEMA_PRIMITIVE_INT64] = 4,
-		[SEMA_PRIMITIVE_UINT8] = 1,
-		[SEMA_PRIMITIVE_UINT16] = 2,
-		[SEMA_PRIMITIVE_UINT32] = 3,
-		[SEMA_PRIMITIVE_UINT64] = 4,
-	};
+
 	switch (source->primitive.type) {
+		case SEMA_PRIMITIVE_FLOAT: {
+			if (sema_type_is_int(dest)) {
+				if (sema_int_is_signed(dest->primitive.integer)) {
+					*type = SEMA_AS_CONV_FLOAT_TO_INT;
+				} else {
+					*type = SEMA_AS_CONV_FLOAT_TO_UINT;
+				}
+				break;
+			}
+			if (sema_type_is_float(dest)) {
+				const int sizes[] = {
+					[SEMA_PRIMITIVE_FLOAT32] = 1,
+					[SEMA_PRIMITIVE_FLOAT64] = 2,
+				};
+				int src_size = sizes[source->primitive.float_type];
+				int dst_size = sizes[dest->primitive.float_type];
+				if (src_size > dst_size) {
+					*type = SEMA_AS_CONV_FTRUNC;
+				} else if (src_size == dst_size) {
+					*type = SEMA_AS_CONV_BITCAST;
+				} else {
+					*type = SEMA_AS_CONV_FEXTEND;
+				}
+				break;
+			}
+			sema_err("{sema::type} cannot be casted to void", source);
+			break;
+		}
 		case SEMA_PRIMITIVE_INT: {
 			switch (dest->type) {
 				case SEMA_TYPE_PRIMITIVE: {
-					if (dest->primitive.type != SEMA_PRIMITIVE_INT) {
-						sema_err("{sema::type} cannot be casted to void", source);
-						break;
-					}
-					int src_size = sizes[source->primitive.integer];
-					int dst_size = sizes[dest->primitive.integer];
-					if (src_size > dst_size) {
-						*type = SEMA_AS_CONV_TRUNC;
-					} else if (src_size == dst_size) {
-						*type = SEMA_AS_CONV_BITCAST;
-					} else {
-						*type = SEMA_AS_CONV_EXTEND;
+					switch (dest->primitive.type) {
+						case SEMA_PRIMITIVE_FLOAT:
+							if (sema_int_is_signed(dest->primitive.integer)) {
+								*type = SEMA_AS_CONV_INT_TO_FLOAT;
+							} else {
+								*type = SEMA_AS_CONV_UINT_TO_FLOAT;
+							}
+							break;
+						case SEMA_PRIMITIVE_INT: {
+							const int sizes[] = {
+								[SEMA_PRIMITIVE_INT8] = 1,
+								[SEMA_PRIMITIVE_INT16] = 2,
+								[SEMA_PRIMITIVE_INT32] = 3,
+								[SEMA_PRIMITIVE_INT64] = 4,
+								[SEMA_PRIMITIVE_UINT8] = 1,
+								[SEMA_PRIMITIVE_UINT16] = 2,
+								[SEMA_PRIMITIVE_UINT32] = 3,
+								[SEMA_PRIMITIVE_UINT64] = 4,
+							};
+							int src_size = sizes[source->primitive.integer];
+							int dst_size = sizes[dest->primitive.integer];
+							if (src_size > dst_size) {
+								*type = SEMA_AS_CONV_TRUNC;
+							} else if (src_size == dst_size) {
+								*type = SEMA_AS_CONV_BITCAST;
+							} else {
+								*type = SEMA_AS_CONV_EXTEND;
+							}
+							break;
+						}
+						default:
+							sema_err("{sema::type} cannot be casted to void", source);
+							break;
 					}
 					break;
 				}

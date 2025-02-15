@@ -10,6 +10,7 @@ SemaValue *sema_analyze_expr_as(SemaModule *sema, AstExprAs *as, SemaExprCtx ctx
 SemaValue *sema_analyze_expr_binop(SemaModule *sema, AstExprBinop *binop, SemaExprCtx ctx);
 SemaValue *sema_analyze_expr_call(SemaModule *sema, AstCall *call, SemaExprCtx ctx);
 SemaValue *sema_analyze_expr_int(SemaModule *sema, uint64_t integer, SemaExprCtx ctx);
+SemaValue *sema_analyze_expr_float(SemaModule *sema, long double float_value, SemaExprCtx ctx);
 SemaValue *sema_analyze_expr_ref(SemaModule *sema, AstExpr *ref_expr, SemaExprCtx ctx);
 SemaValue *sema_analyze_expr_not(SemaModule *sema, AstExpr *not_expr, SemaExprCtx ctx);
 SemaValue *sema_analyze_expr_unary(SemaModule *sema, AstExprUnary *unary, SemaExprCtx ctx);
@@ -32,6 +33,7 @@ SemaValue *sema_expr(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) {
 		case AST_EXPR_BINOP: return expr->value = sema_analyze_expr_binop(sema, &expr->binop, ctx);
 		case AST_EXPR_AS: return expr->value = sema_analyze_expr_as(sema, &expr->as, ctx);
 		case AST_EXPR_INTEGER: return expr->value = sema_analyze_expr_int(sema, expr->integer, ctx);
+		case AST_EXPR_FLOAT: return expr->value = sema_analyze_expr_float(sema, expr->float_value, ctx);
         case AST_EXPR_CALL: return expr->value = sema_analyze_expr_call(sema, &expr->call, ctx);
     }
 	assert(0, "invalid ast expr type: {int}", expr->type);

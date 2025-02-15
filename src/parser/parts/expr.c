@@ -151,6 +151,9 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 			case TOKEN_INTEGER:
                 current_expr = ast_expr_integer(token->integer);
                 break;
+			case TOKEN_FLOAT:
+                current_expr = ast_expr_float(token->float_value);
+                break;
 			case TOKEN_IDENT: {
 				parser_skip_next(parser);
 				AstPath path;

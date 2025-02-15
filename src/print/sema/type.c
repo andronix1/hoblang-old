@@ -34,6 +34,10 @@ void print_sema_type(FILE* stream, va_list list) {
 					[SEMA_PRIMITIVE_UINT32] = "u32",
 					[SEMA_PRIMITIVE_UINT64] = "u64"
 				}[type->primitive.integer]); break;
+				case SEMA_PRIMITIVE_FLOAT: print_to(stream, (const char*[]){
+					[SEMA_PRIMITIVE_FLOAT32] = "f32",
+					[SEMA_PRIMITIVE_FLOAT64] = "4"
+				}[type->primitive.float_type]); break;
 			}
 			break;
 		case SEMA_TYPE_FUNCTION:
