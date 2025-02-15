@@ -1,0 +1,25 @@
+import "std/process.hob" as process;
+import "std/string.hob" as string;
+import "std/io.hob" as io;
+
+fun main() -> i32 {
+    var str = string::with_cap(10);
+    defer str.free();
+    var who = string::from_slice("WORLD");
+    defer who.free();
+
+    str.reserve(8); # does nothing
+
+    str.push('H');
+    str.push('i');
+    str.append_slice(", ");
+    str.append(&who);
+    str.append_slice("!\n");
+
+    str.print();
+    return 0;
+}
+
+fun _start() -> void {
+	process::exit(main());
+}

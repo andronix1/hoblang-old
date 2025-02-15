@@ -1,0 +1,77 @@
+import "salloc.hob" as salloc;
+import "io.hob" as io;
+
+struct String {
+    buffer: []u8,
+    cap: i32
+}
+
+fun new() -> String {
+    var result: String;
+    result.buffer.length = 0;
+    result.cap = 0;
+    return result;
+}
+
+fun with_cap(cap: i32) -> String {
+    var result = new();
+    result.reserve(cap);
+    return result;
+}
+
+fun from_slice(slice: []u8) -> String {
+    var result = with_cap(slice.length);
+    result.append_slice(slice);
+    return result;
+}
+
+fun String.reserve(cap: i32) -> void {
+    if (self.*.cap >= cap) {
+        return;
+    }
+    if (self.*.cap == 0) {
+        self.*.buffer.raw = salloc::allocate(cap as u32) as *u8;
+    } else {
+        self.*.buffer.raw = salloc::reallocate(self.*.buffer.raw as *void, cap as u32) as *u8;
+    }
+    self.*.cap = cap;
+}
+
+fun String.length() -> i32 {
+    return self.*.buffer.length;
+}
+
+fun String.push(char: u8) -> void {
+    if (self.*.buffer.length >= self.*.cap) {
+        var new_cap = self.*.cap * 2;
+        if (self.*.buffer.length >= new_cap) {
+            new_cap = self.*.buffer.length;
+        }
+        self.*.reserve(new_cap);
+    }
+    self.*.buffer[self.*.buffer.length] = char;
+    self.*.buffer.length = self.*.buffer.length + 1;
+}
+
+fun String.append_slice(slice: []u8) -> void {
+    var i = 0;
+    self.*.reserve(self.*.length() + slice.length);
+    while i < slice.length {
+        self.*.push(slice[i]);
+        i = i + 1;
+    }
+}
+
+fun String.append(other: *String) -> void {
+    self.*.append_slice(other.*.buffer);
+}
+
+fun String.free() -> void {
+    if (self.*.cap != 0) {
+        salloc::free(self.*.buffer.raw as *void);
+    }
+}
+
+fun String.print() -> void {
+    io::print(self.*.buffer);
+}
