@@ -40,7 +40,6 @@ bool parse_if_else(Parser *parser, AstIfElse *if_else) {
 				PARSE_ERROR("expected else if or else body but got `{tok}`", parser_token(parser));
 				return false;
 		}
-		parser_step(parser);
 	}
 	return true;
 }
