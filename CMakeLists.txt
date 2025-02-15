@@ -46,6 +46,7 @@ set(SOURCE_FILES
 	src/parser/parts/stmts/asm.c
 	src/parser/parts/decls/struct.c
 	src/parser/parts/decls/ext_func.c
+	src/parser/parts/decls/func_info.c
 	src/parser/parts/decls/func.c
 	src/parser/parts/module.c
 	src/parser/parts/module_node.c
@@ -59,6 +60,7 @@ set(SOURCE_FILES
     src/sema/type/private.c
 	src/sema/module/api.c
 	src/sema/module/private.c
+	src/sema/module/parts/decls/struct.c
 	src/sema/module/parts/expr/eval.c
 	src/sema/module/parts/exprs/array.c
 	src/sema/module/parts/exprs/as.c

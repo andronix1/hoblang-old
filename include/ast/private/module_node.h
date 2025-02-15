@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sema/module/parts/decls/struct/private.h"
 #include "path.h"
 #include "func_info.h"
 #include "body.h"
@@ -46,6 +47,8 @@ typedef struct AstStructMember {
 typedef struct AstStructDef {
 	Slice name;
 	AstStructMember *members;
+
+	SemaStructExtFunc *ext_funcs;
 } AstStructDef;
 
 typedef enum {

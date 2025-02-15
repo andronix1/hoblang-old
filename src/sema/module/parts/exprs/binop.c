@@ -38,7 +38,7 @@ SemaValue *sema_analyze_expr_binop(SemaModule *sema, AstExprBinop *binop, SemaEx
 		}
 	}
 	if (!sema_types_equals(ltype, right_type)) {
-		sema_err("cannot use binop {ast::binop} for types {sema::type} and {sema::type}", binop->type, ltype, &right_type);
+		sema_err("cannot use binop {ast::binop} for types {sema::type} and {sema::type}", binop->type, ltype, right_type);
 		return NULL;
 	}
 	if (binary_binop) {

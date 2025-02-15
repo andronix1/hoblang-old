@@ -6,4 +6,3 @@
 #include "ast/api/expr.h"
 
 LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load);
-LLVMValueRef llvm_call(LlvmBackend *llvm, AstCall *call);

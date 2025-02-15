@@ -4,6 +4,7 @@
 #include "core/slice.h"
 #include "sema/value.h"
 #include "sema/module/decls.h"
+#include "sema/module/parts/decls/struct/struct.h"
 #include "sema/module.h"
 #include "sema/type.h"
 #include "sema/value.h"
@@ -33,7 +34,7 @@ typedef enum {
 } SemaInnerPathType;
 
 typedef struct {
-    size_t idx;
+    SemaStructMember *member;
     SemaType *of;
 } SemaInnerPathStructMember;
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <llvm-c/Core.h>
 #include <string.h>
 #include <malloc.h>
 #include "sema/type.h"
@@ -9,15 +10,17 @@ typedef enum {
     SEMA_VALUE_CONST,
     SEMA_VALUE_VAR,
     SEMA_VALUE_TYPE,
+    SEMA_VALUE_EXT_FUNC_HANDLE,
     SEMA_VALUE_MODULE
 } SemaValueType;
 
 typedef struct SemaValue {
     SemaValueType type;
-    union {
+    union {;
         SemaType *sema_type;
         SemaModule *module;
     };
+	LLVMValueRef ext_func_handle;
     struct AstExpr *integer_expr; // TODO: REMOVE THIS!!!
 } SemaValue;
 
@@ -36,6 +39,7 @@ static inline SemaValue *sema_value_module(SemaModule *module) {
 	return result;
 }
 
+SEMA_VALUE_CONSTRUCTOR(sema_value_ext_func_handle, SEMA_VALUE_EXT_FUNC_HANDLE)
 SEMA_VALUE_CONSTRUCTOR(sema_value_const, SEMA_VALUE_CONST)
 SEMA_VALUE_CONSTRUCTOR(sema_value_type, SEMA_VALUE_TYPE)
 SEMA_VALUE_CONSTRUCTOR(sema_value_var, SEMA_VALUE_VAR)

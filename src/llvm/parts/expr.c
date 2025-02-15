@@ -8,74 +8,36 @@
 #include "ast/private/expr.h"
 
 LLVMValueRef llvm_call(LlvmBackend *llvm, AstCall *call) {
-	LLVMValueRef *params = alloca(sizeof(LLVMValueRef) * vec_len(call->args));
+	LLVMValueRef callable = llvm_expr(llvm, call->callable, true);
+	LLVMValueRef ext_base = call->callable->value->type == SEMA_VALUE_EXT_FUNC_HANDLE ?
+		call->callable->value->ext_func_handle : NULL;
+	size_t ext_offset = ext_base != NULL;
+	LLVMValueRef *params = alloca(sizeof(LLVMValueRef) * (vec_len(call->args) + ext_offset));
+	if (ext_base) {
+		params[0] = ext_base;
+	}
 	for (size_t i = 0; i < vec_len(call->args); i++) {
-		params[i] = llvm_expr(llvm, call->args[i], true);
+		params[i + ext_offset] = llvm_expr(llvm, call->args[i], true);
 	}
 	SemaType *returning = call->callable->value->sema_type->func.returning;
 	bool is_void = returning->type == SEMA_TYPE_PRIMITIVE && returning->primitive == PRIMITIVE_VOID;
 	return LLVMBuildCall2(
 		llvm_builder(llvm),
 		llvm_sema_function_type(&call->callable->value->sema_type->func),
-		llvm_expr(llvm, call->callable, true),
-		params, vec_len(call->args),
+		callable,
+		params, vec_len(call->args) + ext_offset,
 		is_void ? "" : "call_result"
 	);
 }
-/*
-LLVMValueRef llvm_get_local_value_path(LlvmBackend *llvm, AstPath *path) {
-	LLVMValueRef result = NULL;
-	for (size_t i = 0; i < vec_len(path->segments); i++) {
-		SemaPathSegment *segment = &path->segments[i].sema;
-		switch (segment->type) {
-			case SEMA_PATH_SEGMENT_MODULE:
-			case SEMA_PATH_SEGMENT_TYPE: 
-				break;
-			case SEMA_PATH_SEGMENT_DECL:
-				result = segment->decl->value_decl.llvm_value;
-				printf("GET(llvm) %p\n", &segment->decl->value_decl);
-				break;
-			case SEMA_PATH_SEGMENT_STRUCT_MEMBER: {
-				LLVMValueRef indices[2] = {
-					LLVMConstInt(LLVMInt32Type(), 0, false),
-					LLVMConstInt(LLVMInt32Type(), segment->struct_member.member_id, false)
-				};
-				result = LLVMBuildGEP2(
-					llvm_builder(llvm),
-					llvm_resolve_type(segment->struct_member.struct_type),
-					result,
-					indices, 2,
-					"struct_member"
-				);
-				break;
-			}
-			case SEMA_PATH_SEGMENT_SLICE_LENGTH:
-				result = llvm_slice_len(
-					llvm,
-					llvm_resolve_type(segment->slice_type),
-					result
-				);
-				break;
-			case SEMA_PATH_SEGMENT_SLICE_PTR:
-				result = llvm_slice_ptr(
-					llvm,
-					llvm_resolve_type(segment->slice_type),
-					result
-				);
-				break;
-		}
-	}
-	assert(result, "path `{ast::path}` was not resolved!", path);
-	return result;
-}
-*/
+
 LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 	switch (expr->type) {
 		case AST_EXPR_GET_INNER_PATH: {
 			LLVMValueRef value = llvm_resolve_inner_path(
 				llvm,
 				llvm_expr(llvm, expr->get_inner.of, false),
-				&expr->get_inner.path
+				&expr->get_inner.path,
+				expr->value
 			);
 			if (load && expr->value->type == SEMA_VALUE_VAR) {
                 return LLVMBuildLoad2(
@@ -88,7 +50,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 			return value;
 		}
 		case AST_EXPR_GET_LOCAL_PATH: {
-            LLVMValueRef value = llvm_resolve_path(llvm, &expr->get_local.path);
+            LLVMValueRef value = llvm_resolve_path(llvm, &expr->get_local.path, expr->value);
             if (load && expr->value->type == SEMA_VALUE_VAR) {
                 return LLVMBuildLoad2(
                     llvm_builder(llvm),

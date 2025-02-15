@@ -4,11 +4,13 @@
 #include "ast/api/expr.h"
 #include "sema/type/type.h"
 #include "sema/module.h"
+#include "sema/value.h"
 
 typedef struct {
 	SemaType *expectation;
 } SemaExprCtx;
 
+SemaValue *sema_callable_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx);
 SemaType *sema_value_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx);
 SemaType *sema_var_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx);
 SemaType *sema_const_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx);

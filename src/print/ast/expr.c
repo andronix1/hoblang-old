@@ -95,10 +95,10 @@ void print_ast_expr(FILE *stream, va_list list) {
 			print_to(stream, "\"{slice}\"", &expr->str);
 			break;
 		case AST_EXPR_CALL:
-			print_to(stream, "{ast::expr}(", &expr->call.callable);
+			print_to(stream, "{ast::expr}(", expr->call.callable);
 			for (size_t i = 0; i < vec_len(expr->call.args); i++) {
 				if (i != 0) print_to(stream, ", ");
-				print_to(stream, "{ast::expr}", &expr->call.args[i]);
+				print_to(stream, "{ast::expr}", expr->call.args[i]);
 			}
 			print_to(stream, ")");
 			break;

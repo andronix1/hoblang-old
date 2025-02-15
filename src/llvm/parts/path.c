@@ -3,12 +3,13 @@
 #include "core/vec.h"
 #include "ast/private/path.h"
 #include "sema/module/private.h"
+#include "sema/module/parts/decls/struct/impl.h"
 #include "sema/value/private.h"
 #include "sema/module/decls/impl.h"
 #include "llvm/parts/type.h"
 #include "llvm/parts/types/slice.h"
 
-LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstInnerPath *path) {
+LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstInnerPath *path, SemaValue *from) {
     for (size_t i = 0; i < vec_len(path->segments); i++) {
         SemaInnerPath *segment = &path->segments[i].sema;
         switch (segment->type) {
@@ -16,7 +17,7 @@ LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstI
                 value = llvm_type_sizeof(llvm, llvm_resolve_type(segment->sizeof_type));
                 break;
             case SEMA_INNER_PATH_DEREF:
-                if (segment->value->type != SEMA_VALUE_CONST) {
+                if (segment->value->type == SEMA_VALUE_VAR) {
                     value = LLVMBuildLoad2(
                         llvm_builder(llvm),
                         LLVMPointerType(llvm_resolve_type(segment->deref_type), 0),
@@ -26,17 +27,26 @@ LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstI
                 }
                 break;
             case SEMA_INNER_PATH_STRUCT_MEMBER: {
-                LLVMValueRef indices[] = {
-                    LLVMConstInt(LLVMInt32Type(), 0, false),
-                    LLVMConstInt(LLVMInt32Type(), segment->struct_member.idx, false)
-                };
-                value = LLVMBuildGEP2(
-                    llvm_builder(llvm),
-                    llvm_resolve_type(segment->struct_member.of),
-                    value,
-                    indices, 2,
-                    "struct_member"
-                );
+                switch (segment->struct_member.member->type) {
+                    case SEMA_STRUCT_MEMBER_EXT_FUNC:
+                        from->ext_func_handle = value;
+                        value = segment->struct_member.member->ext_func->llvm_value;
+                        break;
+                    case SEMA_STRUCT_MEMBER_FIELD: {
+                        LLVMValueRef indices[] = {
+                            LLVMConstInt(LLVMInt32Type(), 0, false),
+                            LLVMConstInt(LLVMInt32Type(), segment->struct_member.member->field_idx, false)
+                        };
+                        value = LLVMBuildGEP2(
+                            llvm_builder(llvm),
+                            llvm_resolve_type(segment->struct_member.of),
+                            value,
+                            indices, 2,
+                            "struct_member"
+                        );
+                        break;
+                    }
+                }               
                 break;
             }
             case SEMA_INNER_PATH_SLICE_RAW:
@@ -50,15 +60,16 @@ LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstI
     return value;
 }
 
-LLVMValueRef llvm_resolve_value_decl_path(LlvmBackend *llvm, AstDeclPath *path) {
+LLVMValueRef llvm_resolve_value_decl_path(LlvmBackend *llvm, AstDeclPath *path, SemaValue *from) {
 	LLVMValueRef result = path->decl->value_decl.llvm_value;
 	return result;
 }
 
-LLVMValueRef llvm_resolve_path(LlvmBackend *llvm, AstPath *path) {
+LLVMValueRef llvm_resolve_path(LlvmBackend *llvm, AstPath *path, SemaValue *from) {
     return llvm_resolve_inner_path(
         llvm,
-        llvm_resolve_value_decl_path(llvm, &path->decl_path),
-        &path->inner_path
+        llvm_resolve_value_decl_path(llvm, &path->decl_path, from),
+        &path->inner_path,
+        from
     );
 }

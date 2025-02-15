@@ -5,6 +5,8 @@
 #include "sema/type/private.h"
 #include "sema/module/private.h"
 #include "sema/module/decls/impl.h"
+#include "sema/module/parts/decls/struct/api.h"
+#include "sema/module/parts/decls/struct/impl.h"
 #include "sema/value/private.h"
 
 SemaScopeDecl *sema_resolve_decl_path_raw(SemaModule *sema, AstDeclPath *path) {
@@ -63,8 +65,8 @@ SemaValue *sema_resolve_inner_value_path(SemaModule *sema, SemaValue *from, AstI
         }
         case AST_INNER_PATH_SEG_DEREF: {
             if (from->sema_type->type != SEMA_TYPE_POINTER) {
-                sema_err("only pointers can be dereferenced, not {sema::type}\n", from->sema_type);
-                return false;
+                sema_err("only pointers can be dereferenced, not {sema::type}", from->sema_type);
+                return NULL;
             }
             segment->sema.type = SEMA_INNER_PATH_DEREF;
             segment->sema.deref_type = from->sema_type->ptr_to;
@@ -72,18 +74,22 @@ SemaValue *sema_resolve_inner_value_path(SemaModule *sema, SemaValue *from, AstI
         }
 		case AST_INNER_PATH_SEG_IDENT: {
 			if (from->sema_type->type == SEMA_TYPE_STRUCT) {
-				for (size_t i = 0; i < vec_len(from->sema_type->struct_def->members); i++) {
-                    AstStructMember *member = &from->sema_type->struct_def->members[i];
-					if (slice_eq(&member->name, &segment->ident)) {
-                        segment->sema.type = SEMA_INNER_PATH_STRUCT_MEMBER;
-                        segment->sema.struct_member.idx = i;
-                        segment->sema.struct_member.of = from->sema_type;
-                        SemaType *result = member->type->sema;
-                        return sema_value_with_type(from, result);
-					}
-				}
-                sema_err("{sema::type} has not a member {slice}", from->sema_type, &segment->ident);
-                return false;
+                segment->sema.type = SEMA_INNER_PATH_STRUCT_MEMBER;
+                segment->sema.struct_member.of = from->sema_type;
+                SemaStructMember *member = segment->sema.struct_member.member = sema_get_struct_member(sema, from->sema_type->struct_def, &segment->ident);
+                if (!member) {
+                    return NULL;
+                }
+                switch (member->type) {
+                    case SEMA_STRUCT_MEMBER_FIELD:
+                        return sema_value_with_type(from, from->sema_type->struct_def->members[member->field_idx].type->sema);
+                    case SEMA_STRUCT_MEMBER_EXT_FUNC:
+                        if (from->type != SEMA_VALUE_VAR) {
+                            sema_err("ext function can be called on variable only!!!");
+                        }
+                        return sema_value_ext_func_handle(member->ext_func->type);
+                }
+                assert(0, "invalid struct member type");
 			} else if (from->sema_type->type == SEMA_TYPE_SLICE) {
                 Slice length = slice_from_const_cstr("length");
                 Slice raw = slice_from_const_cstr("raw");
@@ -97,13 +103,13 @@ SemaValue *sema_resolve_inner_value_path(SemaModule *sema, SemaValue *from, AstI
                     return sema_value_with_type(from, sema_type_primitive_i32());
                 } else {
                     sema_err("{sema::type} has not member {slice}", from->sema_type, &segment->ident);
-                    return false;
+                    return NULL;
                 }
             }
-			return false;
+			return NULL;
 		}
 	}
-	return false;
+	return NULL;
 }
 
 SemaValue *sema_resolve_inner_type_path(SemaModule *sema, SemaValue *from, AstInnerPathSegment *segment) {
@@ -141,6 +147,9 @@ SemaValue *sema_resolve_inner_path(SemaModule *sema, SemaValue *from, AstInnerPa
                 }
                 break;
             }
+            case SEMA_VALUE_EXT_FUNC_HANDLE:
+        	    sema_err("cannot get path from ext func handle");
+                break;
             case SEMA_VALUE_MODULE:
         	    sema_err("cannot get path from module");
                 break;
@@ -166,7 +175,8 @@ SemaType *sema_resolve_type_path(SemaModule *sema, AstPath *path) {
         case SEMA_VALUE_VAR:
         case SEMA_VALUE_CONST:
         case SEMA_VALUE_MODULE:
-            sema_err("{ast::path} is value, not type", path);
+        case SEMA_VALUE_EXT_FUNC_HANDLE:
+            sema_err("{ast::path} is not a type", path);
             return NULL;
         case SEMA_VALUE_TYPE:
             break;
@@ -185,7 +195,8 @@ SemaType *sema_resolve_value_path(SemaModule *sema, AstPath *path) {
             break;
         case SEMA_VALUE_TYPE:
         case SEMA_VALUE_MODULE:
-            sema_err("{ast::path} is type, not value", path);
+        case SEMA_VALUE_EXT_FUNC_HANDLE:
+            sema_err("{ast::path} is not a value", path);
             return false;
     }
     assert(value->sema_type, "sema type of value was not mapped");

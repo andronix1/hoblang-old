@@ -24,16 +24,20 @@ void llvm_module_node(LlvmBackend *llvm, AstModuleNode *node) {
 			break;
 
 		case AST_MODULE_NODE_FUNC: {
-			llvm_set_current_func(llvm, node->ext_func_decl.info.decl->llvm_value);
+			llvm_set_current_func(llvm, node->func_decl.info.decl->llvm_value);
             LLVMBasicBlockRef entry = LLVMAppendBasicBlock(llvm_current_func(llvm), "entry");
             LLVMBasicBlockRef code = LLVMAppendBasicBlock(llvm_current_func(llvm), "code");
 
             LLVMPositionBuilderAtEnd(llvm_builder(llvm), entry);
             llvm_set_definitions_block(llvm, entry);
+			if (node->func_decl.info.is_extension) {
+				LLVMValueRef value = node->func_decl.info.self->llvm_value = LLVMBuildAlloca(llvm_builder(llvm), llvm_resolve_type(node->func_decl.info.ext_type), "self");
+				LLVMBuildStore(llvm_builder(llvm), LLVMGetParam(llvm_current_func(llvm), 0), value);
+			}
 			for (size_t i = 0; i < vec_len(node->func_decl.info.args); i++) {
 				AstFuncArg *arg = &node->func_decl.info.args[i];
 				LLVMValueRef value = arg->decl->llvm_value = LLVMBuildAlloca(llvm_builder(llvm), llvm_resolve_type(arg->type.sema), slice_to_cstr(&arg->name));
-				LLVMBuildStore(llvm_builder(llvm), LLVMGetParam(llvm_current_func(llvm), i), value);
+				LLVMBuildStore(llvm_builder(llvm), LLVMGetParam(llvm_current_func(llvm), i + node->func_decl.info.is_extension), value);
 			}
 
             LLVMPositionBuilderAtEnd(llvm_builder(llvm), code);
@@ -64,7 +68,10 @@ void llvm_module_init(LlvmBackend *llvm, AstModule *module) {
 				break;
 			case AST_MODULE_NODE_EXTERNAL_FUNC:
 			case AST_MODULE_NODE_FUNC: {
-				LLVMValueRef func = LLVMAddFunction(llvm_current_module(llvm), slice_to_cstr(&node->ext_func_decl.info.public_name), llvm_sema_function_type(&node->func_decl.info.decl->type->func));
+				LLVMValueRef func = LLVMAddFunction(
+					llvm_current_module(llvm),
+					slice_to_cstr(&node->ext_func_decl.info.public_name),
+					llvm_sema_function_type(&node->func_decl.info.decl->type->func));
 				node->func_decl.info.decl->llvm_value = func;
 				break;
             }
