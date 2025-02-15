@@ -28,16 +28,18 @@ LLVMTypeRef llvm_resolve_type(SemaType *type) {
 			return LLVMStructType(elements, vec_len(type->struct_def->members), false);
 		}
 		case SEMA_TYPE_PRIMITIVE:
-			switch (type->primitive) {
-				case PRIMITIVE_I8: case PRIMITIVE_U8: return LLVMInt8Type();
-				case PRIMITIVE_I16: case PRIMITIVE_U16: return LLVMInt16Type();
-				case PRIMITIVE_I32: case PRIMITIVE_U32: return LLVMInt32Type();
-				case PRIMITIVE_I64: case PRIMITIVE_U64: return LLVMInt64Type();
-				case PRIMITIVE_BOOL: return LLVMInt1Type();
-				case PRIMITIVE_VOID: return LLVMVoidType();
+			switch (type->primitive.type) {
+				case SEMA_PRIMITIVE_BOOL: return LLVMInt1Type();
+				case SEMA_PRIMITIVE_VOID: return LLVMVoidType();
+				case SEMA_PRIMITIVE_INT:
+					switch (type->primitive.integer) {
+						case SEMA_PRIMITIVE_INT8: case SEMA_PRIMITIVE_UINT8: return LLVMInt8Type();
+						case SEMA_PRIMITIVE_INT16: case SEMA_PRIMITIVE_UINT16: return LLVMInt16Type();
+						case SEMA_PRIMITIVE_INT32: case SEMA_PRIMITIVE_UINT32: return LLVMInt32Type();
+						case SEMA_PRIMITIVE_INT64: case SEMA_PRIMITIVE_UINT64: return LLVMInt64Type();
+					}
 			}
 			assert(0, "invalid primitive {int}", type->primitive);
-			return NULL;
 		case SEMA_TYPE_FUNCTION: {
 			LLVMTypeRef *params = alloca(sizeof(LLVMTypeRef) * vec_len(type->func.args));
 			for (size_t i = 0; i < vec_len(type->func.args); i++) {

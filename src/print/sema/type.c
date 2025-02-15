@@ -5,18 +5,6 @@
 #include "core/vec.h"
 
 void print_sema_type(FILE* stream, va_list list) {
-	const char *strs[] = {
-		[PRIMITIVE_I8] = "i8",
-		[PRIMITIVE_I16] = "i16",
-		[PRIMITIVE_I32] = "i32",
-		[PRIMITIVE_I64] = "i64",
-		[PRIMITIVE_U8] = "u8",
-		[PRIMITIVE_U16] = "u16",
-		[PRIMITIVE_U32] = "u32",
-		[PRIMITIVE_U64] = "u64",
-		[PRIMITIVE_BOOL] = "bool",
-		[PRIMITIVE_VOID] = "void",
-	};
 	SemaType *type = va_arg(list, SemaType*);
 	switch (type->type) {
 		case SEMA_TYPE_STRUCT:
@@ -33,10 +21,19 @@ void print_sema_type(FILE* stream, va_list list) {
 			print_to(stream, " }");
 			break;
 		case SEMA_TYPE_PRIMITIVE:
-			if (type->primitive >= (sizeof(strs) / sizeof(strs[0]))) {
-				print_to(stream, "<unknown {int}>", type->primitive);
-			} else {
-				print_to(stream, strs[type->primitive]);
+			switch (type->primitive.type) {
+				case SEMA_PRIMITIVE_BOOL: print_to(stream, "bool"); break;
+				case SEMA_PRIMITIVE_VOID: print_to(stream, "void"); break;
+				case SEMA_PRIMITIVE_INT: print_to(stream, (const char*[]){
+					[SEMA_PRIMITIVE_INT8] = "i8",
+					[SEMA_PRIMITIVE_INT16] = "i16",
+					[SEMA_PRIMITIVE_INT32] = "i32",
+					[SEMA_PRIMITIVE_INT64] = "i64",
+					[SEMA_PRIMITIVE_UINT8] = "u8",
+					[SEMA_PRIMITIVE_UINT16] = "u16",
+					[SEMA_PRIMITIVE_UINT32] = "u32",
+					[SEMA_PRIMITIVE_UINT64] = "u64"
+				}[type->primitive.integer]); break;
 			}
 			break;
 		case SEMA_TYPE_FUNCTION:

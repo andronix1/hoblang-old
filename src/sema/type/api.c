@@ -24,7 +24,17 @@ bool sema_types_equals(SemaType *type, SemaType *other) {
 			}
 			return true;
 		case SEMA_TYPE_PRIMITIVE:
-			return type->primitive == other->primitive;
+			if (type->primitive.type != other->primitive.type) {
+				return false;
+			}
+			switch (type->primitive.type) {
+				case SEMA_PRIMITIVE_INT:
+					return type->primitive.integer == other->primitive.integer;
+				case SEMA_PRIMITIVE_BOOL:
+				case SEMA_PRIMITIVE_VOID:
+					return true;
+			}
+			assert(0, "invalid sema primitive type");
 		case SEMA_TYPE_SLICE:
 			return sema_types_equals(type->slice_of, other->slice_of);
 		case SEMA_TYPE_ARRAY:
@@ -50,6 +60,6 @@ bool sema_types_equals(SemaType *type, SemaType *other) {
 	assert(0, "invalid sema type kind {int}", type->type);
 }
 
-bool sema_type_is_primitive(SemaType *type, Primitive primitive) {
-    return type->type == SEMA_TYPE_PRIMITIVE && type->primitive == primitive;
+bool sema_type_is_int(SemaType *type) {
+	return type->type == SEMA_TYPE_PRIMITIVE && type->primitive.type == SEMA_PRIMITIVE_INT;
 }

@@ -20,7 +20,7 @@ SemaValue *sema_analyze_expr_binop(SemaModule *sema, AstExprBinop *binop, SemaEx
 	if (!ltype) {
 		return NULL;
 	}
-	if ((ltype->type != SEMA_TYPE_PRIMITIVE && ltype->type != SEMA_TYPE_POINTER) || ltype->primitive == PRIMITIVE_VOID) {
+	if ((ltype->type != SEMA_TYPE_PRIMITIVE && ltype->type != SEMA_TYPE_POINTER) || sema_types_equals(ltype, sema_type_primitive_void())) {
 		sema_err("cannot use binop for type {sema::type}", ltype);
 		return NULL;
 	}

@@ -27,10 +27,34 @@ typedef struct {
 	size_t length;
 } SemaArrayType;
 
+typedef enum {
+	SEMA_PRIMITIVE_INT,
+	SEMA_PRIMITIVE_BOOL,
+	SEMA_PRIMITIVE_VOID
+} SemaPrimitiveType;
+
+typedef enum {
+	SEMA_PRIMITIVE_INT8,
+	SEMA_PRIMITIVE_INT16,
+	SEMA_PRIMITIVE_INT32,
+	SEMA_PRIMITIVE_INT64,
+	SEMA_PRIMITIVE_UINT8,
+	SEMA_PRIMITIVE_UINT16,
+	SEMA_PRIMITIVE_UINT32,
+	SEMA_PRIMITIVE_UINT64,
+} SemaPrimitiveIntType;
+
+typedef struct {
+	SemaPrimitiveType type;
+	union {
+		SemaPrimitiveIntType integer;
+	};
+} SemaPrimitive;
+
 typedef struct SemaType {
 	SemaTypeKind type;
 	union {
-		Primitive primitive;
+		SemaPrimitive primitive;
 		SemaFunction func;
 		SemaType *ptr_to;
 		SemaType *slice_of;

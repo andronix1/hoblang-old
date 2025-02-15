@@ -90,36 +90,26 @@ void sema_conv_primitive(
 	SemaAsConvType *type
 ) {
 	assert(source->type == SEMA_TYPE_PRIMITIVE, "passed non-primitive type {sema::type}", source);
-	Primitive primitive = source->primitive;
 	const int sizes[] = {
-		[PRIMITIVE_I8] = 1,
-		[PRIMITIVE_I16] = 2,
-		[PRIMITIVE_I32] = 3,
-		[PRIMITIVE_I64] = 4,
-		[PRIMITIVE_U8] = 1,
-		[PRIMITIVE_U16] = 2,
-		[PRIMITIVE_U32] = 3,
-		[PRIMITIVE_U64] = 4,
-		[PRIMITIVE_BOOL] = 1,
+		[SEMA_PRIMITIVE_INT8] = 1,
+		[SEMA_PRIMITIVE_INT16] = 2,
+		[SEMA_PRIMITIVE_INT32] = 3,
+		[SEMA_PRIMITIVE_INT64] = 4,
+		[SEMA_PRIMITIVE_UINT8] = 1,
+		[SEMA_PRIMITIVE_UINT16] = 2,
+		[SEMA_PRIMITIVE_UINT32] = 3,
+		[SEMA_PRIMITIVE_UINT64] = 4,
 	};
-	switch (primitive) {
-		case PRIMITIVE_I8:
-		case PRIMITIVE_U8:
-		case PRIMITIVE_I16:
-		case PRIMITIVE_U16:
-		case PRIMITIVE_I32:
-		case PRIMITIVE_U32:
-		case PRIMITIVE_I64:
-		case PRIMITIVE_U64:
-		case PRIMITIVE_BOOL: {
+	switch (source->primitive.type) {
+		case SEMA_PRIMITIVE_INT: {
 			switch (dest->type) {
 				case SEMA_TYPE_PRIMITIVE: {
-					if (dest->primitive == PRIMITIVE_VOID) {
+					if (dest->primitive.type != SEMA_PRIMITIVE_INT) {
 						sema_err("{sema::type} cannot be casted to void", source);
 						break;
 					}
-					int src_size = sizes[primitive];
-					int dst_size = sizes[dest->primitive];
+					int src_size = sizes[source->primitive.integer];
+					int dst_size = sizes[dest->primitive.integer];
 					if (src_size > dst_size) {
 						*type = SEMA_AS_CONV_TRUNC;
 					} else if (src_size == dst_size) {
@@ -131,7 +121,7 @@ void sema_conv_primitive(
 				}
 
 				case SEMA_TYPE_POINTER: {
-					if (primitive != PRIMITIVE_I64 && primitive != PRIMITIVE_U64) {
+					if (source->primitive.integer != SEMA_PRIMITIVE_UINT64 && source->primitive.integer != SEMA_PRIMITIVE_INT64) {
 						sema_err("only 64-bit values(not {sema::type}) can be casted to pointer", source);
 						break;
 					}
@@ -148,8 +138,9 @@ void sema_conv_primitive(
 			}
 			break;
 		}
-		case PRIMITIVE_VOID:
-			sema_err("void cannot be casted to {sema::type}", dest);
+		case SEMA_PRIMITIVE_BOOL:
+		case SEMA_PRIMITIVE_VOID:
+			sema_err("{sema::type} cannot be casted to {sema::type}", source, dest);
 			break;
 	}
 }

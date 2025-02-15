@@ -20,7 +20,7 @@ LLVMValueRef llvm_call(LlvmBackend *llvm, AstCall *call) {
 		params[i + ext_offset] = llvm_expr(llvm, call->args[i], true);
 	}
 	SemaType *returning = call->callable->value->sema_type->func.returning;
-	bool is_void = returning->type == SEMA_TYPE_PRIMITIVE && returning->primitive == PRIMITIVE_VOID;
+	bool is_void = sema_types_equals(returning, sema_type_primitive_void());
 	return LLVMBuildCall2(
 		llvm_builder(llvm),
 		llvm_sema_function_type(&call->callable->value->sema_type->func),

@@ -45,7 +45,7 @@ void llvm_module_node(LlvmBackend *llvm, AstModuleNode *node) {
 			if (llvm_body(llvm, &node->func_decl.body)) {
 				llvm_body_break(llvm, &node->func_decl.body);
 			}
-			if (sema_type_is_primitive(node->func_decl.info.returning.sema, PRIMITIVE_VOID)) {
+			if (sema_types_equals(node->func_decl.info.returning.sema, sema_type_primitive_void())) {
 				LLVMBuildRetVoid(llvm_builder(llvm));
 			}
 
