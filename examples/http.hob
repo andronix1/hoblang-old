@@ -1,0 +1,102 @@
+import "std/process.hob" as process;
+import "std/tcp.hob" as tcp;
+import "std/io.hob" as io;
+import "std/fs.hob" as fs;
+import "std/salloc.hob" as salloc;
+import "std/string.hob" as string;
+import "std/http/request.hob" as http_request;
+import "std/slices.hob" as slices;
+
+use tcp::Socket;
+use fs::File;
+
+const PORT: u16 = 8080;
+const BACKLOG: i32 = 16;
+
+const BUFFER_SIZE: i32 = 1000;
+
+fun die(msg: []u8) -> void {
+    io::println(msg);
+    process::exit(1);
+}
+
+fun handle_conn(client: Socket) -> void {
+	defer tcp::close(client);
+
+	var req_str = string::with_cap(4000); # one page
+	defer req_str.free();
+	req_str.append_fd(client);
+	var req = http_request::from_slice(req_str.buffer);
+	
+	var path = req.path;
+	if path.length > 0 {
+		path.length = path.length - 1;
+		path.raw = (path.raw as i64 + 1) as *u8;
+		((path.raw as i64 + path.length as i64) as *u8).* = 0;
+	}
+
+	var ext: []u8;
+	var i = path.length - 1;
+	while i > 0 && path[i] != '.' {
+		i = i - 1;
+	}
+	if i < 0 {
+		ext.length = 0;
+	} else {
+		ext.length = path.length - i - 1;
+		ext.raw = (path.raw as i64 + i as i64 + 1) as *u8;
+	}
+
+	io::print(req.version);
+		io::print(" "); io::print(req.method);
+		io::print(" "); io::print(path);
+		io::print(" -> ");
+
+	var file = fs::open_read(path);
+	if file < 0 {
+		io::write_to(client, "HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\n\r\nNOT FOUND!!!");
+		io::println("NOT_FOUND");
+		return;
+	}
+	defer io::close(file);
+
+	io::write_to(client, "HTTP/1.1 200 OK\r\nContent-Type: ");
+	if slices::eq(ext, "jpg") {
+		io::write_to(client, "image/jpg");
+	} else if slices::eq(ext, "html") {
+		io::write_to(client, "text/html");
+	} else {
+		io::write_to(client, "text/plain");
+	}
+	io::write_to(client, "\r\n\r\n");
+	io::full_forward(file, client);
+
+	io::println("OK");
+}
+
+fun main() -> i32 {
+	var server = tcp::bind(PORT, BACKLOG);
+	if server < 0 {
+		io::println("cannot bind a socket :(");
+		return 1;
+	}
+
+	while true {
+		var client = -1;
+		while client < 0 {
+			client = tcp::accept(server);
+		}
+		var pid = process::fork();
+		if pid == 0 {
+			handle_conn(client);
+			process::exit(0);
+		} else {
+			io::close(client);
+		}
+	}
+	return 0;
+}
+
+fun _start() -> void {
+	process::exit(main());
+}

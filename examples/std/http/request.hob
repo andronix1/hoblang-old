@@ -1,0 +1,43 @@
+import "../string.hob" as string;
+
+use string::String;
+
+struct HttpRequest {
+    method: []u8, path: []u8, version: []u8,
+    # TODO: headers
+    body: []u8
+}
+
+struct SplitSlice {
+    left: []u8,
+    right: []u8
+}
+
+fun split_left(slice: []u8, sep: u8) -> SplitSlice {
+    var result: SplitSlice;
+    var i = 0;
+    while i < slice.length {
+        if slice[i] == sep {
+            result.left.raw = slice.raw;
+            result.left.length = i;
+            result.right.raw = (slice.raw as i64 + i as i64 + 1) as *u8;
+            result.right.length = slice.length - i as i32 - 1;
+            return result;
+        }
+        i = i + 1;
+    }
+    result.left = slice;
+    result.right.length = 0;
+    return result;
+}
+
+fun from_slice(slice: []u8) -> HttpRequest {
+    var result: HttpRequest;
+    var split1 = split_left(slice, ' ');
+    result.method = split1.left;
+    var split2 = split_left(split1.right, ' ');
+    result.path = split2.left;
+    var split3 = split_left(split2.right, '\r');
+    result.version = split3.left;
+    return result;
+}
