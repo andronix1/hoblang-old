@@ -4,6 +4,7 @@
 
 typedef enum {
 	AST_BINOP_AND,
+	AST_BINOP_MOD,
 	AST_BINOP_ADD,
 	AST_BINOP_SUB,
 	AST_BINOP_MUL,

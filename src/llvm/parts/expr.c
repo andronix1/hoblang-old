@@ -138,6 +138,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 			LLVMValueRef right = llvm_expr(llvm, expr->binop.right, true);
 			LLVMValueRef left = llvm_expr(llvm, expr->binop.left, true);
 			switch (expr->binop.type) {
+				case AST_BINOP_MOD: return LLVMBuildURem(llvm_builder(llvm), left, right, "");
 				case AST_BINOP_ADD: return (is_float ? LLVMBuildFAdd : LLVMBuildAdd)(llvm_builder(llvm), left, right, "");
 				case AST_BINOP_SUB: return (is_float ? LLVMBuildFSub : LLVMBuildSub)(llvm_builder(llvm), left, right, "");
 				case AST_BINOP_MUL: return (is_float ? LLVMBuildFMul : LLVMBuildMul)(llvm_builder(llvm), left, right, "");

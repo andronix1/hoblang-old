@@ -41,6 +41,7 @@ void print_token(FILE *stream, va_list list) {
 		case TOKEN_OPENING_SQUARE_BRACE: fprintf(stream, "["); return;
 		case TOKEN_CLOSING_SQUARE_BRACE: fprintf(stream, "]"); return;
 		case TOKEN_NOT: fprintf(stream, "!"); return;
+		case TOKEN_MOD: fprintf(stream, "%"); return;
 		case TOKEN_BITNOT: fprintf(stream, "~"); return;
 		case TOKEN_BITAND: fprintf(stream, "&"); return;
 		case TOKEN_BITOR: fprintf(stream, "|"); return;

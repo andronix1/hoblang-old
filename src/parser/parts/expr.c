@@ -178,6 +178,7 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 				}
 				break;
 			}
+			case TOKEN_MOD: PARSE_BINOP(AST_BINOP_MOD); break;
 			case TOKEN_ADD: PARSE_BINOP(AST_BINOP_ADD); break;
 			case TOKEN_AND: PARSE_BINOP(AST_BINOP_AND); break;
 			case TOKEN_XOR: PARSE_BINOP(AST_BINOP_XOR); break;
