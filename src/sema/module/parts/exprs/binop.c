@@ -15,7 +15,9 @@ SemaValue *sema_analyze_expr_binop(SemaModule *sema, AstExprBinop *binop, SemaEx
 			binop->type == AST_BINOP_LE ||
 			bool_binops
 		);
-	SemaType *expect = binary_binop ? (bool_binops ? sema_type_primitive_bool() : NULL) : ctx.expectation;
+	SemaType *expect = binary_binop ? 
+		(bool_binops ? sema_type_primitive_bool() : NULL) :
+		ctx.expectation;
 	SemaType *ltype = sema_value_expr_type(sema, binop->left, sema_expr_ctx_expect(ctx, expect));
 	if (!ltype) {
 		return NULL;
@@ -24,7 +26,7 @@ SemaValue *sema_analyze_expr_binop(SemaModule *sema, AstExprBinop *binop, SemaEx
 		sema_err("cannot use binop for type {sema::type}", ltype);
 		return NULL;
 	}
-	if (binary_binop) {
+	if (!bool_binops) {
 		expect = ltype;
 	}
 	SemaType *right_type = sema_value_expr_type(sema, binop->right, sema_expr_ctx_expect(ctx, expect));
