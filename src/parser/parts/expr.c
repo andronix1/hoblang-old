@@ -215,6 +215,7 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 						return NULL;
 					}
 					values = vec_push(values, &expr);
+					token = parser_next(parser);
 				}
 				current_expr = ast_expr_array(values);
 				break;
