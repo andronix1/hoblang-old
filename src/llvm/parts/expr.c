@@ -69,34 +69,65 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 		case AST_EXPR_CHAR: return LLVMConstInt(LLVMInt8Type(), expr->character, false);
 		case AST_EXPR_STR: return llvm_slice_from_str(llvm, &expr->str);
 		case AST_EXPR_IDX: {
-			LLVMValueRef indices[] = {
-				llvm_expr(llvm, expr->idx.idx, true)
-			};
-			LLVMValueRef value = LLVMBuildGEP2(
-				llvm_builder(llvm),
-				llvm_resolve_type(expr->value->sema_type),
-				LLVMBuildLoad2(
-					llvm_builder(llvm),
-					LLVMPointerType(llvm_resolve_type(expr->value->sema_type), 0),
-					llvm_slice_ptr(
-						llvm,
-						llvm_resolve_type(expr->idx.of->value->sema_type),
-						llvm_expr(llvm, expr->idx.of, false)
-					),
-					"slice_ptr123"
-				),
-				indices, 1,
-				"idx_element_ptr"
-			);
-			if (load) {
-				return LLVMBuildLoad2(
-					llvm_builder(llvm),
-					llvm_resolve_type(expr->value->sema_type),
-					value, 
-					"loaded_idx"
-				);
+			switch (expr->idx.sema) {
+				case SEMA_EXPR_IDX_SLICE: {
+					LLVMValueRef indices[] = {
+						llvm_expr(llvm, expr->idx.idx, true)
+					};
+					LLVMValueRef value = LLVMBuildGEP2(
+						llvm_builder(llvm),
+						llvm_resolve_type(expr->value->sema_type),
+						LLVMBuildLoad2(
+							llvm_builder(llvm),
+							LLVMPointerType(llvm_resolve_type(expr->value->sema_type), 0),
+							llvm_slice_ptr(
+								llvm,
+								llvm_resolve_type(expr->idx.of->value->sema_type),
+								llvm_expr(llvm, expr->idx.of, false)
+							),
+							"slice_ptr123"
+						),
+						indices, 1,
+						"idx_element_ptr"
+					);
+					if (load) {
+						return LLVMBuildLoad2(
+							llvm_builder(llvm),
+							llvm_resolve_type(expr->value->sema_type),
+							value, 
+							"loaded_idx"
+						);
+					}
+					return value;
+				}
+				case SEMA_EXPR_IDX_ARRAY: {
+					LLVMValueRef indices[] = {
+						llvm_expr(llvm, expr->idx.idx, true)
+					};
+					LLVMValueRef value = LLVMBuildGEP2(
+						llvm_builder(llvm),
+						llvm_resolve_type(expr->value->sema_type),
+						LLVMBuildLoad2(
+							llvm_builder(llvm),
+							llvm_resolve_type(expr->value->sema_type),
+							llvm_expr(llvm, expr->idx.of, false),
+							"slice_ptr123"
+						),
+						indices, 1,
+						"idx_element_ptr"
+					);
+					if (load) {
+						return LLVMBuildLoad2(
+							llvm_builder(llvm),
+							llvm_resolve_type(expr->value->sema_type),
+							value, 
+							"loaded_idx"
+						);
+					}
+					return value;
+				}
 			}
-			return value;
+			break;
 		}
 		case AST_EXPR_AS: {
 			LLVMTypeRef to_type = llvm_resolve_type(expr->as.type.sema);
