@@ -54,7 +54,7 @@ fun print_u64(value: u64) -> void {
     }
 
     while value > 0 {
-        buf_slice[i] = '0' + (value - (value / 10 as u64) * 10 as u64) as u8;
+        buf_slice[i] = '0' + (value % 10) as u8;
         i = i - 1;
         value = value / 10;
     }
@@ -81,13 +81,12 @@ fun hex_dump(mem: []u8) -> void {
     }
 }
 
-# TODO
 fun print_f64(value: f64) -> void {
     var int = value as u64;
     print_u64(int);
     print_char('.');
     var fp = ((value - int as f64) * 10000000.0) as u64;
-    while fp - fp / 10 * 10 == 0 {
+    while fp % 10 == 0 {
         fp = fp / 10;
     }
     print_u64(fp);
