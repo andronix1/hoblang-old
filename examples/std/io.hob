@@ -47,6 +47,12 @@ fun print_u64(value: u64) -> void {
     var buf_slice = &buf as []u8;
 
     var i = PRINT_U64_BUF_SIZE - 1;
+
+    if value == 0 {
+        buf_slice[i] = '0';
+        i = i - 1;
+    }
+
     while value > 0 {
         buf_slice[i] = '0' + (value - (value / 10 as u64) * 10 as u64) as u8;
         i = i - 1;
@@ -57,13 +63,34 @@ fun print_u64(value: u64) -> void {
     print(buf_slice);
 }
 
+fun hex_dump_4b(hb: u8) -> void {
+    if hb < 10 {
+        print_char(hb + '0');
+    } else {
+        print_char(hb - 10 + 'a');
+    }
+}
+
+fun hex_dump(mem: []u8) -> void {
+    var i = 0;
+    while i < mem.length {
+        var char = mem[i];
+        hex_dump_4b(char & 0xf0 >> 4);
+        hex_dump_4b(char & 0xf);
+        i = i + 1;
+    }
+}
+
 # TODO
 fun print_f64(value: f64) -> void {
-    var casted = (&value as *i64).*;
-    if casted & (1 << 31) as i64 != 0 {
-        print_char('-');
+    var int = value as u64;
+    print_u64(int);
+    print_char('.');
+    var fp = ((value - int as f64) * 10000000.0) as u64;
+    while fp - fp / 10 * 10 == 0 {
+        fp = fp / 10;
     }
-    print_u64((casted & (0xffffff - (1 << 23))) as u64);
+    print_u64(fp);
 }
 
 fun get_char() -> u8 {

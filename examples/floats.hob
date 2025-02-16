@@ -1,0 +1,21 @@
+import "std/process.hob" as process;
+import "std/io.hob" as io;
+
+fun main() -> i32 {
+    var source: f64 = 65.125;
+    
+    var mem: []u8;
+    mem.length = source.sizeof;
+    mem.raw = &source as *u8;
+    
+    io::print("0x");
+    io::hex_dump(mem);
+    io::print_char('\n');
+    io::print_f64(source);
+    io::print_char('\n');
+    return 0;
+}
+
+fun _start() -> void {
+    process::exit(main());
+}

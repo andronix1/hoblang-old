@@ -74,6 +74,7 @@ fun handle_conn(client: Socket) -> void {
 	io::println("OK");
 }
 
+# TODO: zombie processes
 fun main() -> i32 {
 	var server = tcp::bind(PORT, BACKLOG);
 	if server < 0 {
