@@ -47,6 +47,7 @@ typedef struct AstExpr AstExpr;
 
 typedef struct AstExpr {
 	AstExprType type;
+	bool scoped;
 	union {
 		AstExprBinop binop;
 		AstCall call;

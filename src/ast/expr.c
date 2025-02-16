@@ -4,6 +4,7 @@
 #define FIELD(src, dst) result->src = dst;
 #define CONSTR(_type, fields) { \
         AstExpr *result = malloc(sizeof(AstExpr)); \
+        result->scoped = false; \
         result->type = _type; \
         fields; \
         return result; \

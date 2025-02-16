@@ -29,6 +29,10 @@ void expr_push_down(AstExpr *expr) {
 	AstExpr *pr = expr->binop.left,
 			*pl = expr->binop.right;
 
+	if (pl->scoped) {
+		return;
+	}
+
 	if (
 		expr->type != AST_EXPR_BINOP ||
 		pl->type != AST_EXPR_BINOP ||
@@ -200,6 +204,7 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 			case TOKEN_OR: PARSE_BINOP(AST_BINOP_OR); break;
 			case TOKEN_OPENING_CIRCLE_BRACE:
                 current_expr = parse_expr(parser, token_stop_closing_circle_brace);
+				current_expr->scoped = true;
 				PARSER_EXPECT_NEXT(TOKEN_CLOSING_CIRCLE_BRACE, "scope close");
                 break;
 			case TOKEN_OPENING_FIGURE_BRACE:
