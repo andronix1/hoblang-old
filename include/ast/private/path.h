@@ -27,6 +27,7 @@ typedef enum {
 
 typedef enum {
 	SEMA_INNER_PATH_DEREF,
+    SEMA_INNER_PATH_ARRAY_LEN,
     SEMA_INNER_PATH_SLICE_LEN,
     SEMA_INNER_PATH_SLICE_RAW,
     SEMA_INNER_PATH_STRUCT_MEMBER,
@@ -45,6 +46,7 @@ typedef struct {
         SemaType *sizeof_type;
         SemaType *deref_type;
         SemaType *slice_type;
+		size_t array_length;
         SemaInnerPathStructMember struct_member;
     };
 } SemaInnerPath;

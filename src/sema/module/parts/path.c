@@ -105,6 +105,16 @@ SemaValue *sema_resolve_inner_value_path(SemaModule *sema, SemaValue *from, AstI
                     sema_err("{sema::type} has not member {slice}", from->sema_type, &segment->ident);
                     return NULL;
                 }
+            } else if (from->sema_type->type == SEMA_TYPE_ARRAY) {                Slice length = slice_from_const_cstr("length");
+                Slice raw = slice_from_const_cstr("raw");
+                if (slice_eq(&length, &segment->ident)) {
+                    segment->sema.type = SEMA_INNER_PATH_ARRAY_LEN;
+                    segment->sema.array_length = from->sema_type->array.length;
+                    return sema_value_const(sema_type_primitive_i32());
+                } else {
+                    sema_err("{sema::type} has not member {slice}", from->sema_type, &segment->ident);
+                    return NULL;
+                }
             }
 			return NULL;
 		}

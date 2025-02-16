@@ -49,6 +49,9 @@ LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstI
                 }               
                 break;
             }
+            case SEMA_INNER_PATH_ARRAY_LEN:
+                value = LLVMConstInt(LLVMInt32Type(), segment->array_length, false);
+                break;
             case SEMA_INNER_PATH_SLICE_RAW:
                 value = llvm_slice_ptr(llvm, llvm_resolve_type(segment->slice_type), value);
                 break;
