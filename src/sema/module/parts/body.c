@@ -12,6 +12,7 @@ void sema_stmt_while_loop(SemaModule *sema, AstWhile *while_loop);
 void sema_stmt_inline_asm(SemaModule *sema, AstInlineAsm *inline_asm);
 
 void sema_ast_body(SemaModule *sema, AstBody *body) {
+	sema_module_push_scope(sema);
 	for (size_t i = 0; i < vec_len(body->stmts); i++) {
 		AstStmt *stmt = &body->stmts[i];
 		switch (stmt->type) {
@@ -26,4 +27,5 @@ void sema_ast_body(SemaModule *sema, AstBody *body) {
 		}
 	}
 	body->defers = sema_module_resolve_defers(sema);
+	sema_module_pop_scope(sema);
 } 
