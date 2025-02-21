@@ -16,7 +16,7 @@ fun digit(value: i32) -> ?u8 {
     if pos as u32 >= 10 {
         return null;
     }
-    return 10 as u8 as ?u8;
+    return value as u8 as ?u8;
 }
 
 fun test(value: i32) -> void {
