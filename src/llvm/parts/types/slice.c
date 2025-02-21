@@ -1,32 +1,26 @@
 #include "llvm/private.h"
 #include "llvm/parts/types/slice.h"
+#include "llvm/utils/member.h"
+#include <llvm-c/Core.h>
 
 LLVMTypeRef llvm_slice_type(LLVMTypeRef of) {
     LLVMTypeRef fields[2] = { LLVMInt64Type(), LLVMPointerType(of, 0) };
     return LLVMStructType(fields, 2, false);
 }
 
-LLVMValueRef llvm_slice_len(LlvmBackend *llvm, LLVMTypeRef type, LLVMValueRef slice) {
-    LLVMValueRef indices[2] = {
-        LLVMConstInt(LLVMInt32Type(), 0, false),
-        LLVMConstInt(LLVMInt32Type(), 0, false)
-    };
-    return LLVMBuildGEP2(llvm_builder(llvm), type, slice, indices, 2, "slice_len");
+LLVMValueRef llvm_slice_len(LlvmBackend *llvm, LLVMTypeRef type, LLVMValueRef slice, bool load) {
+    return llvm_get_member(llvm, type, LLVMInt32Type(), slice, 0, load);
 }
 
-LLVMValueRef llvm_slice_ptr(LlvmBackend *llvm, LLVMTypeRef type, LLVMValueRef slice) {
-    LLVMValueRef indices[2] = {
-        LLVMConstInt(LLVMInt32Type(), 0, false),
-        LLVMConstInt(LLVMInt32Type(), 1, false)
-    };
-    return LLVMBuildGEP2(llvm_builder(llvm), type, slice, indices, 2, "slice_ptr");
+LLVMValueRef llvm_slice_ptr(LlvmBackend *llvm, LLVMTypeRef of, LLVMValueRef slice, bool load) {
+    return llvm_get_member(llvm, llvm_slice_type(of), LLVMPointerType(of, 0), slice, 1, load);
 }
 
 LLVMValueRef llvm_alloca_slice(LlvmBackend *llvm, LLVMTypeRef of, LLVMValueRef ptr, size_t len) {
     LLVMTypeRef slice_type = llvm_slice_type(of);
     LLVMValueRef slice = LLVMBuildAlloca(llvm_builder(llvm), slice_type, "slice");
-    LLVMBuildStore(llvm_builder(llvm), LLVMConstInt(LLVMInt64Type(), len, false), llvm_slice_len(llvm, slice_type, slice));
-    LLVMBuildStore(llvm_builder(llvm), ptr, llvm_slice_ptr(llvm, slice_type, slice));
+    LLVMBuildStore(llvm_builder(llvm), LLVMConstInt(LLVMInt64Type(), len, false), llvm_slice_len(llvm, slice_type, slice, false));
+    LLVMBuildStore(llvm_builder(llvm), ptr, llvm_slice_ptr(llvm, slice_type, slice, false));
     return LLVMBuildLoad2(llvm_builder(llvm), slice_type, slice, "loaded_slice");
 }
 

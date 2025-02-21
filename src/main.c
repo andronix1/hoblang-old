@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
-#include <errno.h>
+#include "core/log.h"
+#include "core/vec.h"
 #include "print.h"
-#include "lexer/api.h"
-#include "parser/api.h"
 #include "sema/project/api.h"
 #include "sema/module/api.h"
 #include "llvm/api.h"

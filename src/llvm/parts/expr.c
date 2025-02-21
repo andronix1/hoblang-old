@@ -87,16 +87,12 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 					LLVMValueRef value = LLVMBuildGEP2(
 						llvm_builder(llvm),
 						llvm_resolve_type(expr->value->sema_type),
-						LLVMBuildLoad2(
-							llvm_builder(llvm),
-							LLVMPointerType(llvm_resolve_type(expr->value->sema_type), 0),
-							llvm_slice_ptr(
-								llvm,
-								llvm_resolve_type(expr->idx.of->value->sema_type),
-								llvm_expr(llvm, expr->idx.of, false)
-							),
-							"slice_ptr"
-						),
+                        llvm_slice_ptr(
+                            llvm,
+                            llvm_resolve_type(expr->idx.of->value->sema_type->slice_of),
+                            llvm_expr(llvm, expr->idx.of, false),
+                            true
+                        ),
 						indices, 1,
 						"idx_element_ptr"
 					);

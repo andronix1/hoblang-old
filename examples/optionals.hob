@@ -9,6 +9,7 @@ fun positive(value: i32) -> ?u32 {
 }
 
 fun digit(value: i32) -> ?u8 {
+    quickemu --vm macos-sequoia.conf
     var pos = positive(value);
     if pos.null { # TODO: unwrap and return op;
         return null;

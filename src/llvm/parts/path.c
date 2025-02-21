@@ -13,6 +13,7 @@
 LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstInnerPath *path, SemaValue *from) {
     for (size_t i = 0; i < vec_len(path->segments); i++) {
         SemaInnerPath *segment = &path->segments[i].sema;
+        bool is_last = vec_len(path->segments) - 1 == i;
         switch (segment->type) {
             case SEMA_INNER_PATH_SIZEOF:
                 value = llvm_type_sizeof(llvm, llvm_resolve_type(segment->sizeof_type));
@@ -51,16 +52,16 @@ LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstI
                 break;
             }
             case SEMA_INNER_PATH_IS_NULL:
-                value = llvm_opt_is_null(llvm, llvm_resolve_type(segment->optional_type), value);
+                value = llvm_opt_is_null(llvm, llvm_resolve_type(segment->optional_type), value, false);
                 break;
             case SEMA_INNER_PATH_ARRAY_LEN:
                 value = LLVMConstInt(LLVMInt32Type(), segment->array_length, false);
                 break;
             case SEMA_INNER_PATH_SLICE_RAW:
-                value = llvm_slice_ptr(llvm, llvm_resolve_type(segment->slice_type), value);
+                value = llvm_slice_ptr(llvm, llvm_resolve_type(segment->slice_type), value, false);
                 break;
             case SEMA_INNER_PATH_SLICE_LEN:
-                value = llvm_slice_len(llvm, llvm_resolve_type(segment->slice_type), value);
+                value = llvm_slice_len(llvm, llvm_resolve_type(segment->slice_type), value, false);
                 break;
         }
     }
