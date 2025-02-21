@@ -48,6 +48,9 @@ void print_sema_type(FILE* stream, va_list list) {
 			}
 			print_to(stream, "): {sema::type}", type->func.returning);
 			break;
+		case SEMA_TYPE_OPTIONAL:
+			print_to(stream, "?{sema::type}", type->optional_of);
+			break;
 		case SEMA_TYPE_SLICE:
 			print_to(stream, "[]{sema::type}", type->slice_of);
 			break;

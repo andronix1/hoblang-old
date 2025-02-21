@@ -28,6 +28,14 @@ SemaType *sema_ast_type(SemaModule *sema, AstType *type) {
 			type->sema = stype;
 			break;
 		}
+		case AST_TYPE_OPTIONAL: {
+			SemaType *stype = sema_ast_type(sema, type->optional_of);
+            if (!stype) {
+                return NULL;
+            }
+            type->sema = sema_type_new_optional(stype);
+			break;
+		}
 		case AST_TYPE_PATH: {
 			type->sema = sema_resolve_type_path(sema, &type->path);
 			break;

@@ -171,6 +171,9 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 				current_expr = expr;
 				break;
 			}
+            case TOKEN_NULL:
+                current_expr = ast_expr_null();
+                break;
 			case TOKEN_NOT: 
                 current_expr = ast_expr_not(NOT_NULL(parse_expr(parser, stop)));
                 break;

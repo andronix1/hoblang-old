@@ -139,6 +139,7 @@ bool lexer_try_next(Lexer *lexer) {
 	SYMBOL('~', TOKEN_BITNOT);
 	SYMBOL('$', TOKEN_DOLLAR);
 	SYMBOL('%', TOKEN_MOD);
+    SYMBOL('?', TOKEN_QUESTION_MARK);
 	SYMBOL_DUAL(':', ':', TOKEN_COLON, TOKEN_DOUBLE_COLON);
 	SYMBOL_DUAL('|', '|', TOKEN_BITOR, TOKEN_OR);
 	SYMBOL_DUAL('&', '&', TOKEN_BITAND, TOKEN_AND);
@@ -147,6 +148,7 @@ bool lexer_try_next(Lexer *lexer) {
 	SYMBOL_TRIAL('<', '<', '=', TOKEN_LESS, TOKEN_SHL, TOKEN_LESS_OR_EQUALS);
 	SYMBOL_DUAL('!', '=', TOKEN_NOT, TOKEN_NOT_EQUALS);
 	KEYWORD("asm", TOKEN_ASM);
+	KEYWORD("null", TOKEN_NULL);
 	KEYWORD("sizeof", TOKEN_SIZEOF);
 	KEYWORD("const", TOKEN_CONST);
 	KEYWORD("volatile", TOKEN_VOLATILE);

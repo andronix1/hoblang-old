@@ -23,6 +23,7 @@ typedef enum {
 	AST_INNER_PATH_SEG_IDENT,
 	AST_INNER_PATH_SEG_DEREF,
 	AST_INNER_PATH_SEG_SIZEOF,
+	AST_INNER_PATH_SEG_NULL,
 } AstInnerPathSegmentType;
 
 typedef enum {
@@ -31,6 +32,7 @@ typedef enum {
     SEMA_INNER_PATH_SLICE_LEN,
     SEMA_INNER_PATH_SLICE_RAW,
     SEMA_INNER_PATH_STRUCT_MEMBER,
+    SEMA_INNER_PATH_IS_NULL,
     SEMA_INNER_PATH_SIZEOF
 } SemaInnerPathType;
 
@@ -46,6 +48,7 @@ typedef struct {
         SemaType *sizeof_type;
         SemaType *deref_type;
         SemaType *slice_type;
+        SemaType *optional_type;
 		size_t array_length;
         SemaInnerPathStructMember struct_member;
     };

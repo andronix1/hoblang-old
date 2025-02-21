@@ -11,20 +11,6 @@
 #include "expr/get_inner.h"
 #include "expr/idx.h"
 
-/*
-7 * a.b.c(1, 2).a
-MUL(
-	7,
-	GET_INNER_PATH(
-		CALL(
-			GET_LOCAL_PATH(a.b.c),
-			ARGS: [INT(1), INT(2)]
-		),
-		PATH(a)
-	)
-)
-*/
-
 typedef enum {
 	AST_EXPR_GET_LOCAL_PATH,
 	AST_EXPR_GET_INNER_PATH,
@@ -41,9 +27,15 @@ typedef enum {
 	AST_EXPR_UNARY,
 	AST_EXPR_ARRAY,
 	AST_EXPR_REF,
+	AST_EXPR_NULL,
 } AstExprType;
 
 typedef struct AstExpr AstExpr;
+
+typedef enum {
+    SEMA_NULL_POINTER,
+    SEMA_NULL_OPTIONAL
+} SemaNullType;
 
 typedef struct AstExpr {
 	AstExprType type;
@@ -64,6 +56,7 @@ typedef struct AstExpr {
 		long double float_value;
 		char character;
 		bool boolean;
+		SemaNullType null_type;
 	};
 	// for sema
 	SemaValue *value;
@@ -84,3 +77,4 @@ AstExpr *ast_expr_binop(AstBinopType type, AstExpr *left, AstExpr *right);
 AstExpr *ast_expr_unary(AstUnaryType type, AstExpr *expr);
 AstExpr *ast_expr_array(AstExpr **values);
 AstExpr *ast_expr_ref(AstExpr *expr);
+AstExpr *ast_expr_null();

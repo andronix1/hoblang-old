@@ -6,6 +6,8 @@
 #include "llvm-c/Types.h"
 #include "llvm/llvm.h"
 #include "llvm/parts/type.h"
+#include "llvm/parts/types/slice.h"
+#include "llvm/parts/types/optional.h"
 #include "llvm/private.h"
 #include "core/vec.h"
 
@@ -57,10 +59,8 @@ LLVMTypeRef llvm_resolve_type(SemaType *type) {
 				0
 			);
 		}
-		case SEMA_TYPE_SLICE: {
-			LLVMTypeRef elements[2] = { LLVMInt64Type(), LLVMPointerType(llvm_resolve_type(type->slice_of), 0) };
-			return LLVMStructType(elements, 2, false);
-		}
+		case SEMA_TYPE_OPTIONAL: return llvm_opt_type(llvm_resolve_type(type->optional_of));
+		case SEMA_TYPE_SLICE: return llvm_slice_type(llvm_resolve_type(type->slice_of));
 		case SEMA_TYPE_ARRAY: {
 			return LLVMArrayType(llvm_resolve_type(type->array.of), type->array.length);
 		}

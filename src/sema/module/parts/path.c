@@ -58,6 +58,15 @@ SemaValue *sema_resolve_decl_path(SemaModule *sema, AstDeclPath *path) {
 SemaValue *sema_resolve_inner_value_path(SemaModule *sema, SemaValue *from, AstInnerPathSegment *segment) {
     segment->sema.value = from;
 	switch (segment->type) {
+        case AST_INNER_PATH_SEG_NULL: {
+            if (from->sema_type->type != SEMA_TYPE_OPTIONAL) {
+                sema_err("cannot determine is value null for type {sema::type}", from->sema_type);
+                return NULL;
+            }
+            segment->sema.type = SEMA_INNER_PATH_IS_NULL;
+            segment->sema.optional_type = from->sema_type;
+            return sema_value_with_type(from, sema_type_primitive_bool());
+        }
         case AST_INNER_PATH_SEG_SIZEOF: {
             segment->sema.type = SEMA_INNER_PATH_SIZEOF;
             segment->sema.sizeof_type = from->sema_type;
@@ -128,6 +137,9 @@ SemaValue *sema_resolve_inner_type_path(SemaModule *sema, SemaValue *from, AstIn
             segment->sema.type = SEMA_INNER_PATH_SIZEOF;
             segment->sema.sizeof_type = from->sema_type;
             return sema_value_const(sema_type_primitive_i32());
+        case AST_INNER_PATH_SEG_NULL:
+            sema_err("cannot get a member `null` from type `{sema::type}`", from->sema_type);
+            break;
         case AST_INNER_PATH_SEG_IDENT:
             sema_err("cannot get a member `{slice}` from type `{sema::type}`", &segment->ident, from->sema_type);
             break;

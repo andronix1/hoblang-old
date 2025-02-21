@@ -31,6 +31,9 @@ void print_ast_inner_path(FILE *stream, va_list list) {
 	for (size_t i = 0; i < vec_len(path->segments); i++) {
 		AstInnerPathSegment *seg = &path->segments[i];
 		switch (seg->type) {
+			case AST_INNER_PATH_SEG_NULL:
+				print_to(stream, ".null");
+				break;
 			case AST_INNER_PATH_SEG_IDENT:
 				print_to(stream, ".{slice}", &seg->ident);
 				break;
@@ -83,6 +86,7 @@ void print_ast_expr(FILE *stream, va_list list) {
 			break;
 		}
 		case AST_EXPR_REF: print_to(stream, "&{ast::expr}", &expr->ref_expr); break;
+		case AST_EXPR_NULL: print_to(stream, "null"); break;
 		case AST_EXPR_NOT: print_to(stream, "!({ast::expr})", &expr->not_expr); break;
 		case AST_EXPR_INTEGER: print_to(stream, "{long}", expr->integer); break;
 		case AST_EXPR_CHAR: fprintf(stream, "'%c'", expr->character); break;

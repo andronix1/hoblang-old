@@ -15,6 +15,7 @@ SemaValue *sema_analyze_expr_ref(SemaModule *sema, AstExpr *ref_expr, SemaExprCt
 SemaValue *sema_analyze_expr_not(SemaModule *sema, AstExpr *not_expr, SemaExprCtx ctx);
 SemaValue *sema_analyze_expr_unary(SemaModule *sema, AstExprUnary *unary, SemaExprCtx ctx);
 SemaValue *sema_analyze_expr_idx(SemaModule *sema, AstExprIdx *idx, SemaExprCtx ctx);
+SemaValue *sema_analyze_expr_null(SemaModule *sema, SemaNullType *type, SemaExprCtx ctx);
 SemaValue *sema_analyze_expr_get_inner(SemaModule *sema, AstExprGetInner *get_inner, SemaExprCtx ctx);
 SemaValue *sema_analyze_expr_get_local(SemaModule *sema, AstExprGetLocal *get_local, SemaExprCtx ctx);
 
@@ -32,6 +33,7 @@ SemaValue *sema_expr(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) {
 		case AST_EXPR_ARRAY: return expr->value = sema_analyze_expr_array(sema, expr->array, ctx);
 		case AST_EXPR_BINOP: return expr->value = sema_analyze_expr_binop(sema, &expr->binop, ctx);
 		case AST_EXPR_AS: return expr->value = sema_analyze_expr_as(sema, &expr->as, ctx);
+		case AST_EXPR_NULL: return expr->value = sema_analyze_expr_null(sema, &expr->null_type, ctx);
 		case AST_EXPR_INTEGER: return expr->value = sema_analyze_expr_int(sema, expr->integer, ctx);
 		case AST_EXPR_FLOAT: return expr->value = sema_analyze_expr_float(sema, expr->float_value, ctx);
         case AST_EXPR_CALL: return expr->value = sema_analyze_expr_call(sema, &expr->call, ctx);

@@ -31,6 +31,9 @@ typedef enum {
 	TOKEN_IF,
     TOKEN_ELSE,
 
+    TOKEN_QUESTION_MARK,
+    TOKEN_NULL,
+
     TOKEN_COLON,
     TOKEN_DOUBLE_COLON,
     TOKEN_COMMA,

@@ -59,6 +59,7 @@ AstExpr *ast_expr_unary(AstUnaryType type, AstExpr *expr) CONSTR(AST_EXPR_UNARY,
 AstExpr *ast_expr_array(AstExpr **values) CONSTR(AST_EXPR_ARRAY, {
     FIELD(array, values)
 })
+AstExpr *ast_expr_null(AstExpr *expr) CONSTR(AST_EXPR_NULL, {})
 AstExpr *ast_expr_ref(AstExpr *expr) CONSTR(AST_EXPR_REF, {
     FIELD(ref_expr, expr)
 })

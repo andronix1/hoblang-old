@@ -15,6 +15,7 @@ typedef struct SemaFunction {
 
 typedef enum {
 	SEMA_TYPE_PRIMITIVE,
+	SEMA_TYPE_OPTIONAL,
 	SEMA_TYPE_POINTER,
 	SEMA_TYPE_FUNCTION,
 	SEMA_TYPE_STRUCT,
@@ -65,6 +66,7 @@ typedef struct SemaType {
 		SemaFunction func;
 		SemaType *ptr_to;
 		SemaType *slice_of;
+		SemaType *optional_of;
 		AstStructDef *struct_def;
 		SemaArrayType array;
 	};
@@ -75,6 +77,7 @@ SemaType *sema_type_new_slice(SemaType *of);
 SemaType *sema_type_new_pointer(SemaType *to); 
 SemaType *sema_type_new_func(SemaType *returning, SemaType **args);
 SemaType *sema_type_new_struct(AstStructDef *struct_def);
+SemaType *sema_type_new_optional(SemaType *of);
 
 #define SEMA_TYPE_PRIMITIVE(name) \
     SemaType *sema_type_primitive_##name();

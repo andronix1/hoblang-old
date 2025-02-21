@@ -1,0 +1,44 @@
+import "std/process.hob" as process;
+import "std/io.hob" as io;
+
+fun positive(value: i32) -> ?u32 {
+    if value < 0 {
+        return null;
+    }
+    return value as u32 as ?u32;
+}
+
+fun digit(value: i32) -> ?u8 {
+    var pos = positive(value);
+    if pos.null { # TODO: unwrap and return op;
+        return null;
+    }
+    if pos as u32 >= 10 {
+        return null;
+    }
+    return 10 as u8 as ?u8;
+}
+
+fun test(value: i32) -> void {
+    var fres = digit(value);
+    if !fres.null {
+        io::print_i32(fres as u8 as i32);
+        io::print(" is a digit");
+    } else {
+        io::print_i32(value);
+        io::print(" is not a digit");
+    }
+    io::print("\n");
+}
+
+fun main() -> i32 {
+    test(-123);
+    test(-1);
+    test(123);
+    test(9);
+    return 0;
+}
+
+fun _start() -> void {
+    process::exit(main());
+}

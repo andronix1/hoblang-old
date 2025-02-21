@@ -21,6 +21,9 @@ bool parse_inner_path(Parser *parser, AstInnerPath *path) {
 		Token *token = parser_next(parser);
 		AstInnerPathSegment segment;
 		switch (token->type) {
+			case TOKEN_NULL:
+				segment.type = AST_INNER_PATH_SEG_NULL;
+				break;
 			case TOKEN_IDENT:
 				segment.type = AST_INNER_PATH_SEG_IDENT;
 				segment.ident = token->ident;

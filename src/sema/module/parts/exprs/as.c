@@ -65,6 +65,20 @@ void sema_conv_function(
 	sema_err("{sema::type} cannot be casted to {sema::type}", source, dest);
 }
 
+void sema_conv_optional(
+	SemaModule *sema,
+	SemaType *source,
+	SemaType *dest,
+	SemaAsConvType *type
+) {
+	assert(source->type == SEMA_TYPE_OPTIONAL, "passed non-optional type {sema::type}", source);
+    if (sema_types_equals(source->optional_of, dest)) {
+        *type = SEMA_AS_CONV_OPT_UNWRAP;
+        return;
+    }
+	sema_err("{sema::type} cannot be casted to {sema::type}", source, dest);
+}
+
 void sema_conv_array(
 	SemaModule *sema,
 	SemaType *source,
@@ -72,14 +86,6 @@ void sema_conv_array(
 	SemaAsConvType *type
 ) {
 	assert(source->type == SEMA_TYPE_ARRAY, "passed non-array type {sema::type}", source);
-	/*if (dest->type == SEMA_TYPE_SLICE) {
-		if (!sema_types_equals(source->array.of, dest->slice_of)) {
-			sema_err("cannot cast {semas::type} to {semas::type} because of different inner types", source, dest);
-			return;
-		}
-		*type = SEMA_AS_CONV_ARR_TO_SLICE;
-		return;
-	}*/
 	sema_err("{sema::type} cannot be casted to {sema::type}", source, dest);
 }
 
@@ -180,6 +186,7 @@ void sema_conv_primitive(
 				case SEMA_TYPE_ARRAY:
 				case SEMA_TYPE_FUNCTION:
 				case SEMA_TYPE_SLICE:
+				case SEMA_TYPE_OPTIONAL:
 				case SEMA_TYPE_STRUCT:
 					sema_err("{sema::type} cannot be casted to {sema::type}", source, dest);
 					break;
@@ -204,7 +211,13 @@ SemaValue *sema_analyze_expr_as(SemaModule *sema, AstExprAs *as, SemaExprCtx ctx
 	}
 	if (sema_types_equals(as_type, expr_type)) {
 		as->conv_type = SEMA_AS_CONV_IGNORE;
-	} else {
+	} else if (as_type->type == SEMA_TYPE_OPTIONAL) {
+        if (!sema_types_equals(expr_type, as_type->optional_of)) {
+            sema_err("cannot wrap {sema::type} with {sema::type}", expr_type, as_type);
+            return NULL;
+        }
+        as->conv_type = SEMA_AS_CONV_OPT_WRAP;
+    } else {
 		switch (expr_type->type) {
 			case SEMA_TYPE_PRIMITIVE: sema_conv_primitive(sema, expr_type, as_type, &as->conv_type); break;
 			case SEMA_TYPE_ARRAY: sema_conv_array(sema, expr_type, as_type, &as->conv_type); break;
@@ -212,6 +225,7 @@ SemaValue *sema_analyze_expr_as(SemaModule *sema, AstExprAs *as, SemaExprCtx ctx
 			case SEMA_TYPE_SLICE: sema_conv_slice(sema, expr_type, as_type, &as->conv_type); break;
 
 			case SEMA_TYPE_FUNCTION: sema_conv_function(sema, expr_type, as_type, &as->conv_type); break;
+			case SEMA_TYPE_OPTIONAL: sema_conv_optional(sema, expr_type, as_type, &as->conv_type); break;
 			case SEMA_TYPE_STRUCT:
 				sema_err("unknown conversion from {sema::type} to {sema::type}", expr_type, as_type);
 				return false;

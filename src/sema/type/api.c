@@ -37,6 +37,8 @@ bool sema_types_equals(SemaType *type, SemaType *other) {
 					return true;
 			}
 			assert(0, "invalid sema primitive type");
+		case SEMA_TYPE_OPTIONAL:
+			return sema_types_equals(type->optional_of, other->optional_of);
 		case SEMA_TYPE_SLICE:
 			return sema_types_equals(type->slice_of, other->slice_of);
 		case SEMA_TYPE_ARRAY:

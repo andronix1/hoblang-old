@@ -17,14 +17,14 @@ char *args_shift(int *argc, char ***argv) {
 }
 
 void usage() {
-	printf("hoblang compile <source> <output> - compile source file to machine code\n");
+	printf("hoblang compile <source> <output> [dump <output>] - compile source file to machine code\n");
 }
 
 
 int main(int argc, char **argv) {
 	print_setup();
 
-	if (argc != 4) {
+	if (argc != 4 && !(argc == 6 && !strcmp(argv[4], "dump"))) {
 		usage();
 		return 0;
 	}
@@ -54,6 +54,10 @@ int main(int argc, char **argv) {
 			hob_log(LOGD, "compiling {slice}", &path);
 			llvm_module(llvm, sema_module_of(sema_project_module_inner(modules[i])));
 		}
+        if (argc > 0) {
+            args_shift(&argc, &argv);
+		    llvm_write_module_ir(llvm, args_shift(&argc, &argv));
+        }
 		llvm_write_module(llvm, output_path);
 		hob_log(LOGI, "finished!");
     } else {

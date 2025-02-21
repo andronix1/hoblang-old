@@ -8,6 +8,7 @@
 #include "sema/module/decls/impl.h"
 #include "llvm/parts/type.h"
 #include "llvm/parts/types/slice.h"
+#include "llvm/parts/types/optional.h"
 
 LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstInnerPath *path, SemaValue *from) {
     for (size_t i = 0; i < vec_len(path->segments); i++) {
@@ -49,6 +50,9 @@ LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstI
                 }               
                 break;
             }
+            case SEMA_INNER_PATH_IS_NULL:
+                value = llvm_opt_is_null(llvm, llvm_resolve_type(segment->optional_type), value);
+                break;
             case SEMA_INNER_PATH_ARRAY_LEN:
                 value = LLVMConstInt(LLVMInt32Type(), segment->array_length, false);
                 break;

@@ -72,6 +72,7 @@ set(SOURCE_FILES
 	src/sema/module/parts/exprs/not.c
 	src/sema/module/parts/exprs/ref.c
 	src/sema/module/parts/exprs/unary.c
+	src/sema/module/parts/exprs/null.c
 	src/sema/module/parts/exprs/get_local.c
 	src/sema/module/parts/exprs/get_inner.c
 	src/sema/module/parts/stmts/assign.c
@@ -90,6 +91,7 @@ set(SOURCE_FILES
 	src/llvm/private.c
 	src/llvm/api.c
 	src/llvm/parts/types/slice.c
+	src/llvm/parts/types/optional.c
 	src/llvm/parts/path.c
 	src/llvm/parts/type.c
 	src/llvm/parts/module.c

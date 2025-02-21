@@ -3,6 +3,7 @@
 #include "llvm/parts/type.h"
 #include "llvm/parts/path.h"
 #include "llvm/parts/types/slice.h"
+#include "llvm/parts/types/optional.h"
 #include "sema/value/private.h"
 #include "core/vec.h"
 #include "ast/private/expr.h"
@@ -60,6 +61,15 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
                 );
             }
             return value;
+        }
+		case AST_EXPR_NULL: {
+            switch (expr->null_type) {
+                case SEMA_NULL_POINTER:
+                    return LLVMConstNull(llvm_resolve_type(expr->value->sema_type));
+                case SEMA_NULL_OPTIONAL:
+                    return llvm_opt_null(llvm, llvm_resolve_type(expr->value->sema_type->optional_of));
+            }
+            assert(0, "invalid sema null type");
         }
 		case AST_EXPR_NOT: return LLVMBuildNot(llvm_builder(llvm), llvm_expr(llvm, expr->not_expr, true), "");
 		case AST_EXPR_REF: return llvm_expr(llvm, expr->ref_expr, false);
@@ -146,6 +156,15 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 					expr->as.expr->value->sema_type->ptr_to->array.length
 				);
 				case SEMA_AS_CONV_SLICE_TO_PTR: return LLVMBuildExtractValue(llvm_builder(llvm), value, 1, "");
+				case SEMA_AS_CONV_OPT_WRAP: return llvm_opt_wrap(llvm, llvm_resolve_type(expr->as.expr->value->sema_type), value);
+				case SEMA_AS_CONV_OPT_UNWRAP: {
+                    if (load) {
+                        value = llvm_opt_value_direct(llvm, value);
+                    } else {
+                        value = llvm_opt_value(llvm, llvm_resolve_type(expr->as.expr->value->sema_type), value);
+                    }
+                    return value;
+                }
 				case SEMA_AS_CONV_IGNORE: return value;
 			}
 			break;

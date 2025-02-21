@@ -10,6 +10,9 @@ bool parse_type(Parser *parser, AstType *type) {
 	type->sema = NULL;
 	Token *token = parser_next(parser);
 	switch (token->type) {
+		case TOKEN_QUESTION_MARK:
+			type->type = AST_TYPE_OPTIONAL;
+			return parse_type(parser, type->optional_of = malloc(sizeof(AstType)));
 		case TOKEN_IDENT:
 			type->type = AST_TYPE_PATH;
 			parser_skip_next(parser);

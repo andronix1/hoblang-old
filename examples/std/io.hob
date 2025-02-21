@@ -42,6 +42,14 @@ fun println(str: []u8) -> void {
 
 const PRINT_U64_BUF_SIZE: i32 = 32;
 
+fun print_i32(value: i32) -> void {
+    if value < 0 {
+        print_char('-');
+        value = -value;
+    }
+    print_u64(value as u64);
+}
+
 fun print_u64(value: u64) -> void {
     var buf: [PRINT_U64_BUF_SIZE]u8;
     var buf_slice = &buf as []u8;

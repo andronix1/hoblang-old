@@ -16,6 +16,13 @@ SemaType *sema_type_new_slice(SemaType *of) {
 	return result;
 }
 
+SemaType *sema_type_new_optional(SemaType *of) {
+	SemaType *result = malloc(sizeof(SemaType));
+	result->type = SEMA_TYPE_OPTIONAL;
+	result->optional_of = of;
+	return result;
+}
+
 SemaType *sema_type_new_pointer(SemaType *to) {
 	SemaType *result = malloc(sizeof(SemaType));
 	result->type = SEMA_TYPE_POINTER;
