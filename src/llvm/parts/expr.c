@@ -158,11 +158,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 				case SEMA_AS_CONV_SLICE_TO_PTR: return LLVMBuildExtractValue(llvm_builder(llvm), value, 1, "");
 				case SEMA_AS_CONV_OPT_WRAP: return llvm_opt_wrap(llvm, llvm_resolve_type(expr->as.expr->value->sema_type), value);
 				case SEMA_AS_CONV_OPT_UNWRAP: {
-                    if (load) {
-                        value = llvm_opt_value_direct(llvm, value);
-                    } else {
-                        value = llvm_opt_value(llvm, llvm_resolve_type(expr->as.expr->value->sema_type), value);
-                    }
+                    value = llvm_opt_value(llvm, llvm_resolve_type(expr->as.expr->value->sema_type), value, load);
                     return value;
                 }
 				case SEMA_AS_CONV_IGNORE: return value;
