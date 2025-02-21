@@ -164,11 +164,7 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 				if (!parse_path(parser, &path)) {
 					return NULL;
 				}
-				AstExpr *expr = ast_expr_get_local_path(path);
-				while (parser_next_is(parser, TOKEN_OPENING_CIRCLE_BRACE)) {
-					expr = ast_expr_call(expr, NOT_NULL(parse_call_args(parser)));
-				}
-				current_expr = expr;
+				current_expr= ast_expr_get_local_path(path);
 				break;
 			}
             case TOKEN_NULL:
@@ -206,11 +202,15 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 			case TOKEN_GREATER_OR_EQUALS: PARSE_BINOP(AST_BINOP_GE); break;
 			case TOKEN_OR: PARSE_BINOP(AST_BINOP_OR); break;
 			case TOKEN_OPENING_CIRCLE_BRACE:
-                current_expr = parse_expr(parser, token_stop_closing_circle_brace);
-				current_expr->scoped = true;
-				PARSER_EXPECT_NEXT(TOKEN_CLOSING_CIRCLE_BRACE, "scope close");
+                if (current_expr) {
+					current_expr = ast_expr_call(current_expr, NOT_NULL(parse_call_args(parser)));
+                } else {
+                    current_expr = parse_expr(parser, token_stop_closing_circle_brace);
+                    current_expr->scoped = true;
+                    PARSER_EXPECT_NEXT(TOKEN_CLOSING_CIRCLE_BRACE, "scope close");
+                }
                 break;
-			case TOKEN_OPENING_FIGURE_BRACE:
+			case TOKEN_OPENING_FIGURE_BRACE: {
 				AstExpr **values = vec_new(AstExpr*);
 				while (token->type != TOKEN_CLOSING_FIGURE_BRACE) {
 					AstExpr *expr = parse_expr(parser, token_stop_array_arg);
@@ -222,6 +222,7 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 				}
 				current_expr = ast_expr_array(values);
 				break;
+            }
 			case TOKEN_EOI:
 				PARSE_ERROR("EOI while parsing expression");
 				return NULL;
