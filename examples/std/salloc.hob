@@ -8,7 +8,7 @@ struct PageMeta {
 
 fun page_to_ptr(page: *Page) -> *void {
     if mem::is_page_invalid(page) {
-        return 0 as *void;
+        return null;
     }
     var meta = page.*.ptr as *PageMeta;
     meta.*.size = page.*.size;

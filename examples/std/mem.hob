@@ -7,12 +7,12 @@ struct Page {
 }
 
 fun is_page_invalid(page: *Page) -> bool {
-    return page.*.ptr == 0 as *void;
+    return page.*.ptr == null;
 }
 
 fun pages_alloc(size: u32) -> Page {
     var page: Page;
-    page.ptr = mem::mmap(0 as *void, size as i64, mem::PROT_READ | mem::PROT_WRITE, mem::MAP_ANON | mem::MAP_SHARED, -1, 0);
+    page.ptr = mem::mmap(null, size as i64, mem::PROT_READ | mem::PROT_WRITE, mem::MAP_ANON | mem::MAP_SHARED, -1, 0);
     page.size = size;
     return page;
 }

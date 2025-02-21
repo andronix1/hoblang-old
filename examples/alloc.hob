@@ -23,14 +23,14 @@ fun _start() -> void {
     wait_for("alloc");
 
     var ptr = salloc::allocate(4096 * 2 - 5);
-    if ptr == 0 as *void {
+    if ptr == null {
         die("failed to allocate memory!");
     }
 
     wait_for("realloc");
     
     ptr = salloc::reallocate(ptr, 4096 * 3 - 5);
-    if ptr == 0 as *void {
+    if ptr == null {
         die("failed to reallocate memory!");
     }
 
