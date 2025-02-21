@@ -19,6 +19,7 @@ SemaScopeDecl *sema_module_resolve_public_decl(SemaModule *sema, Slice *name);
 void sema_module_push_defer(SemaModule *sema, AstDefer *defer);
 SemaScopeDecl *sema_module_push_decl(SemaModule *sema, SemaScopeDecl *decl);
 SemaScopeDecl *sema_module_push_public_decl(SemaModule *sema, SemaScopeDecl *decl);
+SemaScopeDecl *sema_module_resolve_ext_func(SemaModule *sema, Slice *name, SemaType *type);
 
 void sema_module_push_primitives(SemaModule *sema);
 void sema_module_push_scope(SemaModule *sema);
@@ -26,6 +27,7 @@ void sema_module_pop_scope(SemaModule *sema);
 
 SemaScopeDecl *sema_scope_decl_new_type(Slice name, SemaType *sema_type);
 SemaScopeDecl *sema_scope_decl_new_value(Slice name, SemaType *type, bool constant);
+SemaScopeDecl *sema_scope_decl_new_in_type_value(Slice name, SemaType *in_type, SemaType *type, bool constant);
 SemaScopeDecl *sema_scope_decl_new_module(Slice name, SemaModule *module);
 
 AstDefer **sema_module_resolve_defers(SemaModule *sema);

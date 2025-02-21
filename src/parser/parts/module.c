@@ -1,5 +1,4 @@
 #include "parser/private.h"
-#include "parser/token_stops.h"
 #include "ast/private/module_node.h"
 #include "ast/private/module.h"
 #include "parser/parts/module_node.h"

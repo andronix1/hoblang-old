@@ -3,15 +3,15 @@
 #include "parser/parts/type.h"
 #include "lexer/token.h"
 #include "parser/private.h"
-#include "parser/token_stops.h"
 
 bool parse_func_info(Parser *parser, AstFuncInfo *info) {
-	info->name = PARSER_EXPECT_NEXT(TOKEN_IDENT, "function name")->ident;
-	info->is_extension = parser_next_is(parser, TOKEN_DOT);
-	if (info->is_extension) {
-		info->extension_of = info->name;
-		info->name = PARSER_EXPECT_NEXT(TOKEN_IDENT, "extension function name")->ident;
+	if ((info->is_extension = parser_next_is(parser, TOKEN_OPENING_CIRCLE_BRACE))) {
+        if (!parse_type(parser, &info->ext.of)) {
+            return false;
+        }
+		PARSER_EXPECT_NEXT(TOKEN_CLOSING_CIRCLE_BRACE, "extension type closing");
 	}
+	info->name = PARSER_EXPECT_NEXT(TOKEN_IDENT, "function name")->ident;
 	PARSER_EXPECT_NEXT(TOKEN_OPENING_CIRCLE_BRACE, "opening args brace");
 	bool parsing_args = true;
 	bool was_arg = false;

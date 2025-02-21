@@ -15,20 +15,14 @@ void sema_add_ast_func_info(SemaModule *sema, AstFuncInfo *info) {
 	if (!returning) {
 		return;
 	}
-	SemaScopeDecl *ext_decl = NULL;
+
 	if (info->is_extension) {
-		ext_decl = sema_module_resolve_scope_decl(sema, &info->extension_of);
-		if (ext_decl) {
-			if (ext_decl->type != SEMA_SCOPE_DECL_TYPE) {
-				sema_err("ext function for types only");
-				ext_decl = NULL;
-			}
-		}
+        sema_ast_type(sema, &info->ext.of);
 	}
 
 	SemaType **args = vec_new(SemaType*);
-	if (ext_decl) {
-		SemaType *type = info->ext_type = sema_type_new_pointer(ext_decl->sema_type);
+	if (info->is_extension) {
+		SemaType *type = info->ext.of.sema;
 		args = vec_push(args, &type);
 	}
 	for (size_t i = 0; i < vec_len(info->args); i++) {
@@ -39,23 +33,13 @@ void sema_add_ast_func_info(SemaModule *sema, AstFuncInfo *info) {
 		}
 		args = vec_push(args, &type);
 	}
-	SemaScopeValueDecl *fdecl = &sema_module_push_public_decl(sema, sema_scope_decl_new_value(
+	SemaScopeValueDecl *fdecl = &sema_module_push_public_decl(sema, sema_scope_decl_new_in_type_value(
 		info->name,
+        info->is_extension ? info->ext.of.sema : NULL,
 		sema_type_new_func(returning, args),
 		true
 	))->value_decl;
 	info->decl = fdecl;
-	if (ext_decl) {
-		if (ext_decl->sema_type->type == SEMA_TYPE_STRUCT) {
-			SemaStructExtFunc func = {
-				.decl = fdecl,
-				.name = info->name
-			};
-			ext_decl->sema_type->struct_def->ext_funcs = vec_push(ext_decl->sema_type->struct_def->ext_funcs, &func);
-			return;
-		}
-		sema_err("cannot add ext function for {sema::type}", ext_decl->sema_type);
-	}
 }
 
 void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
@@ -80,7 +64,6 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 				sema_ast_type(sema, member->type);
 			}
 			sema_module_push_public_decl(sema, sema_scope_decl_new_type(node->struct_def.name, sema_type_new_struct(&node->struct_def)));
-			node->struct_def.ext_funcs = vec_new(SemaStructExtFunc);
 			break;
 		}
 		case AST_MODULE_NODE_CONST: {
@@ -133,7 +116,7 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 
 void sema_push_ast_func_info(SemaModule *sema, AstFuncInfo *info) {
 	if (info->is_extension) {
-		info->self = &sema_module_push_decl(sema, sema_scope_decl_new_value(slice_from_cstr("self"), info->ext_type, false))->value_decl;
+		info->self = &sema_module_push_decl(sema, sema_scope_decl_new_value(slice_from_cstr("self"), info->ext.of.sema, false))->value_decl;
 	}
 	for (size_t i = 0; i < vec_len(info->args); i++) {
 		AstFuncArg *arg = &info->args[i];

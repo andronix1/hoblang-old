@@ -12,14 +12,17 @@ typedef struct {
 	SemaScopeValueDecl *decl;
 } AstFuncArg;
 
+typedef struct {
+	AstType of;
+} AstExtFuncInfo;
+
 typedef struct AstFuncInfo {
 	Slice name;
 	AstType returning;
 	AstFuncArg *args;
 
 	bool is_extension;
-	Slice extension_of;
-	SemaType *ext_type;
+    AstExtFuncInfo ext;
 	
 	Slice public_name;
 	SemaScopeValueDecl *decl;

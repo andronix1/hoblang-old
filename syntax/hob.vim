@@ -34,6 +34,8 @@ syntax keyword hobType
 	\ u64
 	\ bool
 	\ void
+	\ f32
+	\ f64
 
 syntax match hobNumber "\v<\d+>"
 syntax region hobChar start=/'/ skip=/\\'/ end=/'/

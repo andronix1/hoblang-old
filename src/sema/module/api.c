@@ -1,4 +1,3 @@
-#include "sema/project.h"
 #include "sema/module/impl.h"
 #include "core/vec.h"
 

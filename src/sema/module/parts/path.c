@@ -96,7 +96,7 @@ SemaValue *sema_resolve_inner_value_path(SemaModule *sema, SemaValue *from, AstI
                         if (from->type != SEMA_VALUE_VAR) {
                             sema_err("ext function can be called on variable only!!!");
                         }
-                        return sema_value_ext_func_handle(member->ext_func->type);
+                        return sema_value_ext_func_handle(member->ext_func.decl->type);
                 }
                 assert(0, "invalid struct member type");
 			} else if (from->sema_type->type == SEMA_TYPE_SLICE) {

@@ -3,18 +3,32 @@
 #include "sema/type/private.h"
 #include "sema/module/private.h"
 #include "sema/module/decls/impl.h"
+#include "sema/type/api.h"
 
 SemaScopeDecl *sema_scope_decl_new_type(Slice name, SemaType *sema_type) {
     SemaScopeDecl *result = malloc(sizeof(SemaScopeDecl));
     result->type = SEMA_SCOPE_DECL_TYPE;
+    result->in_type = NULL;
     result->name = name;
     result->sema_type = sema_type;
+    return result;
+}
+
+SemaScopeDecl *sema_scope_decl_new_in_type_value(Slice name, SemaType *in_type, SemaType *type, bool constant) {
+    SemaScopeDecl *result = malloc(sizeof(SemaScopeDecl));
+    result->type = SEMA_SCOPE_DECL_VALUE;
+    result->in_type = in_type;
+    result->name = name;
+    result->value_decl.type = type;
+    result->value_decl.constant = constant;
+    result->value_decl.llvm_value = NULL;
     return result;
 }
 
 SemaScopeDecl *sema_scope_decl_new_value(Slice name, SemaType *type, bool constant) {
     SemaScopeDecl *result = malloc(sizeof(SemaScopeDecl));
     result->type = SEMA_SCOPE_DECL_VALUE;
+    result->in_type = NULL;
     result->name = name;
     result->value_decl.type = type;
     result->value_decl.constant = constant;
@@ -25,9 +39,27 @@ SemaScopeDecl *sema_scope_decl_new_value(Slice name, SemaType *type, bool consta
 SemaScopeDecl *sema_scope_decl_new_module(Slice name, SemaModule *module) {
     SemaScopeDecl *result = malloc(sizeof(SemaScopeDecl));
     result->type = SEMA_SCOPE_DECL_MODULE;
+    result->in_type = NULL;
     result->name = name;
     result->module = module;
     return result;
+}
+
+SemaScopeDecl *sema_module_resolve_ext_func(SemaModule *sema, Slice *name, SemaType *type) {
+    for (ssize_t i = (ssize_t)vec_len(sema->scopes) - 1; i >= 0; i--) {
+        SemaScope *scope = &sema->scopes[i];
+        for (size_t j = 0; j < vec_len(scope->decls); j++) {
+            SemaScopeDecl *decl = scope->decls[j];
+            if (decl->in_type && sema_types_equals(type, decl->in_type) && slice_eq(&decl->name, name)) {
+                if (decl->sema_type->type != SEMA_TYPE_FUNCTION) {
+                    sema_err("in_type value is not a function");
+                    return NULL;
+                }
+                return decl;
+            }
+        }
+    }
+    return NULL;
 }
 
 SemaScopeDecl *sema_module_resolve_scope_decl(SemaModule *sema, Slice *name) {
@@ -35,7 +67,7 @@ SemaScopeDecl *sema_module_resolve_scope_decl(SemaModule *sema, Slice *name) {
         SemaScope *scope = &sema->scopes[i];
         for (size_t j = 0; j < vec_len(scope->decls); j++) {
             SemaScopeDecl *decl = scope->decls[j];
-            if (slice_eq(&decl->name, name)) {
+            if (!decl->in_type && slice_eq(&decl->name, name)) {
                 return decl;
             }
         }
@@ -46,7 +78,7 @@ SemaScopeDecl *sema_module_resolve_scope_decl(SemaModule *sema, Slice *name) {
 SemaScopeDecl *sema_module_resolve_public_decl(SemaModule *sema, Slice *name) {
     for (size_t j = 0; j < vec_len(sema->public_decls); j++) {
         SemaScopeDecl *decl = sema->public_decls[j];
-        if (slice_eq(&decl->name, name)) {
+        if (!decl->in_type && slice_eq(&decl->name, name)) {
             return decl;
         }
     }

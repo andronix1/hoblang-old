@@ -1,0 +1,56 @@
+import "std/process.hob" as process;
+import "std/io.hob" as io;
+
+struct Vec2 { x: i32, y: i32 }
+
+fun new(x: i32, y: i32) -> Vec2 {
+    var result: Vec2;
+    result.x = x;
+    result.y = y;
+    return result;
+}
+
+fun(Vec2) print() -> void {
+    io::print("(");
+    io::print_i32(self.x);
+    io::print(", ");
+    io::print_i32(self.y);
+    io::print(")");
+}
+
+fun(Vec2) eq(other: Vec2) -> bool {
+    return self.x == other.x && self.y == other.y;
+}
+
+fun(Vec2) add(other: Vec2) -> Vec2 {
+    return new(self.x + other.x, self.y + other.y);
+}
+
+fun(*Vec2) append(other: Vec2) -> void {
+    self.* = self.*.add(other);
+}
+
+fun main() -> i32 {
+    var a = new(1, 2);
+    var b = new(3, 4);
+    var c = a.add(b);
+    a.append(b);
+
+    var status = 0;
+
+    a.print();
+    if a.eq(c) {
+        io::print(" == ");
+    } else {
+        io::print(" != ");
+        status = 1;
+    }
+    c.print();
+    io::print("\n");
+
+    return status;
+}
+
+fun _start() -> void {
+    process::exit(main());
+}

@@ -5,7 +5,6 @@
 #include "llvm/parts/expr.h"
 #include "llvm/parts/body.h"
 #include "sema/module/decls/impl.h"
-#include "sema/module/private.h"
 #include "sema/type/private.h"
 #include "ast/private/module_node.h"
 #include "ast/private/module.h"
@@ -31,7 +30,7 @@ void llvm_module_node(LlvmBackend *llvm, AstModuleNode *node) {
             LLVMPositionBuilderAtEnd(llvm_builder(llvm), entry);
             llvm_set_definitions_block(llvm, entry);
 			if (node->func_decl.info.is_extension) {
-				LLVMValueRef value = node->func_decl.info.self->llvm_value = LLVMBuildAlloca(llvm_builder(llvm), llvm_resolve_type(node->func_decl.info.ext_type), "self");
+				LLVMValueRef value = node->func_decl.info.self->llvm_value = LLVMBuildAlloca(llvm_builder(llvm), llvm_resolve_type(node->func_decl.info.ext.of.sema), "self");
 				LLVMBuildStore(llvm_builder(llvm), LLVMGetParam(llvm_current_func(llvm), 0), value);
 			}
 			for (size_t i = 0; i < vec_len(node->func_decl.info.args); i++) {

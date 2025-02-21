@@ -26,6 +26,7 @@ typedef struct SemaScopeValueDecl {
 typedef struct SemaScopeDecl {
     SemaScopeDeclType type;
     Slice name;
+    SemaType *in_type;
     union {
         SemaType *sema_type;
         SemaScopeValueDecl value_decl;
