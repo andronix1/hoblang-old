@@ -90,6 +90,15 @@ void sema_module_push_defer(SemaModule *sema, AstDefer *defer) {
     scope->defers = vec_push(scope->defers, &defer);
 }
 
+void sema_module_append_ext_funcs_from(SemaModule *sema, SemaModule *from) {
+    for (size_t i = 0; i < vec_len(from->public_decls); i++) {
+        SemaScopeDecl *decl = from->public_decls[i];
+        if (decl->in_type) {
+            sema_module_push_decl(sema, decl);
+        }
+    }
+}
+
 SemaScopeDecl *sema_module_push_decl(SemaModule *sema, SemaScopeDecl *decl) {
     if (sema_module_resolve_scope_decl(sema, &decl->name)) {
         sema_err("`{slice}` was already declared", &decl->name);

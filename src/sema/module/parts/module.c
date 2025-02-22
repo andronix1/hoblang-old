@@ -101,6 +101,7 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 			}
 
 			sema_module_push_public_decl(sema, sema_scope_decl_new_module(node->import.as, module));
+            sema_module_append_ext_funcs_from(sema, module);
 			break;
 		}
 

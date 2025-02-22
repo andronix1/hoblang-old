@@ -12,6 +12,7 @@ SemaStructMember *sema_get_struct_member(SemaModule *sema, AstStructDef *struct_
             return sema_struct_member_field(i);
         }
     }
+    // TODO: remove from struct
     SemaScopeDecl *decl = sema_module_resolve_ext_func(sema, name, sema_type_new_struct(struct_def));
     if (decl) {
         return sema_struct_member_ext_func(&decl->value_decl, false);

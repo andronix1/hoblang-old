@@ -4,6 +4,7 @@
 #include "core/log.h"
 #include "core/slice.h"
 #include "ast/api/defer.h"
+#include "sema/module/module.h"
 #include "sema/type.h"
 #include "sema/module/decls.h"
 #include "sema/module.h"
@@ -17,6 +18,7 @@
 SemaScopeDecl *sema_module_resolve_scope_decl(SemaModule *sema, Slice *name);
 SemaScopeDecl *sema_module_resolve_public_decl(SemaModule *sema, Slice *name);
 void sema_module_push_defer(SemaModule *sema, AstDefer *defer);
+void sema_module_append_ext_funcs_from(SemaModule *sema, SemaModule *from);
 SemaScopeDecl *sema_module_push_decl(SemaModule *sema, SemaScopeDecl *decl);
 SemaScopeDecl *sema_module_push_public_decl(SemaModule *sema, SemaScopeDecl *decl);
 SemaScopeDecl *sema_module_resolve_ext_func(SemaModule *sema, Slice *name, SemaType *type);
