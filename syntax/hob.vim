@@ -23,6 +23,7 @@ syntax keyword hobKeywords
 	\ as
 	\ while
 	\ null
+	\ unwrap 
 
 syntax keyword hobType
 	\ i8
