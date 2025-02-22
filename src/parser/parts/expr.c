@@ -251,12 +251,14 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 						parser_skip_next(parser);
 						return current_expr;
 					}
-                    AstExpr *expr = malloc(sizeof(AstExpr));
-                    expr->type = AST_EXPR_AS;
-                    expr->as.expr = current_expr;
-                    current_expr = expr;
-                    if (!parse_type(parser, &current_expr->as.type)) {
-                        return NULL;
+                    if (parser_next_is_not(parser, TOKEN_AUTO)) {
+                        AstType type;
+                        if (!parse_type(parser, &type)) {
+                            return NULL;
+                        }
+                        current_expr = ast_expr_as_type(current_expr, type);
+                    } else {
+                        current_expr = ast_expr_as_auto(current_expr);
                     }
                     break;
                 }

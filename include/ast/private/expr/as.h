@@ -25,9 +25,19 @@ typedef enum {
 	SEMA_AS_CONV_IGNORE,
 } SemaAsConvType;
 
+typedef enum {
+    AST_EXPR_AS_TYPE,
+    AST_EXPR_AS_AUTO
+} AstExprAsType;
+
 typedef struct {
-	AstType type;
+    AstExprAsType type;
 	AstExpr *expr;
 
+    union {
+	    AstType as_type;
+    };
+
 	SemaAsConvType conv_type;
+    SemaType *sema_type;
 } AstExprAs;

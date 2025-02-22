@@ -5,7 +5,7 @@ fun positive(value: i32) -> ?u32 {
     if value < 0 {
         return null;
     }
-    return value as u32 as ?u32;
+    return value as u32 as _;
 }
 
 fun digit(value: i32) -> ?u8 {
@@ -13,17 +13,25 @@ fun digit(value: i32) -> ?u8 {
     if pos as u32 >= 10 {
         return null;
     }
-    return value as u8 as ?u8;
+    return value as u8 as _;
+}
+
+fun pos2_digit(value: i32) -> ?u8 {
+    var res = digit(positive(value)? as i32)?;
+    if res % 2 != 0 {
+        return null;
+    }
+    return res as _;
 }
 
 fun test(value: i32) -> void {
-    var fres = digit(value);
+    var fres = pos2_digit(value);
     if !fres.null {
         io::print_i32(fres as u8 as i32);
-        io::print(" is a digit");
+        io::print(" is a 2 digit");
     } else {
         io::print_i32(value);
-        io::print(" is not a digit");
+        io::print(" is not a 2 digit");
     }
     io::print("\n");
 }
@@ -33,6 +41,7 @@ fun main() -> i32 {
     test(-1);
     test(123);
     test(9);
+    test(8);
     return 0;
 }
 

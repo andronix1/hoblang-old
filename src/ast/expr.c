@@ -1,4 +1,5 @@
 #include "ast/private/expr.h"
+#include "ast/private/expr/as.h"
 #include <malloc.h>
 
 #define FIELD(src, dst) result->src = dst;
@@ -46,9 +47,14 @@ AstExpr *ast_expr_call(AstExpr *callable, AstExpr **args) CONSTR(AST_EXPR_CALL, 
 AstExpr *ast_expr_not(AstExpr *expr) CONSTR(AST_EXPR_NOT, {
     FIELD(not_expr, expr)
 })
-AstExpr *ast_expr_as(AstExpr *expr, AstType type) CONSTR(AST_EXPR_AS, {
+AstExpr *ast_expr_as_type(AstExpr *expr, AstType type) CONSTR(AST_EXPR_AS, {
+    FIELD(as.type, AST_EXPR_AS_TYPE)
     FIELD(as.expr, expr)
-    FIELD(as.type, type)
+    FIELD(as.as_type, type)
+})
+AstExpr *ast_expr_as_auto(AstExpr *expr) CONSTR(AST_EXPR_AS, {
+    FIELD(as.type, AST_EXPR_AS_AUTO)
+    FIELD(as.expr, expr)
 })
 AstExpr *ast_expr_binop(AstBinopType type, AstExpr *left, AstExpr *right) CONSTR(AST_EXPR_BINOP, {
     FIELD(binop.type, type)

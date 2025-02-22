@@ -22,6 +22,7 @@ syntax keyword hobKeywords
 	\ module
 	\ as
 	\ while
+	\ null
 
 syntax keyword hobType
 	\ i8

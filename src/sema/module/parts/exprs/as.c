@@ -1,3 +1,4 @@
+#include "ast/private/expr/as.h"
 #include "exprs.h"
 #include "core/assert.h"
 #include "sema/module/parts/type.h"
@@ -201,10 +202,23 @@ void sema_conv_primitive(
 }
 
 SemaValue *sema_analyze_expr_as(SemaModule *sema, AstExprAs *as, SemaExprCtx ctx) { 
-	SemaType *as_type = sema_ast_type(sema, &as->type);
+	SemaType *as_type = NULL, *req_type = NULL;
+    switch (as->type) {
+        case AST_EXPR_AS_TYPE:
+            as_type = sema_ast_type(sema, &as->as_type);
+            break;
+        case AST_EXPR_AS_AUTO:
+            if (!ctx.expectation) {
+                sema_err("cannot determine auto conversion type");
+                return NULL;
+            }
+            as_type = req_type = ctx.expectation;
+            break;
+    }
 	if (!as_type) {
 		return false;
 	}
+    as->sema_type = as_type;
 	SemaType *expr_type = sema_value_expr_type(sema, as->expr, sema_expr_ctx_expect(ctx, sema_type_primitive_i64()));
 	if (!expr_type) {
 		return false;

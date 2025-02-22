@@ -171,7 +171,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 			break;
 		}
 		case AST_EXPR_AS: {
-			LLVMTypeRef to_type = llvm_resolve_type(expr->as.type.sema);
+			LLVMTypeRef to_type = llvm_resolve_type(expr->as.sema_type);
 			LLVMValueRef value = llvm_expr(llvm, expr->as.expr, true);
 			switch (expr->as.conv_type) {
 				case SEMA_AS_CONV_EXTEND: return LLVMBuildZExt(llvm_builder(llvm), value, to_type, "");
