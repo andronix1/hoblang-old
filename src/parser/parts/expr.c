@@ -175,6 +175,13 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 				current_expr= ast_expr_get_local_path(path);
 				break;
 			}
+            case TOKEN_UNWRAP:
+                if (!current_expr) {
+					PARSE_ERROR("expected expression before index expression");
+                    return NULL;
+                }
+                current_expr = ast_expr_unwrap(current_expr, PARSER_EXPECT_NEXT(TOKEN_IDENT, "output name")->ident);
+                break;
             case TOKEN_NULL:
                 current_expr = ast_expr_null();
                 break;

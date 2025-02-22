@@ -25,9 +25,8 @@ fun pos2_digit(value: i32) -> ?u8 {
 }
 
 fun test(value: i32) -> void {
-    var fres = pos2_digit(value);
-    if !fres.null {
-        io::print_i32(fres as u8 as i32);
+    if pos2_digit(value) unwrap fres { 
+        io::print_i32(fres as _);
         io::print(" is a 2 digit");
     } else {
         io::print_i32(value);

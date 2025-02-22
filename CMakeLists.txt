@@ -76,6 +76,7 @@ set(SOURCE_FILES
 	src/sema/module/parts/exprs/ret_on_null.c
 	src/sema/module/parts/exprs/get_local.c
 	src/sema/module/parts/exprs/get_inner.c
+	src/sema/module/parts/exprs/unwrap.c
 	src/sema/module/parts/stmts/assign.c
 	src/sema/module/parts/stmts/asm.c
 	src/sema/module/parts/stmts/if_else.c

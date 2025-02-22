@@ -149,6 +149,7 @@ bool lexer_try_next(Lexer *lexer) {
 	SYMBOL_DUAL('!', '=', TOKEN_NOT, TOKEN_NOT_EQUALS);
 	KEYWORD("asm", TOKEN_ASM);
 	KEYWORD("_", TOKEN_AUTO);
+	KEYWORD("unwrap", TOKEN_UNWRAP);
 	KEYWORD("null", TOKEN_NULL);
 	KEYWORD("sizeof", TOKEN_SIZEOF);
 	KEYWORD("const", TOKEN_CONST);

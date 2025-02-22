@@ -11,6 +11,10 @@
         return result; \
     }
 
+AstExpr *ast_expr_unwrap(AstExpr *expr, Slice name) CONSTR(AST_EXPR_UNWRAP, {
+    FIELD(unwrap.expr, expr)
+    FIELD(unwrap.name, name)
+})
 AstExpr *ast_expr_ret_on_null(AstExpr *expr) CONSTR(AST_EXPR_RET_ON_NULL, {
     FIELD(ret_on_null.expr, expr)
 })

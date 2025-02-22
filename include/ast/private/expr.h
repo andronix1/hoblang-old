@@ -10,6 +10,7 @@
 #include "expr/get_local.h"
 #include "expr/get_inner.h"
 #include "expr/idx.h"
+#include "sema/module/decls/decls.h"
 
 typedef enum {
 	AST_EXPR_GET_LOCAL_PATH,
@@ -29,6 +30,7 @@ typedef enum {
 	AST_EXPR_REF,
 	AST_EXPR_NULL,
 	AST_EXPR_RET_ON_NULL,
+	AST_EXPR_UNWRAP,
 } AstExprType;
 
 typedef struct AstExpr AstExpr;
@@ -37,6 +39,18 @@ typedef enum {
     SEMA_NULL_POINTER,
     SEMA_NULL_OPTIONAL
 } SemaNullType;
+
+typedef enum {
+    SEMA_EXPR_UNWRAP_OPT
+} SemaExprUnwrapType;
+
+typedef struct {
+    AstExpr *expr;
+    Slice name;
+
+    SemaExprUnwrapType type;
+    SemaScopeValueDecl *decl;
+} AstExprUnwrap;
 
 typedef struct {
     AstExpr *expr;
@@ -56,6 +70,7 @@ typedef struct AstExpr {
 		AstExpr *ref_expr;
 		AstExpr *not_expr;
         AstExprRetOnNull ret_on_null;
+        AstExprUnwrap unwrap;
 		AstExprGetLocal get_local;
 		AstExprGetInner get_inner;
 		Slice str;
@@ -70,6 +85,7 @@ typedef struct AstExpr {
 } AstExpr;
 
 AstExpr *ast_expr_ret_on_null(AstExpr *expr);
+AstExpr *ast_expr_unwrap(AstExpr *expr, Slice name);
 AstExpr *ast_expr_get_local_path(AstPath path);
 AstExpr *ast_expr_get_inner_path(AstExpr *of, AstInnerPath path);
 AstExpr *ast_expr_idx(AstExpr *of, AstExpr *idx);

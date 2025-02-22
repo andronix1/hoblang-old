@@ -7,6 +7,7 @@
 #include <llvm-c/Core.h>
 #include <llvm-c/Types.h>
 #include "sema/value/private.h"
+#include "sema/module/decls/impl.h"
 #include "core/vec.h"
 #include "ast/private/expr.h"
 
@@ -35,6 +36,26 @@ LLVMValueRef llvm_call(LlvmBackend *llvm, AstCall *call) {
 
 LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 	switch (expr->type) {
+		case AST_EXPR_UNWRAP: {
+            LLVMValueRef opt = llvm_expr(llvm, expr->unwrap.expr, true);
+            LLVMValueRef is_null = LLVMBuildNot(
+                llvm_builder(llvm),
+                llvm_opt_is_null(
+                    llvm,
+                    llvm_resolve_type(expr->unwrap.expr->value->sema_type),
+                    opt,
+                    true
+                ),
+                "is_not_null"
+            );
+            expr->unwrap.decl->llvm_value = llvm_opt_value(
+                llvm,
+                llvm_resolve_type(expr->unwrap.expr->value->sema_type->optional_of),
+                opt,
+                true
+            );
+            return is_null;
+        }
 		case AST_EXPR_GET_INNER_PATH: {
 			LLVMValueRef value = llvm_resolve_inner_path(
 				llvm,
