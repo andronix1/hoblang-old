@@ -73,6 +73,7 @@ set(SOURCE_FILES
 	src/sema/module/parts/exprs/ref.c
 	src/sema/module/parts/exprs/unary.c
 	src/sema/module/parts/exprs/null.c
+	src/sema/module/parts/exprs/ret_on_null.c
 	src/sema/module/parts/exprs/get_local.c
 	src/sema/module/parts/exprs/get_inner.c
 	src/sema/module/parts/stmts/assign.c

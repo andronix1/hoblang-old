@@ -1,5 +1,3 @@
-#include "llvm-c/Types.h"
-#include "llvm/private.h"
 #include "llvm/parts/body.h"
 #include "llvm/parts/expr.h"
 #include "core/vec.h"

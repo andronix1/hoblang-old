@@ -10,6 +10,9 @@
         return result; \
     }
 
+AstExpr *ast_expr_ret_on_null(AstExpr *expr) CONSTR(AST_EXPR_RET_ON_NULL, {
+    FIELD(ret_on_null.expr, expr)
+})
 AstExpr *ast_expr_idx(AstExpr *of, AstExpr *idx) CONSTR(AST_EXPR_IDX, {
     FIELD(idx.of, of)
     FIELD(idx.idx, idx)

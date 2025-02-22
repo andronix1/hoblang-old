@@ -1,4 +1,5 @@
 #include "ast/private/expr.h"
+#include "lexer/token.h"
 #include "parser/parts/expr.h"
 #include "parser/parts/type.h"
 #include "parser/parts/path.h"
@@ -133,6 +134,13 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 		}
 		
 		switch (token->type) {
+            case TOKEN_QUESTION_MARK:
+                if (!current_expr) {
+                    PARSE_ERROR("expected expression before return-on-null operator");
+                    return NULL;
+                }
+                current_expr = ast_expr_ret_on_null(current_expr);
+                break;
 			case TOKEN_TRUE: case TOKEN_FALSE:
                 current_expr = ast_expr_bool(token->type == TOKEN_TRUE);
                 break;

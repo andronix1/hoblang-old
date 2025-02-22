@@ -62,6 +62,10 @@ void print_ast_path(FILE *stream, va_list list) {
 void print_ast_expr(FILE *stream, va_list list) {
 	AstExpr *expr = va_arg(list, AstExpr*);
 	switch (expr->type) {
+		case AST_EXPR_RET_ON_NULL: {
+			print_to(stream, "{ast::expr}?", &expr->ret_on_null.expr); break;
+			break;
+		}
 		case AST_EXPR_GET_LOCAL_PATH: {
 			print_to(stream, "{ast::path}", &expr->get_local.path); break;
 			break;

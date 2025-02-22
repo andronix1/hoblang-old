@@ -4,6 +4,8 @@
 #include "llvm/parts/path.h"
 #include "llvm/parts/types/slice.h"
 #include "llvm/parts/types/optional.h"
+#include <llvm-c/Core.h>
+#include <llvm-c/Types.h>
 #include "sema/value/private.h"
 #include "core/vec.h"
 #include "ast/private/expr.h"
@@ -78,6 +80,44 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 		case AST_EXPR_BOOL: return LLVMConstInt(LLVMInt1Type(), expr->boolean, false);
 		case AST_EXPR_CHAR: return LLVMConstInt(LLVMInt8Type(), expr->character, false);
 		case AST_EXPR_STR: return llvm_slice_from_str(llvm, &expr->str);
+        case AST_EXPR_RET_ON_NULL: {
+            LLVMBasicBlockRef on_null = LLVMAppendBasicBlock(
+                llvm_current_func(llvm),
+                "on_null"
+            );
+            LLVMBasicBlockRef on_not_null = LLVMAppendBasicBlock(
+                llvm_current_func(llvm),
+                "on_not_null"
+            );
+            LLVMValueRef opt = llvm_expr(llvm, expr->ret_on_null.expr, false);
+            LLVMBuildCondBr(
+                llvm_builder(llvm),
+                llvm_opt_is_null(
+                    llvm,
+                    llvm_resolve_type(expr->ret_on_null.expr->value->sema_type),
+                    opt,
+                    true
+                ),
+                on_null,
+                on_not_null
+            );
+            LLVMPositionBuilderAtEnd(llvm_builder(llvm), on_null);
+            LLVMBuildRet(
+                llvm_builder(llvm),
+                llvm_opt_null(
+                    llvm,
+                    llvm_resolve_type(expr->ret_on_null.fret->optional_of)
+                )
+            );
+            LLVMPositionBuilderAtEnd(llvm_builder(llvm), on_not_null);
+            llvm_set_code_block(llvm, on_not_null);
+            return llvm_opt_value(
+                llvm,
+                llvm_resolve_type(expr->value->sema_type),
+                opt,
+                false
+            );
+        }
 		case AST_EXPR_IDX: {
 			switch (expr->idx.sema) {
 				case SEMA_EXPR_IDX_SLICE: {

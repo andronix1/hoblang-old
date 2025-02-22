@@ -28,6 +28,7 @@ typedef enum {
 	AST_EXPR_ARRAY,
 	AST_EXPR_REF,
 	AST_EXPR_NULL,
+	AST_EXPR_RET_ON_NULL,
 } AstExprType;
 
 typedef struct AstExpr AstExpr;
@@ -36,6 +37,11 @@ typedef enum {
     SEMA_NULL_POINTER,
     SEMA_NULL_OPTIONAL
 } SemaNullType;
+
+typedef struct {
+    AstExpr *expr;
+    SemaType *fret;
+} AstExprRetOnNull;
 
 typedef struct AstExpr {
 	AstExprType type;
@@ -49,6 +55,7 @@ typedef struct AstExpr {
 		AstExpr **array;
 		AstExpr *ref_expr;
 		AstExpr *not_expr;
+        AstExprRetOnNull ret_on_null;
 		AstExprGetLocal get_local;
 		AstExprGetInner get_inner;
 		Slice str;
@@ -62,6 +69,7 @@ typedef struct AstExpr {
 	SemaValue *value;
 } AstExpr;
 
+AstExpr *ast_expr_ret_on_null(AstExpr *expr);
 AstExpr *ast_expr_get_local_path(AstPath path);
 AstExpr *ast_expr_get_inner_path(AstExpr *of, AstInnerPath path);
 AstExpr *ast_expr_idx(AstExpr *of, AstExpr *idx);
