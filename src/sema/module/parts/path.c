@@ -93,9 +93,6 @@ SemaValue *sema_resolve_inner_value_path(SemaModule *sema, SemaValue *from, AstI
                     case SEMA_STRUCT_MEMBER_FIELD:
                         return sema_value_with_type(from, from->sema_type->struct_def->members[member->field_idx].type->sema);
                     case SEMA_STRUCT_MEMBER_EXT_FUNC:
-                        if (from->type != SEMA_VALUE_VAR) {
-                            sema_err("ext function can be called on variable only!!!");
-                        }
                         return sema_value_ext_func_handle(member->ext_func.decl->type);
                 }
                 assert(0, "invalid struct member type");
