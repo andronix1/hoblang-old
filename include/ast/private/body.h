@@ -44,5 +44,6 @@ typedef struct AstBody {
 	AstStmt *stmts;
 
 	// sema
+    AstBody *parent;
 	AstDefer **defers;
 } AstBody;

@@ -1,3 +1,4 @@
+#include "ast/api/defer.h"
 #include "sema/module/private.h"
 #include "sema/module/parts/expr.h"
 #include "ast/private/body.h"
@@ -13,7 +14,8 @@ void sema_stmt_while_loop(SemaModule *sema, AstWhile *while_loop);
 void sema_stmt_inline_asm(SemaModule *sema, AstInlineAsm *inline_asm);
 
 void sema_ast_body(SemaModule *sema, AstBody *body) {
-	sema_module_push_scope(sema);
+    body->defers = vec_new(AstDefer*);
+	sema_module_push_body_scope(sema, body);
 	for (size_t i = 0; i < vec_len(body->stmts); i++) {
 		AstStmt *stmt = &body->stmts[i];
 		switch (stmt->type) {
@@ -29,6 +31,5 @@ void sema_ast_body(SemaModule *sema, AstBody *body) {
 			case AST_STMT_CONTINUE: sema_stmt_loop_control(sema, &stmt->continue_loop); break;
 		}
 	}
-	body->defers = sema_module_resolve_defers(sema);
 	sema_module_pop_scope(sema);
 } 

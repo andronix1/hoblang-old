@@ -3,13 +3,14 @@
 #include <stdbool.h>
 #include "ast/api/defer.h"
 #include "ast/api/module.h"
+#include "ast/api/body.h"
 #include "sema/module/private.h"
 #include "sema/module/loop/loop.h"
 #include "sema/project.h"
 
 typedef struct SemaScope {
     SemaScopeDecl **decls;
-	AstDefer **defers;
+	AstBody *body;
 } SemaScope;
 
 typedef struct SemaModule {

@@ -41,10 +41,9 @@ void llvm_module_node(LlvmBackend *llvm, AstModuleNode *node) {
 
             LLVMPositionBuilderAtEnd(llvm_builder(llvm), code);
             llvm_set_code_block(llvm, code);
-			if (llvm_body(llvm, &node->func_decl.body)) {
-				llvm_body_break(llvm, &node->func_decl.body);
-			}
-			if (sema_types_equals(node->func_decl.info.returning.sema, sema_type_primitive_void())) {
+			llvm_body(llvm, &node->func_decl.body);
+            
+            if (sema_types_equals(node->func_decl.info.returning.sema, sema_type_primitive_void())) {
 				LLVMBuildRetVoid(llvm_builder(llvm));
 			}
 

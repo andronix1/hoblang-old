@@ -1,9 +1,11 @@
+#include "ast/api/defer.h"
 #include "sema/module/impl.h"
 #include "core/vec.h"
 #include "sema/type/private.h"
 #include "sema/module/private.h"
 #include "sema/module/decls/impl.h"
 #include "sema/type/api.h"
+#include "ast/private/body.h"
 
 SemaScopeDecl *sema_scope_decl_new_type(Slice name, SemaType *sema_type) {
     SemaScopeDecl *result = malloc(sizeof(SemaScopeDecl));
@@ -85,9 +87,33 @@ SemaScopeDecl *sema_module_resolve_public_decl(SemaModule *sema, Slice *name) {
     return NULL;
 }
 
+AstBody *sema_module_current_body(SemaModule *sema) {
+    if (vec_len(sema->scopes) == 0) {
+        return NULL;
+    }
+    return sema_module_top_scope(sema)->body;
+}
+
 void sema_module_push_defer(SemaModule *sema, AstDefer *defer) {
-    SemaScope *scope = vec_top(sema->scopes);
-    scope->defers = vec_push(scope->defers, &defer);
+    AstBody* body = sema_module_current_body(sema);
+    assert(body, "trying to push defer outside of body");
+    body->defers = vec_push(body->defers, &defer);
+}
+
+AstDefer **sema_module_defers_up_to(SemaModule *sema, AstBody *to) {
+    AstDefer **result = vec_new(AstDefer*);
+    AstBody *body = sema_module_current_body(sema);
+    assert(body, "trying to resolve defers outside of body");
+    while (body) {
+        for (ssize_t i = vec_len(body->defers) - 1; i >= 0; i--) {
+            result = vec_push(result, &body->defers[i]);
+        }
+        if (body == to) {
+            break;
+        }
+        body = body->parent;
+    }
+    return result;
 }
 
 void sema_module_append_ext_funcs_from(SemaModule *sema, SemaModule *from) {
@@ -121,12 +147,22 @@ SemaScope *sema_module_top_scope(SemaModule *sema) {
     return vec_top(sema->scopes);
 }
 
-void sema_module_push_scope(SemaModule *sema) {
+void sema_module_push_body_scope(SemaModule *sema, AstBody *body) {
+    AstBody *current_body = sema_module_current_body(sema);
+    if (!body) {
+        body = current_body;
+    } else {
+        body->parent = current_body;
+    }
     SemaScope scope = {
         .decls = vec_new(SemaScopeDecl*),
-        .defers = vec_new(AstDefer*) // TODO: defer inside while loop
+        .body = body
     };
     sema->scopes = vec_push(sema->scopes, &scope);
+}
+
+void sema_module_push_scope(SemaModule *sema) {
+    return sema_module_push_body_scope(sema, NULL);
 }
 
 void sema_module_pop_scope(SemaModule *sema) {
@@ -139,17 +175,6 @@ void sema_module_push_primitives(SemaModule *sema) {
     PP(u8); PP(u16); PP(u32); PP(u64);
     PP(f32); PP(f64);
 	PP(bool); PP(void);
-}
-
-AstDefer **sema_module_resolve_defers(SemaModule *sema) {
-    AstDefer **result = vec_new(AstDefer*);
-    for (ssize_t i = (size_t)vec_len(sema->scopes) - 1; i >= 0; i--) {
-        SemaScope *scope = &sema->scopes[i];
-        for (ssize_t j = (size_t)vec_len(scope->defers) - 1; j >= 0; j--) {
-            result = vec_push(result, &scope->defers[j]);
-        }
-    }
-    return result;
 }
 
 void sema_module_set_returns(SemaModule *sema, SemaType *returns) {

@@ -21,4 +21,5 @@ void sema_stmt_return(SemaModule *sema, AstReturn *ret) {
 			return;
 		}
 	}
+    ret->defers = sema_module_defers_up_to(sema, NULL);
 }

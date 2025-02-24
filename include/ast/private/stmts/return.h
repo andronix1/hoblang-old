@@ -5,7 +5,8 @@
 #include "defer.h"
 
 typedef struct {
-    // TODO: NULL
 	AstExpr *expr;
 	bool has_value;
+
+	AstDefer **defers;
 } AstReturn;

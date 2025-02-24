@@ -3,8 +3,8 @@
 #include "llvm/parts/body.h"
 #include "ast/private/stmts/return.h"
 
-void llvm_stmt_return(LlvmBackend *llvm, AstReturn *ret, AstBody *body) {
-	llvm_body_break(llvm, body);
+void llvm_stmt_return(LlvmBackend *llvm, AstReturn *ret) {
+	llvm_body_break(llvm, ret->defers);
 	if (ret->has_value) {
 		LLVMBuildRet(
 			llvm_builder(llvm), 

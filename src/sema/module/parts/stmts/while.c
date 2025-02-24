@@ -4,6 +4,7 @@
 #include "sema/module/private.h"
 #include "sema/module/parts/expr.h"
 #include "sema/module/parts/body.h"
+#include "sema/module/loop/private.h"
 
 void sema_stmt_while_loop(SemaModule *sema, AstWhile *while_loop) {
 	SemaType *type = sema_value_expr_type(sema, while_loop->expr, sema_expr_ctx_default_of(sema_type_primitive_bool()));
@@ -16,6 +17,7 @@ void sema_stmt_while_loop(SemaModule *sema, AstWhile *while_loop) {
     while_loop->loop = while_loop->is_named ?
         sema_loop_new_named(while_loop->name) :
         sema_loop_new();
+    while_loop->loop->body = while_loop->body;
     sema_module_push_loop(sema, while_loop->loop);
 	sema_ast_body(sema, while_loop->body);
     sema_module_pop_loop(sema);
