@@ -79,13 +79,12 @@ const READ_FROM_BUFFER_SIZE: i32 = 64;
 
 fun(*String) append_fd(fd: fs::File) -> void {
     var buf: [READ_FROM_BUFFER_SIZE]u8;
-    var reading = true; # TODO: break
-    while reading {
+    while true {
         var buf_slice = &buf as []u8;
         buf_slice.length = io::read_from(fd, &buf_slice) as i32;
         self.*.append_slice(buf_slice);
         if buf_slice.length != READ_FROM_BUFFER_SIZE {
-            reading = false;
+            break;
         }
     }
 }
