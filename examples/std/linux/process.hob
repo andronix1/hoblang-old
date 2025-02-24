@@ -26,8 +26,27 @@ fun getpid() -> Pid {
 	return syscall::arg0(syscall::GETPID);
 }
 
+fun kill(pid: Pid, signal: i64) -> void {
+	syscall::arg2(syscall::KILL, pid, signal);
+}
+
 fun exit(status: i64) -> void {
 	syscall::arg1(syscall::EXIT, status);
+}
+
+type UContext = void;
+
+type SigActionMask = [128]u8;
+
+struct SigAction {
+    handler: fun (i32, *SigInfo, *UContext) -> void,
+    flags: i64,
+    restorer: fun () -> void,
+    mask: SigActionMask
+}
+
+fun sigaction(signum: i32, new: *SigAction, old: *SigAction) -> Pid {
+	return syscall::arg4(syscall::RT_SIGACTION, signum as i64, new as i64, old as i64, 8); #SigActionMask.sizeof as i64);
 }
 
 const P_ALL: IdType = 0;

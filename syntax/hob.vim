@@ -26,6 +26,8 @@ syntax keyword hobKeywords
 	\ unwrap 
 	\ break
 	\ continue 
+	\ asm
+	\ const
 
 syntax keyword hobType
 	\ i8

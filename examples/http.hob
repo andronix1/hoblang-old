@@ -74,7 +74,6 @@ fun handle_conn(client: Socket) -> void {
 	io::println("OK");
 }
 
-# TODO: zombie processes
 fun main() -> i32 {
 	var server = tcp::bind(PORT, BACKLOG);
 	if server < 0 {
@@ -90,8 +89,8 @@ fun main() -> i32 {
 		var pid = process::fork();
 		if pid == 0 {
 			handle_conn(client);
-			process::exit(0);
-		} else {
+			process::kill(process::get_pid(), 9);
+		} else { 
 			io::close(client);
 		}
 	}
