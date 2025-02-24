@@ -40,4 +40,5 @@ Token *parser_expect_next(Parser *parser, TokenType type);
 bool parser_next_is(Parser *parser, TokenType type);
 bool parser_next_is_not(Parser *parser, TokenType type);
 Token *parser_next_is_not_or(Parser *parser, TokenType type);
+Token *parser_next_is_or(Parser *parser, TokenType type);
 

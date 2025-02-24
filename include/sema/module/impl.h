@@ -4,6 +4,7 @@
 #include "ast/api/defer.h"
 #include "ast/api/module.h"
 #include "sema/module/private.h"
+#include "sema/module/loop/loop.h"
 #include "sema/project.h"
 
 typedef struct SemaScope {
@@ -19,6 +20,7 @@ typedef struct SemaModule {
     SemaProject *project; // TODO: API
     SemaScopeDecl **public_decls;
 	SemaScope *scopes;
+	SemaLoop **loops;
 	SemaType *returning;
 } SemaModule;
 

@@ -150,6 +150,8 @@ bool lexer_try_next(Lexer *lexer) {
 	KEYWORD("asm", TOKEN_ASM);
 	KEYWORD("_", TOKEN_AUTO);
 	KEYWORD("unwrap", TOKEN_UNWRAP);
+	KEYWORD("break", TOKEN_BREAK);
+	KEYWORD("continue", TOKEN_CONTINUE);
 	KEYWORD("null", TOKEN_NULL);
 	KEYWORD("sizeof", TOKEN_SIZEOF);
 	KEYWORD("const", TOKEN_CONST);

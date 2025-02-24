@@ -3,6 +3,7 @@
 #include "ast/private/body.h"
 #include "core/vec.h"
 
+void sema_stmt_loop_control(SemaModule *sema, AstStmtLoopControl *loop_control);
 void sema_stmt_assign(SemaModule *sema, AstAssign *assign);
 void sema_stmt_defer(SemaModule *sema, AstDefer *defer);
 void sema_stmt_if_else(SemaModule *sema, AstIfElse *if_else);
@@ -24,6 +25,8 @@ void sema_ast_body(SemaModule *sema, AstBody *body) {
 			case AST_STMT_DEFER: sema_stmt_defer(sema, &stmt->defer); break;
 			case AST_STMT_INLINE_ASM: sema_stmt_inline_asm(sema, &stmt->inline_asm); break;
 			case AST_STMT_EXPR: sema_value_expr_type(sema, stmt->expr, sema_expr_ctx_default()); break;
+			case AST_STMT_BREAK: sema_stmt_loop_control(sema, &stmt->break_loop); break;
+			case AST_STMT_CONTINUE: sema_stmt_loop_control(sema, &stmt->continue_loop); break;
 		}
 	}
 	body->defers = sema_module_resolve_defers(sema);

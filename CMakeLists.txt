@@ -44,6 +44,7 @@ set(SOURCE_FILES
 	src/parser/parts/stmts/defer.c
 	src/parser/parts/stmts/if_else.c
 	src/parser/parts/stmts/asm.c
+	src/parser/parts/stmts/loop_control.c
 	src/parser/parts/decls/struct.c
 	src/parser/parts/decls/ext_func.c
 	src/parser/parts/decls/func_info.c
@@ -60,6 +61,7 @@ set(SOURCE_FILES
     src/sema/type/private.c
 	src/sema/module/api.c
 	src/sema/module/private.c
+	src/sema/module/loop/api.c
 	src/sema/module/parts/decls/struct.c
 	src/sema/module/parts/expr/eval.c
 	src/sema/module/parts/exprs/array.c
@@ -78,6 +80,7 @@ set(SOURCE_FILES
 	src/sema/module/parts/exprs/get_inner.c
 	src/sema/module/parts/exprs/unwrap.c
 	src/sema/module/parts/stmts/assign.c
+	src/sema/module/parts/stmts/loop_control.c
 	src/sema/module/parts/stmts/asm.c
 	src/sema/module/parts/stmts/if_else.c
 	src/sema/module/parts/stmts/return.c
@@ -106,6 +109,8 @@ set(SOURCE_FILES
 	src/llvm/parts/stmts/return.c
 	src/llvm/parts/stmts/var.c
 	src/llvm/parts/stmts/while.c
+	src/llvm/parts/stmts/break.c
+	src/llvm/parts/stmts/continue.c
 	src/llvm/parts/expr.c
 )
 

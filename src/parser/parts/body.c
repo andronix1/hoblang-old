@@ -1,8 +1,11 @@
 #include "ast/private/body.h"
+#include "ast/private/stmts/loop_control.h"
+#include "lexer/token.h"
 #include "parser/parts/expr.h"
 #include "parser/private.h"
 #include "parser/token_stops.h"
 
+bool parse_loop_control(Parser *parser, AstStmtLoopControl *loop_control);
 bool parse_defer(Parser *parser, AstDefer *defer);
 bool parse_if_else(Parser *parser, AstIfElse *if_else);
 bool parse_return(Parser *parser, AstReturn *ret);
@@ -37,6 +40,12 @@ bool parse_stmt(Parser *parser, AstStmt *stmt) {
 					return false;
 			}
 		}
+		case TOKEN_CONTINUE:
+            stmt->type = AST_STMT_CONTINUE;
+            return parse_loop_control(parser, &stmt->continue_loop);
+		case TOKEN_BREAK:
+            stmt->type = AST_STMT_BREAK;
+            return parse_loop_control(parser, &stmt->break_loop);
 		case TOKEN_DEFER:
 			stmt->type = AST_STMT_DEFER;
 			return parse_defer(parser, &stmt->defer);

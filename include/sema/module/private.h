@@ -26,6 +26,7 @@ SemaScopeDecl *sema_module_resolve_ext_func(SemaModule *sema, Slice *name, SemaT
 void sema_module_push_primitives(SemaModule *sema);
 void sema_module_push_scope(SemaModule *sema);
 void sema_module_pop_scope(SemaModule *sema);
+SemaScope *sema_module_top_scope(SemaModule *sema);
 
 SemaScopeDecl *sema_scope_decl_new_type(Slice name, SemaType *sema_type);
 SemaScopeDecl *sema_scope_decl_new_value(Slice name, SemaType *type, bool constant);

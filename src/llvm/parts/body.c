@@ -1,5 +1,6 @@
 #include "llvm/parts/body.h"
 #include "llvm/parts/expr.h"
+#include "ast/private/stmts/loop_control.h"
 #include "core/vec.h"
 #include "ast/private/body.h"
 
@@ -9,6 +10,8 @@ void llvm_stmt_return(LlvmBackend *llvm, AstReturn *ret, AstBody *body);
 void llvm_stmt_var(LlvmBackend *llvm, AstVar *var);
 void llvm_stmt_while(LlvmBackend *llvm, AstWhile *while_loop);
 void llvm_stmt_asm(LlvmBackend *llvm, AstInlineAsm *inline_asm);
+void llvm_stmt_break(LlvmBackend *llvm, AstStmtLoopControl *loop_control);
+void llvm_stmt_continue(LlvmBackend *llvm, AstStmtLoopControl *loop_control);
 
 void llvm_body_break(LlvmBackend *llvm, AstBody *body) {
 	for (size_t i = 0; i < vec_len(body->defers); i++) {
@@ -22,6 +25,8 @@ bool llvm_body(LlvmBackend *llvm, AstBody *body) {
 		switch (stmt->type) {
 			case AST_STMT_VAR: llvm_stmt_var(llvm, &stmt->var); break;
 			case AST_STMT_RETURN: llvm_stmt_return(llvm, &stmt->ret, body); return false;
+			case AST_STMT_BREAK: llvm_stmt_break(llvm, &stmt->break_loop); return false;
+            case AST_STMT_CONTINUE: llvm_stmt_continue(llvm, &stmt->continue_loop); return false;
 			case AST_STMT_WHILE: llvm_stmt_while(llvm, &stmt->while_loop); break;
 			case AST_STMT_IF: llvm_stmt_if(llvm, &stmt->if_else); break;
 			case AST_STMT_ASSIGN: llvm_stmt_assign(llvm, &stmt->assign); break;

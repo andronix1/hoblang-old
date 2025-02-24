@@ -5,6 +5,7 @@ SemaModule *sema_module_new(SemaProject *project, AstModule *module) {
 	SemaModule *result = malloc(sizeof(SemaModule));
 	result->ast = module;
 	result->public_decls = vec_new(SemaScopeDecl*);
+    result->loops = vec_new(SemaLoop*);
 	result->scopes = vec_new(SemaScope);
 	result->failed = false;
     result->project = project;

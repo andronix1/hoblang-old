@@ -53,6 +53,15 @@ inline bool parser_next_is_not(Parser *parser, TokenType type) {
     return false;
 }
 
+inline Token *parser_next_is_or(Parser *parser, TokenType type) {
+    Token *token = parser_next(parser);
+    if (token->type == type) {
+        return token;
+    }
+    parser_skip_next(parser);
+    return NULL;
+}
+
 inline Token *parser_next_is_not_or(Parser *parser, TokenType type) {
     Token *token = parser_next(parser);
     if (token->type != type) {

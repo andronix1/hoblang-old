@@ -24,6 +24,8 @@ syntax keyword hobKeywords
 	\ while
 	\ null
 	\ unwrap 
+	\ break
+	\ continue 
 
 syntax keyword hobType
 	\ i8

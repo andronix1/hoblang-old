@@ -1,5 +1,5 @@
-#include "ast/private/stmts/return.h" // TODO: refactor ast
-#include <stdbool.h> // TODO: refactor ast
+#include <stdbool.h>
+#include "ast/private/stmts/return.h"
 #include "sema/module/private.h"
 #include "sema/type/private.h"
 #include "sema/module/parts/expr.h"

@@ -117,6 +117,10 @@ SemaScopeDecl *sema_module_push_public_decl(SemaModule *sema, SemaScopeDecl *dec
     return decl;
 }
 
+SemaScope *sema_module_top_scope(SemaModule *sema) {
+    return vec_top(sema->scopes);
+}
+
 void sema_module_push_scope(SemaModule *sema) {
     SemaScope scope = {
         .decls = vec_new(SemaScopeDecl*),
