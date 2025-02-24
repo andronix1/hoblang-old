@@ -55,7 +55,9 @@ int main(int argc, char **argv) {
 		}
         if (argc > 0) {
             args_shift(&argc, &argv);
-		    llvm_write_module_ir(llvm, args_shift(&argc, &argv));
+		    if (!llvm_write_module_ir(llvm, args_shift(&argc, &argv))) {
+                return 1;
+            }
         }
 		llvm_write_module(llvm, output_path);
 		hob_log(LOGI, "finished!");

@@ -2,12 +2,14 @@
 #include "llvm/private.h"
 #include "core/vec.h"
 #include "ast/private/path.h"
+#include "ast/private/module_node.h"
 #include "sema/module/parts/decls/struct/impl.h"
 #include "sema/value/private.h"
 #include "sema/module/decls/impl.h"
 #include "llvm/parts/type.h"
 #include "llvm/parts/types/slice.h"
 #include "llvm/parts/types/optional.h"
+#include "llvm/utils/member.h"
 
 LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstInnerPath *path, SemaValue *from) {
     for (size_t i = 0; i < vec_len(path->segments); i++) {
@@ -42,16 +44,14 @@ LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstI
                         value = segment->struct_member.member->ext_func.decl->llvm_value;
                         break;
                     case SEMA_STRUCT_MEMBER_FIELD: {
-                        LLVMValueRef indices[] = {
-                            LLVMConstInt(LLVMInt32Type(), 0, false),
-                            LLVMConstInt(LLVMInt32Type(), segment->struct_member.member->field_idx, false)
-                        };
-                        value = LLVMBuildGEP2(
-                            llvm_builder(llvm),
+                        size_t mid = segment->struct_member.member->field_idx;
+                        value = llvm_get_member(
+                            llvm,
                             llvm_resolve_type(segment->struct_member.of),
+                            llvm_resolve_type(segment->struct_member.of->struct_def->members[mid].type->sema),
                             value,
-                            indices, 2,
-                            "struct_member"
+                            mid,
+                            false
                         );
                         break;
                     }
