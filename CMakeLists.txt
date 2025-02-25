@@ -11,6 +11,11 @@ set(SOURCE_FILES
     src/main.c
     src/print.c
 
+    src/cmd/api.c
+    src/cmd/build_exe.c
+    src/cmd/build_obj.c
+    src/cmd/emit_llvm.c
+
     src/print/base.c
     src/print/lexer.c
 	src/print/ast/expr.c
@@ -20,6 +25,7 @@ set(SOURCE_FILES
 	src/core/slice/api.c
 	src/core/slice/io.c
 	src/core/path.c
+	src/core/process.c
 	src/core/vec.c
 	src/core/print.c
 	src/core/log.c

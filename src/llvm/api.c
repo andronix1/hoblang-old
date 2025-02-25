@@ -2,13 +2,30 @@
 #include <malloc.h>
 #include "llvm/api.h"
 #include "llvm/impl.h"
+#include "llvm/llvm.h"
 #include "core/log.h"
+#include "sema/module/impl.h"
+#include "sema/module/api.h"
+#include "core/vec.h"
+#include "sema/project/project.h"
+#include "sema/project/api.h"
 
 LlvmBackend *llvm_create() {
     LlvmBackend *llvm = malloc(sizeof(LlvmBackend));
 	llvm->builder = LLVMCreateBuilder();
 	llvm->module = LLVMModuleCreateWithName("main");
 	return llvm;	
+}
+
+bool llvm_emit_project(LlvmBackend *llvm, SemaProject *project) {
+    SemaProjectModule **modules = sema_project_modules(project);
+    for (size_t i = 0; i < vec_len(modules); i++) {
+        llvm_module_init(llvm, sema_module_of(sema_project_module_inner(modules[i])));
+    }
+    for (size_t i = 0; i < vec_len(modules); i++) {
+        llvm_module(llvm, sema_module_of(sema_project_module_inner(modules[i])));
+    }
+    return true;
 }
 
 bool llvm_write_module_ir(LlvmBackend *llvm, char *output_path) {
