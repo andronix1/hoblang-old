@@ -5,6 +5,7 @@
 SemaValue *sema_analyze_expr_null(SemaModule *sema, SemaNullType *type, SemaExprCtx ctx) {
     if (!ctx.expectation) {
         SEMA_ERROR(ctx.loc, "null expects that any type expected, but there is not. Specify it or use as expression");
+        return NULL;
     }
     if (ctx.expectation->type == SEMA_TYPE_POINTER) {
         *type = SEMA_NULL_POINTER;

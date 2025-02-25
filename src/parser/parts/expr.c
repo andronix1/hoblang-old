@@ -246,7 +246,7 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 				PARSE_ERROR("unexpected token `{tok}` while parsing expression", parser_token(parser));
 				return NULL;
 		}
-        current_expr->loc = token->location;
+
         bool reading = true;
         while (reading) {
             Token *token = parser_next(parser);	
