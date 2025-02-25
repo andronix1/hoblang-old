@@ -55,9 +55,11 @@
         })
 
 #define CMD_FLAG_APPEND_ALL(name, output) ({ \
-            while (len > 0) { \
-                const char *arg = POP_ARG(); \
-                output = vec_push(output, &arg);\
+            if (!strcmp(name, CMD_FLAG)) { \
+                while (len > 0) { \
+                    const char *arg = POP_ARG(); \
+                    output = vec_push(output, &arg);\
+                } \
                 continue; \
             } \
         })
