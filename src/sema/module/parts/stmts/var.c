@@ -19,7 +19,7 @@ void sema_stmt_var(SemaModule *sema, AstVar *var) {
 				return;
 			}
 			if (!sema_types_equals(type, var_type)) {
-				sema_err("cannot put {sema::type} in {sema::type} variable", type, var_type);
+				SEMA_ERROR(var->expr->loc, "cannot put {sema::type} in {sema::type} variable", type, var_type);
 				return;
 			}
 		}
@@ -31,9 +31,9 @@ void sema_stmt_var(SemaModule *sema, AstVar *var) {
 			var->typed = true;
 			var->type.sema = var->expr->value->sema_type; 
 		} else {
-			sema_err("variable type must be specified or initializer must present");
+			SEMA_ERROR(var->loc, "variable type must be specified or initializer must present");
 			return;
 		}
 	}
-	var->decl = &sema_module_push_decl(sema, sema_scope_decl_new_value(var->name, var_type, false))->value_decl;
+	var->decl = &sema_module_push_decl(sema, var->loc, sema_scope_decl_new_value(var->name, var_type, false))->value_decl;
 }

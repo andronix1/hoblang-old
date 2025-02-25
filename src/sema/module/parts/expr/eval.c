@@ -25,7 +25,7 @@ uint64_t sema_eval_int_expr(SemaModule *sema, AstExpr *expr) {
         case AST_EXPR_RET_ON_NULL:
         case AST_EXPR_UNWRAP:
         case AST_EXPR_REF:
-            sema_err("cannot use {ast::expr} in constant int expr", expr);
+            SEMA_ERROR(expr->loc, "cannot use {ast::expr} in constant int expr", expr);
             return 0;
         case AST_EXPR_INTEGER:
             return expr->integer;
@@ -33,7 +33,7 @@ uint64_t sema_eval_int_expr(SemaModule *sema, AstExpr *expr) {
             return expr->character;
         case AST_EXPR_GET_LOCAL_PATH: {
             if (vec_len(expr->get_local.path.inner_path.segments)) {
-                sema_err("only decl path constant expr are supported");
+                SEMA_ERROR(expr->loc, "only decl path constant expr are supported");
                 return 0;
             }
             SemaValue *decl = sema_resolve_decl_path(sema, &expr->get_local.path.decl_path);
@@ -41,7 +41,7 @@ uint64_t sema_eval_int_expr(SemaModule *sema, AstExpr *expr) {
                 return 0;
             }
             if (decl->type != SEMA_VALUE_CONST || decl->sema_type->type != SEMA_TYPE_PRIMITIVE) {
-                sema_err("decl is not a constant integer");
+                SEMA_ERROR(expr->loc, "decl is not a constant integer");
                 return 0;
             }
             return sema_eval_int_expr(sema, decl->integer_expr);

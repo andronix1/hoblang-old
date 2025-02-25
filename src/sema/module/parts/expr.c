@@ -22,6 +22,7 @@ SemaValue *sema_analyze_expr_ret_on_null(SemaModule *sema, AstExprRetOnNull *ret
 SemaValue *sema_analyze_expr_unwrap(SemaModule *sema, AstExprUnwrap *unwrap, SemaExprCtx ctx);
 
 SemaValue *sema_expr(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) {
+    ctx.loc = expr->loc;
     switch (expr->type) {
 		case AST_EXPR_IDX: return expr->value = sema_analyze_expr_idx(sema, &expr->idx, ctx);
 		case AST_EXPR_UNWRAP: return expr->value = sema_analyze_expr_unwrap(sema, &expr->unwrap, ctx);
@@ -50,7 +51,7 @@ SemaValue *sema_callable_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx 
         return NULL;
     }
     if (expr->value->type != SEMA_VALUE_CONST && expr->value->type != SEMA_VALUE_VAR && expr->value->type != SEMA_VALUE_EXT_FUNC_HANDLE) {
-        sema_err("`{ast::expr}` is not callable", expr);
+        SEMA_ERROR(expr->loc, "{ast::expr} is not callable", expr);
     }
     return expr->value;
 }
@@ -60,7 +61,7 @@ SemaType *sema_const_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx)
         return NULL;
     }
     if (expr->value->type != SEMA_VALUE_CONST && expr->value->type != SEMA_VALUE_VAR) {
-        sema_err("`{ast::expr}` is not a const", expr);
+        SEMA_ERROR(expr->loc, "{ast::expr} is not a const", expr);
     }
     return expr->value->sema_type;
 }
@@ -70,7 +71,7 @@ SemaType *sema_var_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) {
         return NULL;
     }
     if (expr->value->type != SEMA_VALUE_VAR) {
-        sema_err("`{ast::expr}` is not a variable", expr);
+        SEMA_ERROR(expr->loc, "{ast::expr} is not a variable", expr);
     }
     return expr->value->sema_type;
 }
@@ -80,7 +81,7 @@ SemaType *sema_value_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx)
         return NULL;
     }
     if (expr->value->type != SEMA_VALUE_CONST && expr->value->type != SEMA_VALUE_VAR) {
-        sema_err("`{ast::expr}` is not a value", expr);
+        SEMA_ERROR(expr->loc, "{ast::expr} is not a value", expr);
     }
     return expr->value->sema_type;
 }

@@ -30,6 +30,7 @@ bool parse_stmt(Parser *parser, AstStmt *stmt) {
 				case TOKEN_ASSIGN:
 					stmt->type = AST_STMT_ASSIGN;
 					stmt->assign.assign_expr = expr;
+					stmt->assign.loc = token->location;
 					return (stmt->assign.expr = parse_expr(parser, token_stop_semicolon));
 				case TOKEN_SEMICOLON:
 					stmt->type = AST_STMT_EXPR;
@@ -42,9 +43,11 @@ bool parse_stmt(Parser *parser, AstStmt *stmt) {
 		}
 		case TOKEN_CONTINUE:
             stmt->type = AST_STMT_CONTINUE;
+			stmt->continue_loop.loc = token->location;
             return parse_loop_control(parser, &stmt->continue_loop);
 		case TOKEN_BREAK:
             stmt->type = AST_STMT_BREAK;
+			stmt->break_loop.loc = token->location;
             return parse_loop_control(parser, &stmt->break_loop);
 		case TOKEN_DEFER:
 			stmt->type = AST_STMT_DEFER;
@@ -54,12 +57,15 @@ bool parse_stmt(Parser *parser, AstStmt *stmt) {
 			return parse_if_else(parser, &stmt->if_else);
 		case TOKEN_RETURN:
 			stmt->type = AST_STMT_RETURN;
+			stmt->ret.loc = token->location;
 			return parse_return(parser, &stmt->ret);
 		case TOKEN_WHILE:
 			stmt->type = AST_STMT_WHILE;
+			stmt->while_loop.loc = token->location;
 			return parse_while(parser, &stmt->while_loop);
 		case TOKEN_VAR:
 			stmt->type = AST_STMT_VAR;
+			stmt->var.loc = token->location;
 			return parse_var(parser, &stmt->var);
 		case TOKEN_ASM:
 			stmt->type = AST_STMT_INLINE_ASM;

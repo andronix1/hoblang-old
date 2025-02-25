@@ -1,4 +1,5 @@
 #include "exprs.h"
+#include "sema/module/private.h"
 #include "sema/type/private.h"
 
 SemaValue *sema_analyze_expr_binop(SemaModule *sema, AstExprBinop *binop, SemaExprCtx ctx) { 
@@ -22,8 +23,11 @@ SemaValue *sema_analyze_expr_binop(SemaModule *sema, AstExprBinop *binop, SemaEx
 	if (!ltype) {
 		return NULL;
 	}
-	if ((ltype->type != SEMA_TYPE_PRIMITIVE && ltype->type != SEMA_TYPE_POINTER) || sema_types_equals(ltype, sema_type_primitive_void())) {
-		sema_err("cannot use binop for type {sema::type}", ltype);
+	if (!binary_binop && (ltype->type != SEMA_TYPE_PRIMITIVE || (
+        ltype->primitive.type != SEMA_PRIMITIVE_FLOAT &&
+        ltype->primitive.type != SEMA_PRIMITIVE_INT
+    ))) {
+		SEMA_ERROR(ctx.loc, "binop {ast::binop} can be used for integers and floats only, not {sema::type}", binop->type, ltype);
 		return NULL;
 	}
 	if (!bool_binops) {
@@ -35,12 +39,12 @@ SemaValue *sema_analyze_expr_binop(SemaModule *sema, AstExprBinop *binop, SemaEx
 	}
 	if (bool_binops) {
 		if (!sema_types_equals(ltype, sema_type_primitive_bool()) || !sema_types_equals(right_type, sema_type_primitive_bool())) {
-			sema_err("boolean binops can only operate booleans");
+			SEMA_ERROR(ctx.loc, "binop {ast::binop} can only operate booleans");
 			return NULL;
 		}
 	}
 	if (!sema_types_equals(ltype, right_type)) {
-		sema_err("cannot use binop {ast::binop} for types {sema::type} and {sema::type}", binop->type, ltype, right_type);
+		SEMA_ERROR(ctx.loc, "binop {ast::binop} can operate identical typed, but {sema::type} != {sema::type}", binop->type, ltype, right_type);
 		return NULL;
 	}
 	if (binary_binop) {

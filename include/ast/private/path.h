@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "core/location.h"
 #include "core/slice.h"
 #include "sema/value.h"
 #include "sema/module/decls.h"
@@ -9,8 +10,13 @@
 #include "sema/type.h"
 #include "sema/value.h"
 
+typedef struct AstDeclPathSegment {
+	Slice ident;
+    FileLocation loc;
+} AstDeclPathSegment;
+
 typedef struct AstDeclPath {
-	Slice *segments;
+	AstDeclPathSegment *segments;
 
 	union {
 		SemaModule *module;
@@ -56,6 +62,7 @@ typedef struct {
 
 typedef struct {
 	AstInnerPathSegmentType type;
+    FileLocation loc;
 	union {
 		Slice ident;
 	};

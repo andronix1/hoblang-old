@@ -1,11 +1,14 @@
 #include "ast/private/expr/as.h"
+#include "core/location.h"
 #include "exprs.h"
 #include "core/assert.h"
 #include "sema/module/parts/type.h"
+#include "sema/module/private.h"
 #include "sema/type/private.h"
 
 void sema_conv_pointer(
 	SemaModule *sema,
+    FileLocation at,
 	SemaType *source,
 	SemaType *dest,
 	SemaAsConvType *type
@@ -23,11 +26,12 @@ void sema_conv_pointer(
 		*type = SEMA_AS_CONV_PTR_TO_INT;
 		return;
 	}
-	sema_err("{sema::type} cannot be casted to {sema::type}", source, dest);
+	SEMA_ERROR(at, "pointer {sema::type} can be casted to i64 only, not {sema::type}", source, dest);
 }
 
 void sema_conv_slice(
 	SemaModule *sema,
+    FileLocation at,
 	SemaType *source,
 	SemaType *dest,
 	SemaAsConvType *type
@@ -35,17 +39,18 @@ void sema_conv_slice(
 	assert(source->type == SEMA_TYPE_SLICE, "passed non-slice type {sema::type}", source);
 	if (dest->type == SEMA_TYPE_POINTER) {
 		if (!sema_types_equals(source->slice_of, dest->ptr_to)) {
-			sema_err("cannot cast {sema::type} to {sema::type} because of different inner types", source, dest);
+			SEMA_ERROR(at, "cannot cast slice {sema::type} to pointer {sema::type} with different type", source, dest);
 			return;
 		}
 		*type = SEMA_AS_CONV_SLICE_TO_PTR;
 		return;
 	}
-	sema_err("{sema::type} cannot be casted to {sema::type}", source, dest);
+	SEMA_ERROR(at, "slice {sema::type} can be to pointer with similar type only, not {sema::type}", source, dest);
 }
 
 void sema_conv_function(
 	SemaModule *sema,
+    FileLocation at,
 	SemaType *source,
 	SemaType *dest,
 	SemaAsConvType *type
@@ -57,17 +62,18 @@ void sema_conv_function(
 	}
 	if (dest->type == SEMA_TYPE_POINTER && sema_types_equals(dest->ptr_to, sema_type_primitive_void())) {
 		if (!sema_types_equals(source->slice_of, dest->ptr_to)) {
-			sema_err("cannot cast {sema::type} to {sema::type} because of different inner types", source, dest);
+			SEMA_ERROR(at, "cannot cast {sema::type} to {sema::type} because of different inner types", source, dest);
 			return;
 		}
 		*type = SEMA_AS_CONV_BITCAST;
 		return;
 	}
-	sema_err("{sema::type} cannot be casted to {sema::type}", source, dest);
+	SEMA_ERROR(at, "function type {sema::type} can be casted to pointer only, not {sema::type}", source, dest);
 }
 
 void sema_conv_optional(
 	SemaModule *sema,
+    FileLocation at,
 	SemaType *source,
 	SemaType *dest,
 	SemaAsConvType *type
@@ -77,17 +83,18 @@ void sema_conv_optional(
         *type = SEMA_AS_CONV_OPT_UNWRAP;
         return;
     }
-	sema_err("{sema::type} cannot be casted to {sema::type}", source, dest);
+	SEMA_ERROR(at, "optional {sema::type} can be only unwrapped to inner type {sema::type}, not {sema::type}", source, source->optional_of, dest);
 }
 
 void sema_conv_array(
 	SemaModule *sema,
+    FileLocation at,
 	SemaType *source,
 	SemaType *dest,
 	SemaAsConvType *type
 ) {
 	assert(source->type == SEMA_TYPE_ARRAY, "passed non-array type {sema::type}", source);
-	sema_err("{sema::type} cannot be casted to {sema::type}", source, dest);
+	SEMA_ERROR(at, "array {sema::type} cannot be casted to {sema::type}", source, dest);
 }
 
 bool sema_int_is_signed(SemaPrimitiveIntType type) {
@@ -100,6 +107,7 @@ bool sema_int_is_signed(SemaPrimitiveIntType type) {
 
 void sema_conv_primitive(
 	SemaModule *sema,
+    FileLocation at,
 	SemaType *source,
 	SemaType *dest,
 	SemaAsConvType *type
@@ -132,7 +140,7 @@ void sema_conv_primitive(
 				}
 				break;
 			}
-			sema_err("{sema::type} cannot be casted to void", source);
+			SEMA_ERROR(at, "float {sema::type} can be casted to floats and integers only, not {sema::type}", source, dest);
 			break;
 		}
 		case SEMA_PRIMITIVE_INT: {
@@ -169,7 +177,7 @@ void sema_conv_primitive(
 							break;
 						}
 						default:
-							sema_err("{sema::type} cannot be casted to void", source);
+							SEMA_ERROR(at, "integer {sema::type} can be casted to floats, integers and pointers only, not {sema::type}", source, dest);
 							break;
 					}
 					break;
@@ -177,7 +185,7 @@ void sema_conv_primitive(
 
 				case SEMA_TYPE_POINTER: {
 					if (source->primitive.integer != SEMA_PRIMITIVE_UINT64 && source->primitive.integer != SEMA_PRIMITIVE_INT64) {
-						sema_err("only 64-bit values(not {sema::type}) can be casted to pointer", source);
+						SEMA_ERROR(at, "only i64 integers can be casted to pointer {sema::type}, not {sema::type}", dest, source);
 						break;
 					}
 					*type = SEMA_AS_CONV_INT_TO_PTR;
@@ -189,14 +197,14 @@ void sema_conv_primitive(
 				case SEMA_TYPE_SLICE:
 				case SEMA_TYPE_OPTIONAL:
 				case SEMA_TYPE_STRUCT:
-					sema_err("{sema::type} cannot be casted to {sema::type}", source, dest);
+					SEMA_ERROR(at, "integer {sema::type} can be casted to integers, pointers and floats, not {sema::type}", source, dest);
 					break;
 			}
 			break;
 		}
 		case SEMA_PRIMITIVE_BOOL:
 		case SEMA_PRIMITIVE_VOID:
-			sema_err("{sema::type} cannot be casted to {sema::type}", source, dest);
+			SEMA_ERROR(at, "{sema::type} cannot be casted to anything, including {sema::type}", source, dest);
 			break;
 	}
 }
@@ -209,7 +217,7 @@ SemaValue *sema_analyze_expr_as(SemaModule *sema, AstExprAs *as, SemaExprCtx ctx
             break;
         case AST_EXPR_AS_AUTO:
             if (!ctx.expectation) {
-                sema_err("cannot determine auto conversion type");
+                SEMA_ERROR(ctx.loc, "as-auto operator can be used only then expression destination expect type is specified");
                 return NULL;
             }
             as_type = req_type = ctx.expectation;
@@ -227,21 +235,21 @@ SemaValue *sema_analyze_expr_as(SemaModule *sema, AstExprAs *as, SemaExprCtx ctx
 		as->conv_type = SEMA_AS_CONV_IGNORE;
 	} else if (as_type->type == SEMA_TYPE_OPTIONAL) {
         if (!sema_types_equals(expr_type, as_type->optional_of)) {
-            sema_err("cannot wrap {sema::type} with {sema::type}", expr_type, as_type);
+            SEMA_ERROR(ctx.loc, "cannot wrap {sema::type} with optional {sema::type} because of different inner types", expr_type, as_type);
             return NULL;
         }
         as->conv_type = SEMA_AS_CONV_OPT_WRAP;
     } else {
 		switch (expr_type->type) {
-			case SEMA_TYPE_PRIMITIVE: sema_conv_primitive(sema, expr_type, as_type, &as->conv_type); break;
-			case SEMA_TYPE_ARRAY: sema_conv_array(sema, expr_type, as_type, &as->conv_type); break;
-			case SEMA_TYPE_POINTER: sema_conv_pointer(sema, expr_type, as_type, &as->conv_type); break;
-			case SEMA_TYPE_SLICE: sema_conv_slice(sema, expr_type, as_type, &as->conv_type); break;
+			case SEMA_TYPE_PRIMITIVE: sema_conv_primitive(sema, ctx.loc, expr_type, as_type, &as->conv_type); break;
+			case SEMA_TYPE_ARRAY: sema_conv_array(sema, ctx.loc, expr_type, as_type, &as->conv_type); break;
+			case SEMA_TYPE_POINTER: sema_conv_pointer(sema, ctx.loc, expr_type, as_type, &as->conv_type); break;
+			case SEMA_TYPE_SLICE: sema_conv_slice(sema, ctx.loc, expr_type, as_type, &as->conv_type); break;
 
-			case SEMA_TYPE_FUNCTION: sema_conv_function(sema, expr_type, as_type, &as->conv_type); break;
-			case SEMA_TYPE_OPTIONAL: sema_conv_optional(sema, expr_type, as_type, &as->conv_type); break;
+			case SEMA_TYPE_FUNCTION: sema_conv_function(sema, ctx.loc, expr_type, as_type, &as->conv_type); break;
+			case SEMA_TYPE_OPTIONAL: sema_conv_optional(sema, ctx.loc, expr_type, as_type, &as->conv_type); break;
 			case SEMA_TYPE_STRUCT:
-				sema_err("unknown conversion from {sema::type} to {sema::type}", expr_type, as_type);
+				SEMA_ERROR(ctx.loc, "{sema::type} cannot be casted to anything, including {sema::type}", expr_type, as_type);
 				return false;
 		}
 	}

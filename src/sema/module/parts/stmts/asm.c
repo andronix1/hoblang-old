@@ -19,7 +19,7 @@ void sema_stmt_inline_asm(SemaModule *sema, AstInlineAsm *inline_asm) {
                         }
                     }
                     if (!found) {
-                        sema_err("register `{slice}` was not found", &arg->reg);
+                        SEMA_ERROR(arg->loc, "register `{slice}` was not found", &arg->reg);
                     }
                     break;
                 }

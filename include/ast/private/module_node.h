@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/location.h"
 #include "path.h"
 #include "func_info.h"
 #include "body.h"
@@ -39,6 +40,7 @@ typedef struct {
 } AstExtFuncDecl;
 
 typedef struct AstStructMember {
+    FileLocation loc;
 	Slice name;
 	AstType *type;
 } AstStructMember;
@@ -60,6 +62,7 @@ typedef enum {
 
 typedef struct AstModuleNode {
 	AstModuleNodeType type;
+    FileLocation loc;
 	union {
 		AstFuncDecl func_decl;		
 		AstExtFuncDecl ext_func_decl;		

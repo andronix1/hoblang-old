@@ -2,7 +2,6 @@
 #include <string.h>
 #include <linux/limits.h>
 #include "core/path.h"
-#include "lexer/api.h"
 #include "parser/api.h"
 #include "sema/module/api.h"
 #include "ast/private/module.h"
@@ -29,20 +28,20 @@ SemaModule *sema_project_add_module_at(SemaProject *project, const char *path) {
 	if (dir) {
 		chdir(dir);
 	}
-	Parser *parser = parser_from_file(filename);
+	Parser *parser = parser_from_file(full_path);
 	if (!parser) {
 		chdir(cwd);
 		return NULL;
 	}
 	AstModule *module = malloc(sizeof(AstModule));
+    module->path = full_path;
+    module->parser = parser;
 	parse_module(parser, module);
 	if (parser_failed(parser)) {
 		chdir(cwd);
 		return NULL;
 	}
-	hob_log(LOGD, "reading module `{cstr}`...", filename);
-	SemaModule *sema = sema_module_new(project, module);
-    //sema->project = project;
+    SemaModule *sema = sema_module_new(project, module);
 	sema_module_read_decls(sema);
 	if (sema_module_failed(sema)) {
 		chdir(cwd);
@@ -68,7 +67,6 @@ bool sema_project_analyze(SemaProject *project) {
 	bool success = true;
 	for (size_t i = 0; i < vec_len(project->modules); i++) {
 		SemaProjectModule *module = project->modules[i];
-		hob_log(LOGD, "analyzing module `{slice}`...", &module->path);
 		sema_module_analyze(module->module);
 		if (sema_module_failed(module->module)) {
 			success = false;

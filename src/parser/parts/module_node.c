@@ -11,6 +11,7 @@ bool parse_func_decl(Parser *parser, AstFuncDecl *decl);
 
 bool parse_module_node(Parser *parser, AstModuleNode *node) {
 	Token *token = parser_next(parser);
+    node->loc = token->location;
 	switch (token->type) {
 		case TOKEN_IMPORT: {
 			Token *path_token = PARSER_EXPECT_NEXT(TOKEN_STR, "file path");
@@ -74,7 +75,7 @@ bool parse_module_node(Parser *parser, AstModuleNode *node) {
 			node->type = AST_MODULE_NODE_EXTERNAL_FUNC;
 			return parse_ext_func_decl(parser, &node->ext_func_decl);
 		default:
-			PARSE_ERROR("unexpected `{tok}` while parsing module node", parser_token(parser));
+			PARSE_ERROR("unexpected {tok} while parsing module node", parser_token(parser));
 			return false;
 	}
 }

@@ -1,4 +1,5 @@
 #include "core/vec.h"
+#include "sema/module/private.h"
 #include "sema/type/private.h"
 #include "exprs.h"
 
@@ -12,14 +13,14 @@ SemaValue *sema_analyze_expr_array(SemaModule *sema, AstExpr **array, SemaExprCt
 			return NULL;
 		}
 	} else if (!ctx.expectation) {
-		sema_err("cannot infer array type");
+		SEMA_ERROR(ctx.loc, "cannot infer array type");
 		return NULL;
 	} else {
-		if (ctx.expectation->type != SEMA_TYPE_POINTER) {
-			sema_err("expected ptr but got {sema::type}", ctx.expectation);
+		if (ctx.expectation->type != SEMA_TYPE_ARRAY) {
+			SEMA_ERROR(ctx.loc, "expected array but got {sema::type}", ctx.expectation);
 			return NULL;
 		}
-		expect = ctx.expectation->ptr_to;
+		expect = ctx.expectation->array.of;
 	}
 	for (size_t i = 1; i < vec_len(array); i++) {
 		SemaType *stype = sema_value_expr_type(sema, array[i], sema_expr_ctx_expect(ctx, expect));
@@ -27,7 +28,7 @@ SemaValue *sema_analyze_expr_array(SemaModule *sema, AstExpr **array, SemaExprCt
 			return NULL;
 		}
 		if (!sema_types_equals(expect, stype)) {
-			sema_err("different types in one array: {sema::type} and {sema::type}", expect, &stype);
+			SEMA_ERROR(array[i]->loc, "element of type {sema::type} in array initializer of {sema::type}", &stype, expect);
 			return NULL;
 		}
 	}

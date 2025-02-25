@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "core/location.h"
 #include "path.h"
 #include "expr/as.h"
 #include "expr/binop.h"
@@ -59,7 +60,9 @@ typedef struct {
 
 typedef struct AstExpr {
 	AstExprType type;
-	bool scoped;
+	FileLocation loc;
+    bool scoped;
+
 	union {
 		AstExprBinop binop;
 		AstCall call;
@@ -84,22 +87,22 @@ typedef struct AstExpr {
 	SemaValue *value;
 } AstExpr;
 
-AstExpr *ast_expr_ret_on_null(AstExpr *expr);
-AstExpr *ast_expr_unwrap(AstExpr *expr, Slice name);
-AstExpr *ast_expr_get_local_path(AstPath path);
-AstExpr *ast_expr_get_inner_path(AstExpr *of, AstInnerPath path);
-AstExpr *ast_expr_idx(AstExpr *of, AstExpr *idx);
-AstExpr *ast_expr_integer(uint64_t value);
-AstExpr *ast_expr_float(long double value);
-AstExpr *ast_expr_char(char value);
-AstExpr *ast_expr_str(Slice value);
-AstExpr *ast_expr_bool(bool value);
-AstExpr *ast_expr_call(AstExpr *callable, AstExpr **args);
-AstExpr *ast_expr_not(AstExpr *expr);
-AstExpr *ast_expr_as_type(AstExpr *expr, AstType type);
-AstExpr *ast_expr_as_auto(AstExpr *expr);
-AstExpr *ast_expr_binop(AstBinopType type, AstExpr *left, AstExpr *right);
-AstExpr *ast_expr_unary(AstUnaryType type, AstExpr *expr);
-AstExpr *ast_expr_array(AstExpr **values);
-AstExpr *ast_expr_ref(AstExpr *expr);
-AstExpr *ast_expr_null();
+AstExpr *ast_expr_ret_on_null(FileLocation loc, AstExpr *expr);
+AstExpr *ast_expr_unwrap(FileLocation loc, AstExpr *expr, Slice name);
+AstExpr *ast_expr_get_local_path(FileLocation loc, AstPath path);
+AstExpr *ast_expr_get_inner_path(FileLocation loc, AstExpr *of, AstInnerPath path);
+AstExpr *ast_expr_idx(FileLocation loc, AstExpr *of, AstExpr *idx);
+AstExpr *ast_expr_integer(FileLocation loc, uint64_t value);
+AstExpr *ast_expr_float(FileLocation loc, long double value);
+AstExpr *ast_expr_char(FileLocation loc, char value);
+AstExpr *ast_expr_str(FileLocation loc, Slice value);
+AstExpr *ast_expr_bool(FileLocation loc, bool value);
+AstExpr *ast_expr_call(FileLocation loc, AstExpr *callable, AstExpr **args);
+AstExpr *ast_expr_not(FileLocation loc, AstExpr *expr);
+AstExpr *ast_expr_as_type(FileLocation loc, AstExpr *expr, AstType type);
+AstExpr *ast_expr_as_auto(FileLocation loc, AstExpr *expr);
+AstExpr *ast_expr_binop(FileLocation loc, AstBinopType type, AstExpr *left, AstExpr *right);
+AstExpr *ast_expr_unary(FileLocation loc, AstUnaryType type, AstExpr *expr);
+AstExpr *ast_expr_array(FileLocation loc, AstExpr **values);
+AstExpr *ast_expr_ref(FileLocation loc, AstExpr *expr);
+AstExpr *ast_expr_null(FileLocation loc);

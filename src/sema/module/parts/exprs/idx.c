@@ -14,7 +14,7 @@ SemaValue *sema_analyze_expr_idx(SemaModule *sema, AstExprIdx *idx, SemaExprCtx 
         return NULL;
     }
     if (!sema_types_equals(idx_type, sema_type_primitive_i32())) {
-        sema_err("idx value must be an i32, not {sema::type}", idx_type);
+        SEMA_ERROR(ctx.loc, "idx value must be an i32, not {sema::type}", idx_type);
         return NULL;
     }
     switch (of_type->type) {
@@ -27,7 +27,7 @@ SemaValue *sema_analyze_expr_idx(SemaModule *sema, AstExprIdx *idx, SemaExprCtx 
             return sema_value_with_type(idx->of->value, of_type->array.of);
         }
         default:
-            sema_err("cannot use idx expression on expression {ast::expr}", idx->of);
+            SEMA_ERROR(ctx.loc, "cannot use idx expression on expression {ast::expr}", idx->of);
             return NULL;
     }
 }

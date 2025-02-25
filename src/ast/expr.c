@@ -5,74 +5,75 @@
 #define FIELD(src, dst) result->src = dst;
 #define CONSTR(_type, fields) { \
         AstExpr *result = malloc(sizeof(AstExpr)); \
+        result->loc = loc; \
         result->scoped = false; \
         result->type = _type; \
         fields; \
         return result; \
     }
 
-AstExpr *ast_expr_unwrap(AstExpr *expr, Slice name) CONSTR(AST_EXPR_UNWRAP, {
+AstExpr *ast_expr_unwrap(FileLocation loc, AstExpr *expr, Slice name) CONSTR(AST_EXPR_UNWRAP, {
     FIELD(unwrap.expr, expr)
     FIELD(unwrap.name, name)
 })
-AstExpr *ast_expr_ret_on_null(AstExpr *expr) CONSTR(AST_EXPR_RET_ON_NULL, {
+AstExpr *ast_expr_ret_on_null(FileLocation loc, AstExpr *expr) CONSTR(AST_EXPR_RET_ON_NULL, {
     FIELD(ret_on_null.expr, expr)
 })
-AstExpr *ast_expr_idx(AstExpr *of, AstExpr *idx) CONSTR(AST_EXPR_IDX, {
+AstExpr *ast_expr_idx(FileLocation loc, AstExpr *of, AstExpr *idx) CONSTR(AST_EXPR_IDX, {
     FIELD(idx.of, of)
     FIELD(idx.idx, idx)
 })
-AstExpr *ast_expr_get_local_path(AstPath path) CONSTR(AST_EXPR_GET_LOCAL_PATH, {
+AstExpr *ast_expr_get_local_path(FileLocation loc, AstPath path) CONSTR(AST_EXPR_GET_LOCAL_PATH, {
     FIELD(get_local.path, path)
 })
-AstExpr *ast_expr_get_inner_path(AstExpr *of, AstInnerPath path) CONSTR(AST_EXPR_GET_INNER_PATH, {
+AstExpr *ast_expr_get_inner_path(FileLocation loc, AstExpr *of, AstInnerPath path) CONSTR(AST_EXPR_GET_INNER_PATH, {
     FIELD(get_inner.of, of)
     FIELD(get_inner.path, path)
 })
-AstExpr *ast_expr_integer(uint64_t value) CONSTR(AST_EXPR_INTEGER, {
+AstExpr *ast_expr_integer(FileLocation loc, uint64_t value) CONSTR(AST_EXPR_INTEGER, {
     FIELD(integer, value)
 })
-AstExpr *ast_expr_float(long double value) CONSTR(AST_EXPR_FLOAT, {
+AstExpr *ast_expr_float(FileLocation loc, long double value) CONSTR(AST_EXPR_FLOAT, {
     FIELD(float_value, value)
 })
-AstExpr *ast_expr_char(char value) CONSTR(AST_EXPR_CHAR, {
+AstExpr *ast_expr_char(FileLocation loc, char value) CONSTR(AST_EXPR_CHAR, {
     FIELD(character, value)
 })
-AstExpr *ast_expr_str(Slice value) CONSTR(AST_EXPR_STR, {
+AstExpr *ast_expr_str(FileLocation loc, Slice value) CONSTR(AST_EXPR_STR, {
     FIELD(str, value)
 })
-AstExpr *ast_expr_bool(bool value) CONSTR(AST_EXPR_BOOL, {
+AstExpr *ast_expr_bool(FileLocation loc, bool value) CONSTR(AST_EXPR_BOOL, {
     FIELD(boolean, value)
 })
-AstExpr *ast_expr_call(AstExpr *callable, AstExpr **args) CONSTR(AST_EXPR_CALL, {
+AstExpr *ast_expr_call(FileLocation loc, AstExpr *callable, AstExpr **args) CONSTR(AST_EXPR_CALL, {
     FIELD(call.callable, callable)
     FIELD(call.args, args)
 })
-AstExpr *ast_expr_not(AstExpr *expr) CONSTR(AST_EXPR_NOT, {
+AstExpr *ast_expr_not(FileLocation loc, AstExpr *expr) CONSTR(AST_EXPR_NOT, {
     FIELD(not_expr, expr)
 })
-AstExpr *ast_expr_as_type(AstExpr *expr, AstType type) CONSTR(AST_EXPR_AS, {
+AstExpr *ast_expr_as_type(FileLocation loc, AstExpr *expr, AstType type) CONSTR(AST_EXPR_AS, {
     FIELD(as.type, AST_EXPR_AS_TYPE)
     FIELD(as.expr, expr)
     FIELD(as.as_type, type)
 })
-AstExpr *ast_expr_as_auto(AstExpr *expr) CONSTR(AST_EXPR_AS, {
+AstExpr *ast_expr_as_auto(FileLocation loc, AstExpr *expr) CONSTR(AST_EXPR_AS, {
     FIELD(as.type, AST_EXPR_AS_AUTO)
     FIELD(as.expr, expr)
 })
-AstExpr *ast_expr_binop(AstBinopType type, AstExpr *left, AstExpr *right) CONSTR(AST_EXPR_BINOP, {
+AstExpr *ast_expr_binop(FileLocation loc, AstBinopType type, AstExpr *left, AstExpr *right) CONSTR(AST_EXPR_BINOP, {
     FIELD(binop.type, type)
     FIELD(binop.left, left)
     FIELD(binop.right, right)
 })
-AstExpr *ast_expr_unary(AstUnaryType type, AstExpr *expr) CONSTR(AST_EXPR_UNARY, {
+AstExpr *ast_expr_unary(FileLocation loc, AstUnaryType type, AstExpr *expr) CONSTR(AST_EXPR_UNARY, {
     FIELD(unary.type, type)
     FIELD(unary.expr, expr)
 })
-AstExpr *ast_expr_array(AstExpr **values) CONSTR(AST_EXPR_ARRAY, {
+AstExpr *ast_expr_array(FileLocation loc, AstExpr **values) CONSTR(AST_EXPR_ARRAY, {
     FIELD(array, values)
 })
-AstExpr *ast_expr_null(AstExpr *expr) CONSTR(AST_EXPR_NULL, {})
-AstExpr *ast_expr_ref(AstExpr *expr) CONSTR(AST_EXPR_REF, {
+AstExpr *ast_expr_null(FileLocation loc) CONSTR(AST_EXPR_NULL, {})
+AstExpr *ast_expr_ref(FileLocation loc, AstExpr *expr) CONSTR(AST_EXPR_REF, {
     FIELD(ref_expr, expr)
 })

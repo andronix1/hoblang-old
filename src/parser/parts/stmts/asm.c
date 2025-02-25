@@ -18,18 +18,23 @@ bool parse_asm_mnemonic(Parser *parser, AstAsmMnemonic *mnem) {
         return true;
     }
     while (true) {
-        switch (parser_next(parser)->type) {
+        Token *token = parser_next(parser);
+        switch (token->type) {
             case TOKEN_DOLLAR: {
                 AstAsmArg arg = {
                     .type = AST_ASM_ARG_REGISTER,
-                    .reg = PARSER_EXPECT_NEXT(TOKEN_IDENT, "register name")->ident
+                    .reg = PARSER_EXPECT_NEXT(TOKEN_IDENT, "register name")->ident,
+                    .loc = token->location
                 };
                 mnem->args = vec_push(mnem->args, &arg);
                 break;
             }
 
             case TOKEN_OPENING_SQUARE_BRACE: {
-                AstAsmArg arg = { .type = AST_ASM_ARG_ADDRESS };
+                AstAsmArg arg = {
+                    .type = AST_ASM_ARG_ADDRESS,
+                    .loc = token->location
+                };
                 if (!(arg.expr = parse_expr(parser, token_is_asm_address_end))) {
                     return false;
                 }
@@ -41,7 +46,8 @@ bool parse_asm_mnemonic(Parser *parser, AstAsmMnemonic *mnem) {
             default: {
                 parser_skip_next(parser);
                 AstAsmArg arg = {
-                    .type = AST_ASM_ARG_EXPR
+                    .type = AST_ASM_ARG_EXPR,
+                    .loc = token->location
                 };
                 if (!(arg.expr = parse_expr(parser, token_is_asm_arg_end))) {
                     return false;

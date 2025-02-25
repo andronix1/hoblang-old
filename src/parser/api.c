@@ -20,3 +20,7 @@ Parser *parser_from_file(const char *path) {
 bool parser_failed(const Parser *parser) {
     return parser->failed || lexer_failed(parser->lexer);
 }
+
+void parser_print_line_error_at(Parser *parser, FileLocation at) {
+    lexer_print_line_error_at(parser->lexer, at);
+}

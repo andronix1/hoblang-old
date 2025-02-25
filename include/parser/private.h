@@ -1,6 +1,7 @@
 #pragma once
 
 #include "parser.h"
+#include "api.h"
 #include "lexer/token.h"
 
 #define parse_log(level, fmt, ...) \
@@ -12,6 +13,7 @@
 #define PARSE_ERROR(fmt, ...) \
 	do { \
 		parse_log(LOGE, fmt, ##__VA_ARGS__); \
+        parser_print_line_error_at(parser, parser_token(parser)->location); \
 		parser_fail(parser); \
 	} while (0)
 	

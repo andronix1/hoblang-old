@@ -1,4 +1,5 @@
 #include "lexer/api.h"
+#include "core/location.h"
 #include "lexer/impl.h"
 
 InFilePosition lexer_position(const Lexer *lexer) {
@@ -10,6 +11,28 @@ InFilePosition lexer_position(const Lexer *lexer) {
 
 bool lexer_failed(const Lexer *lexer) {
 	return lexer->failed;
+}
+
+void lexer_print_line_error_at(Lexer *lexer, FileLocation at) {
+    size_t line = 0;
+    size_t len = 0;
+    size_t i = 0;
+    for (; line < at.line && i < lexer->full.len; i++) {
+        if (lexer->full.str[i] == '\n') {
+            line++;
+        }
+    }
+    size_t j = i;
+    while (j < lexer->full.len && lexer->full.str[j] != '\n') {
+        j++;
+        len++;
+    }
+    Slice slice = slice_new(&lexer->full.str[i], len);
+    print("| {slice}\n| ", &slice);
+    for (i = 0; i < at.column; i++) {
+        print(" ");
+    }
+    print("^\n");
 }
 
 Token *lexer_next(Lexer *lexer) {

@@ -9,13 +9,19 @@ SemaValue *sema_analyze_expr_unary(SemaModule *sema, AstExprUnary *unary, SemaEx
     }
     switch (unary->type) {
         case AST_UNARY_MINUS:
-            if (type->type != SEMA_TYPE_PRIMITIVE) {
-                sema_err("cannot apply unary minus to non-primitive types");
+            if (type->type != SEMA_TYPE_PRIMITIVE || (
+                type->primitive.type != SEMA_PRIMITIVE_FLOAT &&
+                type->primitive.type != SEMA_PRIMITIVE_INT
+            )) {
+                SEMA_ERROR(ctx.loc, "unary minus operator can be applied to integer or float, not {sema::type}", type);
             }
 			return sema_value_const(type);
         case AST_UNARY_BITNOT:
-            if (type->type != SEMA_TYPE_PRIMITIVE) {
-                sema_err("cannot apply unary bitnot to non-primitive types");
+            if (type->type != SEMA_TYPE_PRIMITIVE || (
+                type->primitive.type != SEMA_PRIMITIVE_FLOAT &&
+                type->primitive.type != SEMA_PRIMITIVE_INT
+            )) {
+                SEMA_ERROR(ctx.loc, "unary bitnot operator can be applied to integer or float, not {sema::type}", type);
             }
 			return sema_value_const(type);
     }

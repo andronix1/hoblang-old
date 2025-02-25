@@ -14,6 +14,8 @@
 	do { \
 		lexer_fail(lexer); \
 		lex_log(LOGE, fmt, #__VA_ARGS__); \
+        InFilePosition position = lexer_position(lexer); \
+        lexer_print_line_error_at(lexer, position.location); \
 	} while (0)
 
 Token *lexer_token(Lexer *lexer);

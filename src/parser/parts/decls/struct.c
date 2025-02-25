@@ -4,7 +4,9 @@
 #include "ast/private/module_node.h"
 
 bool parse_ast_struct_member(Parser *parser, AstStructMember *member) {
-	member->name = PARSER_EXPECT_NEXT(TOKEN_IDENT, "struct member name")->ident;
+    Token *token = PARSER_EXPECT_NEXT(TOKEN_IDENT, "struct member name");
+	member->name = token->ident;
+    member->loc = token->location;
 	PARSER_EXPECT_NEXT(TOKEN_COLON, "colon");
 	return parse_type(parser, member->type = malloc(sizeof(AstType)));
 }

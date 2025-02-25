@@ -1,3 +1,5 @@
+#include "parser/api.h"
+#include "ast/private/module.h"
 #include "sema/module/impl.h"
 #include "core/vec.h"
 

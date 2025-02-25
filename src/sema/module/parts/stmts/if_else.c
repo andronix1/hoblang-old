@@ -1,4 +1,5 @@
 #include "ast/private/stmts/if_else.h"
+#include "ast/private/expr.h"
 #include "core/vec.h"
 #include "sema/module/private.h"
 #include "sema/type/private.h"
@@ -11,7 +12,7 @@ void sema_if_else_body(SemaModule *sema, AstIfBody *if_body) {
 		return;
 	}
 	if (!sema_types_equals(type, sema_type_primitive_bool())) {
-		sema_err("if condition expression must be boolean, not {sema::type}", type);
+		SEMA_ERROR(if_body->expr->loc, "if condition expression must be boolean, not {sema::type}", type);
 	}
 	sema_ast_body(sema, if_body->body);
 }

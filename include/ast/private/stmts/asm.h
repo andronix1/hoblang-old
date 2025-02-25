@@ -1,6 +1,7 @@
 #pragma once 
 
 #include <stdbool.h>
+#include "core/location.h"
 #include "core/slice.h"
 #include "ast/api/expr.h"
 
@@ -10,15 +11,9 @@ typedef enum {
     AST_ASM_ARG_ADDRESS,
 } AstAsmArgType;
 
-// typedef enum {
-//     AST_ASM_CLOBBER_IMM = 1 << 1,
-//     AST_ASM_CLOBBER_MEM = 1 << 2,
-//     AST_ASM_CLOBBER_REG = 1 << 3,
-//     AST_ASM_CLOBBER_ADDR = 1 << 4,
-// } AstAsmConstraint;
-
 typedef struct {
     AstAsmArgType type;
+    FileLocation loc;
     union {
         Slice reg;
         AstExpr *expr;

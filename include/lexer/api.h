@@ -16,3 +16,4 @@ bool lexer_finished(const Lexer *lexer);
 bool lexer_failed(const Lexer *lexer);
 InFilePosition lexer_position(const Lexer *lexer);
 
+void lexer_print_line_error_at(Lexer *lexer, FileLocation at);

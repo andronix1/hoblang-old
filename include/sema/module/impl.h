@@ -14,6 +14,7 @@ typedef struct SemaScope {
 } SemaScope;
 
 typedef struct SemaModule {
+    const char *path;
 	AstModule *ast;
 	bool failed;
 

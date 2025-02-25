@@ -2,12 +2,14 @@
 
 #include <stddef.h>
 #include "ast/api/expr.h"
+#include "core/location.h"
 #include "sema/type/type.h"
 #include "sema/module.h"
 #include "sema/value.h"
 
 typedef struct {
 	SemaType *expectation;
+    FileLocation loc;
 } SemaExprCtx;
 
 SemaValue *sema_callable_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx);
@@ -24,6 +26,7 @@ inline static SemaExprCtx sema_expr_ctx_default() {
 
 inline static SemaExprCtx sema_expr_ctx_expect(SemaExprCtx ctx, SemaType *type) {
 	ctx.expectation = type;
+    ctx.loc = ctx.loc;
 	return ctx;
 }
 

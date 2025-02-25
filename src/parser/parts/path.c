@@ -3,11 +3,16 @@
 #include "parser/private.h"
 
 bool parse_decl_path(Parser *parser, AstDeclPath *path) {
-    path->segments = vec_new(Slice);
+    path->segments = vec_new(AstDeclPathSegment);
 	while (true) {
+        Token *token = PARSER_EXPECT_NEXT(TOKEN_IDENT, "module decl name");
+        AstDeclPathSegment segment = {
+            .ident = token->ident,
+            .loc = token->location
+        };
 		path->segments = vec_push(
 			path->segments,
-			&PARSER_EXPECT_NEXT(TOKEN_IDENT, "module decl name")->ident
+            &segment
 		);
 		if (parser_next_is_not(parser, TOKEN_DOUBLE_COLON)) {
 			return true;
@@ -17,9 +22,11 @@ bool parse_decl_path(Parser *parser, AstDeclPath *path) {
 
 bool parse_inner_path(Parser *parser, AstInnerPath *path) {
     path->segments = vec_new(AstInnerPathSegment);
+    bool first = true;
     while (true) {
 		Token *token = parser_next(parser);
 		AstInnerPathSegment segment;
+        segment.loc = token->location;
 		switch (token->type) {
 			case TOKEN_NULL:
 				segment.type = AST_INNER_PATH_SEG_NULL;

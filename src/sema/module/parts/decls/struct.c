@@ -5,7 +5,7 @@
 #include "sema/module/parts/decls/struct/api.h"
 #include "sema/module/parts/decls/struct/impl.h"
 
-SemaStructMember *sema_get_struct_member(SemaModule *sema, AstStructDef *struct_def, Slice *name) {
+SemaStructMember *sema_get_struct_member(SemaModule *sema, FileLocation at, AstStructDef *struct_def, Slice *name) {
     for (size_t i = 0; i < vec_len(struct_def->members); i++) {
         AstStructMember *member = &struct_def->members[i];
         if (slice_eq(&member->name, name)) {
@@ -21,6 +21,6 @@ SemaStructMember *sema_get_struct_member(SemaModule *sema, AstStructDef *struct_
     if (ptr_decl) {
         return sema_struct_member_ext_func(&ptr_decl->value_decl, true);
     }
-    sema_err("struct {slice} has not a member {slice}", &struct_def->name, name);
+    SEMA_ERROR(at, "struct `{slice}` has not member `{slice}`", &struct_def->name, name);
     return NULL;
 }

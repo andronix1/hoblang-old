@@ -14,7 +14,7 @@ void sema_stmt_assign(SemaModule *sema, AstAssign *assign) {
 		return;
 	}
 	if (!sema_types_equals(assign_type, expr_type)) {
-		sema_err("cannot assign expression with type `{sema::type}` to variable of type `{sema::type}`", expr_type, assign_type);
+		SEMA_ERROR(assign->loc, "cannot assign expression with type `{sema::type}` to variable of type `{sema::type}`", expr_type, assign_type);
 		return;
 	}
 }

@@ -11,11 +11,11 @@ SemaValue *sema_analyze_expr_unwrap(SemaModule *sema, AstExprUnwrap *unwrap, Sem
         return NULL;
     }
     if (expr_type->type != SEMA_TYPE_OPTIONAL) {
-        sema_err("expected expr type to be optional");
+        SEMA_ERROR(ctx.loc, "only optionals can be unwrapped, not {sema::type}", expr_type);
         return NULL;
     }
     unwrap->type = SEMA_EXPR_UNWRAP_OPT;
-    unwrap->decl = &sema_module_push_decl(sema, sema_scope_decl_new_value(
+    unwrap->decl = &sema_module_push_decl(sema, ctx.loc, sema_scope_decl_new_value(
         unwrap->name,
         expr_type->optional_of,
         true

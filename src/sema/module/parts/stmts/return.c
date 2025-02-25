@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include "ast/private/stmts/return.h"
+#include "ast/private/expr.h"
 #include "sema/module/private.h"
 #include "sema/type/private.h"
 #include "sema/module/parts/expr.h"
@@ -12,12 +13,12 @@ void sema_stmt_return(SemaModule *sema, AstReturn *ret) {
 			return;
 		}
 		if (!sema_types_equals(returns, type)) {
-			sema_err("expected to return `{sema::type}` got `{sema::type}`", returns, type);
+			SEMA_ERROR(ret->expr->loc, "function must return {sema::type} but trying to return expression of type {sema::type}", returns, type);
 			return;
 		}
 	} else {
 		if (!sema_types_equals(returns, sema_type_primitive_void())) {
-			sema_err("expected to return `{sema::type}` but got nothing");
+			SEMA_ERROR(ret->loc, "expected to return `{sema::type}` but got nothing", returns);
 			return;
 		}
 	}

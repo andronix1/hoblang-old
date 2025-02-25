@@ -1,7 +1,5 @@
 #include "ast/private/type.h"
-#include "ast/private/module_node.h"
 #include "sema/type/private.h"
-#include "sema/module/private.h"
 #include "sema/module/parts/type.h"
 #include "sema/module/parts/path.h"
 #include "expr/eval.h"

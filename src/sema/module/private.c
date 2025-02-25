@@ -1,4 +1,7 @@
 #include "ast/api/defer.h"
+#include "ast/private/module.h"
+#include "core/location.h"
+#include "parser/private.h"
 #include "sema/module/impl.h"
 #include "core/vec.h"
 #include "sema/type/private.h"
@@ -54,7 +57,7 @@ SemaScopeDecl *sema_module_resolve_ext_func(SemaModule *sema, Slice *name, SemaT
             SemaScopeDecl *decl = scope->decls[j];
             if (decl->in_type && sema_types_equals(type, decl->in_type) && slice_eq(&decl->name, name)) {
                 if (decl->sema_type->type != SEMA_TYPE_FUNCTION) {
-                    sema_err("in_type value is not a function");
+                    assert(0, "in_type value is not a function");
                     return NULL;
                 }
                 return decl;
@@ -116,18 +119,18 @@ AstDefer **sema_module_defers_up_to(SemaModule *sema, AstBody *to) {
     return result;
 }
 
-void sema_module_append_ext_funcs_from(SemaModule *sema, SemaModule *from) {
+void sema_module_append_ext_funcs_from(SemaModule *sema, FileLocation at, SemaModule *from) {
     for (size_t i = 0; i < vec_len(from->public_decls); i++) {
         SemaScopeDecl *decl = from->public_decls[i];
         if (decl->in_type) {
-            sema_module_push_decl(sema, decl);
+            sema_module_push_decl(sema, at, decl);
         }
     }
 }
 
-SemaScopeDecl *sema_module_push_decl(SemaModule *sema, SemaScopeDecl *decl) {
+SemaScopeDecl *sema_module_push_decl(SemaModule *sema, FileLocation at, SemaScopeDecl *decl) {
     if (sema_module_resolve_scope_decl(sema, &decl->name)) {
-        sema_err("`{slice}` was already declared", &decl->name);
+        SEMA_ERROR(at, "`{slice}` was already declared", &decl->name);
         return NULL;
     }
     SemaScope *scope = vec_top(sema->scopes);
@@ -135,8 +138,8 @@ SemaScopeDecl *sema_module_push_decl(SemaModule *sema, SemaScopeDecl *decl) {
     return decl;
 }
 
-SemaScopeDecl *sema_module_push_public_decl(SemaModule *sema, SemaScopeDecl *decl) {
-    if (!sema_module_push_decl(sema, decl)) {
+SemaScopeDecl *sema_module_push_public_decl(SemaModule *sema, FileLocation at, SemaScopeDecl *decl) {
+    if (!sema_module_push_decl(sema, at, decl)) {
         return NULL;
     }
     sema->public_decls = vec_push(sema->public_decls, &decl);
@@ -170,7 +173,7 @@ void sema_module_pop_scope(SemaModule *sema) {
 }
 
 void sema_module_push_primitives(SemaModule *sema) {
-    #define PP(name) sema_module_push_decl(sema, sema_scope_decl_new_type(slice_from_cstr(#name), sema_type_primitive_##name()));
+    #define PP(name) sema_module_push_decl(sema, file_loc_new(), sema_scope_decl_new_type(slice_from_cstr(#name), sema_type_primitive_##name()));
 	PP(i8); PP(i16); PP(i32); PP(i64);
     PP(u8); PP(u16); PP(u32); PP(u64);
     PP(f32); PP(f64);
@@ -181,10 +184,18 @@ void sema_module_set_returns(SemaModule *sema, SemaType *returns) {
     sema->returning = returns;
 }
 
+const char *sema_module_path(SemaModule *sema) {
+    return sema->ast->path;
+}
+
 SemaType *sema_module_returns(SemaModule *sema) {
     return sema->returning;
 }
 
 void sema_module_fail(SemaModule *sema) {
     sema->failed = true;
+}
+
+void sema_module_print_line_error_at(SemaModule *sema, FileLocation at) {
+    parser_print_line_error_at(sema->ast->parser, at);
 }

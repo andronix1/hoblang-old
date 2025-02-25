@@ -1,10 +1,12 @@
 #include <malloc.h>
 #include "core/slice/api.h"
+#include "core/location.h"
 #include "core/vec.h"
 #include "sema/module/loop/api.h"
 #include "sema/module/impl.h"
 #include "sema/module/loop/loop.h"
 #include "sema/module/loop/private.h"
+#include "sema/module/private.h"
 
 SemaLoop *sema_loop_new() {
     SemaLoop *result = malloc(sizeof(SemaLoop));
@@ -31,10 +33,10 @@ inline SemaLoop *sema_module_try_named_loop(SemaModule *sema, Slice *name) {
     return NULL;
 }
 
-bool sema_module_push_loop(SemaModule *sema, SemaLoop *loop) {
+bool sema_module_push_loop(SemaModule *sema, FileLocation at, SemaLoop *loop) {
     if (loop->is_named) {
         if (sema_module_try_named_loop(sema, &loop->name)) {
-            sema_err("redefenition of named loop `{slice}`", &loop->name);
+            SEMA_ERROR(at, "redefenition of named loop `{slice}`", &loop->name);
             return false;
         }
     }
@@ -46,18 +48,18 @@ void sema_module_pop_loop(SemaModule *sema) {
     vec_pop(sema->loops);
 }
 
-SemaLoop *sema_module_top_loop(SemaModule *sema) {
+SemaLoop *sema_module_top_loop(SemaModule *sema, FileLocation at) {
     if (vec_len(sema->loops) == 0) {
-        sema_err("no loops found");
+        SEMA_ERROR(at, "no loops found");
         return NULL;
     }
     return *vec_top(sema->loops);
 }
 
-SemaLoop *sema_module_named_loop(SemaModule *sema, Slice *name) {
+SemaLoop *sema_module_named_loop(SemaModule *sema, FileLocation at, Slice *name) {
     SemaLoop *trial = sema_module_try_named_loop(sema, name);
     if (!trial) {
-        sema_err("named loop {slice} is undefined", name);
+        SEMA_ERROR(at, "named loop {slice} is undefined", name);
     }
     return trial;
 }
