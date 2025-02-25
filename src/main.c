@@ -43,11 +43,9 @@ int main(int argc, char **argv) {
 		}
         SemaProjectModule **modules = sema_project_modules(project);
 		for (size_t i = 0; i < vec_len(modules); i++) {
-            Slice path = sema_project_module_path(modules[i]);
 			llvm_module_init(llvm, sema_module_of(sema_project_module_inner(modules[i])));
 		}
 		for (size_t i = 0; i < vec_len(modules); i++) {
-            Slice path = sema_project_module_path(modules[i]);
 			llvm_module(llvm, sema_module_of(sema_project_module_inner(modules[i])));
 		}
         if (argc > 0) {
