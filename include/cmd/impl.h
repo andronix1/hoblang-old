@@ -10,6 +10,7 @@ typedef enum {
     CMD_FUNCTION_BUILD_EXE,
     CMD_FUNCTION_BUILD_OBJ,
     CMD_FUNCTION_EMIT_LLVM,
+    CMD_FUNCTION_HELP,
 } CmdFunction;
 
 typedef struct Cmd {

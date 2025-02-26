@@ -5,8 +5,6 @@
 #include "core/slice.h"
 #include "impl.h"
 
-#define HOBLANG "hoblang"
-
 #define POP_ARG() ({ \
         len--; \
         const char *arg = args[0]; \

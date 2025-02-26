@@ -1,5 +1,14 @@
 #include "cmd/private.h"
+#include "cmd/usage.h"
 #include "core/vec.h"
+
+void cmd_usage_build_exe() {
+    CMD_USAGE_MAIN("build-exe", "<input> <output>")
+    CMD_USAGE_FLAG("--temp-obj <path>", "temporary object that will be linked later");
+    CMD_USAGE_FLAG("--run", "temporary object that will be linked later");
+    CMD_USAGE_FLAG("--temp-obj <path>", "run program after successful build");
+    CMD_USAGE_FLAG("--args [...args]", "pass arguments to running program");
+}
 
 bool cmd_parse_build_exe(Cmd *output, const char **args, size_t len) {
     output->build_exe.linker.libs = vec_new(const char*);

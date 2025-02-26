@@ -1,4 +1,9 @@
 #include "cmd/private.h"
+#include "cmd/usage.h"
+
+void cmd_usage_build_obj() {
+    CMD_USAGE_MAIN("build-obj", "<input> <output>")
+}
 
 bool cmd_parse_build_obj(Cmd *output, const char **args, size_t len) {
     CMD_PARSE {

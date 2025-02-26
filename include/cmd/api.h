@@ -5,3 +5,4 @@
 #include "impl.h"
 
 bool cmd_parse(Cmd *output, const char **args, size_t len);
+void cmd_help();

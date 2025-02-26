@@ -118,6 +118,10 @@ int main(int argc, char **argv) {
             }
             return 0;
         }
+        case CMD_FUNCTION_HELP: {
+            cmd_help();
+            return 0;
+        }
     }
 
     assert(0, "unknown cmd function");

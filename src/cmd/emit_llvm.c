@@ -1,4 +1,9 @@
 #include "cmd/private.h"
+#include "cmd/usage.h"
+
+void cmd_usage_emit_llvm() {
+    CMD_USAGE_MAIN("emit-llvm", "<input> <output>")
+}
 
 bool cmd_parse_emit_llvm(Cmd *output, const char **args, size_t len) {
     CMD_PARSE {

@@ -15,6 +15,7 @@ set(SOURCE_FILES
     src/cmd/build_exe.c
     src/cmd/build_obj.c
     src/cmd/emit_llvm.c
+    src/cmd/help.c
 
     src/print/base.c
     src/print/lexer.c

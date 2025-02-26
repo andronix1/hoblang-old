@@ -1,12 +1,6 @@
 #include <string.h>
 #include "core/log.h"
-
-#define ANSI(cmd) "\033[" #cmd "m"
-#define ANSI_RESET ANSI(0)
-#define ANSI_RED ANSI(31)
-#define ANSI_YELLOW ANSI(33)
-#define ANSI_GREEN ANSI(32)
-#define ANSI_BLUE ANSI(34)
+#include "core/ansi.h"
 
 const char *log_level_str[] = {
 	[LOGD] = ANSI_BLUE   "debug"   ANSI_RESET,
