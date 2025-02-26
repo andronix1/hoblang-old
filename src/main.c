@@ -62,7 +62,6 @@ int main(int argc, char **argv) {
             if (!llvm_write_module(llvm, (char*)cmd.build_exe.temp_obj)) {
                 return 1;
             }
-            const char *linker = "/usr/bin/ld";
             const char **args = vec_new(const char*);
             const char *default_args[] = {
                 cmd.build_exe.temp_obj,
@@ -76,7 +75,7 @@ int main(int argc, char **argv) {
                 args = vec_push(args, &cmd.build_exe.linker.libs[i]);
             }
             int status = 1;
-            if (!process_run(linker, (char**)args, &status)) {
+            if (!process_run(cmd.build_exe.linker.path, (char**)args, &status)) {
                 hob_log(LOGE, "failed to run linker {errno}");
                 return 1;
             }

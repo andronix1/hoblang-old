@@ -3,6 +3,7 @@
 #include <stdbool.h>
 
 typedef struct {
+    const char *path;
     const char **libs;
 } CmdLinker;
 

@@ -6,7 +6,8 @@ void cmd_usage_build_exe() {
     CMD_USAGE_MAIN("build-exe", "<input> <output>")
     CMD_USAGE_FLAG("--temp-obj <path>", "temporary object that will be linked later");
     CMD_USAGE_FLAG("--run", "temporary object that will be linked later");
-    CMD_USAGE_FLAG("--temp-obj <path>", "run program after successful build");
+    CMD_USAGE_FLAG("--link <name>", "link with library");
+    CMD_USAGE_FLAG("--linker <path>", "use custom linker");
     CMD_USAGE_FLAG("--args [...args]", "pass arguments to running program");
 }
 
@@ -17,6 +18,7 @@ bool cmd_parse_build_exe(Cmd *output, const char **args, size_t len) {
         const char *arg = POP_ARG();
         if (CMD_IS_FLAG) {
             CMD_FLAG_APPEND("link", output->build_exe.linker.libs);
+            CMD_FLAG_STR("linker", output->build_exe.linker.path);
             CMD_FLAG_STR("temp-obj", output->build_exe.temp_obj);
             CMD_FLAG_ON("run", output->build_exe.run);
             CMD_FLAG_APPEND_ALL("args", output->build_exe.run_args);
@@ -29,5 +31,6 @@ bool cmd_parse_build_exe(Cmd *output, const char **args, size_t len) {
     }
     CMD_END(2);
     CMD_DEFAULT(output->build_exe.temp_obj, "/tmp/hobtmp.o");
+    CMD_DEFAULT(output->build_exe.linker.path, "/usr/bin/ld");
     return true;
 }
