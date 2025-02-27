@@ -3,18 +3,11 @@
   you can write anything here except # after `, but you can just write `
 `#
 
-macro $swap(a: var, b: var) {
-    var t = a;
-    a = b;
-    b = a;
-}
-
 fun test() -> void {
     var NULL = null;
     if 0.0 {
         (0) = 10;
     }
-    @swap(a, b);
     return 0.0;
 }
 

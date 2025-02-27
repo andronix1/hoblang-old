@@ -1,0 +1,12 @@
+macro $swap(a: var, b: var) {
+    var t = a;
+    a = b;
+    b = a;
+}
+
+fun main() {
+    var a = 1;
+    var b = 2;
+
+    @swap(a, b);
+}
