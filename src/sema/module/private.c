@@ -2,9 +2,11 @@
 #include "ast/private/module.h"
 #include "core/location.h"
 #include "parser/private.h"
+#include "sema/arch/bits/private.h"
 #include "sema/module/impl.h"
 #include "core/vec.h"
 #include "sema/type/private.h"
+#include "sema/type/arch.h"
 #include "sema/module/private.h"
 #include "sema/module/decls/impl.h"
 #include "sema/type/api.h"
@@ -173,11 +175,26 @@ void sema_module_pop_scope(SemaModule *sema) {
 }
 
 void sema_module_push_primitives(SemaModule *sema) {
-    #define PP(name) sema_module_push_decl(sema, file_loc_new(), sema_scope_decl_new_type(slice_from_cstr(#name), sema_type_primitive_##name()));
-	PP(i8); PP(i16); PP(i32); PP(i64);
-    PP(u8); PP(u16); PP(u32); PP(u64);
-    PP(f32); PP(f64);
+    #define PD(name, type) sema_module_push_decl(sema, file_loc_new(), sema_scope_decl_new_type(slice_from_cstr(#name), type))
+    #define PP(name) sema_module_push_decl(sema, file_loc_new(), sema_scope_decl_new_type(slice_from_cstr(#name), sema_type_primitive_##name()))
+    #define ADIPP(name, size) do { \
+        if (sema->arch_info.ints & SEMA_INT_##size) { \
+            PP(name); \
+        } \
+    } while (0)
+    #define ADFPP(name, size) do { \
+        if (sema->arch_info.floats & SEMA_FLOAT_##size) { \
+            PP(name); \
+        } \
+    } while (0)
+    PP(u8);
+	ADIPP(i8, 8);
+    ADIPP(i16, 16); ADIPP(u16, 16);
+    ADIPP(i32, 32); ADIPP(u32, 32);
+    ADIPP(i64, 64); ADIPP(u64, 64);
+    ADFPP(f32, 32); ADFPP(f64, 64);
 	PP(bool); PP(void);
+    PD(usize, sema_arch_usize(sema));
 }
 
 void sema_module_set_returns(SemaModule *sema, SemaType *returns) {

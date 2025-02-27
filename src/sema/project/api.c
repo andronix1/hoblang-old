@@ -41,7 +41,7 @@ SemaModule *sema_project_add_module_at(SemaProject *project, const char *path) {
 		chdir(cwd);
 		return NULL;
 	}
-    SemaModule *sema = sema_module_new(project, module);
+    SemaModule *sema = sema_module_new(project, module, project->arch_info);
 	sema_module_read_decls(sema);
 	if (sema_module_failed(sema)) {
 		chdir(cwd);
@@ -56,9 +56,10 @@ SemaModule *sema_project_add_module_at(SemaProject *project, const char *path) {
 	return sema;
 }
 
-SemaProject *sema_project_new() {
+SemaProject *sema_project_new(SemaArchInfo arch_info) {
 	SemaProject *project = malloc(sizeof(SemaProject));
 	project->modules = vec_new(SemaProjectModule*);
+    project->arch_info = arch_info;
 	return project;
 }
 

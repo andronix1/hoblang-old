@@ -1,3 +1,4 @@
+#include "sema/arch/bits/private.h"
 #include "sema/value.h"
 #include "sema/module.h"
 #include "sema/type/private.h"
@@ -9,11 +10,11 @@ SemaValue *sema_analyze_expr_idx(SemaModule *sema, AstExprIdx *idx, SemaExprCtx 
     if (!of_type) {
         return NULL;
     }
-    SemaType *idx_type = sema_value_expr_type(sema, idx->idx, sema_expr_ctx_expect(ctx, sema_type_primitive_i32()));
+    SemaType *idx_type = sema_value_expr_type(sema, idx->idx, sema_expr_ctx_expect(ctx, sema_arch_usize(sema)));
     if (!idx_type) {
         return NULL;
     }
-    if (!sema_types_equals(idx_type, sema_type_primitive_i32())) {
+    if (!sema_types_equals(idx_type, sema_arch_usize(sema))) {
         SEMA_ERROR(ctx.loc, "idx value must be an i32, not {sema::type}", idx_type);
         return NULL;
     }

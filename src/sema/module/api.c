@@ -3,9 +3,10 @@
 #include "sema/module/impl.h"
 #include "core/vec.h"
 
-SemaModule *sema_module_new(SemaProject *project, AstModule *module) {
+SemaModule *sema_module_new(SemaProject *project, AstModule *module, SemaArchInfo arch_info) {
 	SemaModule *result = malloc(sizeof(SemaModule));
 	result->ast = module;
+	result->arch_info = arch_info;
 	result->public_decls = vec_new(SemaScopeDecl*);
     result->loops = vec_new(SemaLoop*);
 	result->scopes = vec_new(SemaScope);

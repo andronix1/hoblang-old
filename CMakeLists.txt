@@ -12,6 +12,7 @@ set(SOURCE_FILES
     src/print.c
 
     src/cmd/api.c
+    src/cmd/shared/arch.c
     src/cmd/build_exe.c
     src/cmd/build_obj.c
     src/cmd/emit_llvm.c
@@ -63,6 +64,8 @@ set(SOURCE_FILES
 	src/parser/parts/path.c
 	src/parser/parts/body.c
 
+    src/sema/arch/bits.c
+    src/sema/arch/private.c
 	src/sema/project/api.c
     src/sema/type/api.c
     src/sema/type/private.c

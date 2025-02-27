@@ -1,32 +1,32 @@
 #include <stdio.h>
-#include <sys/wait.h>
-#include <assert.h>
-#include <string.h>
-#include <unistd.h>
 #include "cmd/impl.h"
 #include "core/log.h"
 #include "core/process.h"
 #include "core/vec.h"
 #include "print.h"
+#include "sema/arch/bits/bits.h"
+#include "sema/arch/bits/api.h"
 #include "sema/project/api.h"
-#include "sema/module/api.h"
 #include "llvm/api.h"
-#include "llvm/impl.h"
 #include "cmd/api.h"
 
-char *args_shift(int *argc, char ***argv) {
-    *argc -= 1;
-    char *cached = (*argv)[0];
-    *argv = &(*argv)[1];
-    return cached;
-}
-
-void usage() {
-	printf("hoblang compile <source> <output> [dump <output>] - compile source file to machine code\n");
-}
-
-LlvmBackend *llvm_create_from_file(const char *input) {
-    SemaProject *project = sema_project_new();
+LlvmBackend *llvm_create_from_file(const char *input, CmdArchFlags *arch) {
+    SemaIntBits ints = SEMA_INT_8;
+    SemaFloatBits floats = 0;
+    switch (arch->bits) {
+        case ARCH_MODE_16:
+            ints = SEMA_INT_8 | SEMA_INT_16;
+            break;
+        case ARCH_MODE_32:
+            ints = SEMA_INT_8 | SEMA_INT_16 | SEMA_INT_32;
+            floats = SEMA_FLOAT_32;
+            break;
+        case ARCH_MODE_64:
+            ints = SEMA_INT_8 | SEMA_INT_16 | SEMA_INT_32 | SEMA_INT_64;
+            floats = SEMA_FLOAT_32 | SEMA_FLOAT_64;
+            break;
+    }
+    SemaProject *project = sema_project_new(sema_arch_info_new(ints, floats));
     sema_project_add_module_at(project, input);
     if (!sema_project_analyze(project)) {
         return NULL;
@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
 
     switch (cmd.function) {
         case CMD_FUNCTION_BUILD_EXE: {
-            LlvmBackend *llvm = llvm_create_from_file(cmd.build_exe.input);
+            LlvmBackend *llvm = llvm_create_from_file(cmd.build_exe.input, &cmd.build_exe.arch);
             if (!llvm) {
                 return 1;
             }
@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
             return 0;
         }
         case CMD_FUNCTION_BUILD_OBJ: {
-            LlvmBackend *llvm = llvm_create_from_file(cmd.build_obj.input);
+            LlvmBackend *llvm = llvm_create_from_file(cmd.build_obj.input, &cmd.build_obj.arch);
             if (!llvm) {
                 return 1;
             }
@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
             return 0;
         }
         case CMD_FUNCTION_EMIT_LLVM: {
-            LlvmBackend *llvm = llvm_create_from_file(cmd.emit_llvm.input);
+            LlvmBackend *llvm = llvm_create_from_file(cmd.emit_llvm.input, &cmd.emit_llvm.arch);
             if (!llvm) {
                 return 1;
             }

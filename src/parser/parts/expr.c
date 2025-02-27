@@ -1,4 +1,5 @@
 #include "ast/private/expr.h"
+#include "core/location.h"
 #include "lexer/token.h"
 #include "parser/parts/expr.h"
 #include "parser/parts/type.h"
@@ -133,6 +134,8 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 			}
 			return current_expr;
 		}
+
+        FileLocation loc = token->location;
 		
 		switch (token->type) {
             case TOKEN_QUESTION_MARK:
@@ -140,32 +143,32 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
                     PARSE_ERROR("expected expression before return-on-null operator");
                     return NULL;
                 }
-                current_expr = ast_expr_ret_on_null(token->location, current_expr);
+                current_expr = ast_expr_ret_on_null(loc, current_expr);
                 break;
 			case TOKEN_TRUE: case TOKEN_FALSE:
-                current_expr = ast_expr_bool(token->location, token->type == TOKEN_TRUE);
+                current_expr = ast_expr_bool(loc, token->type == TOKEN_TRUE);
                 break;
 			case TOKEN_CHAR: 
-                current_expr = ast_expr_char(token->location, token->character);
+                current_expr = ast_expr_char(loc, token->character);
                 break;
 			case TOKEN_STR:
-                current_expr = ast_expr_str(token->location, slice_new(token->str, vec_len(token->str)));
+                current_expr = ast_expr_str(loc, slice_new(token->str, vec_len(token->str)));
                 break;
 			case TOKEN_OPENING_SQUARE_BRACE:
 				if (!current_expr) {
 					PARSE_ERROR("expected expression before index expression");
 				}
-                current_expr = ast_expr_idx(token->location, current_expr, parse_expr(parser, token_stop_idx));
+                current_expr = ast_expr_idx(loc, current_expr, parse_expr(parser, token_stop_idx));
 				if (!current_expr) {
 					return NULL;
 				}
 				PARSER_EXPECT_NEXT(TOKEN_CLOSING_SQUARE_BRACE, "index closing brace");
 				break;
 			case TOKEN_INTEGER:
-                current_expr = ast_expr_integer(token->location, token->integer);
+                current_expr = ast_expr_integer(loc, token->integer);
                 break;
 			case TOKEN_FLOAT:
-                current_expr = ast_expr_float(token->location, token->float_value);
+                current_expr = ast_expr_float(loc, token->float_value);
                 break;
 			case TOKEN_IDENT: {
 				parser_skip_next(parser);
@@ -173,7 +176,7 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 				if (!parse_path(parser, &path)) {
 					return NULL;
 				}
-				current_expr= ast_expr_get_local_path(token->location, path);
+				current_expr= ast_expr_get_local_path(loc, path);
 				break;
 			}
             case TOKEN_UNWRAP:
@@ -181,17 +184,17 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 					PARSE_ERROR("expected expression before index expression");
                     return NULL;
                 }
-                current_expr = ast_expr_unwrap(token->location, current_expr, PARSER_EXPECT_NEXT(TOKEN_IDENT, "output name")->ident);
+                current_expr = ast_expr_unwrap(loc, current_expr, PARSER_EXPECT_NEXT(TOKEN_IDENT, "output name")->ident);
                 break;
             case TOKEN_NULL:
-                current_expr = ast_expr_null(token->location);
+                current_expr = ast_expr_null(loc);
                 break;
 			case TOKEN_NOT: 
-                current_expr = ast_expr_not(token->location, NOT_NULL(parse_expr(parser, stop)));
+                current_expr = ast_expr_not(loc, NOT_NULL(parse_expr(parser, stop)));
                 break;
 			case TOKEN_BITAND: {
 				if (first) {
-					current_expr = ast_expr_ref(token->location, NOT_NULL(_parse_expr(parser, stop, false)));
+					current_expr = ast_expr_ref(loc, NOT_NULL(_parse_expr(parser, stop, false)));
 				} else {
 					PARSE_BINOP(AST_BINOP_BITAND);
 				}
@@ -219,7 +222,7 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 			case TOKEN_OR: PARSE_BINOP(AST_BINOP_OR); break;
 			case TOKEN_OPENING_CIRCLE_BRACE:
                 if (current_expr) {
-					current_expr = ast_expr_call(token->location, current_expr, NOT_NULL(parse_call_args(parser)));
+					current_expr = ast_expr_call(loc, current_expr, NOT_NULL(parse_call_args(parser)));
                 } else {
                     current_expr = parse_expr(parser, token_stop_closing_circle_brace);
                     current_expr->scoped = true;
@@ -236,7 +239,7 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 					values = vec_push(values, &expr);
 					token = parser_next(parser);
 				}
-				current_expr = ast_expr_array(token->location, values);
+				current_expr = ast_expr_array(loc, values);
 				break;
             }
 			case TOKEN_EOI:
@@ -265,9 +268,9 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
                         if (!parse_type(parser, &type)) {
                             return NULL;
                         }
-                        current_expr = ast_expr_as_type(token->location, current_expr, type);
+                        current_expr = ast_expr_as_type(loc, current_expr, type);
                     } else {
-                        current_expr = ast_expr_as_auto(token->location, current_expr);
+                        current_expr = ast_expr_as_auto(loc, current_expr);
                     }
                     break;
                 }
@@ -276,7 +279,7 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 					if (!parse_inner_path(parser, &path)) {
 						return NULL;
 					}
-					current_expr = ast_expr_get_inner_path(token->location, current_expr, path);
+					current_expr = ast_expr_get_inner_path(loc, current_expr, path);
 					break;
 				}
                 default:
@@ -284,7 +287,6 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
                     reading = false;
                     break;
             }
-            current_expr->loc = token->location;
             first = false;
         }
 	}

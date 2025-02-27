@@ -42,6 +42,7 @@ syntax keyword hobType
 	\ void
 	\ f32
 	\ f64
+	\ usize 
 
 syntax match hobNumber "\v<\d+>"
 syntax region hobChar start=/'/ skip=/\\'/ end=/'/

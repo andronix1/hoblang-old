@@ -5,6 +5,7 @@
 #include "sema/module/parts/type.h"
 #include "sema/module/private.h"
 #include "sema/type/private.h"
+#include "sema/arch/bits/private.h"
 
 void sema_conv_pointer(
 	SemaModule *sema,
@@ -22,7 +23,7 @@ void sema_conv_pointer(
 		*type = SEMA_AS_CONV_BITCAST;
 		return;
 	}
-	if (sema_types_equals(dest, sema_type_primitive_i64())) {
+	if (sema_types_equals(dest, sema_arch_ptr(sema))) {
 		*type = SEMA_AS_CONV_PTR_TO_INT;
 		return;
 	}
@@ -56,7 +57,7 @@ void sema_conv_function(
 	SemaAsConvType *type
 ) {
 	assert(source->type == SEMA_TYPE_FUNCTION, "passed non-function type {sema::type}", source);
-	if (sema_types_equals(dest, sema_type_primitive_i64())) {
+	if (sema_types_equals(dest, sema_arch_ptr(sema))) {
 		*type = SEMA_AS_CONV_PTR_TO_INT;
 		return;
 	}
@@ -227,7 +228,7 @@ SemaValue *sema_analyze_expr_as(SemaModule *sema, AstExprAs *as, SemaExprCtx ctx
 		return false;
 	}
     as->sema_type = as_type;
-	SemaType *expr_type = sema_value_expr_type(sema, as->expr, sema_expr_ctx_expect(ctx, sema_type_primitive_i64()));
+	SemaType *expr_type = sema_value_expr_type(sema, as->expr, sema_expr_ctx_expect(ctx, as_type));
 	if (!expr_type) {
 		return false;
 	}

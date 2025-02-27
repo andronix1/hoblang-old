@@ -28,7 +28,7 @@ SemaValue *sema_analyze_expr_call(SemaModule *sema, AstCall *call, SemaExprCtx c
 			return NULL;
 		}
 		if (!sema_types_equals(arg_type, type->func.args[i + args_offset])) {
-			SEMA_ERROR(ctx.loc, "arg №{long} expected to has type {sema::type} but expression of type {sema::type} was passed", i, type->func.args[i + args_offset], arg_type);
+			SEMA_ERROR(call->args[i]->loc, "arg №{long} expected to has type {sema::type} but expression of type {sema::type} was passed", i + 1, type->func.args[i + args_offset], arg_type);
 			return NULL;
 		}
 	}

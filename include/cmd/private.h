@@ -37,22 +37,24 @@
 
 #define CMD_FLAG (&arg[2])
 
-#define CMD_FLAG_ON(name, output) ({ \
+#define CMD_FLAG_SET(name, output, value) { \
             if (!strcmp(name, CMD_FLAG)) { \
-                output = true; \
+                output = value; \
                 continue; \
             } \
-        })
+        }
 
-#define CMD_FLAG_STR(name, output) ({ \
+#define CMD_FLAG_ON(name, output) CMD_FLAG_SET(name, output, true)
+
+#define CMD_FLAG_STR(name, output) { \
             if (!strcmp(name, CMD_FLAG)) { \
                 const char *arg = POP_ARG(); \
                 output = arg;\
                 continue; \
             } \
-        })
+        }
 
-#define CMD_FLAG_APPEND_ALL(name, output) ({ \
+#define CMD_FLAG_APPEND_ALL(name, output) { \
             if (!strcmp(name, CMD_FLAG)) { \
                 while (len > 0) { \
                     const char *arg = POP_ARG(); \
@@ -60,21 +62,22 @@
                 } \
                 continue; \
             } \
-        })
+        }
 
-#define CMD_FLAG_APPEND(name, output) ({ \
+#define CMD_FLAG_APPEND(name, output) { \
             if (!strcmp(name, CMD_FLAG)) { \
                 const char *arg = POP_ARG(); \
                 output = vec_push(output, &arg);\
                 continue; \
             } \
-        })
+        }
 
 #define CMD_IS_FLAG (strlen(arg) > 2 && arg[0] == '-' && arg[1] == '-')
 
-#define CMD_FLAGS_END \
-    hob_log(LOGE, "unknown flag `{cstr}`", CMD_FLAG); \
-    return false; \
+#define CMD_FLAGS_END { \
+        hob_log(LOGE, "unknown flag `{cstr}`", CMD_FLAG); \
+        return false; \
+    }
 
 #define CMD_END(pos_args) \
     if (__pos_arg != pos_args) { \

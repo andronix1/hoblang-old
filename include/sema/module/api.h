@@ -6,9 +6,10 @@
 #include "core/location.h"
 #include "ast/api/module.h"
 #include "sema/project.h"
+#include "sema/arch/bits/bits.h"
 #include "module.h"
 
-SemaModule *sema_module_new(SemaProject *project, AstModule *module);
+SemaModule *sema_module_new(SemaProject *project, AstModule *module, SemaArchInfo arch_info);
 AstModule *sema_module_of(SemaModule *module);
 void sema_module_read_decls(SemaModule *sema);
 void sema_module_analyze(SemaModule *sema);

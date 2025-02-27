@@ -2,6 +2,7 @@
 #include "ast/private/type.h"
 #include "ast/private/module_node.h"
 #include "core/vec.h"
+#include "sema/arch/bits/private.h"
 #include "sema/type/private.h"
 #include "sema/module/private.h"
 #include "sema/module/decls/impl.h"
@@ -71,7 +72,7 @@ SemaValue *sema_resolve_inner_value_path(SemaModule *sema, SemaValue *from, AstI
         case AST_INNER_PATH_SEG_SIZEOF: {
             segment->sema.type = SEMA_INNER_PATH_SIZEOF;
             segment->sema.sizeof_type = from->sema_type;
-            return sema_value_const(sema_type_primitive_i32());
+            return sema_value_const(sema_arch_usize(sema));
         }
         case AST_INNER_PATH_SEG_DEREF: {
             if (from->sema_type->type != SEMA_TYPE_POINTER) {
@@ -107,7 +108,7 @@ SemaValue *sema_resolve_inner_value_path(SemaModule *sema, SemaValue *from, AstI
                     return sema_value_with_type(from, output_type);
                 } else if (slice_eq(&length, &segment->ident)) {
                     segment->sema.type = SEMA_INNER_PATH_SLICE_LEN;
-                    return sema_value_with_type(from, sema_type_primitive_i32());
+                    return sema_value_with_type(from, sema_arch_usize(sema));
                 } else {
                     SEMA_ERROR(segment->loc, "{sema::type} has not member {slice}", from->sema_type, &segment->ident);
                     return NULL;
@@ -117,7 +118,7 @@ SemaValue *sema_resolve_inner_value_path(SemaModule *sema, SemaValue *from, AstI
                 if (slice_eq(&length, &segment->ident)) {
                     segment->sema.type = SEMA_INNER_PATH_ARRAY_LEN;
                     segment->sema.array_length = from->sema_type->array.length;
-                    return sema_value_const(sema_type_primitive_i32());
+                    return sema_value_const(sema_arch_usize(sema));
                 } else {
                     SEMA_ERROR(segment->loc, "{sema::type} has not member {slice}", from->sema_type, &segment->ident);
                     return NULL;
@@ -134,7 +135,7 @@ SemaValue *sema_resolve_inner_type_path(SemaModule *sema, SemaValue *from, AstIn
         case AST_INNER_PATH_SEG_SIZEOF:
             segment->sema.type = SEMA_INNER_PATH_SIZEOF;
             segment->sema.sizeof_type = from->sema_type;
-            return sema_value_const(sema_type_primitive_i32());
+            return sema_value_const(sema_arch_usize(sema));
         case AST_INNER_PATH_SEG_NULL:
             SEMA_ERROR(segment->loc, "cannot get a member `null` from type `{sema::type}`", from->sema_type);
             break;

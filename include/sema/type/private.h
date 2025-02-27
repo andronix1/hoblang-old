@@ -79,18 +79,8 @@ SemaType *sema_type_new_func(SemaType *returning, SemaType **args);
 SemaType *sema_type_new_struct(AstStructDef *struct_def);
 SemaType *sema_type_new_optional(SemaType *of);
 
-#define SEMA_TYPE_PRIMITIVE(name) \
-    SemaType *sema_type_primitive_##name();
+#define SEMA_TYPE_PRIMITIVE(name) SemaType *sema_type_primitive_##name();
 
 SEMA_TYPE_PRIMITIVE(u8)
-SEMA_TYPE_PRIMITIVE(u16)
-SEMA_TYPE_PRIMITIVE(u32)
-SEMA_TYPE_PRIMITIVE(u64)
-SEMA_TYPE_PRIMITIVE(i8)
-SEMA_TYPE_PRIMITIVE(i16)
-SEMA_TYPE_PRIMITIVE(i32)
-SEMA_TYPE_PRIMITIVE(i64)
-SEMA_TYPE_PRIMITIVE(f32)
-SEMA_TYPE_PRIMITIVE(f64)
 SEMA_TYPE_PRIMITIVE(bool)
 SEMA_TYPE_PRIMITIVE(void)
