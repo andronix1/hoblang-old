@@ -226,6 +226,7 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
                 } else {
                     current_expr = parse_expr(parser, token_stop_closing_circle_brace);
                     current_expr->scoped = true;
+                    current_expr->loc = loc;
                     PARSER_EXPECT_NEXT(TOKEN_CLOSING_CIRCLE_BRACE, "scope close");
                 }
                 break;
