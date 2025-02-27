@@ -3,6 +3,7 @@
 #define __ANSI(cmd) "\033[" #cmd "m"
 #define ANSI_RESET __ANSI(0)
 #define ANSI_BOLD __ANSI(1)
+#define ANSI_DIM __ANSI(2)
 #define ANSI_UNDERLINE __ANSI(4)
 #define ANSI_RED __ANSI(31)
 #define ANSI_YELLOW __ANSI(33)
