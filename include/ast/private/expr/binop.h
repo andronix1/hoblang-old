@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ast/api/expr.h"
+#include "core/location.h"
 
 typedef enum {
 	AST_BINOP_AND,
@@ -27,4 +28,5 @@ typedef enum {
 typedef struct {
 	AstBinopType type;
 	AstExpr *left, *right;
+    FileLocation loc;
 } AstExprBinop;

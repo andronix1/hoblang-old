@@ -62,7 +62,7 @@ bool expr_make_binop(Parser *parser, AstBinopType type, AstExpr **current_expr, 
 	result->type = AST_EXPR_BINOP;
 	result->binop.type = type;
 	result->binop.left = *current_expr;
-    result->loc = parser_token(parser)->location;
+    result->binop.loc = parser_token(parser)->location;
 	if (!(result->binop.right = parse_expr(parser, stop))) {
 		return false;
 	}
@@ -264,14 +264,15 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 						parser_skip_next(parser);
 						return current_expr;
 					}
+                    FileLocation as_loc = token->location;
                     if (parser_next_is_not(parser, TOKEN_AUTO)) {
                         AstType type;
                         if (!parse_type(parser, &type)) {
                             return NULL;
                         }
-                        current_expr = ast_expr_as_type(loc, current_expr, type);
+                        current_expr = ast_expr_as_type(loc, as_loc, current_expr, type);
                     } else {
-                        current_expr = ast_expr_as_auto(loc, current_expr);
+                        current_expr = ast_expr_as_auto(loc, as_loc, current_expr);
                     }
                     break;
                 }

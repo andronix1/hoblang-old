@@ -52,12 +52,14 @@ AstExpr *ast_expr_call(FileLocation loc, AstExpr *callable, AstExpr **args) CONS
 AstExpr *ast_expr_not(FileLocation loc, AstExpr *expr) CONSTR(AST_EXPR_NOT, {
     FIELD(not_expr, expr)
 })
-AstExpr *ast_expr_as_type(FileLocation loc, AstExpr *expr, AstType type) CONSTR(AST_EXPR_AS, {
+AstExpr *ast_expr_as_type(FileLocation loc, FileLocation as_loc, AstExpr *expr, AstType type) CONSTR(AST_EXPR_AS, {
+    FIELD(as.loc, as_loc)
     FIELD(as.type, AST_EXPR_AS_TYPE)
     FIELD(as.expr, expr)
     FIELD(as.as_type, type)
 })
-AstExpr *ast_expr_as_auto(FileLocation loc, AstExpr *expr) CONSTR(AST_EXPR_AS, {
+AstExpr *ast_expr_as_auto(FileLocation loc, FileLocation as_loc, AstExpr *expr) CONSTR(AST_EXPR_AS, {
+    FIELD(as.loc, as_loc)
     FIELD(as.type, AST_EXPR_AS_AUTO)
     FIELD(as.expr, expr)
 })

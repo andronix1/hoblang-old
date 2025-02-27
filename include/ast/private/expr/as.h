@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../type.h"
+#include "core/location.h"
 
 typedef enum {
 	SEMA_AS_CONV_EXTEND,
@@ -33,6 +34,7 @@ typedef enum {
 typedef struct {
     AstExprAsType type;
 	AstExpr *expr;
+    FileLocation loc;
 
     union {
 	    AstType as_type;

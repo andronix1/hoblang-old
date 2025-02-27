@@ -16,6 +16,7 @@ fun main() -> i32 {
         ("OK").duper();
             (0.1 + 1);
     ("super")();
+        (1 as []u8);
     return;
     return 0.0;
 }

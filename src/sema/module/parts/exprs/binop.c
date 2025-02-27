@@ -3,6 +3,7 @@
 #include "sema/type/private.h"
 
 SemaValue *sema_analyze_expr_binop(SemaModule *sema, AstExprBinop *binop, SemaExprCtx ctx) { 
+    ctx.loc = binop->loc;
 	bool bool_binops = (
 			binop->type == AST_BINOP_OR ||
 			binop->type == AST_BINOP_AND
