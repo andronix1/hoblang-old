@@ -48,10 +48,12 @@ syntax match hobNumber "\v<\d+>"
 syntax region hobChar start=/'/ skip=/\\'/ end=/'/
 syntax region hobString start=/"/ skip=/\\"/ end=/"/
 syntax region hobComment start='#' end='\n'
+syntax region hobMultilineComment start='#`' end='`#'
 
 highlight default link hobKeywords Keyword
 highlight default link hobType Type
 highlight default link hobComment Comment
+highlight default link hobMultilineComment Comment
 highlight default link hobNumber Number
 highlight default link hobBoolean Boolean
 highlight default link hobChar String

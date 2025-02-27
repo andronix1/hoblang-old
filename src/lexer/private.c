@@ -109,7 +109,17 @@ bool lexer_skip_comment(Lexer *lexer) {
 	if (lexer_future_char(lexer) != '#') {
 		return false;
 	}
-	while (lexer_next_char(lexer) != '\n');
+    lexer_next_char(lexer);
+    if (lexer_future_char(lexer) == '`') {
+	    while (lexer_next_char(lexer) != '`' || lexer_future_char(lexer) != '#') {
+            if (lexer_finished(lexer)) {
+                lex_err("multiline comment started but was not finished");
+                return true;
+            }
+        }
+    } else {
+	    while (lexer_next_char(lexer) != '\n' && !lexer_finished(lexer));
+    }
 	return true;
 }
 
