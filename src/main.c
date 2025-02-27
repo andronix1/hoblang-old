@@ -27,7 +27,9 @@ LlvmBackend *llvm_create_from_file(const char *input, CmdArchFlags *arch) {
             break;
     }
     SemaProject *project = sema_project_new(sema_arch_info_new(ints, floats));
-    sema_project_add_module_at(project, input);
+    if (!sema_project_add_module_at(project, input)) {
+        return NULL;
+    }
     if (!sema_project_analyze(project)) {
         return NULL;
     }
