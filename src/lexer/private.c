@@ -1,4 +1,5 @@
 #include "lexer/private.h"
+#include "lexer/api.h"
 #include "lexer/parts/symbol.h"
 #include "lexer/parts/simple.h"
 #include "lexer/impl.h"
@@ -177,8 +178,7 @@ bool lexer_try_next(Lexer *lexer) {
 	TOKEN_PARSE(lex_integer(lexer));
 	TOKEN_PARSE(lex_str(lexer));
 
-	lex_err("unknown token");
-	lexer_next_char(lexer);
-	return true;
+	lex_err("failed to recognize token");
+	return false;
 }
 

@@ -36,7 +36,9 @@ void lexer_print_line_error_at(Lexer *lexer, FileLocation at) {
 }
 
 Token *lexer_next(Lexer *lexer) {
-    while (!lexer_try_next(lexer));
+    while (!lexer_try_next(lexer)) {
+        lexer_next_char(lexer);
+    }
     return &lexer->token;
 }
 
