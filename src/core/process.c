@@ -6,11 +6,9 @@
 bool process_run(const char *file, char **args, int *status) {
     char **real_args = vec_new(char*);
     real_args = vec_push(real_args, (char**)&file);
-    real_args = vec_append_raw(
-        real_args,
-        args,
-        vec_len(args)
-    );
+    for (size_t i = 0; i < vec_len(args); i++) {
+        real_args = vec_push(real_args, &args[i]);
+    }
     char *end = NULL;
     real_args = vec_push(real_args, &end);
     pid_t pid = vfork();

@@ -3,16 +3,14 @@
 #include "sema/module/parts/expr.h"
 #include "sema/module/private.h"
 #include "sema/type/private.h"
+#include "sema/value/api.h"
 
 SemaValue *sema_analyze_expr_call(SemaModule *sema, AstCall *call, SemaExprCtx ctx) { 
 	SemaValue *value = sema_callable_expr_type(sema, call->callable, sema_expr_ctx_expect(ctx, NULL));
     if (!value) {
         return NULL;
     }
-	SemaType *type = value->sema_type;
-	if (!type) {
-		return NULL;
-	}
+	SemaType *type = sema_value_typeof(value);
 	if (type->type != SEMA_TYPE_FUNCTION) {	
 		SEMA_ERROR(ctx.loc, "{sema::type} is not a function, so it cannot be called", type);
 		return NULL;
@@ -32,5 +30,5 @@ SemaValue *sema_analyze_expr_call(SemaModule *sema, AstCall *call, SemaExprCtx c
 			return NULL;
 		}
 	}
-	return sema_value_const(type->func.returning);
+	return sema_value_final(type->func.returning);
 }

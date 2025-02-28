@@ -5,9 +5,11 @@
 #include <malloc.h>
 #include "sema/type.h"
 #include "sema/module.h"
+#include "sema/const/const.h"
 
 typedef enum {
     SEMA_VALUE_CONST,
+    SEMA_VALUE_FINAL,
     SEMA_VALUE_VAR,
     SEMA_VALUE_TYPE,
     SEMA_VALUE_EXT_FUNC_HANDLE,
@@ -16,7 +18,8 @@ typedef enum {
 
 typedef struct SemaValue {
     SemaValueType type;
-    union {;
+    union {
+        SemaConst constant;
         SemaType *sema_type;
         SemaModule *module;
     };
@@ -39,8 +42,16 @@ static inline SemaValue *sema_value_module(SemaModule *module) {
 	return result;
 }
 
+static inline SemaValue *sema_value_const(SemaConst constant) {
+    SemaValue *result = malloc(sizeof(SemaValue));
+	result->type = SEMA_VALUE_CONST;
+    result->sema_type = constant.sema_type;
+	result->constant = constant;
+	return result;
+}
+
 SEMA_VALUE_CONSTRUCTOR(sema_value_ext_func_handle, SEMA_VALUE_EXT_FUNC_HANDLE)
-SEMA_VALUE_CONSTRUCTOR(sema_value_const, SEMA_VALUE_CONST)
+SEMA_VALUE_CONSTRUCTOR(sema_value_final, SEMA_VALUE_FINAL)
 SEMA_VALUE_CONSTRUCTOR(sema_value_type, SEMA_VALUE_TYPE)
 SEMA_VALUE_CONSTRUCTOR(sema_value_var, SEMA_VALUE_VAR)
 

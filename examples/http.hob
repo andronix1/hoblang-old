@@ -82,7 +82,7 @@ fun main() -> i32 {
 	}
 
 	while true {
-		var client = -1;
+		var client: Socket = -1;
 		while client < 0 {
 			client = tcp::accept(server);
 		}

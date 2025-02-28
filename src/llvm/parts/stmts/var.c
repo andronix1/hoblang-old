@@ -10,9 +10,9 @@
 void llvm_stmt_var(LlvmBackend *llvm, AstVar *var) {
 	LLVMTypeRef type = llvm_resolve_type(var->type.sema);
     LLVMPositionBuilderAtEnd(llvm_builder(llvm), llvm_definitions_block(llvm));
-    LLVMValueRef allocated = var->decl->llvm_value = LLVMBuildAlloca(llvm_builder(llvm), type, slice_to_cstr(&var->name));
+    LLVMValueRef allocated = var->decl->llvm.value = LLVMBuildAlloca(llvm_builder(llvm), type, slice_to_cstr(&var->name));
     LLVMPositionBuilderAtEnd(llvm_builder(llvm), llvm_code_block(llvm));
 	if (var->initializes) {
-		LLVMBuildStore(llvm_builder(llvm), llvm_expr(llvm, var->expr, true), var->decl->llvm_value);
+		LLVMBuildStore(llvm_builder(llvm), llvm_expr(llvm, var->expr, true), var->decl->llvm.value);
 	}
 }

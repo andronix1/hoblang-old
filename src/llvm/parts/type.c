@@ -71,7 +71,7 @@ LLVMTypeRef llvm_resolve_type(SemaType *type) {
 	assert(0, "invalid type {int}", type->type);
 }
 
-LLVMValueRef llvm_type_sizeof(LlvmBackend *llvm, LLVMTypeRef type) {
+LLVMValueRef llvm_type_sizeof(LlvmBackend *llvm, LLVMTypeRef type, LLVMTypeRef output_type) {
     LLVMValueRef indices[] = {
         LLVMConstInt(LLVMInt32Type(), 1, false)
     };
@@ -84,7 +84,7 @@ LLVMValueRef llvm_type_sizeof(LlvmBackend *llvm, LLVMTypeRef type) {
             indices, 1,
             "sizeof.gep"
         ),
-        LLVMInt32Type(),
+        output_type,
         "sizeof.int"
     );
 }

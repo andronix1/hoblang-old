@@ -70,7 +70,9 @@ int main(int argc, char **argv) {
                 "-o",
                 cmd.build_exe.output,
             };
-            args = vec_append_raw(args, default_args, sizeof(default_args) / sizeof(default_args[0]));
+            for (size_t i = 0; i < sizeof(default_args) / sizeof(default_args[0]); i++) {
+                args = vec_push(args, &default_args[i]);
+            }
             for (size_t i = 0; i < vec_len(cmd.build_exe.linker.libs); i++) {
                 const char *flag = "-l";
                 args = vec_push(args, &flag);

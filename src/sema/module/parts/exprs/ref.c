@@ -6,6 +6,6 @@ SemaValue *sema_analyze_expr_ref(SemaModule *sema, AstExpr *ref_expr, SemaExprCt
     if (!type) {
         return false;
     }
-    return sema_value_const(sema_type_new_pointer(type));
+    return sema_value_final(sema_type_new_pointer(type));
 }
 

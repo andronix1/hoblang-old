@@ -51,23 +51,20 @@ void expr_push_down(AstExpr *expr) {
 	expr->binop.right = cl;
 	expr->binop.left = pl;
 	pl->binop.type = pb;
-	pl->binop.right= cr;
+	pl->binop.right = cr;
 	pl->binop.left = pr;
 
 	expr_push_down(pl);
 }
 
 bool expr_make_binop(Parser *parser, AstBinopType type, AstExpr **current_expr, bool(*stop)(TokenType)) {
-	AstExpr *result = malloc(sizeof(AstExpr));				
-	result->type = AST_EXPR_BINOP;
-	result->binop.type = type;
-	result->binop.left = *current_expr;
-    result->binop.loc = parser_token(parser)->location;
-	if (!(result->binop.right = parse_expr(parser, stop))) {
+    FileLocation loc = parser_token(parser)->location;
+    AstExpr *right = parse_expr(parser, stop);
+	if (!right) {
 		return false;
 	}
-	expr_push_down(result);
-	*current_expr = result;
+    *current_expr = ast_expr_binop(loc, type, *current_expr, right);
+	expr_push_down(*current_expr);
 	return true;
 }
 

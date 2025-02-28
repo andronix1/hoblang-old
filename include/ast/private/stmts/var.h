@@ -5,6 +5,7 @@
 #include "sema/module/decls.h"
 #include "../type.h"
 #include "ast/api/expr.h"
+#include "sema/module/decls/decls.h"
 
 typedef struct {
     FileLocation loc;
@@ -14,5 +15,5 @@ typedef struct {
 	AstExpr *expr;
 	bool initializes, typed;
 	
-	SemaScopeValueDecl *decl;
+	SemaDecl *decl;
 } AstVar;

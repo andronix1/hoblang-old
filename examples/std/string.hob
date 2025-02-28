@@ -4,7 +4,7 @@ import "fs.hob" as fs;
 
 struct String {
     buffer: []u8,
-    cap: i32
+    cap: usize 
 }
 
 fun new() -> String {
@@ -14,7 +14,7 @@ fun new() -> String {
     return result;
 }
 
-fun with_cap(cap: i32) -> String {
+fun with_cap(cap: usize) -> String {
     var result = new();
     result.reserve(cap);
     return result;
@@ -26,23 +26,23 @@ fun from_slice(slice: []u8) -> String {
     return result;
 }
 
-fun(*String) reserve(cap: i32) -> void {
+fun(*String) reserve(cap: usize) -> void {
     if self.*.cap >= cap {
         return;
     }
     if self.*.cap == 0 {
-        self.*.buffer.raw = salloc::allocate(cap as u32) as *u8;
+        self.*.buffer.raw = salloc::allocate(cap) as *u8;
     } else {
-        self.*.buffer.raw = salloc::reallocate(self.*.buffer.raw as *void, cap as u32) as *u8;
+        self.*.buffer.raw = salloc::reallocate(self.*.buffer.raw as *void, cap) as *u8;
     }
     self.*.cap = cap;
 }
 
-fun(String) length() -> i32 {
+fun(String) length() -> usize {
     return self.buffer.length;
 }
 
-fun(String) calc_cap(requires: i32) -> i32 {
+fun(String) calc_cap(requires: usize) -> usize {
     var new_cap = self.cap * 2;
     if requires >= new_cap {
         new_cap = requires;
@@ -50,7 +50,7 @@ fun(String) calc_cap(requires: i32) -> i32 {
     return new_cap;
 }
 
-fun(*String) maybe_extend(requires: i32) -> void {
+fun(*String) maybe_extend(requires: usize) -> void {
     if requires > self.*.cap {
         self.*.reserve(self.*.calc_cap(self.*.length() + 1));
     }
@@ -63,7 +63,7 @@ fun(*String) push(char: u8) -> void {
 }
 
 fun(*String) append_slice(slice: []u8) -> void {
-    var i = 0;
+    var i: usize = 0;
     self.*.maybe_extend(self.*.length() + slice.length);
     while i < slice.length {
         self.*.push(slice[i]);
@@ -75,13 +75,13 @@ fun(*String) append(other: *String) -> void {
     self.*.append_slice(other.*.buffer);
 }
 
-const READ_FROM_BUFFER_SIZE: i32 = 64;
+const READ_FROM_BUFFER_SIZE: usize = 64;
 
 fun(*String) append_fd(fd: fs::File) -> void {
     var buf: [READ_FROM_BUFFER_SIZE]u8;
     while true {
         var buf_slice = &buf as []u8;
-        buf_slice.length = io::read_from(fd, &buf_slice) as i32;
+        buf_slice.length = io::read_from(fd, &buf_slice) as usize;
         self.*.append_slice(buf_slice);
         if buf_slice.length != READ_FROM_BUFFER_SIZE {
             break;

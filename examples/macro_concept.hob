@@ -1,12 +1,54 @@
-macro $swap(a: var, b: var) {
+macro @swap(a: $var, b: $var) {
     var t = a;
     a = b;
     b = a;
 }
 
+macro @if(cond: $const, then: $expr, else_eval_it: $expr) {
+    $const not_cond = !$cond;
+    $if $not_cond {
+        return $then;
+    } else {
+        return $else_eval_it;
+    }
+}
+
+$struct Import {
+    value: $const,
+    then: $const
+}
+
+macro @match(value: $const, cases: []$Import) {
+    $foreach case : $cases {
+        $if value == $case.value {
+            return $case.then;
+        }
+    }
+    @error("unknown value");
+}
+
+macro @syscall() {
+    $return @switch($os.kind, [
+        { $OsKind.Windows, "syscall/windows.hob" },
+        { $OsKind.Linux,   "syscall/linux.hob"   }
+    ])
+}
+
+import @syscall_hob as arch_spec;
+
 fun main() {
     var a = 1;
     var b = 2;
-
     @swap(a, b);
+    #`
+        {
+            var @t = a;
+            a = b;
+            b = a;
+        }
+    `#
+    var inv_if = @inv_if_expr(true, a + b, c + d);
+    #`
+        var inv_if = c + d;
+    `#
 }

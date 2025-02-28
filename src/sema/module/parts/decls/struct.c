@@ -13,13 +13,13 @@ SemaStructMember *sema_get_struct_member(SemaModule *sema, FileLocation at, AstS
         }
     }
     // TODO: remove from struct
-    SemaScopeDecl *decl = sema_module_resolve_ext_func(sema, name, sema_type_new_struct(struct_def));
+    SemaDecl *decl = sema_module_resolve_ext_func(sema, name, sema_type_new_struct(struct_def));
     if (decl) {
-        return sema_struct_member_ext_func(&decl->value_decl, false);
+        return sema_struct_member_ext_func(decl, false);
     }
-    SemaScopeDecl *ptr_decl = sema_module_resolve_ext_func(sema, name, sema_type_new_pointer(sema_type_new_struct(struct_def)));
+    SemaDecl *ptr_decl = sema_module_resolve_ext_func(sema, name, sema_type_new_pointer(sema_type_new_struct(struct_def)));
     if (ptr_decl) {
-        return sema_struct_member_ext_func(&ptr_decl->value_decl, true);
+        return sema_struct_member_ext_func(ptr_decl, true);
     }
     SEMA_ERROR(at, "struct `{slice}` has not member `{slice}`", &struct_def->name, name);
     return NULL;

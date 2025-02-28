@@ -20,7 +20,7 @@ typedef struct AstDeclPath {
 
 	union {
 		SemaModule *module;
-		SemaScopeDecl *decl;
+		SemaDecl *decl;
     	SemaType *type;
 	};
 } AstDeclPath;
@@ -51,7 +51,10 @@ typedef struct {
     SemaInnerPathType type;
     SemaValue *value;
     union {
-        SemaType *sizeof_type;
+        struct {
+            SemaType *type;
+            SemaType *output_type;
+        } sizeof_op;
         SemaType *deref_type;
         SemaType *slice_type;
         SemaType *optional_type;

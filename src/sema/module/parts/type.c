@@ -1,8 +1,13 @@
 #include "ast/private/type.h"
+#include "ast/private/expr.h"
+#include "sema/arch/bits/private.h"
+#include "sema/const/const.h"
+#include "sema/module/private.h"
+#include "sema/module/parts/expr.h"
+#include "sema/type/api.h"
 #include "sema/type/private.h"
 #include "sema/module/parts/type.h"
 #include "sema/module/parts/path.h"
-#include "expr/eval.h"
 #include "core/vec.h"
 
 SemaType *sema_ast_type(SemaModule *sema, AstType *type) {
@@ -43,7 +48,20 @@ SemaType *sema_ast_type(SemaModule *sema, AstType *type) {
 			if (!array_of) {
 				return NULL;
 			}
-			type->sema = sema_type_new_array(sema_eval_int_expr(sema, type->array.length), array_of);
+            SemaType *size_type = sema_arch_usize(sema);
+            SemaConst *size = sema_const_expr(sema, type->array.length, sema_expr_ctx_default_of(size_type));
+            if (!size) {
+                return NULL;
+            }
+            if (!sema_types_equals(size->sema_type, size_type)) {
+                SEMA_ERROR(type->array.length->loc, "array size must be usize, not {sema::type}", size->sema_type);
+                return NULL;
+            }
+            if (size->integer <= 0) {
+                SEMA_ERROR(type->array.length->loc, "array size must be positive, not {long}", size->integer);
+                return NULL;
+            }
+			type->sema = sema_type_new_array(size->integer, array_of);
 			break;
 		}
 		case AST_TYPE_SLICE: {

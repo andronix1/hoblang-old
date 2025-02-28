@@ -6,6 +6,7 @@
 #include "sema/type/type.h"
 #include "sema/module.h"
 #include "sema/value.h"
+#include "sema/const/const.h"
 
 typedef struct {
 	SemaType *expectation;
@@ -15,7 +16,7 @@ typedef struct {
 SemaValue *sema_callable_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx);
 SemaType *sema_value_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx);
 SemaType *sema_var_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx);
-SemaType *sema_const_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx);
+SemaConst *sema_const_expr(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx);
 
 inline static SemaExprCtx sema_expr_ctx_default() {
 	SemaExprCtx ctx = {

@@ -2,7 +2,7 @@ fun eq(a: []u8, b: []u8) -> bool {
     if a.length != b.length {
         return false;
     }
-    var i = 0;
+    var i: usize = 0;
     while i < a.length {
         if a[i] != b[i] {
             return false;

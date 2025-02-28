@@ -1,3 +1,4 @@
+#include "llvm/api.h"
 #include "llvm/private.h"
 #include "llvm/parts/expr.h"
 #include "llvm/parts/type.h"
@@ -6,6 +7,9 @@
 #include "llvm/parts/types/optional.h"
 #include <llvm-c/Core.h>
 #include <llvm-c/Types.h>
+#include "sema/const/const.h"
+#include "sema/type/private.h"
+#include "sema/value/api.h"
 #include "sema/value/private.h"
 #include "sema/module/decls/impl.h"
 #include "core/vec.h"
@@ -13,6 +17,7 @@
 
 LLVMValueRef llvm_call(LlvmBackend *llvm, AstCall *call) {
 	LLVMValueRef callable = llvm_expr(llvm, call->callable, true);
+    SemaType *callable_type = sema_value_typeof(call->callable->value);
 	LLVMValueRef ext_base = call->callable->value->type == SEMA_VALUE_EXT_FUNC_HANDLE ?
 		call->callable->value->ext_func_handle : NULL;
 	size_t ext_offset = ext_base != NULL;
@@ -23,18 +28,45 @@ LLVMValueRef llvm_call(LlvmBackend *llvm, AstCall *call) {
 	for (size_t i = 0; i < vec_len(call->args); i++) {
 		params[i + ext_offset] = llvm_expr(llvm, call->args[i], true);
 	}
-	SemaType *returning = call->callable->value->sema_type->func.returning;
+	SemaType *returning = callable_type->func.returning;
 	bool is_void = sema_types_equals(returning, sema_type_primitive_void());
 	return LLVMBuildCall2(
 		llvm_builder(llvm),
-		llvm_sema_function_type(&call->callable->value->sema_type->func),
+		llvm_sema_function_type(&callable_type->func),
 		callable,
 		params, vec_len(call->args) + ext_offset,
 		is_void ? "" : "call_result"
 	);
 }
 
+LLVMValueRef llvm_const(SemaConst *constant) {
+    switch (constant->type) {
+        case SEMA_CONST_INT: 
+            return LLVMConstInt(llvm_resolve_type(constant->sema_type), constant->integer, false);
+        case SEMA_CONST_FLOAT:
+            return LLVMConstReal(llvm_resolve_type(constant->sema_type), constant->fp);
+        case SEMA_CONST_BOOL:
+            return LLVMConstInt(LLVMInt1Type(), constant->boolean, false);
+        case SEMA_CONST_ARRAY: {
+			LLVMTypeRef of = llvm_resolve_type(constant->sema_type->array.of);
+            LLVMValueRef *values = alloca(sizeof(LLVMValueRef) * constant->sema_type->array.length);
+			for (size_t i = 0; i < constant->sema_type->array.length; i++) {
+				values[i] = llvm_const(constant->array);
+			}
+			return LLVMConstArray2(of, values, constant->sema_type->array.length);
+        }
+        case SEMA_CONST_STRUCT:
+            assert(0, "TODO const struct");
+        case SEMA_CONST_OPTIONAL:
+            assert(0, "TODO const optional");
+    }
+    assert(0, "invalid const type");
+}
+
 LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
+    if (expr->value->type == SEMA_VALUE_CONST) {
+        return llvm_const(&expr->value->constant);
+    }
 	switch (expr->type) {
 		case AST_EXPR_UNWRAP: {
             LLVMValueRef opt = llvm_expr(llvm, expr->unwrap.expr, true);
@@ -48,7 +80,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
                 ),
                 "is_not_null"
             );
-            expr->unwrap.decl->llvm_value = llvm_opt_value(
+            expr->unwrap.decl->llvm.value = llvm_opt_value(
                 llvm,
                 llvm_resolve_type(expr->unwrap.expr->value->sema_type->optional_of),
                 opt,
@@ -96,10 +128,11 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
         }
 		case AST_EXPR_NOT: return LLVMBuildNot(llvm_builder(llvm), llvm_expr(llvm, expr->not_expr, true), "");
 		case AST_EXPR_REF: return llvm_expr(llvm, expr->ref_expr, false);
-		case AST_EXPR_INTEGER: return LLVMConstInt(llvm_resolve_type(expr->value->sema_type), expr->integer, false);
-		case AST_EXPR_FLOAT: return LLVMConstReal(llvm_resolve_type(expr->value->sema_type), expr->float_value);
-		case AST_EXPR_BOOL: return LLVMConstInt(LLVMInt1Type(), expr->boolean, false);
-		case AST_EXPR_CHAR: return LLVMConstInt(LLVMInt8Type(), expr->character, false);
+		case AST_EXPR_INTEGER: 
+		case AST_EXPR_FLOAT: 
+		case AST_EXPR_BOOL: 
+		case AST_EXPR_CHAR:
+            assert(0, "should be caught as const");
 		case AST_EXPR_STR: return llvm_slice_from_str(llvm, &expr->str);
         case AST_EXPR_RET_ON_NULL: {
             LLVMBasicBlockRef on_null = LLVMAppendBasicBlock(
@@ -223,7 +256,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 			break;
 		}
 		case AST_EXPR_UNARY: {
-			bool is_float = sema_type_is_float(expr->unary.expr->value->sema_type);
+			bool is_float = sema_type_is_float(sema_value_typeof(expr->unary.expr->value));
 			switch (expr->unary.type) {
 				case AST_UNARY_MINUS: return (is_float ? LLVMBuildFNeg : LLVMBuildNeg)(llvm_builder(llvm), llvm_expr(llvm, expr->unary.expr, true), "");
 				case AST_UNARY_BITNOT: return LLVMBuildNot(llvm_builder(llvm), llvm_expr(llvm, expr->unary.expr, true), "");
@@ -232,7 +265,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 			return NULL;
 		}
 		case AST_EXPR_BINOP: {
-			bool is_float = sema_type_is_float(expr->binop.left->value->sema_type);
+			bool is_float = sema_type_is_float(sema_value_typeof(expr->unary.expr->value));
 			LLVMValueRef right = llvm_expr(llvm, expr->binop.right, true);
 			LLVMValueRef left = llvm_expr(llvm, expr->binop.left, true);
 			switch (expr->binop.type) {
@@ -265,7 +298,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 			return llvm_call(llvm, &expr->call);
 		}
 		case AST_EXPR_ARRAY: {
-			LLVMTypeRef of = llvm_resolve_type(expr->value->sema_type->array.of);
+			LLVMTypeRef of = llvm_resolve_type(sema_value_typeof(expr->value)->array.of);
 			LLVMTypeRef type = LLVMArrayType(of, vec_len(expr->array));
 			LLVMValueRef array = LLVMBuildAlloca(llvm_builder(llvm), type, "new_arr");
 			for (size_t i = 0; i < vec_len(expr->array); i++) {

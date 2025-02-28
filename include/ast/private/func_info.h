@@ -9,7 +9,7 @@ typedef struct {
 	AstType type;
 	Slice name;
 
-	SemaScopeValueDecl *decl;
+	SemaDecl *decl;
 } AstFuncArg;
 
 typedef struct {
@@ -25,6 +25,6 @@ typedef struct AstFuncInfo {
     AstExtFuncInfo ext;
 	
 	Slice public_name;
-	SemaScopeValueDecl *decl;
-	SemaScopeValueDecl *self;
+	SemaDecl *decl;
+	SemaDecl *self;
 } AstFuncInfo;

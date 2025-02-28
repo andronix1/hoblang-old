@@ -39,7 +39,7 @@ void *_vec_pop(void *vec) {
 	return result;
 }
 
-void *_vec_push(void *vec, void *element) {
+void *_vec_push(void *vec, const void *element) {
 	VecHeader *header = vec_header(vec);
 	if (header->cap <= header->len) {
 		vec = _vec_reserve(vec, header->cap == 0 ? 1 : header->cap * 2);
@@ -53,9 +53,7 @@ void *_vec_push(void *vec, void *element) {
 void *_vec_append_raw(void *vec, const void *ptr, size_t len) {
 	VecHeader *header = vec_header(vec);
 	vec = _vec_reserve(vec, header->len + len);
-	for (size_t i = 0; i < len; i++) {
-		vec = _vec_push(vec, (char*)ptr + i * header->esize);
-	}
+    memcpy((char*)vec + header->len * header->esize, ptr, len * header->esize);
 	return vec;
 }
 

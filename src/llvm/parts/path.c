@@ -17,7 +17,7 @@ LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstI
         bool is_last = vec_len(path->segments) - 1 == i;
         switch (segment->type) {
             case SEMA_INNER_PATH_SIZEOF:
-                value = llvm_type_sizeof(llvm, llvm_resolve_type(segment->sizeof_type));
+                value = llvm_type_sizeof(llvm, llvm_resolve_type(segment->sizeof_op.type), llvm_resolve_type(segment->sizeof_op.output_type));
                 break;
             case SEMA_INNER_PATH_DEREF:
                 if (segment->value->type == SEMA_VALUE_VAR) {
@@ -41,7 +41,7 @@ LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstI
                                 ""
                             );
                         }
-                        value = segment->struct_member.member->ext_func.decl->llvm_value;
+                        value = segment->struct_member.member->ext_func.decl->llvm.value;
                         break;
                     case SEMA_STRUCT_MEMBER_FIELD: {
                         size_t mid = segment->struct_member.member->field_idx;
@@ -76,7 +76,7 @@ LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstI
 }
 
 LLVMValueRef llvm_resolve_value_decl_path(LlvmBackend *llvm, AstDeclPath *path, SemaValue *from) {
-	LLVMValueRef result = path->decl->value_decl.llvm_value;
+	LLVMValueRef result = path->decl->llvm.value;
 	return result;
 }
 

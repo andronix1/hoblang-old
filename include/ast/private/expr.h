@@ -50,7 +50,7 @@ typedef struct {
     Slice name;
 
     SemaExprUnwrapType type;
-    SemaScopeValueDecl *decl;
+    SemaDecl *decl;
 } AstExprUnwrap;
 
 typedef struct {

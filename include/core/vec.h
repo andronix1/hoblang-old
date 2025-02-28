@@ -10,7 +10,7 @@ typedef struct {
 VecHeader *vec_header(void *vec);
 void *_vec_new(size_t esize);
 void *_vec_reserve(void *vec, size_t cap);
-void *_vec_push(void *vec, void *element);
+void *_vec_push(void *vec, const void *element);
 void *_vec_top(void *vec);
 void *_vec_pop(void *vec);
 size_t vec_len(void *vec);
@@ -32,6 +32,9 @@ void vec_free(void *vec);
 
 #define vec_append_raw(vec, ptr, len) ({ \
 	assert(sizeof(*ptr) == vec_header(vec)->esize, "trying to append vector with esize {long} by pointer with size {long}", sizeof(*ptr), vec_header(vec)->esize); \
-	(typeof(vec))_vec_append_raw((vec), ptr, len); \
+    typeof(vec) _ptr = (typeof(vec))ptr; \
+    typeof(vec) _vec = vec; \
+    for (size_t i = 0; i < (size_t)len; i++) { _vec = vec_push(_vec, &_ptr[i]); } \
+    _vec; \
 })
 

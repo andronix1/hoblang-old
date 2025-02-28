@@ -30,7 +30,11 @@ void lexer_print_line_error_at(Lexer *lexer, FileLocation at) {
     Slice slice = slice_new(&lexer->full.str[i], len);
     print("| {slice}\n| ", &slice);
     for (i = 0; i < at.column; i++) {
-        print(" ");
+        if (slice.str[i] == '\t') {
+            print("\t");
+        } else {
+            print(" ");
+        }
     }
     print("^\n");
 }

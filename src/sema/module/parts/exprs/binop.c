@@ -51,5 +51,6 @@ SemaValue *sema_analyze_expr_binop(SemaModule *sema, AstExprBinop *binop, SemaEx
 	if (binary_binop) {
 		ltype = sema_type_primitive_bool();
 	}
-	return sema_value_const(ltype);
+    // TODO: binop between constants
+	return sema_value_final(ltype);
 }

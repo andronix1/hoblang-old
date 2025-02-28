@@ -1,6 +1,7 @@
 #include "llvm/private.h"
 #include "llvm/parts/type.h"
 #include "llvm/parts/expr.h"
+#include "sema/value/api.h"
 #include "sema/value/private.h"
 #include "core/vec.h"
 #include "ast/private/stmts/asm.h"
@@ -47,9 +48,10 @@ void llvm_stmt_asm(LlvmBackend *llvm, AstInlineAsm *inline_asm) {
                 case AST_ASM_ARG_EXPR: {
                     LLVMValueRef value = llvm_expr(llvm, arg->expr, true);
                     values = vec_push(values, &value);
-                    LLVMTypeRef type = llvm_resolve_type(arg->expr->value->sema_type);
+                    LLVMTypeRef type = llvm_resolve_type(sema_value_typeof(arg->expr->value));
                     types = vec_push(types, &type);
-                    APPEND_ASM("$%lu", args_count++);
+                    APPEND_ASM("$%lu", args_count);
+                    args_count++;
                     APPEND_CONSTR("rim");
                     break;
                 }
@@ -63,7 +65,8 @@ void llvm_stmt_asm(LlvmBackend *llvm, AstInlineAsm *inline_asm) {
                     values = vec_push(values, &value);
                     LLVMTypeRef type = LLVMInt64Type();
                     types = vec_push(types, &type);
-                    APPEND_ASM("$%ld", args_count++);
+                    APPEND_ASM("$%ld", args_count);
+                    args_count++;
                     APPEND_CONSTR("p");
                     break;
                 }

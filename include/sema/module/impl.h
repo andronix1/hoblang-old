@@ -10,7 +10,7 @@
 #include "sema/project.h"
 
 typedef struct SemaScope {
-    SemaScopeDecl **decls;
+    SemaDecl **decls;
 	AstBody *body;
 } SemaScope;
 
@@ -22,7 +22,7 @@ typedef struct SemaModule {
 
     // internal
     SemaProject *project; // TODO: API
-    SemaScopeDecl **public_decls;
+    SemaDecl **public_decls;
 	SemaScope *scopes;
 	SemaLoop **loops;
 	SemaType *returning;

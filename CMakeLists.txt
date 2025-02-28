@@ -72,8 +72,9 @@ set(SOURCE_FILES
 	src/sema/module/api.c
 	src/sema/module/private.c
 	src/sema/module/loop/api.c
+	src/sema/module/decls/api.c
+	src/sema/module/value/api.c
 	src/sema/module/parts/decls/struct.c
-	src/sema/module/parts/expr/eval.c
 	src/sema/module/parts/exprs/array.c
 	src/sema/module/parts/exprs/as.c
 	src/sema/module/parts/exprs/idx.c
@@ -129,9 +130,13 @@ link_directories(${LLVM_LIBRARY_DIRS})
 add_executable(hoblang ${SOURCE_FILES})
 target_compile_options(hoblang PRIVATE 
     -O3 -g -ggdb
+    -fsanitize=address
 	-Wall -Wextra -Werror
 	-Wno-format
 	-Wno-error=unused-parameter -Wno-error=unused-variable
+)
+target_link_options(hoblang PRIVATE
+    -fsanitize=address
 )
 target_link_libraries(hoblang PRIVATE LLVM)
 target_include_directories(hoblang PRIVATE src)

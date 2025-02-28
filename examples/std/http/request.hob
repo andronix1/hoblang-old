@@ -15,13 +15,13 @@ struct SplitSlice {
 
 fun split_left(slice: []u8, sep: u8) -> SplitSlice {
     var result: SplitSlice;
-    var i = 0;
+    var i: usize = 0;
     while i < slice.length {
         if slice[i] == sep {
             result.left.raw = slice.raw;
             result.left.length = i;
             result.right.raw = (slice.raw as i64 + i as i64 + 1) as *u8;
-            result.right.length = slice.length - i as i32 - 1;
+            result.right.length = slice.length - i - 1;
             return result;
         }
         i = i + 1;

@@ -1,5 +1,6 @@
 #include <stdarg.h>
 #include "ast/private/expr.h"
+#include "ast/private/expr/as.h"
 #include "ast/private/path.h"
 #include "core/vec.h"
 #include "core/print.h"
@@ -119,7 +120,14 @@ void print_ast_expr(FILE *stream, va_list list) {
 			print_to(stream, ")");
 			break;
 		case AST_EXPR_AS:
-			print_to(stream, "{ast::expr} as {ast::type}", expr->as.expr, &expr->as.type);
+            switch (expr->as.type) {
+                case AST_EXPR_AS_TYPE:
+			        print_to(stream, "{ast::expr} as {ast::type}", expr->as.expr, &expr->as.as_type);
+                    break;
+                case AST_EXPR_AS_AUTO:
+			        print_to(stream, "{ast::expr} as _", expr->as.expr);
+                    break;
+            }
 			break;
 	}
 }

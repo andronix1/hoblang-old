@@ -1,11 +1,12 @@
 #include "ast/private/stmts/var.h"
-#include "sema/module/decls/impl.h"
 #include "ast/private/expr.h"
 #include "sema/module/private.h"
 #include "sema/module/parts/expr.h"
 #include "sema/module/parts/type.h"
+#include "sema/value/api.h"
 #include "sema/value/private.h"
 #include "sema/type/api.h"
+#include "sema/module/decls/api.h"
 
 void sema_stmt_var(SemaModule *sema, AstVar *var) {
 	SemaType *var_type;
@@ -29,11 +30,11 @@ void sema_stmt_var(SemaModule *sema, AstVar *var) {
 				return;
 			}
 			var->typed = true;
-			var->type.sema = var->expr->value->sema_type; 
+			var->type.sema = sema_value_typeof(var->expr->value); 
 		} else {
 			SEMA_ERROR(var->loc, "variable type must be specified or initializer must present");
 			return;
 		}
 	}
-	var->decl = &sema_module_push_decl(sema, var->loc, sema_scope_decl_new_value(var->name, var_type, false))->value_decl;
+	var->decl = sema_module_push_decl(sema, var->loc, sema_decl_new(var->name, sema_value_var(var_type)));
 }

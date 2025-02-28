@@ -1,7 +1,10 @@
+#include "sema/const/const.h"
 #include "sema/module/private.h"
 #include "sema/module/parts/expr.h"
 #include "sema/type/private.h"
 #include "sema/value/private.h"
+#include "sema/value/api.h"
+#include "sema/const/api.h"
 #include "ast/private/expr.h"
 #include "core/assert.h"
 
@@ -32,9 +35,12 @@ SemaValue *sema_expr(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) {
 		case AST_EXPR_GET_LOCAL_PATH: return expr->value = sema_analyze_expr_get_local(sema, &expr->get_local, ctx);
 		case AST_EXPR_REF: return expr->value = sema_analyze_expr_ref(sema, expr->ref_expr, ctx);
 		case AST_EXPR_NOT: return expr->value = sema_analyze_expr_not(sema, expr->not_expr, ctx);
-		case AST_EXPR_STR: return expr->value = sema_value_const(sema_type_new_slice(sema_type_primitive_u8()));
-		case AST_EXPR_CHAR: return expr->value = sema_value_const(sema_type_primitive_u8());
-		case AST_EXPR_BOOL: return expr->value = sema_value_const(sema_type_primitive_bool());
+        // TODO: strings - arrays
+		case AST_EXPR_STR: return expr->value = sema_value_final(sema_type_new_slice(sema_type_primitive_u8()));
+		case AST_EXPR_CHAR: return expr->value = sema_value_const(
+            sema_const_int(sema_type_primitive_u8(), expr->character)
+        );
+		case AST_EXPR_BOOL: return expr->value = sema_value_const(sema_const_bool(expr->boolean));
 		case AST_EXPR_ARRAY: return expr->value = sema_analyze_expr_array(sema, expr->array, ctx);
 		case AST_EXPR_BINOP: return expr->value = sema_analyze_expr_binop(sema, &expr->binop, ctx);
 		case AST_EXPR_AS: return expr->value = sema_analyze_expr_as(sema, &expr->as, ctx);
@@ -50,20 +56,24 @@ SemaValue *sema_callable_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx 
     if (!sema_expr(sema, expr, ctx)) {
         return NULL;
     }
-    if (expr->value->type != SEMA_VALUE_CONST && expr->value->type != SEMA_VALUE_VAR && expr->value->type != SEMA_VALUE_EXT_FUNC_HANDLE) {
+    if (
+        expr->value->type != SEMA_VALUE_FINAL &&
+        expr->value->type != SEMA_VALUE_VAR &&
+        expr->value->type != SEMA_VALUE_EXT_FUNC_HANDLE) {
         SEMA_ERROR(expr->loc, "{ast::expr} is not callable", expr);
+        return NULL;
     }
     return expr->value;
 }
 
-SemaType *sema_const_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) {
+SemaConst *sema_const_expr(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) {
     if (!sema_expr(sema, expr, ctx)) {
         return NULL;
     }
-    if (expr->value->type != SEMA_VALUE_CONST && expr->value->type != SEMA_VALUE_VAR) {
+    if (expr->value->type != SEMA_VALUE_CONST) {
         SEMA_ERROR(expr->loc, "{ast::expr} is not a const", expr);
     }
-    return expr->value->sema_type;
+    return &expr->value->constant;
 }
 
 SemaType *sema_var_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) {
@@ -73,15 +83,16 @@ SemaType *sema_var_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) {
     if (expr->value->type != SEMA_VALUE_VAR) {
         SEMA_ERROR(expr->loc, "{ast::expr} is not a variable", expr);
     }
-    return expr->value->sema_type;
+    return sema_value_typeof(expr->value);
 }
 
 SemaType *sema_value_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) {
     if (!sema_expr(sema, expr, ctx)) {
         return NULL;
     }
-    if (expr->value->type != SEMA_VALUE_CONST && expr->value->type != SEMA_VALUE_VAR) {
+    if (expr->value->type != SEMA_VALUE_CONST && expr->value->type != SEMA_VALUE_FINAL && expr->value->type != SEMA_VALUE_VAR) {
         SEMA_ERROR(expr->loc, "{ast::expr} is not a value", expr);
+        return NULL;
     }
-    return expr->value->sema_type;
+    return sema_value_typeof(expr->value);
 }

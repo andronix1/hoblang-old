@@ -40,7 +40,7 @@ fun println(str: []u8) -> void {
     print("\n");
 }
 
-const PRINT_U64_BUF_SIZE: i32 = 32;
+const PRINT_U64_BUF_SIZE: usize = 32;
 
 fun print_i32(value: i32) -> void {
     if value < 0 {
@@ -80,7 +80,7 @@ fun hex_dump_4b(hb: u8) -> void {
 }
 
 fun hex_dump(mem: []u8) -> void {
-    var i = 0;
+    var i: usize = 0;
     while i < mem.length {
         var char = mem[i];
         hex_dump_4b(char & 0xf0 >> 4);
