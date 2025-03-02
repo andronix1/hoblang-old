@@ -8,6 +8,11 @@ void print_token(FILE *stream, va_list list) {
 	}
 	switch (token->type) {
     	case TOKEN_EOI: fprintf(stream, "<EOI>"); return;
+        case TOKEN_ASSIGN_MOD: fprintf(stream, "%%="); return;
+        case TOKEN_ASSIGN_ADD: fprintf(stream, "+="); return;
+        case TOKEN_ASSIGN_MINUS: fprintf(stream, "-="); return;
+        case TOKEN_ASSIGN_MULTIPLY: fprintf(stream, "*="); return;
+        case TOKEN_ASSIGN_DIVIDE: fprintf(stream, "/="); return;
     	case TOKEN_ASM: fprintf(stream, "asm"); return;
     	case TOKEN_BREAK: fprintf(stream, "break"); return;
     	case TOKEN_CONTINUE: fprintf(stream, "continue"); return;
