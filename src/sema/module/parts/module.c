@@ -45,6 +45,9 @@ void sema_add_ast_func_info(SemaModule *sema, FileLocation at, AstFuncInfo *info
 	));
 }
 
+// TODO: remove duplicate
+void sema_stmt_const(SemaModule *sema, FileLocation loc, AstConst *constant);
+
 void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 	switch (node->type) {
 		case AST_MODULE_NODE_TYPE_ALIAS: {
@@ -70,24 +73,7 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 			break;
 		}
 		case AST_MODULE_NODE_CONST: {
-			SemaType *const_type = sema_ast_type(sema, &node->constant.type);
-            if (!const_type) {
-                break;
-            }
-            SemaConst *constant = sema_const_expr(sema, node->constant.expr, sema_expr_ctx_default_of(const_type));
-            if (!constant) {
-                break;
-            }
-            if (!sema_types_equals(const_type, constant->sema_type)) {
-                SEMA_ERROR(node->constant.expr->loc, "expected {sema::type} type of constant, not {sema::type}", const_type, constant->sema_type);
-                break;
-            }
-			if (const_type) {
-				node->constant.decl = sema_module_push_public_decl(sema, node->loc, sema_decl_new(
-					node->constant.name,
-					sema_value_const(*constant)
-				));
-			}
+            sema_stmt_const(sema, node->loc, &node->constant);
 			break;
 		}
 

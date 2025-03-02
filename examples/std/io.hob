@@ -48,9 +48,9 @@ fun print_i32(value: i32) -> void {
     print_u64(value as u64);
 }
 
-const BUF_SIZE: usize = 32;
-
 fun print_u64(val: u64) -> void {
+    const BUF_SIZE: usize = 32;
+
     var i: usize = 0;
     var buf: [BUF_SIZE]u8;
     while val != 0 {

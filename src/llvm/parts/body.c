@@ -32,7 +32,9 @@ bool llvm_body(LlvmBackend *llvm, AstBody *body) {
 			case AST_STMT_ASSIGN: llvm_stmt_assign(llvm, &stmt->assign); break;
 			case AST_STMT_INLINE_ASM: llvm_stmt_asm(llvm, &stmt->inline_asm); break;
 			case AST_STMT_EXPR: llvm_expr(llvm, stmt->expr, false); break;
-			case AST_STMT_DEFER: break;
+			case AST_STMT_CONST:
+			case AST_STMT_DEFER:
+                break;
 		}
 	}
 	llvm_body_break(llvm, body->defers);

@@ -24,14 +24,14 @@ SemaValue *sema_expr_binop_eval(AstBinopType type, SemaConst *left, SemaConst *r
     switch (type) {
         case AST_BINOP_ADD: IFO(+);
         case AST_BINOP_MOD: IO(%);
-        case AST_BINOP_SUB: IFO(+);
-        case AST_BINOP_MUL: IFO(+);
-        case AST_BINOP_DIV: IFO(+);
-        case AST_BINOP_BITAND: IFO(+);
-        case AST_BINOP_BITOR: IFO(+);
-        case AST_BINOP_SHR: IO(+);
-        case AST_BINOP_SHL: IO(+);
-        case AST_BINOP_XOR: IFO(+);
+        case AST_BINOP_SUB: IFO(-);
+        case AST_BINOP_MUL: IFO(*);
+        case AST_BINOP_DIV: IFO(/);
+        case AST_BINOP_BITAND: IO(&);
+        case AST_BINOP_BITOR: IO(|);
+        case AST_BINOP_SHR: IO(>>);
+        case AST_BINOP_SHL: IO(<<);
+        case AST_BINOP_XOR: IO(^);
 
         case AST_BINOP_EQ: IFO(==);
         case AST_BINOP_NEQ: IFO(!=);

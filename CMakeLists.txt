@@ -49,6 +49,7 @@ set(SOURCE_FILES
 	src/parser/private.c
 	src/parser/parts/types/func.c
 	src/parser/parts/stmts/var.c
+	src/parser/parts/stmts/const.c
 	src/parser/parts/stmts/return.c
 	src/parser/parts/stmts/while.c
 	src/parser/parts/stmts/defer.c
@@ -99,6 +100,7 @@ set(SOURCE_FILES
 	src/sema/module/parts/stmts/return.c
 	src/sema/module/parts/stmts/defer.c
 	src/sema/module/parts/stmts/var.c
+	src/sema/module/parts/stmts/const.c
 	src/sema/module/parts/stmts/while.c
 	src/sema/module/parts/module.c
 	src/sema/module/parts/path.c

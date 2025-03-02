@@ -10,9 +10,11 @@
 #include "stmts/while.h"
 #include "stmts/asm.h"
 #include "stmts/loop_control.h"
+#include "stmts/const.h"
 
 typedef enum {
 	AST_STMT_IF,
+	AST_STMT_CONST,
 	AST_STMT_VAR,
 	AST_STMT_RETURN,
 	AST_STMT_WHILE,
@@ -28,6 +30,7 @@ typedef struct {
 	AstStmtType type;
 	union {
 		AstVar var;
+		AstConst constant;
 		AstExpr *expr;
 		AstIfElse if_else;
 		AstReturn ret;

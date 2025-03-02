@@ -5,6 +5,7 @@
 #include "core/location.h"
 #include "lexer/token.h"
 #include "parser/parts/expr.h"
+#include "parser/parts/const.h"
 #include "parser/private.h"
 #include "parser/token_stops.h"
 
@@ -80,6 +81,9 @@ bool parse_stmt(Parser *parser, AstStmt *stmt) {
 					return false;
 			}
 		}
+		case TOKEN_CONST:
+            stmt->type = AST_STMT_CONST;
+            return parse_const(parser, &stmt->constant);
 		case TOKEN_CONTINUE:
             stmt->type = AST_STMT_CONTINUE;
 			stmt->continue_loop.loc = token->location;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "stmts/const.h"
 #include "core/location.h"
 #include "path.h"
 #include "func_info.h"
@@ -9,14 +10,6 @@ typedef struct {
 	AstType type;
 	Slice alias;
 } AstTypeAlias;
-
-typedef struct {
-	AstType type;
-	Slice name;
-	AstExpr *expr;
-
-	SemaDecl *decl;
-} AstConst;
 
 typedef struct {
 	AstDeclPath path;

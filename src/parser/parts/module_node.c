@@ -1,4 +1,5 @@
 #include "ast/private/module_node.h"
+#include "parser/parts/const.h"
 #include "parser/parts/module_node.h"
 #include "parser/parts/type.h"
 #include "parser/parts/path.h"
@@ -47,18 +48,7 @@ bool parse_module_node(Parser *parser, AstModuleNode *node) {
 			return true;
 		case TOKEN_CONST:
 			node->type = AST_MODULE_NODE_CONST;
-			node->constant.name = PARSER_EXPECT_NEXT(TOKEN_IDENT, "name")->ident;
-			PARSER_EXPECT_NEXT(TOKEN_COLON, "colon");
-			if (!parse_type(parser, &node->constant.type)) {
-				return false;
-			}
-			PARSER_EXPECT_NEXT(TOKEN_ASSIGN, "assign");
-			node->constant.expr = parse_expr(parser, token_stop_semicolon);
-			if (!node->constant.expr) {
-				return false;
-			}
-			PARSER_EXPECT_NEXT(TOKEN_SEMICOLON, "semicolon");
-			return true;
+			return parse_const(parser, &node->constant);
 		case TOKEN_TYPE:
 			node->type = AST_MODULE_NODE_TYPE_ALIAS;
 			node->type_alias.alias = PARSER_EXPECT_NEXT(TOKEN_IDENT, "alias")->ident;

@@ -10,7 +10,6 @@ struct ConstTest {
 
 const a: i32 = 1 + 2;
 const b: i32 = a + 2;
-const c: i32 = b * 123;
 # const s: ConstTest;
 
 fun new_slice(ptr: *u8, len: usize) -> []u8 {
@@ -19,6 +18,7 @@ fun new_slice(ptr: *u8, len: usize) -> []u8 {
     result.length = len;
     return result;
 }
+
 fun dbg(name: []u8, val: i32) -> void {
     io::print(name);
     io::print(" = ");
@@ -27,9 +27,11 @@ fun dbg(name: []u8, val: i32) -> void {
 }
 
 fun main() -> i32 {
+    const c: i32 = b * 123;
+
     dbg("a", a);
     dbg("b", b);
-    dbg("c", 123);
+    dbg("c", c);
     # dbg("s", s.a);
     return 0;
 }
