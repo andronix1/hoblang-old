@@ -14,7 +14,6 @@
 LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstInnerPath *path, SemaValue *from) {
     for (size_t i = 0; i < vec_len(path->segments); i++) {
         SemaInnerPath *segment = &path->segments[i].sema;
-        bool is_last = vec_len(path->segments) - 1 == i;
         switch (segment->type) {
             case SEMA_INNER_PATH_SIZEOF:
                 value = llvm_type_sizeof(llvm, llvm_resolve_type(segment->sizeof_op.type), llvm_resolve_type(segment->sizeof_op.output_type));

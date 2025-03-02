@@ -1,0 +1,40 @@
+import "std/io.hob" as io;
+import "std/process.hob" as process;
+
+#`
+struct ConstTest {
+    a: i32,
+    b: i32
+}
+`#
+
+const a: i32 = 1 + 2;
+const b: i32 = a + 2;
+const c: i32 = b * 123;
+# const s: ConstTest;
+
+fun new_slice(ptr: *u8, len: usize) -> []u8 {
+    var result: []u8;
+    result.raw = ptr;
+    result.length = len;
+    return result;
+}
+fun dbg(name: []u8, val: i32) -> void {
+    io::print(name);
+    io::print(" = ");
+    io::print_i32(val);
+    io::println(";");
+}
+
+fun main() -> i32 {
+    dbg("a", a);
+    dbg("b", b);
+    dbg("c", 123);
+    # dbg("s", s.a);
+    return 0;
+}
+
+fun _start() -> void {
+    process::exit(main());
+}
+
