@@ -13,9 +13,11 @@ set(SOURCE_FILES
 
     src/cmd/api.c
     src/cmd/shared/arch.c
+    src/cmd/shared/llvm.c
     src/cmd/build_exe.c
     src/cmd/build_obj.c
     src/cmd/emit_llvm.c
+    src/cmd/list_targets.c
     src/cmd/help.c
 
     src/print/base.c

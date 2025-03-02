@@ -10,7 +10,7 @@
 #include "llvm/api.h"
 #include "cmd/api.h"
 
-LlvmBackend *llvm_create_from_file(const char *input, CmdArchFlags *arch) {
+LlvmBackend *llvm_create_from_file(const char *input, CmdLlvm *cmd, CmdArchFlags *arch) {
     SemaIntBits ints = SEMA_INT_8;
     SemaFloatBits floats = 0;
     switch (arch->bits) {
@@ -41,7 +41,7 @@ LlvmBackend *llvm_create_from_file(const char *input, CmdArchFlags *arch) {
         return NULL;
     }
     char *temp = "/tmp/hobtmp.o";
-    if (!llvm_write_module(llvm, temp)) {
+    if (!llvm_write_module(llvm, cmd->target, temp)) {
         return NULL;
     }
     return llvm;
@@ -57,11 +57,11 @@ int main(int argc, char **argv) {
 
     switch (cmd.function) {
         case CMD_FUNCTION_BUILD_EXE: {
-            LlvmBackend *llvm = llvm_create_from_file(cmd.build_exe.input, &cmd.build_exe.arch);
+            LlvmBackend *llvm = llvm_create_from_file(cmd.build_exe.input, &cmd.build_exe.llvm, &cmd.build_exe.arch);
             if (!llvm) {
                 return 1;
             }
-            if (!llvm_write_module(llvm, (char*)cmd.build_exe.temp_obj)) {
+            if (!llvm_write_module(llvm, cmd.build_exe.llvm.target, (char*)cmd.build_exe.temp_obj)) {
                 return 1;
             }
             const char **args = vec_new(const char*);
@@ -77,6 +77,9 @@ int main(int argc, char **argv) {
                 const char *flag = "-l";
                 args = vec_push(args, &flag);
                 args = vec_push(args, &cmd.build_exe.linker.libs[i]);
+            }
+            for (size_t i = 0; i < vec_len(cmd.build_exe.linker.args); i++) {
+                args = vec_push(args, &cmd.build_exe.linker.args[i]);
             }
             int status = 1;
             if (!process_run(cmd.build_exe.linker.path, (char**)args, &status)) {
@@ -102,23 +105,27 @@ int main(int argc, char **argv) {
             return 0;
         }
         case CMD_FUNCTION_BUILD_OBJ: {
-            LlvmBackend *llvm = llvm_create_from_file(cmd.build_obj.input, &cmd.build_obj.arch);
+            LlvmBackend *llvm = llvm_create_from_file(cmd.build_obj.input, &cmd.build_obj.llvm, &cmd.build_obj.arch);
             if (!llvm) {
                 return 1;
             }
-            if (!llvm_write_module(llvm, (char*)cmd.build_obj.output)) {
+            if (!llvm_write_module(llvm, cmd.build_obj.llvm.target, (char*)cmd.build_obj.output)) {
                 return 1;
             }
             return 0;
         }
         case CMD_FUNCTION_EMIT_LLVM: {
-            LlvmBackend *llvm = llvm_create_from_file(cmd.emit_llvm.input, &cmd.emit_llvm.arch);
+            LlvmBackend *llvm = llvm_create_from_file(cmd.emit_llvm.input, &cmd.emit_llvm.llvm, &cmd.emit_llvm.arch);
             if (!llvm) {
                 return 1;
             }
 		    if (!llvm_write_module_ir(llvm, (char*)cmd.emit_llvm.output)) {
                 return 1;
             }
+            return 0;
+        }
+        case CMD_FUNCTION_LIST_TARGETS: {
+            llvm_print_targets();
             return 0;
         }
         case CMD_FUNCTION_HELP: {

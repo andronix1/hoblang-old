@@ -14,14 +14,20 @@ typedef struct {
 } CmdArchFlags;
 
 typedef struct {
+    const char *target;
+} CmdLlvm;
+
+typedef struct {
     const char *path;
     const char **libs;
+    const char **args;
 } CmdLinker;
 
 typedef enum {
     CMD_FUNCTION_BUILD_EXE,
     CMD_FUNCTION_BUILD_OBJ,
     CMD_FUNCTION_EMIT_LLVM,
+    CMD_FUNCTION_LIST_TARGETS,
     CMD_FUNCTION_HELP,
 } CmdFunction;
 
@@ -35,6 +41,7 @@ typedef struct Cmd {
             bool run;
             const char *temp_obj;
             const char **run_args;
+            CmdLlvm llvm;
             CmdLinker linker;
             CmdArchFlags arch;
         } build_exe;
@@ -42,12 +49,14 @@ typedef struct Cmd {
         struct {
             const char *input;
             const char *output;
+            CmdLlvm llvm;
             CmdArchFlags arch;
         } build_obj;
 
         struct {
             const char *input;
             const char *output; 
+            CmdLlvm llvm;
             CmdArchFlags arch;
         } emit_llvm;
     };

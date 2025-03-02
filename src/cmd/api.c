@@ -3,13 +3,15 @@
 #include "cmd/impl.h"
 #include "cmd/private.h"
 
-void cmd_usage_build_exe();
-bool cmd_parse_build_exe(Cmd *output, const char **args, size_t len);
-void cmd_usage_build_obj();
-bool cmd_parse_build_obj(Cmd *output, const char **args, size_t len);
-void cmd_usage_emit_llvm();
-bool cmd_parse_emit_llvm(Cmd *output, const char **args, size_t len);
-bool cmd_parse_help(Cmd *output, const char **args, size_t len);
+#define CMD_DEF(name) \
+    void cmd_usage_##name(); \
+    bool cmd_parse_##name(Cmd *output, const char **args, size_t len);
+
+CMD_DEF(build_exe);
+CMD_DEF(build_obj);
+CMD_DEF(emit_llvm);
+CMD_DEF(list_targets);
+CMD_DEF(help);
 
 typedef struct {
     const char *name;
@@ -24,6 +26,7 @@ const CmdParseInfo cmds[] = {
     CMD("build-exe", CMD_FUNCTION_BUILD_EXE, cmd_parse_build_exe, cmd_usage_build_exe),
     CMD("build-obj", CMD_FUNCTION_BUILD_OBJ, cmd_parse_build_obj, cmd_usage_build_obj),
     CMD("emit-llvm", CMD_FUNCTION_EMIT_LLVM, cmd_parse_emit_llvm, cmd_usage_emit_llvm),
+    CMD("list-targets", CMD_FUNCTION_LIST_TARGETS, cmd_parse_list_targets, cmd_usage_emit_llvm),
     CMD("help", CMD_FUNCTION_HELP, cmd_parse_help, NULL),
 };
 

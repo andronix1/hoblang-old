@@ -1,10 +1,12 @@
 #include "cmd/shared/arch.h"
 #include "cmd/private.h"
+#include "cmd/shared/llvm.h"
 #include "cmd/usage.h"
 
 void cmd_usage_emit_llvm() {
     CMD_USAGE_MAIN("emit-llvm", "<input> <output>")
     cmd_usage_arch_flags();
+    cmd_usage_llvm_flags();
 }
 
 bool cmd_parse_emit_llvm(Cmd *output, const char **args, size_t len) {
@@ -12,6 +14,7 @@ bool cmd_parse_emit_llvm(Cmd *output, const char **args, size_t len) {
         const char *arg = POP_ARG();
         if (CMD_IS_FLAG) {
             CMD_ARCH_FLAGS(output->emit_llvm.arch);
+            CMD_LLVM_FLAGS(output->emit_llvm.llvm);
             CMD_FLAGS_END;
         } else {
             CMD_POS_ARG(0, output->emit_llvm.input);

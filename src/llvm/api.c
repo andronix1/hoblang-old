@@ -1,4 +1,6 @@
 #include <llvm-c/Analysis.h>
+#include <llvm-c/Target.h>
+#include <llvm-c/TargetMachine.h>
 #include <malloc.h>
 #include "llvm/api.h"
 #include "llvm/impl.h"
@@ -7,6 +9,7 @@
 #include "sema/module/impl.h"
 #include "sema/module/api.h"
 #include "core/vec.h"
+#include "core/ansi.h"
 #include "sema/project/project.h"
 #include "sema/project/api.h"
 
@@ -28,6 +31,20 @@ bool llvm_emit_project(LlvmBackend *llvm, SemaProject *project) {
     return true;
 }
 
+void llvm_print_targets() {
+    LLVMInitializeAllTargetInfos();
+    for (
+        LLVMTargetRef target = LLVMGetFirstTarget();
+        target;
+        target = LLVMGetNextTarget(target)
+    ) {
+        printf(ANSI_BOLD "%s" ANSI_RESET " — %s\n",
+            LLVMGetTargetName(target),
+            LLVMGetTargetDescription(target)
+        );
+    }
+}
+
 bool llvm_write_module_ir(LlvmBackend *llvm, char *output_path) {
 	char *error;	
 	if (LLVMPrintModuleToFile(llvm->module, output_path, &error) == 1) {
@@ -37,28 +54,38 @@ bool llvm_write_module_ir(LlvmBackend *llvm, char *output_path) {
 	return true;
 }
 
-bool llvm_write_module(LlvmBackend *llvm, char *output_path) {
+bool llvm_write_module(LlvmBackend *llvm, const char *target_name, char *output_path) {
 	if (LLVMVerifyModule(llvm->module, LLVMAbortProcessAction | LLVMPrintMessageAction | LLVMReturnStatusAction, NULL)) {
 		return false;
 	}
     
-	LLVMInitializeNativeTarget();
-	LLVMInitializeNativeAsmPrinter();
-	LLVMInitializeNativeAsmParser();
-
-	LLVMTargetRef target = LLVMGetFirstTarget();
-	if (!target) {
-		hob_log(LOGE, "failed to initialize target");
-		return false;
-	}
-	const char *features = LLVMGetHostCPUFeatures();
-	const char *cpu = LLVMGetHostCPUName();
-	const char *triple = LLVMGetDefaultTargetTriple();
-	// hob_log(LOGD, "target: {cstr} - {cstr}", LLVMGetTargetName(target), LLVMGetTargetDescription(target));
-	// hob_log(LOGD, "triple: {cstr}", triple);
-	// hob_log(LOGD, "with features {cstr}", features);
-	// hob_log(LOGD, "cpu: {cstr}", cpu);
-	llvm->machine = LLVMCreateTargetMachine(target, triple, cpu, features, LLVMCodeGenLevelAggressive, LLVMRelocDefault, LLVMCodeModelDefault);
+	LLVMTargetRef target = NULL;
+    if (!target_name) {
+        LLVMInitializeNativeTarget();
+        LLVMInitializeNativeAsmPrinter();
+        LLVMInitializeNativeAsmParser();
+        target = LLVMGetFirstTarget();
+        if (!target) {
+            hob_log(LOGE, "failed to initialize target");
+            return false;
+        }
+        const char *features = LLVMGetHostCPUFeatures();
+        const char *cpu = LLVMGetHostCPUName();
+        const char *triple = LLVMGetDefaultTargetTriple();
+        llvm->machine = LLVMCreateTargetMachine(target, triple, cpu, features, LLVMCodeGenLevelAggressive, LLVMRelocDefault, LLVMCodeModelDefault);
+    } else {
+        LLVMInitializeAllTargets();
+        LLVMInitializeAllTargetInfos();
+        LLVMInitializeAllTargetMCs();
+        LLVMInitializeAllAsmPrinters();
+        LLVMInitializeAllAsmParsers();
+        target = LLVMGetTargetFromName(target_name);
+        if (!target) {
+            hob_log(LOGE, "failed to initialize target `{cstr}`", target_name);
+            return false;
+        }
+        llvm->machine = LLVMCreateTargetMachine(target, target_name, "", "", LLVMCodeGenLevelAggressive, LLVMRelocDefault, LLVMCodeModelDefault);
+    }
 	if (!llvm->machine) {
 		hob_log(LOGE, "failed to create target machine");
 		return false;
