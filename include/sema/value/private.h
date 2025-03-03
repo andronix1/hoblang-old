@@ -24,7 +24,6 @@ typedef struct SemaValue {
         SemaModule *module;
     };
 	LLVMValueRef ext_func_handle;
-    struct AstExpr *integer_expr; // TODO: REMOVE THIS!!!
 } SemaValue;
 
 #define SEMA_VALUE_CONSTRUCTOR(name, value_type) \
@@ -45,7 +44,6 @@ static inline SemaValue *sema_value_module(SemaModule *module) {
 static inline SemaValue *sema_value_const(SemaConst constant) {
     SemaValue *result = malloc(sizeof(SemaValue));
 	result->type = SEMA_VALUE_CONST;
-    result->sema_type = constant.sema_type;
 	result->constant = constant;
 	return result;
 }

@@ -15,73 +15,73 @@ SemaValue *sema_resolve_inner_value_path(SemaModule *sema, SemaValue *from, AstP
     segment->sema.value = from;
 	switch (segment->type) {
         case AST_PATH_SEG_NULL: {
-            if (from->sema_type->type != SEMA_TYPE_OPTIONAL) {
-                SEMA_ERROR(segment->loc, "cannot determine is value null for type {sema::type}", from->sema_type);
+            if (sema_value_typeof(from)->type != SEMA_TYPE_OPTIONAL) {
+                SEMA_ERROR(segment->loc, "cannot determine is value null for type {sema::type}", sema_value_typeof(from));
                 return NULL;
             }
             segment->sema.type = SEMA_PATH_IS_NULL;
-            segment->sema.optional_type = from->sema_type;
+            segment->sema.optional_type = sema_value_typeof(from);
             return sema_value_with_type(from, sema_type_primitive_bool());
         }
         case AST_PATH_SEG_SIZEOF: {
             segment->sema.type = SEMA_PATH_SIZEOF;
-            segment->sema.sizeof_op.type = from->sema_type;
+            segment->sema.sizeof_op.type = sema_value_typeof(from);
             segment->sema.sizeof_op.output_type = sema_arch_usize(sema);
             // TODO: sizeof is constant
             return sema_value_final(segment->sema.sizeof_op.output_type);
         }
         case AST_PATH_SEG_DEREF: {
-            if (from->sema_type->type != SEMA_TYPE_POINTER) {
-                SEMA_ERROR(segment->loc, "only pointers can be dereferenced, not {sema::type}", from->sema_type);
+            if (sema_value_typeof(from)->type != SEMA_TYPE_POINTER) {
+                SEMA_ERROR(segment->loc, "only pointers can be dereferenced, not {sema::type}", sema_value_typeof(from));
                 return NULL;
             }
             segment->sema.type = SEMA_PATH_DEREF;
-            segment->sema.deref_type = from->sema_type->ptr_to;
-            return sema_value_var(from->sema_type->ptr_to);
+            segment->sema.deref_type = sema_value_typeof(from)->ptr_to;
+            return sema_value_var(sema_value_typeof(from)->ptr_to);
         }
 		case AST_PATH_SEG_IDENT: {
-			if (from->sema_type->type == SEMA_TYPE_STRUCT) {
+			if (sema_value_typeof(from)->type == SEMA_TYPE_STRUCT) {
                 segment->sema.type = SEMA_PATH_STRUCT_MEMBER;
-                segment->sema.struct_member.of = from->sema_type;
-                ssize_t idx = segment->sema.struct_member.idx = sema_get_struct_member_id(sema, segment->loc, from->sema_type->struct_def, &segment->ident);
+                segment->sema.struct_member.of = sema_value_typeof(from);
+                ssize_t idx = segment->sema.struct_member.idx = sema_get_struct_member_id(sema, segment->loc, sema_value_typeof(from)->struct_def, &segment->ident);
                 if (idx != -1) {
-                    return sema_value_with_type(from, from->sema_type->struct_def->members[idx].type->sema);
+                    return sema_value_with_type(from, sema_value_typeof(from)->struct_def->members[idx].type->sema);
                 }
-			} else if (from->sema_type->type == SEMA_TYPE_SLICE) {
+			} else if (sema_value_typeof(from)->type == SEMA_TYPE_SLICE) {
                 Slice length = slice_from_const_cstr("length");
                 Slice raw = slice_from_const_cstr("raw");
-                segment->sema.slice_type = from->sema_type;
+                segment->sema.slice_type = sema_value_typeof(from);
                 if (slice_eq(&raw, &segment->ident)) {
                     segment->sema.type = SEMA_PATH_SLICE_RAW;
-                    SemaType *output_type = sema_type_new_pointer(from->sema_type->slice_of);
+                    SemaType *output_type = sema_type_new_pointer(sema_value_typeof(from)->slice_of);
                     return sema_value_with_type(from, output_type);
                 } else if (slice_eq(&length, &segment->ident)) {
                     segment->sema.type = SEMA_PATH_SLICE_LEN;
                     return sema_value_with_type(from, sema_arch_usize(sema));
                 }
-            } else if (from->sema_type->type == SEMA_TYPE_ARRAY) {                Slice length = slice_from_const_cstr("length");
+            } else if (sema_value_typeof(from)->type == SEMA_TYPE_ARRAY) {                Slice length = slice_from_const_cstr("length");
                 Slice raw = slice_from_const_cstr("raw");
                 if (slice_eq(&length, &segment->ident)) {
                     segment->sema.type = SEMA_PATH_ARRAY_LEN;
-                    segment->sema.array_length = from->sema_type->array.length;
+                    segment->sema.array_length = sema_value_typeof(from)->array.length;
                     return sema_value_final(sema_arch_usize(sema));
                 }
             }
-            SemaDecl *decl = sema_module_resolve_ext_func(sema, &segment->ident, from->sema_type);
+            SemaDecl *decl = sema_module_resolve_ext_func(sema, &segment->ident, sema_value_typeof(from));
             if (decl) {
                 segment->sema.type = SEMA_PATH_EXT_FUNC_DIRECT;
                 segment->sema.ext_func_decl = decl;
                 return sema_value_ext_func_handle(sema_value_typeof(decl->value));
             }
             if (from->type == SEMA_VALUE_VAR) {
-                SemaDecl *ptr_decl = sema_module_resolve_ext_func(sema, &segment->ident, sema_type_new_pointer(from->sema_type));
+                SemaDecl *ptr_decl = sema_module_resolve_ext_func(sema, &segment->ident, sema_type_new_pointer(sema_value_typeof(from)));
                 segment->sema.ext_func_decl = ptr_decl;
                 if (ptr_decl) {
                     segment->sema.type = SEMA_PATH_EXT_FUNC_REF;
                     return sema_value_ext_func_handle(sema_value_typeof(ptr_decl->value));
                 }
             }
-            SEMA_ERROR(segment->loc, "{sema::type} has no member `{slice}`", from->sema_type, &segment->ident);
+            SEMA_ERROR(segment->loc, "{sema::type} has no member `{slice}`", sema_value_typeof(from), &segment->ident);
 			return NULL;
 		}
 	}
@@ -119,18 +119,18 @@ SemaValue *sema_resolve_inner_type_path(SemaModule *sema, SemaValue *from, AstPa
     switch (segment->type) {
         case AST_PATH_SEG_SIZEOF:
             segment->sema.type = SEMA_PATH_SIZEOF;
-            segment->sema.sizeof_op.type = from->sema_type;
+            segment->sema.sizeof_op.type = sema_value_typeof(from);
             segment->sema.sizeof_op.output_type = sema_arch_usize(sema);
             // TODO: sizeof is constant
             return sema_value_final(segment->sema.sizeof_op.output_type);
         case AST_PATH_SEG_NULL:
-            SEMA_ERROR(segment->loc, "cannot get a member `null` from type `{sema::type}`", from->sema_type);
+            SEMA_ERROR(segment->loc, "cannot get a member `null` from type `{sema::type}`", sema_value_typeof(from));
             break;
         case AST_PATH_SEG_IDENT:
-            SEMA_ERROR(segment->loc, "cannot get a member `{slice}` from type `{sema::type}`", &segment->ident, from->sema_type);
+            SEMA_ERROR(segment->loc, "cannot get a member `{slice}` from type `{sema::type}`", &segment->ident, sema_value_typeof(from));
             break;
         case AST_PATH_SEG_DEREF:
-            SEMA_ERROR(segment->loc, "cannot dereference type `{sema::type}`", from->sema_type);
+            SEMA_ERROR(segment->loc, "cannot dereference type `{sema::type}`", sema_value_typeof(from));
             break;
     }
     assert(0, "falled through");
