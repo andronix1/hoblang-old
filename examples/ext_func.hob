@@ -11,11 +11,11 @@ fun new(x: i32, y: i32) -> Vec2 {
 }
 
 fun(Vec2) print() -> void {
-    io::print("(");
-    io::print_i32(self.x);
-    io::print(", ");
-    io::print_i32(self.y);
-    io::print(")");
+    io.print("(");
+    io.print_i32(self.x);
+    io.print(", ");
+    io.print_i32(self.y);
+    io.print(")");
 }
 
 fun(Vec2) eq(other: Vec2) -> bool {
@@ -40,17 +40,17 @@ fun main() -> i32 {
 
     a.print();
     if a.eq(c) {
-        io::print(" == ");
+        io.print(" == ");
     } else {
-        io::print(" != ");
+        io.print(" != ");
         status = 1;
     }
     c.print();
-    io::print("\n");
+    io.print("\n");
 
     return status;
 }
 
 fun _start() -> void {
-    process::exit(main());
+    process.exit(main());
 }

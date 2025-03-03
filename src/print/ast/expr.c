@@ -27,37 +27,28 @@ void print_ast_binop_type(FILE *stream, va_list list) {
 	print_to(stream, strs[binop]);
 }
 
-void print_ast_inner_path(FILE *stream, va_list list) {
-	AstInnerPath *path = va_arg(list, AstInnerPath*);
+void print_ast_path(FILE *stream, va_list list) {
+	AstPath *path = va_arg(list, AstPath*);
 	for (size_t i = 0; i < vec_len(path->segments); i++) {
-		AstInnerPathSegment *seg = &path->segments[i];
+        if (i != 0) {
+            print_to(stream, ".");
+        }
+		AstPathSegment *seg = &path->segments[i];
 		switch (seg->type) {
-			case AST_INNER_PATH_SEG_NULL:
-				print_to(stream, ".null");
+			case AST_PATH_SEG_NULL:
+				print_to(stream, "null");
 				break;
-			case AST_INNER_PATH_SEG_IDENT:
-				print_to(stream, ".{slice}", &seg->ident);
+			case AST_PATH_SEG_IDENT:
+				print_to(stream, "{slice}", &seg->ident);
 				break;
-			case AST_INNER_PATH_SEG_SIZEOF:
-				print_to(stream, ".sizeof");
+			case AST_PATH_SEG_SIZEOF:
+				print_to(stream, "sizeof");
 				break;
-			case AST_INNER_PATH_SEG_DEREF:
-				print_to(stream, ".*", &seg->ident);
+			case AST_PATH_SEG_DEREF:
+				print_to(stream, "*", &seg->ident);
 				break;
 		}
 	}
-}
-
-void print_ast_decl_path(FILE *stream, va_list list) {
-	AstDeclPath *path = va_arg(list, AstDeclPath*);
-	for (size_t i = 0; i < vec_len(path->segments); i++) {
-		print_to(stream, i == 0 ? "{slice}" : "::{slice}", &path->segments[i]);
-	}
-}
-
-void print_ast_path(FILE *stream, va_list list) {
-	AstPath *path = va_arg(list, AstPath*);
-	print_to(stream, "{ast::dpath}{ast::ipath}", &path->decl_path, &path->inner_path);
 }
 
 void print_ast_expr(FILE *stream, va_list list) {
@@ -76,7 +67,7 @@ void print_ast_expr(FILE *stream, va_list list) {
 			break;
 		}
 		case AST_EXPR_GET_INNER_PATH: {
-			print_to(stream, "({ast::expr}){ast::ipath}", expr->get_inner.of, &expr->get_inner.path); break;
+			print_to(stream, "({ast::expr}).{ast::path}", expr->get_inner.of, &expr->get_inner.path); break;
 			break;
 		}
 		case AST_EXPR_FLOAT: {

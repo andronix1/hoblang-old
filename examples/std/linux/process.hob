@@ -3,11 +3,11 @@ import "syscall.hob" as syscall;
 type Pid = i64;
 
 fun fork() -> Pid {
-	return syscall::arg0(syscall::FORK);
+	return syscall.arg0(syscall.FORK);
 }
 
 fun vfork() -> Pid {
-	return syscall::arg0(syscall::VFORK);
+	return syscall.arg0(syscall.VFORK);
 }
 
 type IdType = i64;
@@ -19,19 +19,19 @@ struct SigInfo {
 }
 
 fun waitid(id_type: IdType, pid: Pid, info: *SigInfo, options: i64) -> void {
-	syscall::arg4(syscall::WAIT_ID, id_type, pid, info as i64, options);
+	syscall.arg4(syscall.WAIT_ID, id_type, pid, info as i64, options);
 }
 
 fun getpid() -> Pid {
-	return syscall::arg0(syscall::GETPID);
+	return syscall.arg0(syscall.GETPID);
 }
 
 fun kill(pid: Pid, signal: i64) -> void {
-	syscall::arg2(syscall::KILL, pid, signal);
+	syscall.arg2(syscall.KILL, pid, signal);
 }
 
 fun exit(status: i64) -> void {
-	syscall::arg1(syscall::EXIT, status);
+	syscall.arg1(syscall.EXIT, status);
 }
 
 type UContext = void;
@@ -46,7 +46,7 @@ struct SigAction {
 }
 
 fun sigaction(signum: i32, new: *SigAction, old: *SigAction) -> Pid {
-	return syscall::arg4(syscall::RT_SIGACTION, signum as i64, new as i64, old as i64, 8); #SigActionMask.sizeof as i64);
+	return syscall.arg4(syscall.RT_SIGACTION, signum as i64, new as i64, old as i64, 8); #SigActionMask.sizeof as i64);
 }
 
 const P_ALL: IdType = 0;

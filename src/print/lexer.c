@@ -41,7 +41,6 @@ void print_token(FILE *stream, va_list list) {
     	case TOKEN_TRUE: fprintf(stream, "true"); return;
     	case TOKEN_FALSE: fprintf(stream, "false"); return;
 		case TOKEN_COLON: fprintf(stream, ":"); return;
-		case TOKEN_DOUBLE_COLON: fprintf(stream, "::"); return;
     	case TOKEN_COMMA: fprintf(stream, ","); return;
     	case TOKEN_SEMICOLON: fprintf(stream, ";"); return;
     	case TOKEN_ASSIGN: fprintf(stream, "="); return;

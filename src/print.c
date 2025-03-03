@@ -18,8 +18,6 @@ void print_setup() {
 	print_register(slice_from_cstr("sema::type"), print_sema_type);
 	print_register(slice_from_cstr("ast::expr"), print_ast_expr);
 	print_register(slice_from_cstr("ast::binop"), print_ast_binop_type);
-	print_register(slice_from_cstr("ast::ipath"), print_ast_inner_path);
-	print_register(slice_from_cstr("ast::dpath"), print_ast_decl_path);
 	print_register(slice_from_cstr("ast::path"), print_ast_path);
 	print_register(slice_from_cstr("ast::type"), print_ast_type);
 }

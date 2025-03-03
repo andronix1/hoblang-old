@@ -1,16 +1,16 @@
 import "syscall.hob" as syscall;
 import "io.hob" as io;
 
-fun mmap(addr: *void, len: i64, prot: i64, flags: i64, fd: io::Fd, offset: i64) -> *void {
-	return syscall::arg6(syscall::MMAP, addr as i64, len, prot, flags, fd as i64, offset) as *void;
+fun mmap(addr: *void, len: i64, prot: i64, flags: i64, fd: io.Fd, offset: i64) -> *void {
+	return syscall.arg6(syscall.MMAP, addr as i64, len, prot, flags, fd as i64, offset) as *void;
 }
 
 fun munmap(addr: *void, len: i64) -> i64 {
-	return syscall::arg2(syscall::MUNMAP, addr as i64, len);
+	return syscall.arg2(syscall.MUNMAP, addr as i64, len);
 }
 
 fun mremap(addr: *void, old_len: i64, new_len: i64, flags: i64) -> i64 {
-	return syscall::arg4(syscall::MREMAP, addr as i64, old_len, new_len, flags);
+	return syscall.arg4(syscall.MREMAP, addr as i64, old_len, new_len, flags);
 }
 
 const PROT_READ: i64 = 0x1;

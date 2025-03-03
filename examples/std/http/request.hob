@@ -1,6 +1,6 @@
 import "../string.hob" as string;
 
-use string::String;
+use string.String;
 
 struct HttpRequest {
     method: []u8, path: []u8, version: []u8,

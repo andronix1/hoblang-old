@@ -30,7 +30,7 @@ bool parse_module_node(Parser *parser, AstModuleNode *node) {
 		}
 		case TOKEN_USE:
 			node->type = AST_MODULE_NODE_USE;
-			if (!parse_decl_path(parser, &node->use.path)) {
+			if (!parse_path(parser, &node->use.path)) {
 				return false;
 			}
 			node->use.has_alias = false;

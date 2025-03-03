@@ -3,45 +3,45 @@ import "std/salloc.hob" as salloc;
 import "std/io.hob" as io;
 
 fun die(msg: []u8) -> void {
-    io::println(msg);
-    process::exit(1);
+    io.println(msg);
+    process.exit(1);
 }
 
 
 fun wait_for(what: []u8) -> void {
-    io::print(what);
-    io::get_char();
+    io.print(what);
+    io.get_char();
 }
 
 fun _start() -> void {
     wait_for("pid");
     
-    io::print("current process pid: ");
-    io::print_u64(process::get_pid() as u64);
-    io::print("\n");
+    io.print("current process pid: ");
+    io.print_u64(process.get_pid() as u64);
+    io.print("\n");
 
     wait_for("alloc");
 
-    var ptr = salloc::allocate(4096 * 2 - 5);
+    var ptr = salloc.allocate(4096 * 2 - 5);
     if ptr == null {
         die("failed to allocate memory!");
     }
 
     wait_for("realloc");
     
-    ptr = salloc::reallocate(ptr, 4096 * 3 - 5);
+    ptr = salloc.reallocate(ptr, 4096 * 3 - 5);
     if ptr == null {
         die("failed to reallocate memory!");
     }
 
     wait_for("free");
 
-    if !salloc::free(ptr) {
+    if !salloc.free(ptr) {
         die("failed to free memory!");
     }
     
     wait_for("finish");
 
-    io::println("yay, cool!");
-    process::exit(0);
+    io.println("yay, cool!");
+    process.exit(0);
 }

@@ -12,7 +12,7 @@ typedef struct {
 } AstTypeAlias;
 
 typedef struct {
-	AstDeclPath path;
+	AstPath path;
 	bool has_alias;
 	Slice alias;
 } AstUse;

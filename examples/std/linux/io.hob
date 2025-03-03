@@ -3,34 +3,34 @@ import "syscall.hob" as syscall;
 type Fd = i32;
 
 fun write(fd: Fd, buf: *u8, len: i64) ->i64 {
-	return syscall::arg3(syscall::WRITE, fd as i64, buf as i64, len);
+	return syscall.arg3(syscall.WRITE, fd as i64, buf as i64, len);
 }
 
 fun read(fd: Fd, buf: *u8, len: i64) -> i64 {
-	return syscall::arg3(syscall::READ, fd as i64, buf as i64, len);
+	return syscall.arg3(syscall.READ, fd as i64, buf as i64, len);
 }
 
 const FCNTL_SET_FLAG: i64 = 4;
 const O_NONBLOCK: i64 = 00004000;
 
 fun fcntl_set_flag(fd: Fd, flags: i64) -> i64 {
-	return syscall::arg3(syscall::FCNTL, fd as i64, FCNTL_SET_FLAG, flags);
+	return syscall.arg3(syscall.FCNTL, fd as i64, FCNTL_SET_FLAG, flags);
 }
 
 fun open(filename: *u8, flags: i64, mode: i64) ->Fd {
-	return syscall::arg3(syscall::OPEN, filename as i64, flags, mode) as Fd;
+	return syscall.arg3(syscall.OPEN, filename as i64, flags, mode) as Fd;
 }
 
 fun close(fd: Fd) ->i64 {
-	return syscall::arg1(syscall::CLOSE, fd as i64);
+	return syscall.arg1(syscall.CLOSE, fd as i64);
 }
 
 fun sendfile(to: Fd, from: Fd, offset: *i64, len: i64) ->i64 {
-	return syscall::arg4(syscall::SENDFILE, to as i64, from as i64, offset as i64, len);
+	return syscall.arg4(syscall.SENDFILE, to as i64, from as i64, offset as i64, len);
 }
 
 fun lseek(fd: Fd, offset: i64, whence: i64) ->i64 {
-	return syscall::arg3(syscall::SEEK, fd as i64, offset as i64, whence);
+	return syscall.arg3(syscall.SEEK, fd as i64, offset as i64, whence);
 }
 
 const SEEK_END: i64 = 2;

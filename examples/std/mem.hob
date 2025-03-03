@@ -12,20 +12,20 @@ fun is_page_invalid(page: *Page) -> bool {
 
 fun pages_alloc(size: usize) -> Page {
     var page: Page;
-    page.ptr = mem::mmap(null, size as i64, mem::PROT_READ | mem::PROT_WRITE, mem::MAP_ANON | mem::MAP_SHARED, -1, 0);
+    page.ptr = mem.mmap(null, size as i64, mem.PROT_READ | mem.PROT_WRITE, mem.MAP_ANON | mem.MAP_SHARED, -1, 0);
     page.size = size;
     return page;
 }
 
 fun pages_realloc(page: *Page, size: usize) -> Page {
     var new_page: Page;
-    new_page.ptr = mem::mremap(page.*.ptr, page.*.size as i64, size as i64, mem::MREMAP_MAYMOVE) as *void;
+    new_page.ptr = mem.mremap(page.*.ptr, page.*.size as i64, size as i64, mem.MREMAP_MAYMOVE) as *void;
     new_page.size = size;
     return new_page;
 }
 
 fun page_free(page: *Page) -> bool {
-    return mem::munmap(page.*.ptr, page.*.size as i64) == 0;
+    return mem.munmap(page.*.ptr, page.*.size as i64) == 0;
 }
 
 fun copy(src: *void, dst: *void, size: usize) -> void {

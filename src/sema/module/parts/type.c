@@ -40,7 +40,7 @@ SemaType *sema_ast_type(SemaModule *sema, AstType *type) {
 			break;
 		}
 		case AST_TYPE_PATH: {
-			type->sema = sema_resolve_type_path(sema, &type->path);
+			type->sema = sema_resolve_type_path(sema, NULL, &type->path);
 			break;
 		}
 		case AST_TYPE_ARRAY: {

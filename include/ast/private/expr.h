@@ -90,7 +90,7 @@ typedef struct AstExpr {
 AstExpr *ast_expr_ret_on_null(FileLocation loc, AstExpr *expr);
 AstExpr *ast_expr_unwrap(FileLocation loc, AstExpr *expr, Slice name);
 AstExpr *ast_expr_get_local_path(FileLocation loc, AstPath path);
-AstExpr *ast_expr_get_inner_path(FileLocation loc, AstExpr *of, AstInnerPath path);
+AstExpr *ast_expr_get_inner_path(FileLocation loc, AstExpr *of, AstPath path);
 AstExpr *ast_expr_idx(FileLocation loc, AstExpr *of, AstExpr *idx);
 AstExpr *ast_expr_integer(FileLocation loc, uint64_t value);
 AstExpr *ast_expr_float(FileLocation loc, long double value);

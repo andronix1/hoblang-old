@@ -78,10 +78,10 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 		}
 
 		case AST_MODULE_NODE_USE: {
-			SemaDecl *decl = sema_resolve_decl_path_raw(sema, &node->use.path);
-			if (!decl) {
-				break;
-			}
+			SemaDecl *decl = sema_resolve_decl_path(sema, &node->use.path);
+            if (!decl) {
+                break;
+            }
 			sema_module_push_public_decl(sema, node->loc, decl);
 			// TODO: alias
 			//  sema_scope_decl_new_module(

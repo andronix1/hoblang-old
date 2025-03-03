@@ -4,7 +4,7 @@ import "std/io.hob" as io;
 fun main() -> i32 {
     var i = 1;
     while[outer] true {
-        defer io::println("tried something new");
+        defer io.println("tried something new");
         if i % 2 == 0 {
             i = i + 1;
             continue;
@@ -12,7 +12,7 @@ fun main() -> i32 {
         if i >= 10 {
             break;
         }
-        defer io::println("new digit");
+        defer io.println("new digit");
         var j = 1;
         while true {
             if j % 3 == 0 {
@@ -23,9 +23,9 @@ fun main() -> i32 {
                 i = i + 1;
                 continue outer;
             }
-            io::print_i32(i);
-            io::print_i32(j);
-            io::print("\n");
+            io.print_i32(i);
+            io.print_i32(j);
+            io.print("\n");
             j = j + 1;
         }
     }
@@ -33,5 +33,5 @@ fun main() -> i32 {
 }
 
 fun _start() -> void {
-    process::exit(main());
+    process.exit(main());
 }

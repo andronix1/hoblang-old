@@ -3,9 +3,9 @@ import "std/string.hob" as string;
 import "std/io.hob" as io;
 
 fun main() -> i32 {
-    var str = string::with_cap(10);
+    var str = string.with_cap(10);
     defer str.free();
-    var who = string::from_slice("WORLD");
+    var who = string.from_slice("WORLD");
     defer who.free();
 
     str.reserve(8); # does nothing
@@ -21,5 +21,5 @@ fun main() -> i32 {
 }
 
 fun _start() -> void {
-	process::exit(main());
+	process.exit(main());
 }

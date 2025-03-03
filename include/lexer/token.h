@@ -39,7 +39,6 @@ typedef enum {
     TOKEN_NULL,
 
     TOKEN_COLON,
-    TOKEN_DOUBLE_COLON,
     TOKEN_COMMA,
     TOKEN_SEMICOLON,
     TOKEN_ASSIGN,

@@ -274,8 +274,8 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
                     break;
                 }
 				case TOKEN_DOT: {
-					AstInnerPath path;
-					if (!parse_inner_path(parser, &path)) {
+					AstPath path;
+					if (!parse_path(parser, &path)) {
 						return NULL;
 					}
 					current_expr = ast_expr_get_inner_path(loc, current_expr, path);

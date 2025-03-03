@@ -26,13 +26,13 @@ fun pos2_digit(value: i32) -> ?u8 {
 
 fun test(value: i32) -> void {
     if pos2_digit(value) unwrap fres { 
-        io::print_i32(fres as _);
-        io::print(" is a 2 digit");
+        io.print_i32(fres as _);
+        io.print(" is a 2 digit");
     } else {
-        io::print_i32(value);
-        io::print(" is not a 2 digit");
+        io.print_i32(value);
+        io.print(" is not a 2 digit");
     }
-    io::print("\n");
+    io.print("\n");
 }
 
 fun main() -> i32 {
@@ -45,5 +45,5 @@ fun main() -> i32 {
 }
 
 fun _start() -> void {
-    process::exit(main());
+    process.exit(main());
 }

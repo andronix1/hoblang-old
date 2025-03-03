@@ -13,6 +13,7 @@ typedef struct {
     FileLocation loc;
 } SemaExprCtx;
 
+SemaValue *sema_expr(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx);
 SemaValue *sema_callable_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx);
 SemaType *sema_value_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx);
 SemaType *sema_var_expr_type(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx);

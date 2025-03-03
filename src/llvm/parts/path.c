@@ -11,14 +11,18 @@
 #include "llvm/parts/types/optional.h"
 #include "llvm/utils/member.h"
 
-LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstInnerPath *path, SemaValue *from) {
+LLVMValueRef llvm_resolve_path(LlvmBackend *llvm, LLVMValueRef value, AstPath *path, SemaValue *from) {
     for (size_t i = 0; i < vec_len(path->segments); i++) {
-        SemaInnerPath *segment = &path->segments[i].sema;
+        SemaPath *segment = &path->segments[i].sema;
         switch (segment->type) {
-            case SEMA_INNER_PATH_SIZEOF:
+            case SEMA_PATH_DECL: {
+                value = segment->decl->llvm.value;
+                break;
+            }
+            case SEMA_PATH_SIZEOF:
                 value = llvm_type_sizeof(llvm, llvm_resolve_type(segment->sizeof_op.type), llvm_resolve_type(segment->sizeof_op.output_type));
                 break;
-            case SEMA_INNER_PATH_DEREF:
+            case SEMA_PATH_DEREF:
                 if (segment->value->type == SEMA_VALUE_VAR) {
                     value = LLVMBuildLoad2(
                         llvm_builder(llvm),
@@ -28,7 +32,7 @@ LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstI
                     );
                 }
                 break;
-            case SEMA_INNER_PATH_STRUCT_MEMBER: {
+            case SEMA_PATH_STRUCT_MEMBER: {
                 switch (segment->struct_member.member->type) {
                     case SEMA_STRUCT_MEMBER_EXT_FUNC:
                         from->ext_func_handle = value;
@@ -57,33 +61,19 @@ LLVMValueRef llvm_resolve_inner_path(LlvmBackend *llvm, LLVMValueRef value, AstI
                 }               
                 break;
             }
-            case SEMA_INNER_PATH_IS_NULL:
+            case SEMA_PATH_IS_NULL:
                 value = llvm_opt_is_null(llvm, llvm_resolve_type(segment->optional_type), value, false);
                 break;
-            case SEMA_INNER_PATH_ARRAY_LEN:
+            case SEMA_PATH_ARRAY_LEN:
                 value = LLVMConstInt(LLVMInt32Type(), segment->array_length, false);
                 break;
-            case SEMA_INNER_PATH_SLICE_RAW:
+            case SEMA_PATH_SLICE_RAW:
                 value = llvm_slice_ptr(llvm, llvm_resolve_type(segment->slice_type), value, false);
                 break;
-            case SEMA_INNER_PATH_SLICE_LEN:
+            case SEMA_PATH_SLICE_LEN:
                 value = llvm_slice_len(llvm, llvm_resolve_type(segment->slice_type), value, false);
                 break;
         }
     }
     return value;
-}
-
-LLVMValueRef llvm_resolve_value_decl_path(LlvmBackend *llvm, AstDeclPath *path, SemaValue *from) {
-	LLVMValueRef result = path->decl->llvm.value;
-	return result;
-}
-
-LLVMValueRef llvm_resolve_path(LlvmBackend *llvm, AstPath *path, SemaValue *from) {
-    return llvm_resolve_inner_path(
-        llvm,
-        llvm_resolve_value_decl_path(llvm, &path->decl_path, from),
-        &path->inner_path,
-        from
-    );
 }

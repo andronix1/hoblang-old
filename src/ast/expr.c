@@ -27,7 +27,7 @@ AstExpr *ast_expr_idx(FileLocation loc, AstExpr *of, AstExpr *idx) CONSTR(AST_EX
 AstExpr *ast_expr_get_local_path(FileLocation loc, AstPath path) CONSTR(AST_EXPR_GET_LOCAL_PATH, {
     FIELD(get_local.path, path)
 })
-AstExpr *ast_expr_get_inner_path(FileLocation loc, AstExpr *of, AstInnerPath path) CONSTR(AST_EXPR_GET_INNER_PATH, {
+AstExpr *ast_expr_get_inner_path(FileLocation loc, AstExpr *of, AstPath path) CONSTR(AST_EXPR_GET_INNER_PATH, {
     FIELD(get_inner.of, of)
     FIELD(get_inner.path, path)
 })

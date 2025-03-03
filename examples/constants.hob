@@ -20,10 +20,10 @@ fun new_slice(ptr: *u8, len: usize) -> []u8 {
 }
 
 fun dbg(name: []u8, val: i32) -> void {
-    io::print(name);
-    io::print(" = ");
-    io::print_i32(val);
-    io::println(";");
+    io.print(name);
+    io.print(" = ");
+    io.print_i32(val);
+    io.println(";");
 }
 
 fun main() -> i32 {
@@ -37,6 +37,6 @@ fun main() -> i32 {
 }
 
 fun _start() -> void {
-    process::exit(main());
+    process.exit(main());
 }
 

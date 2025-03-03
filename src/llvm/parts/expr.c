@@ -89,7 +89,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
             return is_null;
         }
 		case AST_EXPR_GET_INNER_PATH: {
-			LLVMValueRef value = llvm_resolve_inner_path(
+			LLVMValueRef value = llvm_resolve_path(
 				llvm,
 				llvm_expr(llvm, expr->get_inner.of, false),
 				&expr->get_inner.path,
@@ -106,7 +106,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 			return value;
 		}
 		case AST_EXPR_GET_LOCAL_PATH: {
-            LLVMValueRef value = llvm_resolve_path(llvm, &expr->get_local.path, expr->value);
+            LLVMValueRef value = llvm_resolve_path(llvm, NULL, &expr->get_local.path, expr->value);
             if (load && expr->value->type == SEMA_VALUE_VAR) {
                 return LLVMBuildLoad2(
                     llvm_builder(llvm),
