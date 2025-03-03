@@ -8,7 +8,6 @@
 #include "sema/module/private.h"
 #include "sema/module/decls/impl.h"
 #include "sema/module/parts/decls/struct/api.h"
-#include "sema/module/parts/decls/struct/impl.h"
 #include "sema/value/private.h"
 #include "sema/value/api.h"
 
@@ -44,17 +43,10 @@ SemaValue *sema_resolve_inner_value_path(SemaModule *sema, SemaValue *from, AstP
 			if (from->sema_type->type == SEMA_TYPE_STRUCT) {
                 segment->sema.type = SEMA_PATH_STRUCT_MEMBER;
                 segment->sema.struct_member.of = from->sema_type;
-                SemaStructMember *member = segment->sema.struct_member.member = sema_get_struct_member(sema, segment->loc, from->sema_type->struct_def, &segment->ident);
-                if (!member) {
-                    return NULL;
+                ssize_t idx = segment->sema.struct_member.idx = sema_get_struct_member_id(sema, segment->loc, from->sema_type->struct_def, &segment->ident);
+                if (idx != -1) {
+                    return sema_value_with_type(from, from->sema_type->struct_def->members[idx].type->sema);
                 }
-                switch (member->type) {
-                    case SEMA_STRUCT_MEMBER_FIELD:
-                        return sema_value_with_type(from, from->sema_type->struct_def->members[member->field_idx].type->sema);
-                    case SEMA_STRUCT_MEMBER_EXT_FUNC:
-                        return sema_value_ext_func_handle(sema_value_typeof(member->ext_func.decl->value));
-                }
-                assert(0, "invalid struct member type");
 			} else if (from->sema_type->type == SEMA_TYPE_SLICE) {
                 Slice length = slice_from_const_cstr("length");
                 Slice raw = slice_from_const_cstr("raw");
@@ -66,9 +58,6 @@ SemaValue *sema_resolve_inner_value_path(SemaModule *sema, SemaValue *from, AstP
                 } else if (slice_eq(&length, &segment->ident)) {
                     segment->sema.type = SEMA_PATH_SLICE_LEN;
                     return sema_value_with_type(from, sema_arch_usize(sema));
-                } else {
-                    SEMA_ERROR(segment->loc, "{sema::type} has not member {slice}", from->sema_type, &segment->ident);
-                    return NULL;
                 }
             } else if (from->sema_type->type == SEMA_TYPE_ARRAY) {                Slice length = slice_from_const_cstr("length");
                 Slice raw = slice_from_const_cstr("raw");
@@ -76,11 +65,23 @@ SemaValue *sema_resolve_inner_value_path(SemaModule *sema, SemaValue *from, AstP
                     segment->sema.type = SEMA_PATH_ARRAY_LEN;
                     segment->sema.array_length = from->sema_type->array.length;
                     return sema_value_final(sema_arch_usize(sema));
-                } else {
-                    SEMA_ERROR(segment->loc, "{sema::type} has not member {slice}", from->sema_type, &segment->ident);
-                    return NULL;
                 }
             }
+            SemaDecl *decl = sema_module_resolve_ext_func(sema, &segment->ident, from->sema_type);
+            if (decl) {
+                segment->sema.type = SEMA_PATH_EXT_FUNC_DIRECT;
+                segment->sema.ext_func_decl = decl;
+                return sema_value_ext_func_handle(sema_value_typeof(decl->value));
+            }
+            if (from->type == SEMA_VALUE_VAR) {
+                SemaDecl *ptr_decl = sema_module_resolve_ext_func(sema, &segment->ident, sema_type_new_pointer(from->sema_type));
+                segment->sema.ext_func_decl = ptr_decl;
+                if (ptr_decl) {
+                    segment->sema.type = SEMA_PATH_EXT_FUNC_REF;
+                    return sema_value_ext_func_handle(sema_value_typeof(ptr_decl->value));
+                }
+            }
+            SEMA_ERROR(segment->loc, "{sema::type} has no member `{slice}`", from->sema_type, &segment->ident);
 			return NULL;
 		}
 	}

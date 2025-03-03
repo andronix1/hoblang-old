@@ -1,26 +1,12 @@
-#include "sema/module/private.h"
-#include "sema/type/private.h"
-#include "sema/module/decls/impl.h"
 #include "ast/private/module_node.h"
 #include "sema/module/parts/decls/struct/api.h"
-#include "sema/module/parts/decls/struct/impl.h"
 
-SemaStructMember *sema_get_struct_member(SemaModule *sema, FileLocation at, AstStructDef *struct_def, Slice *name) {
+ssize_t sema_get_struct_member_id(SemaModule *sema, FileLocation at, AstStructDef *struct_def, Slice *name) {
     for (size_t i = 0; i < vec_len(struct_def->members); i++) {
         AstStructMember *member = &struct_def->members[i];
         if (slice_eq(&member->name, name)) {
-            return sema_struct_member_field(i);
+            return i;
         }
     }
-    // TODO: remove from struct
-    SemaDecl *decl = sema_module_resolve_ext_func(sema, name, sema_type_new_struct(struct_def));
-    if (decl) {
-        return sema_struct_member_ext_func(decl, false);
-    }
-    SemaDecl *ptr_decl = sema_module_resolve_ext_func(sema, name, sema_type_new_pointer(sema_type_new_struct(struct_def)));
-    if (ptr_decl) {
-        return sema_struct_member_ext_func(ptr_decl, true);
-    }
-    SEMA_ERROR(at, "struct `{slice}` has not member `{slice}`", &struct_def->name, name);
-    return NULL;
+    return -1;
 }

@@ -6,7 +6,6 @@
 #include "sema/module/decls/decls.h"
 #include "sema/value.h"
 #include "sema/module/decls.h"
-#include "sema/module/parts/decls/struct/struct.h"
 #include "sema/module.h"
 #include "sema/type.h"
 #include "sema/value.h"
@@ -27,11 +26,13 @@ typedef enum {
     SEMA_PATH_STRUCT_MEMBER,
     SEMA_PATH_IS_NULL,
     SEMA_PATH_DECL,
+    SEMA_PATH_EXT_FUNC_DIRECT,
+    SEMA_PATH_EXT_FUNC_REF,
     SEMA_PATH_SIZEOF
 } SemaPathType;
 
 typedef struct {
-    SemaStructMember *member;
+    size_t idx;
     SemaType *of;
 } SemaPathStructMember;
 
@@ -47,6 +48,7 @@ typedef struct {
         SemaType *slice_type;
         SemaType *optional_type;
         SemaDecl *decl;
+        SemaDecl *ext_func_decl;
 		size_t array_length;
         SemaPathStructMember struct_member;
     };

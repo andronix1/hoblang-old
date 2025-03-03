@@ -1,9 +1,9 @@
 #pragma once
 
-#include "struct.h"
+#include <stdint.h>
 #include "core/slice.h"
 #include "core/location.h"
 #include "ast/api/module_node.h"
 #include "sema/module.h"
 
-SemaStructMember *sema_get_struct_member(SemaModule *sema, FileLocation at, AstStructDef *struct_def, Slice *name);
+ssize_t sema_get_struct_member_id(SemaModule *sema, FileLocation at, AstStructDef *struct_def, Slice *name);

@@ -30,20 +30,26 @@ fun(*Vec2) append(other: Vec2) -> void {
     self.* = self.*.add(other);
 }
 
+fun (*i32) increment() -> void {
+    self.* += 1;
+}
+
 fun main() -> i32 {
     var a = new(1, 2);
     var b = new(3, 4);
     var c = a.add(b);
     a.append(b);
 
-    var status = 0;
+    var status: i32 = -1;
 
     a.print();
     if a.eq(c) {
         io.print(" == ");
+        status.increment();
     } else {
         io.print(" != ");
-        status = 1;
+        status.increment();
+        status.increment();
     }
     c.print();
     io.print("\n");
