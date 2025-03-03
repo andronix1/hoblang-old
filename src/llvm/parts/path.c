@@ -37,7 +37,7 @@ LLVMValueRef llvm_resolve_path(LlvmBackend *llvm, LLVMValueRef value, AstPath *p
                 if (segment->type != SEMA_PATH_EXT_FUNC_REF && LLVMGetTypeKind(LLVMTypeOf(value)) == LLVMPointerTypeKind) {
                     from->ext_func_handle = LLVMBuildLoad2(
                         llvm_builder(llvm),
-                        llvm_resolve_type(segment->struct_member.of),
+                        llvm_resolve_type(segment->ext_func_decl->in_type),
                         value,
                         ""
                     );
