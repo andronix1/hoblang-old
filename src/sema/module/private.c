@@ -92,26 +92,21 @@ void sema_module_append_ext_funcs_from(SemaModule *sema, FileLocation at, SemaMo
     for (size_t i = 0; i < vec_len(from->public_decls); i++) {
         SemaDecl *decl = from->public_decls[i];
         if (decl->in_type) {
-            sema_module_push_decl(sema, at, decl);
+            sema_module_push_decl(sema, at, false, decl);
         }
     }
 }
 
-SemaDecl *sema_module_push_decl(SemaModule *sema, FileLocation at, SemaDecl *decl) {
+SemaDecl *sema_module_push_decl(SemaModule *sema, FileLocation at, bool public, SemaDecl *decl) {
     if (sema_module_resolve_scope_decl(sema, &decl->name)) {
         SEMA_ERROR(at, "`{slice}` was already declared", &decl->name);
         return NULL;
     }
     SemaScope *scope = vec_top(sema->scopes);
     scope->decls = vec_push(scope->decls, &decl);
-    return decl;
-}
-
-SemaDecl *sema_module_push_public_decl(SemaModule *sema, FileLocation at, SemaDecl *decl) {
-    if (!sema_module_push_decl(sema, at, decl)) {
-        return NULL;
+    if (public) {
+        sema->public_decls = vec_push(sema->public_decls, &decl);
     }
-    sema->public_decls = vec_push(sema->public_decls, &decl);
     return decl;
 }
 
@@ -142,8 +137,8 @@ void sema_module_pop_scope(SemaModule *sema) {
 }
 
 void sema_module_push_primitives(SemaModule *sema) {
-    #define PD(name, type) sema_module_push_decl(sema, file_loc_new(), sema_decl_new(slice_from_cstr(#name), sema_value_type(type)))
-    #define PP(name) sema_module_push_decl(sema, file_loc_new(), sema_decl_new(slice_from_cstr(#name), sema_value_type(sema_type_primitive_##name())))
+    #define PD(name, type) sema_module_push_decl(sema, file_loc_new(), false, sema_decl_new(slice_from_cstr(#name), sema_value_type(type)))
+    #define PP(name) sema_module_push_decl(sema, file_loc_new(), false, sema_decl_new(slice_from_cstr(#name), sema_value_type(sema_type_primitive_##name())))
     #define ADIPP(name, size) do { \
         if (sema->arch_info.ints & SEMA_INT_##size) { \
             PP(name); \

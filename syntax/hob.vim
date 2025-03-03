@@ -28,6 +28,7 @@ syntax keyword hobKeywords
 	\ continue 
 	\ asm
 	\ const
+	\ public 
 
 syntax keyword hobType
 	\ i8

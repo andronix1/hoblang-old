@@ -15,7 +15,7 @@
 #include "sema/module/decls/api.h"
 #include "sema/value/private.h"
 
-void sema_add_ast_func_info(SemaModule *sema, FileLocation at, AstFuncInfo *info) {	
+void sema_add_ast_func_info(SemaModule *sema, FileLocation at, bool public, AstFuncInfo *info) {	
 	SemaType *returning = sema_ast_type(sema, &info->returning);
 	if (!returning) {
 		return;
@@ -38,7 +38,7 @@ void sema_add_ast_func_info(SemaModule *sema, FileLocation at, AstFuncInfo *info
 		}
 		args = vec_push(args, &type);
 	}
-	info->decl = sema_module_push_public_decl(sema, at, sema_decl_new_in_type(
+	info->decl = sema_module_push_decl(sema, at, public, sema_decl_new_in_type(
 		info->name,
         info->is_extension ? info->ext.of.sema : NULL,
         sema_value_final(sema_type_new_func(returning, args))
@@ -46,7 +46,7 @@ void sema_add_ast_func_info(SemaModule *sema, FileLocation at, AstFuncInfo *info
 }
 
 // TODO: remove duplicate
-void sema_stmt_const(SemaModule *sema, FileLocation loc, AstConst *constant);
+void sema_stmt_const(SemaModule *sema, FileLocation loc, bool public, AstConst *constant);
 
 void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 	switch (node->type) {
@@ -55,7 +55,7 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 			if (!type) {
 				break;
 			}
-			sema_module_push_public_decl(sema, node->loc, sema_decl_new(node->type_alias.alias, sema_value_type(type)));
+			sema_module_push_decl(sema, node->loc, node->public, sema_decl_new(node->type_alias.alias, sema_value_type(type)));
 			break;
 		}
 		case AST_MODULE_NODE_STRUCT_DEF: {
@@ -69,11 +69,11 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 				}
 				sema_ast_type(sema, member->type);
 			}
-			sema_module_push_public_decl(sema, node->loc, sema_decl_new(node->struct_def.name, sema_value_type(sema_type_new_struct(&node->struct_def))));
+			sema_module_push_decl(sema, node->loc, node->public, sema_decl_new(node->struct_def.name, sema_value_type(sema_type_new_struct(&node->struct_def))));
 			break;
 		}
 		case AST_MODULE_NODE_CONST: {
-            sema_stmt_const(sema, node->loc, &node->constant);
+            sema_stmt_const(sema, node->loc, node->public, &node->constant);
 			break;
 		}
 
@@ -82,7 +82,7 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
             if (!decl) {
                 break;
             }
-			sema_module_push_public_decl(sema, node->loc, decl);
+			sema_module_push_decl(sema, node->loc, node->public, decl);
 			// TODO: alias
 			//  sema_scope_decl_new_module(
 			// 	node->use.has_alias ? node->use.alias : *(Slice*)vec_top(node->use.path.segments),
@@ -97,17 +97,17 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 				break;
 			}
 
-			sema_module_push_public_decl(sema, node->loc, sema_decl_new(node->import.as, sema_value_module(module)));
+			sema_module_push_decl(sema, node->loc, node->public, sema_decl_new(node->import.as, sema_value_module(module)));
             sema_module_append_ext_funcs_from(sema, node->loc, module);
 			break;
 		}
 
 		case AST_MODULE_NODE_FUNC:
-			sema_add_ast_func_info(sema, node->loc, &node->func_decl.info);
+			sema_add_ast_func_info(sema, node->loc, node->public, &node->func_decl.info);
 			break;
 		
 		case AST_MODULE_NODE_EXTERNAL_FUNC:
-			sema_add_ast_func_info(sema, node->loc, &node->ext_func_decl.info);
+			sema_add_ast_func_info(sema, node->loc, node->public, &node->ext_func_decl.info);
 			break;
 	}
 }
@@ -115,12 +115,12 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 void sema_push_ast_func_info(SemaModule *sema, FileLocation at, AstFuncInfo *info) {
 	if (info->is_extension) {
         // TODO: self is final
-		info->self = sema_module_push_decl(sema, at, sema_decl_new(slice_from_cstr("self"), sema_value_var(info->ext.of.sema)));
+		info->self = sema_module_push_decl(sema, at, false, sema_decl_new(slice_from_cstr("self"), sema_value_var(info->ext.of.sema)));
 	}
 	for (size_t i = 0; i < vec_len(info->args); i++) {
 		AstFuncArg *arg = &info->args[i];
 		SemaType *type = sema_ast_type(sema, &arg->type);
-		arg->decl = sema_module_push_decl(sema, at, sema_decl_new(arg->name, sema_value_var(type)));
+		arg->decl = sema_module_push_decl(sema, at, false, sema_decl_new(arg->name, sema_value_var(type)));
 	}
 }
 

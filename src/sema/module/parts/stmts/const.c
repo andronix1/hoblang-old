@@ -10,7 +10,7 @@
 #include "core/assert.h"
 #include "sema/module/decls/impl.h"
 
-void sema_stmt_const(SemaModule *sema, FileLocation loc, AstConst *const_stmt) {
+void sema_stmt_const(SemaModule *sema, FileLocation loc, bool public, AstConst *const_stmt) {
     SemaType *const_type = sema_ast_type(sema, &const_stmt->type);
     if (!const_type) {
         return;
@@ -24,7 +24,7 @@ void sema_stmt_const(SemaModule *sema, FileLocation loc, AstConst *const_stmt) {
         return;
     }
     if (const_type) {
-        const_stmt->decl = sema_module_push_public_decl(sema, loc, sema_decl_new(
+        const_stmt->decl = sema_module_push_decl(sema, loc, public, sema_decl_new(
             const_stmt->name,
             sema_value_const(*constant)
         ));

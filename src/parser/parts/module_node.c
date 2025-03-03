@@ -1,4 +1,5 @@
 #include "ast/private/module_node.h"
+#include "lexer/token.h"
 #include "parser/parts/const.h"
 #include "parser/parts/module_node.h"
 #include "parser/parts/type.h"
@@ -10,7 +11,7 @@
 bool parse_ext_func_decl(Parser *parser, AstExtFuncDecl *info);
 bool parse_func_decl(Parser *parser, AstFuncDecl *decl);
 
-bool parse_module_node(Parser *parser, AstModuleNode *node) {
+bool parse_module_node_decl(Parser *parser, AstModuleNode *node) {
 	Token *token = parser_next(parser);
     node->loc = token->location;
 	switch (token->type) {
@@ -68,4 +69,9 @@ bool parse_module_node(Parser *parser, AstModuleNode *node) {
 			PARSE_ERROR("unexpected {tok} while parsing module node", parser_token(parser));
 			return false;
 	}
+}
+
+bool parse_module_node(Parser *parser, AstModuleNode *node) {
+    node->public = parser_next_is(parser, TOKEN_PUBLIC);
+    return parse_module_node_decl(parser, node);
 }

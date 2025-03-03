@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdbool.h>
 #include "stmts/const.h"
 #include "core/location.h"
 #include "path.h"
@@ -56,6 +57,7 @@ typedef enum {
 typedef struct AstModuleNode {
 	AstModuleNodeType type;
     FileLocation loc;
+    bool public;
 	union {
 		AstFuncDecl func_decl;		
 		AstExtFuncDecl ext_func_decl;		

@@ -16,6 +16,7 @@ void print_token(FILE *stream, va_list list) {
     	case TOKEN_ASM: fprintf(stream, "asm"); return;
     	case TOKEN_BREAK: fprintf(stream, "break"); return;
     	case TOKEN_CONTINUE: fprintf(stream, "continue"); return;
+    	case TOKEN_PUBLIC: fprintf(stream, "public"); return;
     	case TOKEN_AUTO: fprintf(stream, "_"); return;
     	case TOKEN_UNWRAP: fprintf(stream, "unwrap"); return;
     	case TOKEN_SIZEOF: fprintf(stream, "sizeof"); return;
