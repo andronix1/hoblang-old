@@ -1,4 +1,4 @@
-fun eq(a: []u8, b: []u8) -> bool {
+public fun eq(a: []u8, b: []u8) -> bool {
     if a.length != b.length {
         return false;
     }

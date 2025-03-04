@@ -3,23 +3,23 @@ import "linux/process.hob" as process;
 use process.UContext;
 use process.SigInfo;
 
-fun fork() -> process.Pid {
+public fun fork() -> process.Pid {
     return process.fork();
 }
 
-fun get_pid() -> i64 {
+public fun get_pid() -> i64 {
     return process.getpid();
 }
 
-fun wait_for(pid: process.Pid) -> void {
+public fun wait_for(pid: process.Pid) -> void {
     var info: process.SigInfo;
     process.waitid(process.P_PID, pid, &info, process.WEXITED | process.WNOWAIT);
 }
 
-fun kill(pid: process.Pid, signal: i64) -> void {
+public fun kill(pid: process.Pid, signal: i64) -> void {
     process.kill(pid, signal);
 }
 
-fun exit(status: i32) -> void {
+public fun exit(status: i32) -> void {
     process.exit(status as i64);
 }

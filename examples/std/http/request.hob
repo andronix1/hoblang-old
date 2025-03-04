@@ -2,18 +2,20 @@ import "../string.hob" as string;
 
 use string.String;
 
-struct HttpRequest {
-    method: []u8, path: []u8, version: []u8,
+public struct HttpRequest {
+    public method: []u8,
+    public path: []u8,
+    public version: []u8,
     # TODO: headers
-    body: []u8
+    public body: []u8
 }
 
-struct SplitSlice {
+public struct SplitSlice {
     left: []u8,
     right: []u8
 }
 
-fun split_left(slice: []u8, sep: u8) -> SplitSlice {
+public fun split_left(slice: []u8, sep: u8) -> SplitSlice {
     var result: SplitSlice;
     var i: usize = 0;
     while i < slice.length {
@@ -31,7 +33,7 @@ fun split_left(slice: []u8, sep: u8) -> SplitSlice {
     return result;
 }
 
-fun from_slice(slice: []u8) -> HttpRequest {
+public fun from_slice(slice: []u8) -> HttpRequest {
     var result: HttpRequest;
     var split1 = split_left(slice, ' ');
     result.method = split1.left;

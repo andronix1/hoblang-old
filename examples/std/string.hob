@@ -2,31 +2,31 @@ import "salloc.hob" as salloc;
 import "io.hob" as io;
 import "fs.hob" as fs;
 
-struct String {
-    buffer: []u8,
+public struct String {
+    public buffer: []u8,
     cap: usize 
 }
 
-fun new() -> String {
+public fun new() -> String {
     var result: String;
     result.buffer.length = 0;
     result.cap = 0;
     return result;
 }
 
-fun with_cap(cap: usize) -> String {
+public fun with_cap(cap: usize) -> String {
     var result = new();
     result.reserve(cap);
     return result;
 }
 
-fun from_slice(slice: []u8) -> String {
+public fun from_slice(slice: []u8) -> String {
     var result = with_cap(slice.length);
     result.append_slice(slice);
     return result;
 }
 
-fun(*String) reserve(cap: usize) -> void {
+public fun(*String) reserve(cap: usize) -> void {
     if self.*.cap >= cap {
         return;
     }
@@ -38,11 +38,11 @@ fun(*String) reserve(cap: usize) -> void {
     self.*.cap = cap;
 }
 
-fun(String) length() -> usize {
+public fun(String) length() -> usize {
     return self.buffer.length;
 }
 
-fun(String) calc_cap(requires: usize) -> usize {
+public fun(String) calc_cap(requires: usize) -> usize {
     var new_cap = self.cap * 2;
     if requires >= new_cap {
         new_cap = requires;
@@ -50,19 +50,19 @@ fun(String) calc_cap(requires: usize) -> usize {
     return new_cap;
 }
 
-fun(*String) maybe_extend(requires: usize) -> void {
+public fun(*String) maybe_extend(requires: usize) -> void {
     if requires > self.*.cap {
         self.*.reserve(self.*.calc_cap(self.*.length() + 1));
     }
 }
 
-fun(*String) push(char: u8) -> void {
+public fun(*String) push(char: u8) -> void {
     self.*.maybe_extend(self.*.length() + 1);
     self.*.buffer[self.*.length()] = char;
     self.*.buffer.length = self.*.length() + 1;
 }
 
-fun(*String) append_slice(slice: []u8) -> void {
+public fun(*String) append_slice(slice: []u8) -> void {
     var i: usize = 0;
     self.*.maybe_extend(self.*.length() + slice.length);
     while i < slice.length {
@@ -71,13 +71,13 @@ fun(*String) append_slice(slice: []u8) -> void {
     }
 }
 
-fun(*String) append(other: *String) -> void {
+public fun(*String) append(other: *String) -> void {
     self.*.append_slice(other.*.buffer);
 }
 
 const READ_FROM_BUFFER_SIZE: usize = 64;
 
-fun(*String) append_fd(fd: fs.File) -> void {
+public fun(*String) append_fd(fd: fs.File) -> void {
     var buf: [READ_FROM_BUFFER_SIZE]u8;
     while true {
         var buf_slice = &buf as []u8;
@@ -89,12 +89,12 @@ fun(*String) append_fd(fd: fs.File) -> void {
     }
 }
 
-fun(String) free() -> void {
+public fun(String) free() -> void {
     if self.cap != 0 {
         salloc.free(self.buffer.raw as *void);
     }
 }
 
-fun(String) print() -> void {
+public fun(String) print() -> void {
     io.print(self.buffer);
 }

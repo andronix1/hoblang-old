@@ -1,7 +1,7 @@
 import "linux/io.hob" as io;
 
-type File = io.Fd;
+public type File = io.Fd;
 
-fun open_read(filename: []u8) -> File {
+public fun open_read(filename: []u8) -> File {
 	return io.open(filename.raw, 0, 0);
 }

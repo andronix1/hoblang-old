@@ -2,45 +2,45 @@ import "linux/io.hob" as io;
 
 const FD_STDOUT: io.Fd = io.FD_STDOUT;
 
-fun fd_remains(fd: io.Fd) -> i64 {
+public fun fd_remains(fd: io.Fd) -> i64 {
     var pos = io.lseek(fd, 0, io.SEEK_CUR);
     var end_pos = io.lseek(fd, 0, io.SEEK_END);
     io.lseek(fd, pos, io.SEEK_SET);
     return end_pos - pos;
 }
 
-fun full_forward(from: io.Fd, to: io.Fd) -> void {
+public fun full_forward(from: io.Fd, to: io.Fd) -> void {
     var offset = 0 as i64;
     io.lseek(from, 0, io.SEEK_SET);
     io.sendfile(to, from, &offset, fd_remains(from));
 }
 
-fun write_to(fd: io.Fd, str: []u8) -> void {
+public fun write_to(fd: io.Fd, str: []u8) -> void {
     io.write(fd, str.raw, str.length as i64);
 }
 
-fun read_from(fd: io.Fd, output: *[]u8) -> i64 {
+public fun read_from(fd: io.Fd, output: *[]u8) -> i64 {
     return io.read(fd, output.*.raw, output.*.length as i64);
 }
 
-fun close(fd: io.Fd) -> void {
+public fun close(fd: io.Fd) -> void {
     io.close(fd);
 }
 
-fun print(str: []u8) -> void {
+public fun print(str: []u8) -> void {
     write_to(io.FD_STDOUT, str);
 }
 
-fun print_char(char: u8) -> void {
+public fun print_char(char: u8) -> void {
     io.write(io.FD_STDOUT, &char, 1);
 }
 
-fun println(str: []u8) -> void {
+public fun println(str: []u8) -> void {
     print(str);
     print("\n");
 }
 
-fun print_i32(value: i32) -> void {
+public fun print_i32(value: i32) -> void {
     if value < 0 {
         print_char('-');
         value = -value;
@@ -48,7 +48,7 @@ fun print_i32(value: i32) -> void {
     print_u64(value as u64);
 }
 
-fun print_u64(val: u64) -> void {
+public fun print_u64(val: u64) -> void {
     const BUF_SIZE: usize = 32;
 
     var i: usize = 0;
@@ -64,7 +64,7 @@ fun print_u64(val: u64) -> void {
     print(slice);
 }
 
-fun hex_dump_4b(hb: u8) -> void {
+public fun hex_dump_4b(hb: u8) -> void {
     if hb < 10 {
         print_char(hb + '0');
     } else {
@@ -72,7 +72,7 @@ fun hex_dump_4b(hb: u8) -> void {
     }
 }
 
-fun hex_dump(mem: []u8) -> void {
+public fun hex_dump(mem: []u8) -> void {
     var i: usize = 0;
     while i < mem.length {
         var char = mem[i];
@@ -82,7 +82,7 @@ fun hex_dump(mem: []u8) -> void {
     }
 }
 
-fun print_f64(value: f64) -> void {
+public fun print_f64(value: f64) -> void {
     var int = value as u64;
     print_u64(int);
     print_char('.');
@@ -93,7 +93,7 @@ fun print_f64(value: f64) -> void {
     print_u64(fp);
 }
 
-fun get_char() -> u8 {
+public fun get_char() -> u8 {
     var res: u8;
     if io.read(io.FD_STDIN, &res, 1) != 1 {
         return '!';

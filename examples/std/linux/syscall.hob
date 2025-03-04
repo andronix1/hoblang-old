@@ -1,4 +1,4 @@
-fun arg0(num: i64) -> i64 {
+public fun arg0(num: i64) -> i64 {
     var res: i64;
 	asm (rax, rdi) {
 		mov $rax, num;
@@ -8,7 +8,7 @@ fun arg0(num: i64) -> i64 {
 	return res;
 }
 
-fun arg1(num: i64, a: i64) -> i64 {
+public fun arg1(num: i64, a: i64) -> i64 {
     var res: i64;
 	asm (rax, rdi, rcx, r11) {
 		mov $rax, num;
@@ -19,7 +19,7 @@ fun arg1(num: i64, a: i64) -> i64 {
 	return res;
 }
 
-fun arg2(num: i64, a: i64, b: i64) -> i64 {
+public fun arg2(num: i64, a: i64, b: i64) -> i64 {
     var res: i64;
 	asm (rax, rdi, rsi, rcx, r11) {
 		mov $rax, num;
@@ -31,7 +31,7 @@ fun arg2(num: i64, a: i64, b: i64) -> i64 {
 	return res;
 }
 
-fun arg3(num: i64, a: i64, b: i64, c: i64) -> i64 {
+public fun arg3(num: i64, a: i64, b: i64, c: i64) -> i64 {
     var res: i64;
 	asm (rax, rdi, rsi, rdx, rcx, r11) {
 		mov $rax, num;
@@ -44,7 +44,7 @@ fun arg3(num: i64, a: i64, b: i64, c: i64) -> i64 {
 	return res;
 }
 
-fun arg4(num: i64, a: i64, b: i64, c: i64, d: i64) -> i64 {
+public fun arg4(num: i64, a: i64, b: i64, c: i64, d: i64) -> i64 {
     var res: i64;
 	asm (rax, rdi, rsi, rdx, r10, rcx, r11) {
 		mov $rax, num;
@@ -58,7 +58,7 @@ fun arg4(num: i64, a: i64, b: i64, c: i64, d: i64) -> i64 {
 	return res;
 }
 
-fun arg5(num: i64, a: i64, b: i64, c: i64, d: i64, e: i64) -> i64 {
+public fun arg5(num: i64, a: i64, b: i64, c: i64, d: i64, e: i64) -> i64 {
     var res: i64;
 	asm (rax, rdi, rsi, rdx, r10, rcx, r11) {
 		mov $rax, num;
@@ -73,7 +73,7 @@ fun arg5(num: i64, a: i64, b: i64, c: i64, d: i64, e: i64) -> i64 {
 	return res;
 }
 
-fun arg6(num: i64, a: i64, b: i64, c: i64, d: i64, e: i64, f: i64) -> i64 {
+public fun arg6(num: i64, a: i64, b: i64, c: i64, d: i64, e: i64, f: i64) -> i64 {
     var res: i64;
 	asm (rax, rdi, rsi, rdx, r10, r9, rcx, r11) {
 		mov $rax, num;
@@ -89,26 +89,26 @@ fun arg6(num: i64, a: i64, b: i64, c: i64, d: i64, e: i64, f: i64) -> i64 {
 	return res;
 }
 
-const READ: i64 = 0;
-const WRITE: i64 = 1;
-const OPEN: i64 = 2;
-const CLOSE: i64 = 3;
-const SEEK: i64 = 8;
-const MMAP: i64 = 9;
-const MUNMAP: i64 = 11;
-const RT_SIGACTION: i64 = 13;
-const MREMAP: i64 = 25;
-const GETPID: i64 = 39;
-const SENDFILE: i64 = 40;
-const SOCKET: i64 = 41;
-const ACCEPT: i64 = 43;
-const BIND: i64 = 49;
-const LISTEN: i64 = 50;
-const SETSOCKOPT: i64 = 54;
-const CLONE: i64 = 56;
-const FORK: i64 = 57;
-const VFORK: i64 = 58;
-const EXIT: i64 = 60;
-const KILL: i64 = 62;
-const FCNTL: i64 = 72;
-const WAIT_ID: i64 = 247;
+public const READ: i64 = 0;
+public const WRITE: i64 = 1;
+public const OPEN: i64 = 2;
+public const CLOSE: i64 = 3;
+public const SEEK: i64 = 8;
+public const MMAP: i64 = 9;
+public const MUNMAP: i64 = 11;
+public const RT_SIGACTION: i64 = 13;
+public const MREMAP: i64 = 25;
+public const GETPID: i64 = 39;
+public const SENDFILE: i64 = 40;
+public const SOCKET: i64 = 41;
+public const ACCEPT: i64 = 43;
+public const BIND: i64 = 49;
+public const LISTEN: i64 = 50;
+public const SETSOCKOPT: i64 = 54;
+public const CLONE: i64 = 56;
+public const FORK: i64 = 57;
+public const VFORK: i64 = 58;
+public const EXIT: i64 = 60;
+public const KILL: i64 = 62;
+public const FCNTL: i64 = 72;
+public const WAIT_ID: i64 = 247;

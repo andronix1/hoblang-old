@@ -6,7 +6,7 @@ struct PageMeta {
     size: usize 
 }
 
-fun page_to_ptr(page: *Page) -> *void {
+public fun page_to_ptr(page: *Page) -> *void {
     if mem.is_page_invalid(page) {
         return null;
     }
@@ -15,7 +15,7 @@ fun page_to_ptr(page: *Page) -> *void {
     return (page.*.ptr as i64 + PageMeta.sizeof as i64) as *void;
 }
 
-fun page_from_ptr(src: *void) -> Page {
+public fun page_from_ptr(src: *void) -> Page {
     var page_ptr = (src as i64 - PageMeta.sizeof as i64) as *void;
     var meta = page_ptr as *PageMeta;
     var page: Page;
@@ -24,18 +24,18 @@ fun page_from_ptr(src: *void) -> Page {
     return page;
 }
 
-fun allocate(size: usize) -> *void {
+public fun allocate(size: usize) -> *void {
     var page = mem.pages_alloc(size + 4);
     return page_to_ptr(&page);
 }
 
-fun reallocate(ptr: *void, size: usize) -> *void {
+public fun reallocate(ptr: *void, size: usize) -> *void {
     var old_page = page_from_ptr(ptr);
     var new_page = mem.pages_realloc(&old_page, size + PageMeta.sizeof);
     return page_to_ptr(&new_page);
 }
 
-fun free(ptr: *void) -> bool {
+public fun free(ptr: *void) -> bool {
     var page = page_from_ptr(ptr);
     return mem.page_free(&page);
 }

@@ -1,44 +1,44 @@
 import "io.hob" as io;
 import "syscall.hob" as syscall;
 
-type Socket = io.Fd;
+public type Socket = io.Fd;
 
-fun socket(domain: i64, socket_type: i64, protocol: i64) ->Socket {
+public fun socket(domain: i64, socket_type: i64, protocol: i64) ->Socket {
 	return syscall.arg3(syscall.SOCKET, domain, socket_type, protocol) as Socket;
 }
 
-type Family = u16;
-type Port = u16;
-type InAddr = i32;
-struct AddressIn {
-    family: Family,
-    port: Port,
-    in_addr: InAddr,
-    _reserved: u64
+public type Family = u16;
+public type Port = u16;
+public type InAddr = i32;
+public struct AddressIn {
+    public family: Family,
+    public port: Port,
+    public in_addr: InAddr,
+    public _reserved: u64
 }
 
-fun bind(fd: Socket, addr: *void, size: i64) ->Socket {
+public fun bind(fd: Socket, addr: *void, size: i64) ->Socket {
 	return syscall.arg3(syscall.BIND, fd as i64, addr as i64, size) as Socket;
 }
 
-fun listen(fd: Socket, backlog: i64) ->Socket {
+public fun listen(fd: Socket, backlog: i64) ->Socket {
 	return syscall.arg2(syscall.LISTEN, fd as i64, backlog) as Socket;
 }
 
-fun accept(fd: Socket, addr: *void, size: *i32) ->Socket {
+public fun accept(fd: Socket, addr: *void, size: *i32) ->Socket {
 	return syscall.arg3(syscall.ACCEPT, fd as i64, addr as i64, size as i64) as Socket;
 }
 
-fun htons(input_port: u16) ->Port {
+public fun htons(input_port: u16) ->Port {
     return input_port & 0xff << 8 | input_port >> 8 & 0xff;
 }
 
-fun setsockopt(fd: Socket, level: i64, optname: i64, value: *void, size: i64) ->i64 {
+public fun setsockopt(fd: Socket, level: i64, optname: i64, value: *void, size: i64) ->i64 {
 	return syscall.arg5(syscall.SETSOCKOPT, fd as i64, level, optname, value as i64, size);
 }
 
-const AF_INET: i64 = 2;
-const SOCK_STREAM: i64 = 1;
-const SOL_SOCKET: i64 = 1;
-const SO_REUSEADDR: i64 = 2;
-const INADDR_ANY: i64 = 0;
+public const AF_INET: i64 = 2;
+public const SOCK_STREAM: i64 = 1;
+public const SOL_SOCKET: i64 = 1;
+public const SO_REUSEADDR: i64 = 2;
+public const INADDR_ANY: i64 = 0;
