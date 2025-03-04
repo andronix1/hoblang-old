@@ -59,6 +59,7 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 			break;
 		}
 		case AST_MODULE_NODE_STRUCT_DEF: {
+            node->struct_def.module = sema;
 			for (size_t i = 0; i < vec_len(node->struct_def.members); i++) {
 				AstStructMember *member = &node->struct_def.members[i];
 				for (size_t j = 0; j < i; j++) {

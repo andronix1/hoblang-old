@@ -36,12 +36,15 @@ typedef struct {
 typedef struct AstStructMember {
     FileLocation loc;
 	Slice name;
+    bool public;
 	AstType *type;
 } AstStructMember;
 
 typedef struct AstStructDef {
 	Slice name;
 	AstStructMember *members;
+
+    SemaModule *module;
 } AstStructDef;
 
 typedef enum {

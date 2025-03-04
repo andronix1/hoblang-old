@@ -1,9 +1,11 @@
+#include "lexer/token.h"
 #include "parser/private.h"
 #include "parser/parts/type.h"
 #include "ast/private/type.h"
 #include "ast/private/module_node.h"
 
 bool parse_ast_struct_member(Parser *parser, AstStructMember *member) {
+    member->public = parser_next_is(parser, TOKEN_PUBLIC);
     Token *token = PARSER_EXPECT_NEXT(TOKEN_IDENT, "struct member name");
 	member->name = token->ident;
     member->loc = token->location;
