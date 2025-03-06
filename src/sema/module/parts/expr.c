@@ -23,11 +23,13 @@ SemaValue *sema_analyze_expr_get_inner(SemaModule *sema, AstExprGetInner *get_in
 SemaValue *sema_analyze_expr_get_local(SemaModule *sema, AstExprGetLocal *get_local, SemaExprCtx ctx);
 SemaValue *sema_analyze_expr_ret_on_null(SemaModule *sema, AstExprRetOnNull *ret_on_null, SemaExprCtx ctx);
 SemaValue *sema_analyze_expr_unwrap(SemaModule *sema, AstExprUnwrap *unwrap, SemaExprCtx ctx);
+SemaValue *sema_analyze_expr_struct(SemaModule *sema, FileLocation at, AstExprStruct *structure, SemaExprCtx ctx);
 
 SemaValue *sema_expr(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) {
     ctx.loc = expr->loc;
     switch (expr->type) {
 		case AST_EXPR_IDX: return expr->value = sema_analyze_expr_idx(sema, &expr->idx, ctx);
+		case AST_EXPR_STRUCT: return expr->value = sema_analyze_expr_struct(sema, expr->loc, &expr->structure, ctx);
 		case AST_EXPR_UNWRAP: return expr->value = sema_analyze_expr_unwrap(sema, &expr->unwrap, ctx);
 		case AST_EXPR_RET_ON_NULL: return expr->value = sema_analyze_expr_ret_on_null(sema, &expr->ret_on_null, ctx);
 		case AST_EXPR_UNARY: return expr->value = sema_analyze_expr_unary(sema, &expr->unary, ctx);

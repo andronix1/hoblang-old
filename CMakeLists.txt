@@ -78,6 +78,7 @@ set(SOURCE_FILES
 	src/sema/module/decls/api.c
 	src/sema/module/value/api.c
 	src/sema/module/parts/decls/struct.c
+	src/sema/module/parts/exprs/struct.c
 	src/sema/module/parts/exprs/array.c
 	src/sema/module/parts/exprs/as.c
 	src/sema/module/parts/exprs/idx.c

@@ -1,4 +1,7 @@
 #include "ast/private/expr.h"
+#include "ast/api/expr.h"
+#include "ast/private/expr/struct.h"
+#include "ast/private/module_node.h"
 #include "core/location.h"
 #include "lexer/token.h"
 #include "parser/parts/expr.h"
@@ -119,6 +122,12 @@ AstExpr **parse_call_args(Parser *parser) {
 	}
 }
 
+bool token_struct_stop(TokenType type) {
+    return 
+        type == TOKEN_CLOSING_FIGURE_BRACE ||
+        type == TOKEN_COMMA;
+}
+
 AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 	bool first = true;
 	AstExpr *current_expr = NULL;
@@ -167,6 +176,27 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 			case TOKEN_FLOAT:
                 current_expr = ast_expr_float(loc, token->float_value);
                 break;
+			case TOKEN_STRUCT: {
+                AstPath path;
+                if (!parse_path(parser, &path)) {
+                    return NULL;
+                }
+                PARSER_EXPECT_NEXT(TOKEN_OPENING_FIGURE_BRACE, "opening figure brace");
+                AstExprStructMember *members = vec_new(AstExprStructMember);
+                while (true) {
+                    AstExprStructMember member;
+                    member.name = PARSER_EXPECT_NEXT(TOKEN_IDENT, "field name")->ident;
+                    PARSER_EXPECT_NEXT(TOKEN_COLON, "colon");
+                    if (!(member.expr = parse_expr(parser, token_struct_stop))) {
+                        return NULL;
+                    }
+                    members = vec_push(members, &member);
+                    if (parser_next(parser)->type == TOKEN_CLOSING_FIGURE_BRACE) {
+                        break;
+                    }
+                }
+                return ast_expr_struct(loc, path, members);
+            }
 			case TOKEN_IDENT: {
 				parser_skip_next(parser);
 				AstPath path;

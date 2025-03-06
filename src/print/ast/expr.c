@@ -54,6 +54,12 @@ void print_ast_path(FILE *stream, va_list list) {
 void print_ast_expr(FILE *stream, va_list list) {
 	AstExpr *expr = va_arg(list, AstExpr*);
 	switch (expr->type) {
+		case AST_EXPR_STRUCT: {
+            print_to(stream, "struct {ast::path} ", &expr->structure.path);
+            fprintf(stream, "{...}");
+
+			break;
+		}
 		case AST_EXPR_UNWRAP: {
 			print_to(stream, "{ast::expr} unwrap {slice}", expr->unwrap.expr, &expr->unwrap.name); break;
 			break;

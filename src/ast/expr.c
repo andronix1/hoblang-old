@@ -13,6 +13,10 @@
         return result; \
     }
 
+AstExpr *ast_expr_struct(FileLocation loc, AstPath path, AstExprStructMember *members) CONSTR(AST_EXPR_STRUCT, {
+    FIELD(structure.path, path)
+    FIELD(structure.members, members)
+})
 AstExpr *ast_expr_unwrap(FileLocation loc, AstExpr *expr, Slice name) CONSTR(AST_EXPR_UNWRAP, {
     FIELD(unwrap.expr, expr)
     FIELD(unwrap.name, name)

@@ -1,0 +1,25 @@
+import "std/process.hob" as process;
+import "std/io.hob" as io;
+
+struct Test {
+    a: i32,
+    b: i64
+}
+
+fun main() -> i32 {
+    var test = struct Test {
+        a: 1,
+        b: 234
+    };
+    io.print("1 == ");
+    io.print_u64(test.a as _);
+    io.print("\n");
+    io.print("234 == ");
+    io.print_u64(test.b as _);
+    io.print("\n");
+    return 0;
+}
+
+fun _start() -> void {
+    process.exit(main());
+}

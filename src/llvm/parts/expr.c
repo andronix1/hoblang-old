@@ -5,6 +5,7 @@
 #include "llvm/parts/path.h"
 #include "llvm/parts/types/slice.h"
 #include "llvm/parts/types/optional.h"
+#include "llvm/utils/member.h"
 #include <llvm-c/Core.h>
 #include <llvm-c/Types.h>
 #include "sema/const/const.h"
@@ -87,6 +88,37 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
                 true
             );
             return is_null;
+        }
+        case AST_EXPR_STRUCT: {
+            LLVMTypeRef type = llvm_resolve_type(expr->structure.struct_type);
+            LLVMValueRef value = LLVMBuildAlloca(
+                llvm_builder(llvm),
+                type,
+                ""
+            );
+            for (size_t i = 0; i < vec_len(expr->structure.members); i++) {
+                AstExprStructMember *member = &expr->structure.members[i];
+                LLVMValueRef member_val = llvm_get_member(llvm, 
+                    type, llvm_resolve_type(sema_value_typeof(member->expr->value)),
+                    value,
+                    member->idx,
+                    false
+                );
+                LLVMBuildStore(
+                    llvm_builder(llvm),
+                    llvm_expr(llvm, member->expr, true),
+                    member_val
+                );
+            }
+            if (load) {
+                return LLVMBuildLoad2(
+                    llvm_builder(llvm),
+                    type,
+                    value,
+                    ""
+                );
+            }
+            return value;
         }
 		case AST_EXPR_GET_INNER_PATH: {
 			LLVMValueRef value = llvm_resolve_path(
