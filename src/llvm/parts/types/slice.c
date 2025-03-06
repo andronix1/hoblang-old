@@ -1,5 +1,6 @@
 #include "llvm/private.h"
 #include "llvm/parts/types/slice.h"
+#include "llvm/utils/alloca.h"
 #include "llvm/utils/member.h"
 #include <llvm-c/Core.h>
 
@@ -18,16 +19,13 @@ LLVMValueRef llvm_slice_ptr(LlvmBackend *llvm, LLVMTypeRef of, LLVMValueRef slic
 
 LLVMValueRef llvm_alloca_slice(LlvmBackend *llvm, LLVMTypeRef of, LLVMValueRef ptr, size_t len) {
     LLVMTypeRef slice_type = llvm_slice_type(of);
-    LLVMValueRef slice = LLVMBuildAlloca(llvm_builder(llvm), slice_type, "slice");
+    LLVMValueRef slice = llvm_alloca(llvm, slice_type);
     LLVMBuildStore(llvm_builder(llvm), LLVMConstInt(LLVMInt64Type(), len, false), llvm_slice_len(llvm, slice_type, slice, false));
     LLVMBuildStore(llvm_builder(llvm), ptr, llvm_slice_ptr(llvm, slice_type, slice, false));
     return LLVMBuildLoad2(llvm_builder(llvm), slice_type, slice, "loaded_slice");
 }
 
 LLVMValueRef llvm_slice_from_array_ptr(LlvmBackend *llvm, LLVMTypeRef of, LLVMValueRef array, size_t len) {
-    // LLVMValueRef arr_alloca = LLVMBuildAlloca(llvm_builder(llvm), LLVMArrayType(of, len), "arr_alloca");
-    // LLVMBuildStore(llvm_builder(llvm), array, arr_alloca);
-    // LLVMValueRef array_ptr = LLVMBuildBitCast(llvm_builder(llvm), arr_alloca, LLVMPointerType(of, 0), "");
 	LLVMValueRef indices[] = {
 		LLVMConstInt(LLVMInt32Type(), 0, false),
 		LLVMConstInt(LLVMInt32Type(), 0, false)

@@ -112,6 +112,7 @@ set(SOURCE_FILES
 	src/llvm/private.c
 	src/llvm/api.c
 	src/llvm/utils/member.c
+	src/llvm/utils/alloca.c
 	src/llvm/parts/types/slice.c
 	src/llvm/parts/types/optional.c
 	src/llvm/parts/path.c

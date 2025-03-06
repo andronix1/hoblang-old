@@ -15,6 +15,7 @@ void llvm_stmt_if(LlvmBackend *llvm, AstIfElse *if_else) {
 		LLVMBuildBr(llvm_builder(llvm), end_block);
 	}
 	LLVMPositionBuilderAtEnd(llvm_builder(llvm), else_block);
+    llvm_set_code_block(llvm, else_block);
 	for (size_t i = 0; i < vec_len(if_else->else_ifs); i++) {
 		LLVMBasicBlockRef next_else_block = LLVMAppendBasicBlock(llvm_current_func(llvm), "");
 		LLVMBasicBlockRef else_if_body = LLVMAppendBasicBlock(llvm_current_func(llvm), "");

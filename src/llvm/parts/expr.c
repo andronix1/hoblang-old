@@ -5,6 +5,7 @@
 #include "llvm/parts/path.h"
 #include "llvm/parts/types/slice.h"
 #include "llvm/parts/types/optional.h"
+#include "llvm/utils/alloca.h"
 #include "llvm/utils/member.h"
 #include <llvm-c/Core.h>
 #include <llvm-c/Types.h>
@@ -91,11 +92,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
         }
         case AST_EXPR_STRUCT: {
             LLVMTypeRef type = llvm_resolve_type(expr->structure.struct_type);
-            LLVMValueRef value = LLVMBuildAlloca(
-                llvm_builder(llvm),
-                type,
-                ""
-            );
+            LLVMValueRef value = llvm_alloca(llvm, type);
             for (size_t i = 0; i < vec_len(expr->structure.members); i++) {
                 AstExprStructMember *member = &expr->structure.members[i];
                 if (member->is_undefined) {
@@ -335,7 +332,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 		case AST_EXPR_ARRAY: {
 			LLVMTypeRef of = llvm_resolve_type(sema_value_typeof(expr->value)->array.of);
 			LLVMTypeRef type = LLVMArrayType(of, vec_len(expr->array));
-			LLVMValueRef array = LLVMBuildAlloca(llvm_builder(llvm), type, "new_arr");
+			LLVMValueRef array = llvm_alloca(llvm, type);
 			for (size_t i = 0; i < vec_len(expr->array); i++) {
 				LLVMValueRef indices[1] = { LLVMConstInt(LLVMInt32Type(), i, false) };
 				LLVMBuildStore(
