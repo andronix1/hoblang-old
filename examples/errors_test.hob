@@ -3,7 +3,20 @@
   you can write anything here except # after `, but you can just write `
 `#
 
+struct Test {
+    a: i32,
+    b: i64
+}
+
 fun test() -> void {
+    var t = struct Test {
+        a: 12
+    };
+    var t = struct Test {
+        a: 12,
+        b: 123,
+        c: 90
+    };
     var NULL = null;
     if 0.0 {
         (0) = 10;

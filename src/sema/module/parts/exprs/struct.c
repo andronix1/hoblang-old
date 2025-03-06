@@ -27,22 +27,27 @@ SemaValue *sema_analyze_expr_struct(SemaModule *sema, FileLocation at, AstExprSt
         }
     }
     AstStructDef *struct_def = type->struct_def;
-    if (vec_len(structure->members) != vec_len(struct_def->members)) {
+    if (vec_len(structure->members) < vec_len(struct_def->members)) {
         SEMA_ERROR(at, "missing fields in struct constructor");
     }
     for (size_t i = 0; i < vec_len(structure->members); i++) {
         AstExprStructMember *member = &structure->members[i];
+        bool found = false;
         for (size_t j = 0; j < vec_len(struct_def->members); j++) {
             AstStructMember *struct_member = &struct_def->members[j];
             if (!slice_eq(&struct_member->name, &member->name)) {
                 continue;
             }
+            found = true;
             member->idx = j;
             SemaType *member_type = sema_value_expr_type(sema, member->expr, sema_expr_ctx_expect(ctx, struct_member->type->sema));
             if (!sema_types_equals(member_type, struct_member->type->sema)) {
                 SEMA_ERROR(member->loc, "invalid struct member `{slice}` type. Expected {sema::type}, got {sema::type}", &member->name, struct_member->type->sema, member_type);
             }
             break;
+        }
+        if (!found) {
+            SEMA_ERROR(member->loc, "there is no field `{slice}` in struct `{ast::path}`", &member->name, &structure->path);
         }
     }
     return sema_value_final(type);

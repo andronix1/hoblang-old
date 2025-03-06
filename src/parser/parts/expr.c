@@ -185,7 +185,9 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
                 AstExprStructMember *members = vec_new(AstExprStructMember);
                 while (true) {
                     AstExprStructMember member;
-                    member.name = PARSER_EXPECT_NEXT(TOKEN_IDENT, "field name")->ident;
+                    Token *name = PARSER_EXPECT_NEXT(TOKEN_IDENT, "field name");
+                    member.loc = name->location;
+                    member.name = name->ident;
                     PARSER_EXPECT_NEXT(TOKEN_COLON, "colon");
                     if (!(member.expr = parse_expr(parser, token_struct_stop))) {
                         return NULL;
