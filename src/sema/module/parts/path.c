@@ -125,13 +125,13 @@ SemaValue *sema_resolve_inner_type_path(SemaModule *sema, SemaValue *from, AstPa
             return sema_value_final(segment->sema.sizeof_op.output_type);
         case AST_PATH_SEG_NULL:
             SEMA_ERROR(segment->loc, "cannot get a member `null` from type `{sema::type}`", sema_value_typeof(from));
-            break;
+	        return NULL;
         case AST_PATH_SEG_IDENT:
             SEMA_ERROR(segment->loc, "cannot get a member `{slice}` from type `{sema::type}`", &segment->ident, sema_value_typeof(from));
-            break;
+	        return NULL;
         case AST_PATH_SEG_DEREF:
             SEMA_ERROR(segment->loc, "cannot dereference type `{sema::type}`", sema_value_typeof(from));
-            break;
+	        return NULL;
     }
     assert(0, "falled through");
 	return NULL;
