@@ -9,6 +9,7 @@ typedef struct {
     FileLocation loc;
     Slice name;
     AstExpr *expr;
+    bool is_undefined;
 
     size_t idx;
 } AstExprStructMember;

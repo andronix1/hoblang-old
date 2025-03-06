@@ -29,6 +29,7 @@ syntax keyword hobKeywords
 	\ asm
 	\ const
 	\ public 
+	\ undefined 
 
 syntax keyword hobType
 	\ i8

@@ -17,6 +17,10 @@ SemaValue *sema_analyze_expr_struct(SemaModule *sema, FileLocation at, AstExprSt
         SEMA_ERROR(structure->path.segments[0].loc, "{ast::path} is not a structure", &structure->path);
         return NULL;
     }
+    if (type->struct_def->module != sema) {
+        SEMA_ERROR(structure->path.segments[0].loc, "struct constructors are always private, so `{ast::path}` may be called inside a module it's declared", &structure->path);
+        return NULL;
+    }
     for (size_t i = 0; i < vec_len(structure->members); i++) {
         AstExprStructMember *member1 = &structure->members[i];
         for (size_t j = i + 1; j < vec_len(structure->members); j++) {
@@ -33,6 +37,9 @@ SemaValue *sema_analyze_expr_struct(SemaModule *sema, FileLocation at, AstExprSt
     for (size_t i = 0; i < vec_len(structure->members); i++) {
         AstExprStructMember *member = &structure->members[i];
         bool found = false;
+        if (member->is_undefined) {
+            continue;
+        }
         for (size_t j = 0; j < vec_len(struct_def->members); j++) {
             AstStructMember *struct_member = &struct_def->members[j];
             if (!slice_eq(&struct_member->name, &member->name)) {

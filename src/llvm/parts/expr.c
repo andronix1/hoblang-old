@@ -98,6 +98,9 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
             );
             for (size_t i = 0; i < vec_len(expr->structure.members); i++) {
                 AstExprStructMember *member = &expr->structure.members[i];
+                if (member->is_undefined) {
+                    continue;
+                }
                 LLVMValueRef member_val = llvm_get_member(llvm, 
                     type, llvm_resolve_type(sema_value_typeof(member->expr->value)),
                     value,

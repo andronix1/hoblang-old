@@ -189,8 +189,10 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
                     member.loc = name->location;
                     member.name = name->ident;
                     PARSER_EXPECT_NEXT(TOKEN_COLON, "colon");
-                    if (!(member.expr = parse_expr(parser, token_struct_stop))) {
-                        return NULL;
+                    if (!(member.is_undefined = parser_next_is(parser, TOKEN_UNDEFINED))) {
+                        if (!(member.expr = parse_expr(parser, token_struct_stop))) {
+                            return NULL;
+                        }
                     }
                     members = vec_push(members, &member);
                     if (parser_next(parser)->type == TOKEN_CLOSING_FIGURE_BRACE) {
