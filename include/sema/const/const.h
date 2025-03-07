@@ -24,8 +24,10 @@ typedef struct {
     bool is_null;
 } SemaConstOptional;
 
+typedef struct SemaConstStructField SemaConstStructField;
+
 typedef struct {
-    SemaConst *fields;
+    SemaConstStructField *fields;
     AstStructDef *struct_def;
 } SemaConstStruct;
 
@@ -44,3 +46,9 @@ typedef struct SemaConst {
     };
 } SemaConst;
 
+typedef struct SemaConstStructField {
+    SemaConst value;
+    SemaType *type;
+    bool is_undefined;
+    size_t idx;
+} SemaConstStructField;

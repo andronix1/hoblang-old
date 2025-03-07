@@ -16,6 +16,18 @@ static inline SemaConst sema_const_optional_filled(SemaType *of, SemaConst *valu
     return result;
 }
 
+static inline SemaConst sema_const_struct(AstStructDef *def, SemaConstStructField *fields) {
+    SemaConst result = {
+        .type = SEMA_CONST_STRUCT,
+        .sema_type = sema_type_new_struct(def),
+        .structure = {
+            .fields = fields,
+            .struct_def = def,
+        }
+    };
+    return result;
+}
+
 static inline SemaConst sema_const_optional_null(SemaType *of) {
     SemaConst result = {
         .type = SEMA_CONST_OPTIONAL,

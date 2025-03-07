@@ -114,7 +114,7 @@ SemaValue *sema_conv_array(
     FileLocation at,
 	SemaValue *source_val,
 	SemaType *dest,
-	SemaAsConvType *type
+	SemaAsConvType *type __attribute__((unused))
 ) {
     SemaType *source = sema_value_typeof(source_val);
 	assert(source->type == SEMA_TYPE_ARRAY, "passed non-array type {sema::type}", source);
@@ -273,19 +273,26 @@ SemaValue *sema_analyze_expr_as(SemaModule *sema, AstExprAs *as, SemaExprCtx ctx
 		return false;
 	}
     as->sema_type = as_type;
-	SemaType *expr_type = sema_value_expr_type(sema, as->expr, sema_expr_ctx_expect(ctx, as_type));
+    SemaType *expectation = as_type;
+    if (as_type->type == SEMA_TYPE_OPTIONAL) {
+        expectation = as_type->optional_of;
+    }
+	SemaType *expr_type = sema_value_expr_type(sema, as->expr, sema_expr_ctx_expect(ctx, expectation));
 	if (!expr_type) {
 		return false;
 	}
 	if (sema_types_equals(as_type, expr_type)) {
 		as->conv_type = SEMA_AS_CONV_IGNORE;
-        return sema_value_final(as_type);
+        return as->expr->value;
 	} else if (as_type->type == SEMA_TYPE_OPTIONAL) {
         if (!sema_types_equals(expr_type, as_type->optional_of)) {
             SEMA_ERROR(ctx.loc, "cannot wrap {sema::type} with optional {sema::type} because of different inner types", expr_type, as_type);
             return NULL;
         }
         as->conv_type = SEMA_AS_CONV_OPT_WRAP;
+        if (sema_value_is_const(as->expr->value)) {
+            return sema_value_const(sema_const_optional_filled(expr_type, &as->expr->value->constant));
+        }
         return sema_value_final(as_type);
     } else {
 		switch (expr_type->type) {

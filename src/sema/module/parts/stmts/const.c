@@ -7,9 +7,6 @@
 #include "sema/module/parts/expr.h"
 #include "sema/module/parts/type.h"
 
-#include "core/assert.h"
-#include "sema/module/decls/impl.h"
-
 void sema_stmt_const(SemaModule *sema, FileLocation loc, bool public, AstConst *const_stmt) {
     SemaType *const_type = sema_ast_type(sema, &const_stmt->type);
     if (!const_type) {

@@ -57,12 +57,25 @@ LLVMValueRef llvm_const(SemaConst *constant) {
 			}
 			return LLVMConstArray2(of, values, constant->sema_type->array.length);
         }
-        case SEMA_CONST_STRUCT:
-            assert(0, "TODO const struct");
+        case SEMA_CONST_STRUCT: {
+            size_t fields_count = vec_len(constant->structure.fields);
+            LLVMValueRef *values = alloca(sizeof(LLVMValueRef) * fields_count);
+            for (size_t i = 0; i < fields_count; i++) {
+                SemaConstStructField *field = &constant->structure.fields[i];
+                values[field->idx] = field->is_undefined ?
+                    LLVMGetUndef(llvm_resolve_type(field->type)) :
+                    llvm_const(&field->value);
+            }
+            return LLVMConstStruct(values, fields_count, false);
+        }
         case SEMA_CONST_OPTIONAL:
-            assert(0, "TODO const optional");
+            if (constant->optional.is_null) {
+                return llvm_opt_null(llvm_resolve_type(constant->sema_type->optional_of));
+            } else {
+                return llvm_opt_wrap_const(llvm_const(constant->optional.value));
+            }
     }
-    assert(0, "invalid const type");
+    assert(0, "invalid const type {int} for type {sema::type}", constant->type, constant->sema_type);
 }
 
 LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
@@ -154,7 +167,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
                 case SEMA_NULL_POINTER:
                     return LLVMConstNull(llvm_resolve_type(expr->value->sema_type));
                 case SEMA_NULL_OPTIONAL:
-                    return llvm_opt_null(llvm, llvm_resolve_type(expr->value->sema_type->optional_of));
+                    return llvm_opt_null(llvm_resolve_type(expr->value->sema_type->optional_of));
             }
             assert(0, "invalid sema null type");
         }
@@ -191,7 +204,6 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
             LLVMBuildRet(
                 llvm_builder(llvm),
                 llvm_opt_null(
-                    llvm,
                     llvm_resolve_type(expr->ret_on_null.fret->optional_of)
                 )
             );

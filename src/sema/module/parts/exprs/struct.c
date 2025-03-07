@@ -1,8 +1,11 @@
 #include "exprs.h"
 #include "ast/private/module_node.h"
+#include "sema/const/const.h"
+#include "sema/const/api.h"
 #include "sema/module/parts/expr.h"
 #include "sema/type/api.h"
 #include "sema/type/private.h"
+#include "sema/value/api.h"
 #include "sema/module/parts/path.h"
 #include "core/vec.h"
 #include "sema/value/private.h"
@@ -34,10 +37,14 @@ SemaValue *sema_analyze_expr_struct(SemaModule *sema, FileLocation at, AstExprSt
     if (vec_len(structure->members) < vec_len(struct_def->members)) {
         SEMA_ERROR(at, "missing fields in struct constructor");
     }
+    bool is_const = true;
+    SemaConstStructField *fields = vec_new(SemaConstStructField);
     for (size_t i = 0; i < vec_len(structure->members); i++) {
         AstExprStructMember *member = &structure->members[i];
         bool found = false;
         if (member->is_undefined) {
+            is_const = false;
+            vec_free(fields);
             continue;
         }
         for (size_t j = 0; j < vec_len(struct_def->members); j++) {
@@ -47,7 +54,25 @@ SemaValue *sema_analyze_expr_struct(SemaModule *sema, FileLocation at, AstExprSt
             }
             found = true;
             member->idx = j;
-            SemaType *member_type = sema_value_expr_type(sema, member->expr, sema_expr_ctx_expect(ctx, struct_member->type->sema));
+            SemaValue *member_value = sema_expr(sema, member->expr, sema_expr_ctx_expect(ctx, struct_member->type->sema));
+            if (sema_value_is_const(member_value)) {
+                if (is_const) {
+                    SemaConstStructField field = {
+                        .value = member_value->constant,
+                        .is_undefined = member->is_undefined,
+                        .type = struct_member->type->sema,
+                        .idx = j
+                    };
+                    fields = vec_push(fields, &field);
+                }
+            } else if (sema_value_is_runtime(member_value)) {
+                vec_free(fields);
+                is_const = false;
+            } else {
+                SEMA_ERROR(member->expr->loc, "expression is not a value");
+                break;
+            }
+            SemaType *member_type = sema_value_typeof(member_value);
             if (!sema_types_equals(member_type, struct_member->type->sema)) {
                 SEMA_ERROR(member->loc, "invalid struct member `{slice}` type. Expected {sema::type}, got {sema::type}", &member->name, struct_member->type->sema, member_type);
             }
@@ -57,5 +82,9 @@ SemaValue *sema_analyze_expr_struct(SemaModule *sema, FileLocation at, AstExprSt
             SEMA_ERROR(member->loc, "there is no field `{slice}` in struct `{ast::path}`", &member->name, &structure->path);
         }
     }
-    return sema_value_final(type);
+    if (is_const) {
+        return sema_value_const(sema_const_struct(struct_def, fields));
+    } else {
+        return sema_value_final(type);
+    }
 }

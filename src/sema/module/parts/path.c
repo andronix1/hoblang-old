@@ -3,6 +3,7 @@
 #include "ast/private/module_node.h"
 #include "core/vec.h"
 #include "sema/arch/bits/private.h"
+#include "sema/const/const.h"
 #include "sema/module/module.h"
 #include "sema/type/private.h"
 #include "sema/module/private.h"
@@ -45,7 +46,22 @@ SemaValue *sema_resolve_inner_value_path(SemaModule *sema, SemaValue *from, AstP
                 segment->sema.struct_member.of = sema_value_typeof(from);
                 ssize_t idx = segment->sema.struct_member.idx = sema_get_struct_member_id(sema, segment->loc, sema_value_typeof(from)->struct_def, &segment->ident);
                 if (idx != -1) {
-                    return sema_value_with_type(from, sema_value_typeof(from)->struct_def->members[idx].type->sema);
+                    if (sema_value_is_const(from)) {
+                        for (size_t i = 0; i < vec_len(from->constant.structure.fields); i++) {
+                            SemaConstStructField *field = &from->constant.structure.fields[i];
+                            if (field->idx == (size_t)idx) {
+                                if (field->is_undefined) {
+                                    SEMA_ERROR(segment->loc, "trying to get undefined value");
+                                    return NULL;
+                                }
+                                SemaConst constant;
+                                memcpy(&constant, &field->value, sizeof(SemaConst));
+                                return sema_value_const(constant); 
+                            }
+                        }
+                    } else {
+                        return sema_value_with_type(from, sema_value_typeof(from)->struct_def->members[idx].type->sema);
+                    }
                 }
 			} else if (sema_value_typeof(from)->type == SEMA_TYPE_SLICE) {
                 Slice length = slice_from_const_cstr("length");
@@ -59,8 +75,8 @@ SemaValue *sema_resolve_inner_value_path(SemaModule *sema, SemaValue *from, AstP
                     segment->sema.type = SEMA_PATH_SLICE_LEN;
                     return sema_value_with_type(from, sema_arch_usize(sema));
                 }
+
             } else if (sema_value_typeof(from)->type == SEMA_TYPE_ARRAY) {                Slice length = slice_from_const_cstr("length");
-                Slice raw = slice_from_const_cstr("raw");
                 if (slice_eq(&length, &segment->ident)) {
                     segment->sema.type = SEMA_PATH_ARRAY_LEN;
                     segment->sema.array_length = sema_value_typeof(from)->array.length;

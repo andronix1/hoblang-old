@@ -29,3 +29,12 @@ SemaModule *sema_value_module_of(SemaValue *value) {
 bool sema_value_is_type_of(SemaValue *value, SemaTypeKind kind) {
     return value->type == SEMA_VALUE_TYPE && value->sema_type->type == kind;
 }
+
+bool sema_value_is_const(SemaValue *value) {
+    return value->type == SEMA_VALUE_CONST;
+}
+
+bool sema_value_is_runtime(SemaValue *value) {
+    return value->type == SEMA_VALUE_VAR ||
+        value->type == SEMA_VALUE_FINAL;
+}

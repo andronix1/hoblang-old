@@ -2,6 +2,7 @@
 #include "sema/module/private.h"
 #include "sema/type/private.h"
 #include "sema/const/api.h"
+#include "sema/value/private.h"
 
 SemaValue *sema_analyze_expr_null(SemaModule *sema, SemaNullType *type, SemaExprCtx ctx) {
     if (!ctx.expectation) {
@@ -14,8 +15,7 @@ SemaValue *sema_analyze_expr_null(SemaModule *sema, SemaNullType *type, SemaExpr
     }
     if (ctx.expectation->type == SEMA_TYPE_OPTIONAL) {
         *type = SEMA_NULL_OPTIONAL;
-        // TODO: return sema_value_const(sema_const_optional_null(ctx.expectation->optional_of));
-        return sema_value_final(ctx.expectation);
+        return sema_value_const(sema_const_optional_null(ctx.expectation->optional_of));
     }
     SEMA_ERROR(ctx.loc, "null expects that pointer or optional expected, but got {sema::type}", ctx.expectation);
     return NULL;

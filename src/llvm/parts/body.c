@@ -5,7 +5,7 @@
 #include "ast/private/body.h"
 
 void llvm_stmt_assign(LlvmBackend *llvm, AstAssign *assign);
-void llvm_stmt_if(LlvmBackend *llvm, AstIfElse *if_else);
+bool llvm_stmt_if(LlvmBackend *llvm, AstIfElse *if_else);
 void llvm_stmt_return(LlvmBackend *llvm, AstReturn *ret);
 void llvm_stmt_var(LlvmBackend *llvm, AstVar *var);
 void llvm_stmt_while(LlvmBackend *llvm, AstWhile *while_loop);
@@ -28,7 +28,7 @@ bool llvm_body(LlvmBackend *llvm, AstBody *body) {
 			case AST_STMT_BREAK: llvm_stmt_break(llvm, &stmt->break_loop); return false;
             case AST_STMT_CONTINUE: llvm_stmt_continue(llvm, &stmt->continue_loop); return false;
 			case AST_STMT_WHILE: llvm_stmt_while(llvm, &stmt->while_loop); break;
-			case AST_STMT_IF: llvm_stmt_if(llvm, &stmt->if_else); break;
+			case AST_STMT_IF: if (!llvm_stmt_if(llvm, &stmt->if_else)) return false; break;
 			case AST_STMT_ASSIGN: llvm_stmt_assign(llvm, &stmt->assign); break;
 			case AST_STMT_INLINE_ASM: llvm_stmt_asm(llvm, &stmt->inline_asm); break;
 			case AST_STMT_EXPR: llvm_expr(llvm, stmt->expr, false); break;

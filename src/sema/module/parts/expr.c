@@ -74,6 +74,7 @@ SemaConst *sema_const_expr(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) {
     }
     if (expr->value->type != SEMA_VALUE_CONST) {
         SEMA_ERROR(expr->loc, "{ast::expr} is not a const", expr);
+        return NULL;
     }
     return &expr->value->constant;
 }

@@ -17,11 +17,20 @@ LLVMValueRef llvm_opt_value(LlvmBackend *llvm, LLVMTypeRef of, LLVMValueRef opt,
     return llvm_get_member(llvm, llvm_opt_type(of), of, opt, 1, load);
 }
 
-LLVMValueRef llvm_opt_null(LlvmBackend *llvm, LLVMTypeRef of) {
-    LLVMTypeRef opt_type = llvm_opt_type(of);
-    LLVMValueRef opt = llvm_alloca(llvm, opt_type);
-    LLVMBuildStore(llvm_builder(llvm), LLVMConstInt(LLVMInt1Type(), 1, false), llvm_opt_is_null(llvm, opt_type, opt, false));
-    return LLVMBuildLoad2(llvm_builder(llvm), opt_type, opt, "loaded_opt");
+LLVMValueRef llvm_opt_null(LLVMTypeRef of) {
+    LLVMValueRef values[] = {
+        LLVMConstInt(LLVMInt1Type(), 1, false),
+        LLVMGetUndef(of)
+    };
+    return LLVMConstStruct(values, 2, false);
+}
+
+LLVMValueRef llvm_opt_wrap_const(LLVMValueRef value) {
+    LLVMValueRef values[] = {
+        LLVMConstInt(LLVMInt1Type(), 1, false),
+        value
+    };
+    return LLVMConstStruct(values, 2, false);
 }
 
 LLVMValueRef llvm_opt_wrap(LlvmBackend *llvm, LLVMTypeRef of, LLVMValueRef value) {

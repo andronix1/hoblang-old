@@ -1,16 +1,17 @@
 import "std/io.hob" as io;
 import "std/process.hob" as process;
 
-#`
 struct ConstTest {
     a: i32,
     b: i32
 }
-`#
 
 const a: i32 = 1 + 2;
 const b: i32 = a + 2;
-# const s: ConstTest;
+const s: ConstTest = struct ConstTest {
+    a: 4,
+    b: 1
+};
 
 fun new_slice(ptr: *u8, len: usize) -> []u8 {
     var result: []u8;
@@ -32,7 +33,8 @@ fun main() -> i32 {
     dbg("a", a);
     dbg("b", b);
     dbg("c", c);
-    # dbg("s", s.a);
+    dbg("s.a", s.a);
+    dbg("s.b", s.b);
     return 0;
 }
 
