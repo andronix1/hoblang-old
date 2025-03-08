@@ -40,10 +40,6 @@ LlvmBackend *llvm_create_from_file(const char *input, CmdLlvm *cmd, CmdArchFlags
     if (!llvm_emit_project(llvm, project)) {
         return NULL;
     }
-    char *temp = "/tmp/hobtmp.o";
-    if (!llvm_write_module(llvm, cmd->target, temp)) {
-        return NULL;
-    }
     return llvm;
 }
 

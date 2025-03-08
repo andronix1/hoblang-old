@@ -6,8 +6,10 @@
 #include "sema/module/private.h"
 #include "sema/module/parts/expr.h"
 #include "sema/module/parts/type.h"
+#include "core/assert.h"
 
-void sema_stmt_const(SemaModule *sema, FileLocation loc, bool public, AstConst *const_stmt) {
+void sema_stmt_const(SemaModule *sema, FileLocation loc, bool is_global, bool public, AstConst *const_stmt) {
+    assert(!(public && !is_global), "local constant cannot be public");
     SemaType *const_type = sema_ast_type(sema, &const_stmt->type);
     if (!const_type) {
         return;
@@ -21,9 +23,16 @@ void sema_stmt_const(SemaModule *sema, FileLocation loc, bool public, AstConst *
         return;
     }
     if (const_type) {
-        const_stmt->decl = sema_module_push_decl(sema, loc, public, sema_decl_new(
-            const_stmt->name,
-            sema_value_const(*constant)
-        ));
+        if (is_global) {
+            const_stmt->decl = sema_module_push_module_decl(sema, loc, public, sema_decl_new(
+                const_stmt->name,
+                sema_value_const(*constant)
+            ));
+        } else {
+            const_stmt->decl = sema_module_push_scope_decl(sema, loc, sema_decl_new(
+                const_stmt->name,
+                sema_value_const(*constant)
+            ));
+        }
     }
 }

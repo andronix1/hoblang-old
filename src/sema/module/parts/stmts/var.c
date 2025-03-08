@@ -8,7 +8,7 @@
 #include "sema/type/api.h"
 #include "sema/module/decls/api.h"
 
-void sema_stmt_var(SemaModule *sema, bool public, AstVar *var) {
+void sema_stmt_var(SemaModule *sema, AstVar *var) {
 	SemaType *var_type;
 	if (var->typed) {
 		if (!(var_type = sema_ast_type(sema, &var->type))) {
@@ -36,5 +36,5 @@ void sema_stmt_var(SemaModule *sema, bool public, AstVar *var) {
 			return;
 		}
 	}
-	var->decl = sema_module_push_decl(sema, var->loc, public, sema_decl_new(var->name, sema_value_var(var_type)));
+	var->decl = sema_module_push_scope_decl(sema, var->loc, sema_decl_new(var->name, sema_value_var(var_type)));
 }

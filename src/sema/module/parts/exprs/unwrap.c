@@ -16,7 +16,7 @@ SemaValue *sema_analyze_expr_unwrap(SemaModule *sema, AstExprUnwrap *unwrap, Sem
         return NULL;
     }
     unwrap->type = SEMA_EXPR_UNWRAP_OPT;
-    unwrap->decl = sema_module_push_decl(sema, ctx.loc, false, sema_decl_new(
+    unwrap->decl = sema_module_push_scope_decl(sema, ctx.loc, sema_decl_new(
         unwrap->name,
         sema_value_final(expr_type->optional_of)
     ));

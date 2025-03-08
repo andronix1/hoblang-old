@@ -5,6 +5,7 @@
 #include "core/slice.h"
 #include "ast/api/defer.h"
 #include "ast/api/body.h"
+#include "sema/module/scopes/scope.h"
 #include "sema/module/module.h"
 #include "sema/type.h"
 #include "sema/module/decls.h"
@@ -24,6 +25,7 @@
 		sema_module_fail(sema); \
 	} while (0)
 */
+SemaScopeStack *sema_module_ss_swap(SemaModule *sema, SemaScopeStack *ss);
 
 SemaDecl *sema_module_resolve_scope_decl(SemaModule *sema, Slice *name);
 SemaDecl *sema_module_resolve_public_decl(SemaModule *sema, Slice *name);
@@ -32,7 +34,8 @@ void sema_module_push_defer(SemaModule *sema, AstDefer *defer);
 AstDefer **sema_module_defers_up_to(SemaModule *sema, AstBody *to);
 
 void sema_module_append_ext_funcs_from(SemaModule *sema, FileLocation at, SemaModule *from);
-SemaDecl *sema_module_push_decl(SemaModule *sema, FileLocation at, bool public, SemaDecl *decl);
+SemaDecl *sema_module_push_module_decl(SemaModule *sema, FileLocation at, bool public, SemaDecl *decl);
+SemaDecl *sema_module_push_scope_decl(SemaModule *sema, FileLocation at, SemaDecl *decl);
 SemaDecl *sema_module_resolve_ext_func(SemaModule *sema, Slice *name, SemaType *type);
 
 void sema_module_push_primitives(SemaModule *sema);

@@ -27,6 +27,8 @@ fun dbg(name: []u8, val: i32) -> void {
     io.println(";");
 }
 
+const super: ?i32 = null;
+
 fun main() -> i32 {
     const c: i32 = b * 123;
 

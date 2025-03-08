@@ -7,6 +7,10 @@
 #include "sema/module/loop/loop.h"
 #include "sema/module/loop/private.h"
 #include "sema/module/private.h"
+#include "sema/module/scopes/scope.h"
+#include "sema/module/scopes/impl.h"
+
+#define ASSERT_SS() assert(sema->current_ss, "illegal operation outside of scope stack");
 
 SemaLoop *sema_loop_new() {
     SemaLoop *result = malloc(sizeof(SemaLoop));
@@ -23,9 +27,11 @@ SemaLoop *sema_loop_new_named(Slice name) {
     return result;
 }
 
-inline SemaLoop *sema_module_try_named_loop(SemaModule *sema, Slice *name) {
-    for (size_t i = 0; i < vec_len(sema->loops); i++) {
-        SemaLoop *loop = sema->loops[i];
+SemaLoop *sema_module_try_named_loop(SemaModule *sema, Slice *name) {
+    ASSERT_SS();
+    SemaScopeStack *ss = sema->current_ss;
+    for (size_t i = 0; i < vec_len(ss->loops); i++) {
+        SemaLoop *loop = ss->loops[i];
         if (loop->is_named && slice_eq(name, &loop->name)) {
             return loop;
         }
@@ -34,26 +40,32 @@ inline SemaLoop *sema_module_try_named_loop(SemaModule *sema, Slice *name) {
 }
 
 bool sema_module_push_loop(SemaModule *sema, FileLocation at, SemaLoop *loop) {
+    ASSERT_SS();
+    SemaScopeStack *ss = sema->current_ss;
     if (loop->is_named) {
         if (sema_module_try_named_loop(sema, &loop->name)) {
             SEMA_ERROR(at, "redefenition of named loop `{slice}`", &loop->name);
             return false;
         }
     }
-    sema->loops = vec_push(sema->loops, &loop);
+    ss->loops = vec_push(ss->loops, &loop);
     return true;
 }
 
 void sema_module_pop_loop(SemaModule *sema) {
-    vec_pop(sema->loops);
+    ASSERT_SS();
+    SemaScopeStack *ss = sema->current_ss;
+    vec_pop(ss->loops);
 }
 
 SemaLoop *sema_module_top_loop(SemaModule *sema, FileLocation at) {
-    if (vec_len(sema->loops) == 0) {
+    ASSERT_SS();
+    SemaScopeStack *ss = sema->current_ss;
+    if (vec_len(ss->loops) == 0) {
         SEMA_ERROR(at, "no loops found");
         return NULL;
     }
-    return *vec_top(sema->loops);
+    return *vec_top(ss->loops);
 }
 
 SemaLoop *sema_module_named_loop(SemaModule *sema, FileLocation at, Slice *name) {

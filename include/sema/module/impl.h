@@ -8,11 +8,7 @@
 #include "sema/module/private.h"
 #include "sema/module/loop/loop.h"
 #include "sema/project.h"
-
-typedef struct SemaScope {
-    SemaDecl **decls;
-	AstBody *body;
-} SemaScope;
+#include "scopes/scope.h"
 
 typedef struct SemaModule {
     const char *path;
@@ -23,8 +19,8 @@ typedef struct SemaModule {
     // internal
     SemaProject *project; // TODO: API
     SemaDecl **public_decls;
-	SemaScope *scopes;
-	SemaLoop **loops;
+    SemaDecl **private_decls;
+    SemaScopeStack *current_ss;
 	SemaType *returning;
 } SemaModule;
 

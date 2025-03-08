@@ -1,30 +1,40 @@
 #include "ast/api/defer.h"
 #include "ast/private/module.h"
 #include "core/location.h"
-#include "parser/private.h"
 #include "sema/arch/bits/private.h"
+#include "sema/module/decls/decls.h"
 #include "sema/module/impl.h"
 #include "sema/module/decls/api.h"
 #include "core/vec.h"
+#include "sema/module/scopes/scope.h"
+#include "sema/type/api.h"
 #include "sema/type/private.h"
 #include "sema/type/arch.h"
 #include "sema/module/private.h"
 #include "sema/module/decls/impl.h"
-#include "sema/type/api.h"
 #include "ast/private/body.h"
 #include "sema/value/api.h"
 #include "sema/value/private.h"
+#include "sema/module/scopes/private.h"
+#include "parser/api.h"
 
-SemaDecl *sema_module_resolve_ext_func(SemaModule *sema, Slice *name, SemaType *type) {
-    for (ssize_t i = (ssize_t)vec_len(sema->scopes) - 1; i >= 0; i--) {
-        SemaScope *scope = &sema->scopes[i];
-        for (size_t j = 0; j < vec_len(scope->decls); j++) {
-            SemaDecl *decl = scope->decls[j];
-            if (decl->in_type && slice_eq(&decl->name, name) && sema_types_equals(type, decl->in_type)) {
-                if (sema_value_is_type_of(decl->value, SEMA_TYPE_FUNCTION)) {
-                    assert(0, "in_type value is not a function");
-                    return NULL;
+#define ASSERT_SS() assert(sema->current_ss, "illegal operation outside of scope stack");
+
+SemaScopeStack *sema_module_ss_swap(SemaModule *sema, SemaScopeStack *ss) {
+    SemaScopeStack *result = sema->current_ss;
+    sema->current_ss = ss;
+    return result;
+}
+
+SemaDecl *sema_module_resolve_module_decl_in_type(SemaModule *sema, SemaType *type, Slice *name) {
+    for (size_t j = 0; j < vec_len(sema->private_decls); j++) {
+        SemaDecl *decl = sema->private_decls[j];
+        if (slice_eq(&decl->name, name)) {
+            if (type) {
+                if (decl->in_type && sema_types_equals(decl->in_type, type)) { 
+                    return decl;
                 }
+            } else if (!decl->in_type) {
                 return decl;
             }
         }
@@ -32,21 +42,30 @@ SemaDecl *sema_module_resolve_ext_func(SemaModule *sema, Slice *name, SemaType *
     return NULL;
 }
 
-SemaDecl *sema_module_resolve_scope_decl_in_type(SemaModule *sema, SemaType *type, Slice *name) {
-    for (ssize_t i = (ssize_t)vec_len(sema->scopes) - 1; i >= 0; i--) {
-        SemaScope *scope = &sema->scopes[i];
-        for (size_t j = 0; j < vec_len(scope->decls); j++) {
-            SemaDecl *decl = scope->decls[j];
-            if (decl->in_type == type && slice_eq(&decl->name, name)) {
-                return decl;
-            }
-        }
+SemaDecl *sema_module_resolve_module_ext_func(SemaModule *sema, Slice *name, SemaType *type) {
+    SemaDecl *decl = sema_module_resolve_module_decl_in_type(sema, type, name);
+    if (!decl) {
+        return NULL;
     }
-    return NULL;
+    if (sema_value_is_type_of(decl->value, SEMA_TYPE_FUNCTION)) {
+        assert(0, "in_type value is not a function");
+        return NULL;
+    }
+    return decl;
+}
+
+SemaDecl *sema_module_resolve_ext_func(SemaModule *sema, Slice *name, SemaType *type) {
+    return sema_module_resolve_module_ext_func(sema, name, type);
 }
 
 SemaDecl *sema_module_resolve_scope_decl(SemaModule *sema, Slice *name) {
-    return sema_module_resolve_scope_decl_in_type(sema, NULL, name);
+    if (sema->current_ss) {
+        SemaDecl *in_ss = sema_ss_resolve_decl(sema->current_ss, NULL, name);
+        if (in_ss) {
+            return in_ss;
+        }
+    }
+    return sema_module_resolve_module_decl_in_type(sema, NULL, name);
 }
 
 SemaDecl *sema_module_resolve_public_decl(SemaModule *sema, Slice *name) {
@@ -60,10 +79,10 @@ SemaDecl *sema_module_resolve_public_decl(SemaModule *sema, Slice *name) {
 }
 
 AstBody *sema_module_current_body(SemaModule *sema) {
-    if (vec_len(sema->scopes) == 0) {
+    if (!sema->current_ss) {
         return NULL;
     }
-    return sema_module_top_scope(sema)->body;
+    return sema_ss_current_body(sema->current_ss);
 }
 
 void sema_module_push_defer(SemaModule *sema, AstDefer *defer) {
@@ -92,53 +111,45 @@ void sema_module_append_ext_funcs_from(SemaModule *sema, FileLocation at, SemaMo
     for (size_t i = 0; i < vec_len(from->public_decls); i++) {
         SemaDecl *decl = from->public_decls[i];
         if (decl->in_type) {
-            sema_module_push_decl(sema, at, false, decl);
+            sema_module_push_module_decl(sema, at, false, decl);
         }
     }
 }
 
-SemaDecl *sema_module_push_decl(SemaModule *sema, FileLocation at, bool public, SemaDecl *decl) {
+SemaDecl *sema_module_push_scope_decl(SemaModule *sema, FileLocation at, SemaDecl *decl) {
+    ASSERT_SS();
+    return sema_ss_push_decl(sema->current_ss, decl);
+}
+
+SemaDecl *sema_module_push_module_decl(SemaModule *sema, FileLocation at, bool public, SemaDecl *decl) {
     if (sema_module_resolve_scope_decl(sema, &decl->name)) {
         SEMA_ERROR(at, "`{slice}` was already declared", &decl->name);
         return NULL;
     }
-    SemaScope *scope = vec_top(sema->scopes);
-    scope->decls = vec_push(scope->decls, &decl);
+    sema->private_decls = vec_push(sema->private_decls, &decl);
     if (public) {
         sema->public_decls = vec_push(sema->public_decls, &decl);
     }
     return decl;
 }
 
-SemaScope *sema_module_top_scope(SemaModule *sema) {
-    return vec_top(sema->scopes);
-}
-
 void sema_module_push_body_scope(SemaModule *sema, AstBody *body) {
-    AstBody *current_body = sema_module_current_body(sema);
-    if (!body) {
-        body = current_body;
-    } else {
-        body->parent = current_body;
-    }
-    SemaScope scope = {
-        .decls = vec_new(SemaDecl*),
-        .body = body
-    };
-    sema->scopes = vec_push(sema->scopes, &scope);
+    ASSERT_SS();
+    sema_ss_push_body_scope(sema->current_ss, body);
 }
 
 void sema_module_push_scope(SemaModule *sema) {
-    return sema_module_push_body_scope(sema, NULL);
+    sema_module_push_body_scope(sema, NULL);
 }
 
 void sema_module_pop_scope(SemaModule *sema) {
-    vec_pop(sema->scopes);
+    ASSERT_SS();
+    sema_ss_pop_scope(sema->current_ss);
 }
 
 void sema_module_push_primitives(SemaModule *sema) {
-    #define PD(name, type) sema_module_push_decl(sema, file_loc_new(), false, sema_decl_new(slice_from_cstr(#name), sema_value_type(type)))
-    #define PP(name) sema_module_push_decl(sema, file_loc_new(), false, sema_decl_new(slice_from_cstr(#name), sema_value_type(sema_type_primitive_##name())))
+    #define PD(name, type) sema_module_push_module_decl(sema, file_loc_new(), false, sema_decl_new(slice_from_cstr(#name), sema_value_type(type)))
+    #define PP(name) sema_module_push_module_decl(sema, file_loc_new(), false, sema_decl_new(slice_from_cstr(#name), sema_value_type(sema_type_primitive_##name())))
     #define ADIPP(name, size) do { \
         if (sema->arch_info.ints & SEMA_INT_##size) { \
             PP(name); \

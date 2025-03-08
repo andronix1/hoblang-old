@@ -7,9 +7,11 @@ SemaModule *sema_module_new(SemaProject *project, AstModule *module, SemaArchInf
 	SemaModule *result = malloc(sizeof(SemaModule));
 	result->ast = module;
 	result->arch_info = arch_info;
+
 	result->public_decls = vec_new(SemaDecl*);
-    result->loops = vec_new(SemaLoop*);
-	result->scopes = vec_new(SemaScope);
+	result->private_decls = vec_new(SemaDecl*);
+	result->current_ss = NULL;
+
 	result->failed = false;
     result->project = project;
 	return result;
