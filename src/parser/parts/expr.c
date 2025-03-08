@@ -1,10 +1,13 @@
 #include "ast/private/expr.h"
 #include "ast/api/expr.h"
+#include "ast/api/func_info.h"
 #include "ast/private/expr/struct.h"
-#include "ast/private/module_node.h"
+#include "ast/private/type.h"
 #include "core/location.h"
 #include "lexer/token.h"
+#include "parser/parts/body.h"
 #include "parser/parts/expr.h"
+#include "parser/parts/func_info.h"
 #include "parser/parts/type.h"
 #include "parser/parts/path.h"
 #include "parser/private.h"
@@ -144,6 +147,19 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
         FileLocation loc = token->location;
 		
 		switch (token->type) {
+            case TOKEN_FUN: {
+                AstFuncArg *args;
+                AstType returning;
+                if (!parse_func_type(parser, &args, &returning)) {
+                    return NULL;
+                }
+                AstBody body;
+                if (!parse_body(parser, &body)) {
+                    return NULL;
+                }
+                current_expr = ast_expr_anon_fun(loc, args, returning, body);
+                break;
+            }
             case TOKEN_QUESTION_MARK:
                 if (!current_expr) {
                     PARSE_ERROR("expected expression before return-on-null operator");

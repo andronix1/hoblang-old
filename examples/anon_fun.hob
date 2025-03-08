@@ -1,0 +1,22 @@
+import "std/process.hob" as process;
+import "std/io.hob" as io;
+
+fun main() -> i32 {
+    var arr = {
+        fun (x: i32) -> i32 { return x; },
+        fun (x: i32) -> i32 { return 2 * x; },
+        fun (x: i32) -> i32 { return x * x; },
+        fun (x: i32) -> i32 { return -x; }
+    };
+    var i: usize = 0;
+    while i < arr.length {
+        io.print_i32(arr[i](3));
+        io.print("\n");
+        i += 1;
+    }
+    return 0;
+}
+
+fun _start() -> void {
+    process.exit(main());
+}

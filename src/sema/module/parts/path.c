@@ -80,7 +80,7 @@ SemaValue *sema_resolve_inner_value_path(SemaModule *sema, SemaValue *from, AstP
                 if (slice_eq(&length, &segment->ident)) {
                     segment->sema.type = SEMA_PATH_ARRAY_LEN;
                     segment->sema.array_length = sema_value_typeof(from)->array.length;
-                    return sema_value_final(sema_arch_usize(sema));
+                    return segment->sema.value = sema_value_final(sema_arch_usize(sema));
                 }
             }
             SemaDecl *decl = sema_module_resolve_ext_func(sema, &segment->ident, sema_value_typeof(from));

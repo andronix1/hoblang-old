@@ -54,9 +54,22 @@ void print_ast_path(FILE *stream, va_list list) {
 void print_ast_expr(FILE *stream, va_list list) {
 	AstExpr *expr = va_arg(list, AstExpr*);
 	switch (expr->type) {
-		case AST_EXPR_STRUCT: {
-            print_to(stream, "struct {ast::path} ", &expr->structure.path);
+		case AST_EXPR_ANON_FUN: {
+            print_to(stream, "fun (");
+            for (size_t i = 0; i < vec_len(expr->anon_fun.args); i++) {
+                AstFuncArg *arg = &expr->anon_fun.args[i];
+                if (i != 0) {        
+                    fprintf(stream, ", ");
+                }
+                print_to(stream, "{slice}: {ast::type}", &arg->name, &arg->type);
+            }
+            print_to(stream, ") -> {ast::type}", &expr->anon_fun.returning);
             fprintf(stream, "{...}");
+
+			break;
+		}
+		case AST_EXPR_STRUCT: {
+            print_to(stream, "struct {ast::path}", &expr->structure.path);
 
 			break;
 		}

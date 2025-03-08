@@ -12,6 +12,7 @@
 #include "expr/get_inner.h"
 #include "expr/idx.h"
 #include "expr/struct.h"
+#include "expr/anon_fun.h"
 #include "sema/module/decls/decls.h"
 
 typedef enum {
@@ -34,6 +35,7 @@ typedef enum {
 	AST_EXPR_RET_ON_NULL,
 	AST_EXPR_UNWRAP,
 	AST_EXPR_STRUCT,
+	AST_EXPR_ANON_FUN,
 } AstExprType;
 
 typedef struct AstExpr AstExpr;
@@ -75,6 +77,7 @@ typedef struct AstExpr {
 		AstExpr *ref_expr;
 		AstExpr *not_expr;
         AstExprRetOnNull ret_on_null;
+        AstExprAnonFun anon_fun;
         AstExprUnwrap unwrap;
 		AstExprGetLocal get_local;
 		AstExprGetInner get_inner;
@@ -90,6 +93,7 @@ typedef struct AstExpr {
 	SemaValue *value;
 } AstExpr;
 
+AstExpr *ast_expr_anon_fun(FileLocation loc, AstFuncArg *args, AstType returning, AstBody body);
 AstExpr *ast_expr_struct(FileLocation loc, AstPath path, AstExprStructMember *members);
 AstExpr *ast_expr_ret_on_null(FileLocation loc, AstExpr *expr);
 AstExpr *ast_expr_unwrap(FileLocation loc, AstExpr *expr, Slice name);

@@ -3,6 +3,7 @@
 #include "core/vec.h"
 #include "ast/private/path.h"
 #include "ast/private/module_node.h"
+#include "sema/value/api.h"
 #include "sema/value/private.h"
 #include "sema/module/decls/impl.h"
 #include "llvm/parts/type.h"
@@ -67,7 +68,7 @@ LLVMValueRef llvm_resolve_path(LlvmBackend *llvm, LLVMValueRef value, AstPath *p
                 value = llvm_opt_is_null(llvm, llvm_resolve_type(segment->optional_type), value, false);
                 break;
             case SEMA_PATH_ARRAY_LEN:
-                value = LLVMConstInt(LLVMInt32Type(), segment->array_length, false);
+                value = LLVMConstInt(llvm_resolve_type(sema_value_typeof(segment->value)), segment->array_length, false);
                 break;
             case SEMA_PATH_SLICE_RAW:
                 value = llvm_slice_ptr(llvm, llvm_resolve_type(segment->slice_type), value, false);

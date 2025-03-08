@@ -80,6 +80,7 @@ set(SOURCE_FILES
 	src/sema/module/decls/api.c
 	src/sema/module/value/api.c
 	src/sema/module/parts/decls/struct.c
+	src/sema/module/parts/exprs/anon_fun.c
 	src/sema/module/parts/exprs/struct.c
 	src/sema/module/parts/exprs/array.c
 	src/sema/module/parts/exprs/as.c
@@ -106,6 +107,7 @@ set(SOURCE_FILES
 	src/sema/module/parts/stmts/const.c
 	src/sema/module/parts/stmts/while.c
 	src/sema/module/parts/module.c
+	src/sema/module/parts/func_info.c
 	src/sema/module/parts/path.c
 	src/sema/module/parts/type.c
 	src/sema/module/parts/body.c
@@ -121,6 +123,7 @@ set(SOURCE_FILES
 	src/llvm/parts/type.c
 	src/llvm/parts/module.c
 	src/llvm/parts/body.c
+	src/llvm/parts/func.c
 	src/llvm/parts/stmts/asm/x86.c
 	src/llvm/parts/stmts/assign.c
 	src/llvm/parts/stmts/asm/x86.c

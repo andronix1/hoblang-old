@@ -1,13 +1,15 @@
 #pragma once
 
+#include "core/location.h"
 #include "sema/module/decls.h"
 #include "core/vec.h"
 #include "core/slice.h"
 #include "type.h"
 
-typedef struct {
+typedef struct AstFuncArg {
 	AstType type;
 	Slice name;
+    FileLocation loc;
 
 	SemaDecl *decl;
 } AstFuncArg;

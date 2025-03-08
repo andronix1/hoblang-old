@@ -1,4 +1,5 @@
 #include "core/location.h"
+#include "sema/module/parts/func_info.h"
 #include "sema/module/scopes/api.h"
 #include "sema/module/scopes/scope.h"
 #include "sema/project/api.h"
@@ -16,32 +17,19 @@
 #include "sema/value/private.h"
 
 void sema_add_ast_func_info(SemaModule *sema, FileLocation at, bool public, AstFuncInfo *info) {	
-	SemaType *returning = sema_ast_type(sema, &info->returning);
-	if (!returning) {
-		return;
+    SemaType *ext_of = NULL;
+	if (info->is_extension) {
+        if (!(ext_of = sema_ast_type(sema, &info->ext.of))) {
+            return;
+        }
 	}
 
-	if (info->is_extension) {
-        sema_ast_type(sema, &info->ext.of);
-	}
+    SemaType *func_type = sema_ast_func(sema, at, ext_of, info->args, &info->returning);
 
-	SemaType **args = vec_new(SemaType*);
-	if (info->is_extension) {
-		SemaType *type = info->ext.of.sema;
-		args = vec_push(args, &type);
-	}
-	for (size_t i = 0; i < vec_len(info->args); i++) {
-		AstFuncArg *arg = &info->args[i];
-		SemaType *type = sema_ast_type(sema, &arg->type);
-		if (!type) {
-			return;
-		}
-		args = vec_push(args, &type);
-	}
 	info->decl = sema_module_push_module_decl(sema, at, public, sema_decl_new_in_type(
 		info->name,
         info->is_extension ? info->ext.of.sema : NULL,
-        sema_value_final(sema_type_new_func(returning, args))
+        sema_value_final(func_type)
 	));
 }
 

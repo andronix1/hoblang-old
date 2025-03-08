@@ -1,3 +1,5 @@
+#include "ast/private/expr/anon_fun.h"
+#include "core/location.h"
 #include "sema/const/const.h"
 #include "sema/module/private.h"
 #include "sema/module/parts/expr.h"
@@ -8,6 +10,7 @@
 #include "ast/private/expr.h"
 #include "core/assert.h"
 
+SemaValue *sema_analyze_expr_anon_fun(SemaModule *sema, FileLocation loc, AstExprAnonFun *anon_fun, SemaExprCtx ctx);
 SemaValue *sema_analyze_expr_array(SemaModule *sema, AstExpr **array, SemaExprCtx ctx);
 SemaValue *sema_analyze_expr_as(SemaModule *sema, AstExprAs *as, SemaExprCtx ctx);
 SemaValue *sema_analyze_expr_binop(SemaModule *sema, AstExprBinop *binop, SemaExprCtx ctx);
@@ -30,6 +33,7 @@ SemaValue *sema_expr(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) {
     switch (expr->type) {
 		case AST_EXPR_IDX: return expr->value = sema_analyze_expr_idx(sema, &expr->idx, ctx);
 		case AST_EXPR_STRUCT: return expr->value = sema_analyze_expr_struct(sema, expr->loc, &expr->structure, ctx);
+		case AST_EXPR_ANON_FUN: return expr->value = sema_analyze_expr_anon_fun(sema, expr->loc, &expr->anon_fun, ctx);
 		case AST_EXPR_UNWRAP: return expr->value = sema_analyze_expr_unwrap(sema, &expr->unwrap, ctx);
 		case AST_EXPR_RET_ON_NULL: return expr->value = sema_analyze_expr_ret_on_null(sema, &expr->ret_on_null, ctx);
 		case AST_EXPR_UNARY: return expr->value = sema_analyze_expr_unary(sema, &expr->unary, ctx);

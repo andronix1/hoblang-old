@@ -1,5 +1,8 @@
 #include "ast/private/expr.h"
+#include "ast/private/body.h"
 #include "ast/private/expr/as.h"
+#include "ast/private/func_info.h"
+#include "ast/private/type.h"
 #include <malloc.h>
 
 #define FIELD(src, dst) result->src = dst;
@@ -13,6 +16,11 @@
         return result; \
     }
 
+AstExpr *ast_expr_anon_fun(FileLocation loc, AstFuncArg *args, AstType returning, AstBody body) CONSTR(AST_EXPR_ANON_FUN, {
+    FIELD(anon_fun.args, args)
+    FIELD(anon_fun.body, body)
+    FIELD(anon_fun.returning, returning)
+})
 AstExpr *ast_expr_struct(FileLocation loc, AstPath path, AstExprStructMember *members) CONSTR(AST_EXPR_STRUCT, {
     FIELD(structure.path, path)
     FIELD(structure.members, members)
