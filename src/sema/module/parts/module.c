@@ -127,11 +127,10 @@ void sema_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 			break;
 
 		case AST_MODULE_NODE_FUNC: {
-            SemaScopeStack new_ss = sema_ss_new();
+            SemaScopeStack new_ss = sema_ss_new(node->func_decl.info.returning.sema);
             SemaScopeStack *ss = sema_module_ss_swap(sema, &new_ss);
             sema_module_push_scope(sema);
 			sema_push_ast_func_info(sema, node->loc, &node->func_decl.info);
-			sema_module_set_returns(sema, node->func_decl.info.returning.sema);
 			sema_ast_body(sema, &node->func_decl.body);
             sema_module_pop_scope(sema);
             sema_module_ss_swap(sema, ss);

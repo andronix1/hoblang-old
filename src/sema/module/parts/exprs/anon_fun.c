@@ -10,9 +10,9 @@
 #include "sema/value/private.h"
 
 SemaValue *sema_analyze_expr_anon_fun(SemaModule *sema, FileLocation at, AstExprAnonFun *anon_fun, SemaExprCtx ctx) {
-    SemaScopeStack new_ss = sema_ss_new();
-    SemaScopeStack *ss = sema_module_ss_swap(sema, &new_ss);
     SemaType *func_type = sema_ast_func(sema, at, NULL, anon_fun->args, &anon_fun->returning);
+    SemaScopeStack new_ss = sema_ss_new(anon_fun->returning.sema);
+    SemaScopeStack *ss = sema_module_ss_swap(sema, &new_ss);
     if (!func_type) {
         sema_module_ss_swap(sema, ss);
         return NULL;

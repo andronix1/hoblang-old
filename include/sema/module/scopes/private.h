@@ -13,4 +13,4 @@ SemaDecl *sema_ss_push_decl(SemaScopeStack *stack, SemaDecl *decl);
 void sema_ss_push_body_scope(SemaScopeStack *stack, AstBody *body);
 void sema_ss_push_scope(SemaScopeStack *stack);
 void sema_ss_pop_scope(SemaScopeStack *stack);
-
+SemaType *sema_ss_returns(SemaScopeStack *stack);

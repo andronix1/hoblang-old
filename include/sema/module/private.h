@@ -45,7 +45,6 @@ void sema_module_pop_scope(SemaModule *sema);
 SemaScope *sema_module_top_scope(SemaModule *sema);
 
 void sema_module_fail(SemaModule *sema);
-void sema_module_set_returns(SemaModule *sema, SemaType *returns);
 SemaType *sema_module_returns(SemaModule *sema);
 
 const char *sema_module_path(SemaModule *sema);

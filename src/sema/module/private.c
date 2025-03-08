@@ -170,16 +170,13 @@ void sema_module_push_primitives(SemaModule *sema) {
     PD(usize, sema_arch_usize(sema));
 }
 
-void sema_module_set_returns(SemaModule *sema, SemaType *returns) {
-    sema->returning = returns;
-}
-
 const char *sema_module_path(SemaModule *sema) {
     return sema->ast->path;
 }
 
 SemaType *sema_module_returns(SemaModule *sema) {
-    return sema->returning;
+    ASSERT_SS();
+    return sema_ss_returns(sema->current_ss);
 }
 
 void sema_module_fail(SemaModule *sema) {

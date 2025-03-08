@@ -1,6 +1,11 @@
 import "std/process.hob" as process;
 import "std/io.hob" as io;
 
+fun (*usize) apply(f: fun (usize) -> usize) -> *usize {
+    self.* = f(self.*);
+    return self;
+}
+
 fun main() -> i32 {
     var arr = {
         fun (x: i32) -> i32 { return x; },
@@ -12,7 +17,11 @@ fun main() -> i32 {
     while i < arr.length {
         io.print_i32(arr[i](3));
         io.print("\n");
-        i += 1;
+        i.apply(fun (v: usize) -> usize {
+            return v + 1;
+        }).apply(fun (v: usize) -> usize {
+            return v;
+        });
     }
     return 0;
 }

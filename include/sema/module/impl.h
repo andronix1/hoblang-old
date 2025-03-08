@@ -21,7 +21,6 @@ typedef struct SemaModule {
     SemaDecl **public_decls;
     SemaDecl **private_decls;
     SemaScopeStack *current_ss;
-	SemaType *returning;
 } SemaModule;
 
 

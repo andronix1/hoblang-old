@@ -47,6 +47,10 @@ void sema_ss_push_scope(SemaScopeStack *stack) {
     return sema_ss_push_body_scope(stack, NULL);
 }
 
+SemaType *sema_ss_returns(SemaScopeStack *stack) {
+    return stack->returning;
+}
+
 void sema_ss_pop_scope(SemaScopeStack *stack) {
     vec_pop(stack->scopes);
 }

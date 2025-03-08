@@ -32,17 +32,21 @@ LLVMValueRef llvm_resolve_path(LlvmBackend *llvm, LLVMValueRef value, AstPath *p
                     );
                 }
                 break;
-            case SEMA_PATH_EXT_FUNC_DIRECT:
-            case SEMA_PATH_EXT_FUNC_REF: {
+            case SEMA_PATH_EXT_FUNC_DIRECT: {
                 from->ext_func_handle = value;
-                if (segment->type != SEMA_PATH_EXT_FUNC_REF && LLVMGetTypeKind(LLVMTypeOf(value)) == LLVMPointerTypeKind) {
-                    from->ext_func_handle = LLVMBuildLoad2(
+                if (from->type == SEMA_VALUE_VAR) {
+                    value = from->ext_func_handle = LLVMBuildLoad2(
                         llvm_builder(llvm),
                         llvm_resolve_type(segment->ext_func_decl->in_type),
                         value,
                         ""
                     );
                 }
+                value = segment->ext_func_decl->llvm.value;
+                break;
+            }
+            case SEMA_PATH_EXT_FUNC_REF: {
+                from->ext_func_handle = value;
                 value = segment->ext_func_decl->llvm.value;
                 break;
             }
