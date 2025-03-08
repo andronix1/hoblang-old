@@ -33,19 +33,21 @@ LLVMValueRef llvm_resolve_path(LlvmBackend *llvm, LLVMValueRef value, AstPath *p
                 }
                 break;
             case SEMA_PATH_EXT_FUNC_DIRECT: {
-                from->ext_func_handle = value;
-                if (from->type == SEMA_VALUE_VAR) {
+                if (segment->value->type == SEMA_VALUE_VAR) {
                     value = from->ext_func_handle = LLVMBuildLoad2(
                         llvm_builder(llvm),
                         llvm_resolve_type(segment->ext_func_decl->in_type),
                         value,
                         ""
                     );
+                } else {
+                    from->ext_func_handle = value;
                 }
                 value = segment->ext_func_decl->llvm.value;
                 break;
             }
             case SEMA_PATH_EXT_FUNC_REF: {
+                assert(segment->value->type == SEMA_VALUE_VAR, "trying to call ext func ref from non-var value");
                 from->ext_func_handle = value;
                 value = segment->ext_func_decl->llvm.value;
                 break;

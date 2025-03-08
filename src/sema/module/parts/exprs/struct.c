@@ -43,8 +43,10 @@ SemaValue *sema_analyze_expr_struct(SemaModule *sema, FileLocation at, AstExprSt
         AstExprStructMember *member = &structure->members[i];
         bool found = false;
         if (member->is_undefined) {
-            is_const = false;
-            vec_free(fields);
+            if (is_const) {
+                is_const = false;
+                vec_free(fields);
+            }
             continue;
         }
         for (size_t j = 0; j < vec_len(struct_def->members); j++) {
@@ -66,8 +68,10 @@ SemaValue *sema_analyze_expr_struct(SemaModule *sema, FileLocation at, AstExprSt
                     fields = vec_push(fields, &field);
                 }
             } else if (sema_value_is_runtime(member_value)) {
-                vec_free(fields);
-                is_const = false;
+                if (is_const) {
+                    vec_free(fields);
+                    is_const = false;
+                }
             } else {
                 SEMA_ERROR(member->expr->loc, "expression is not a value");
                 break;
