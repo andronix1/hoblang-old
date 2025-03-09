@@ -362,8 +362,10 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 					LLVMBuildGEP2(llvm_builder(llvm), of, array, indices, 1, "arri")
 				);
 			}
-			
-			return LLVMBuildLoad2(llvm_builder(llvm), type, array, "");
+			if (load) {
+			    return LLVMBuildLoad2(llvm_builder(llvm), type, array, "");
+            }
+            return array;
 		}
 	}
 	assert(0, "invalid expr {int}", expr->type);

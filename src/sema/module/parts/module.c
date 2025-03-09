@@ -72,6 +72,9 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
                 break;
             }
 			sema_module_push_module_decl(sema, node->loc, node->public, decl);
+            if (decl->value->type == SEMA_VALUE_MODULE) {
+                sema_module_append_ext_funcs_from(sema, node->loc, decl->value->module);
+            }
 			// TODO: alias
 			//  sema_scope_decl_new_module(
 			// 	node->use.has_alias ? node->use.alias : *(Slice*)vec_top(node->use.path.segments),
