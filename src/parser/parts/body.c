@@ -5,7 +5,6 @@
 #include "ast/impl/expr.h"
 #include "lexer/token.h"
 #include "parser/parts/expr.h"
-#include "parser/parts/const.h"
 #include "parser/parts/val_decl.h"
 #include "parser/private.h"
 #include "parser/token_stops.h"

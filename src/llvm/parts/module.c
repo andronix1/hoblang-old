@@ -18,6 +18,7 @@ void llvm_module_node(LlvmBackend *llvm, AstModuleNode *node) {
 		case AST_MODULE_NODE_TYPE_ALIAS:
 		case AST_MODULE_NODE_IMPORT:
 		case AST_MODULE_NODE_EXTERNAL_FUNC:
+		case AST_MODULE_NODE_EXTERNAL_VAR:
 		case AST_MODULE_NODE_STRUCT_DEF:
 			break;
 			
@@ -70,6 +71,14 @@ void llvm_module_init(LlvmBackend *llvm, AstModule *module) {
 			case AST_MODULE_NODE_IMPORT:
 			case AST_MODULE_NODE_STRUCT_DEF:
 				break;
+			case AST_MODULE_NODE_EXTERNAL_VAR: {
+				node->ext_var_decl.sema.decl->llvm.value = LLVMAddGlobal(
+					llvm_current_module(llvm),
+                    llvm_resolve_type(node->ext_var_decl.type->sema),
+					slice_to_cstr(&node->ext_var_decl.public_name)
+                );
+                break;
+            }
 			case AST_MODULE_NODE_EXTERNAL_FUNC:
 			case AST_MODULE_NODE_FUNC: {
 				LLVMValueRef func = LLVMAddFunction(

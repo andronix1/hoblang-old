@@ -13,10 +13,8 @@
 #include "ast/private/module.h"
 #include "sema/module/parts/path.h"
 #include "sema/module/parts/body.h"
-#include "sema/module/parts/expr.h"
 #include "sema/module/parts/type.h"
 #include "sema/module/decls/api.h"
-#include "sema/value/api.h"
 #include "sema/value/private.h"
 
 void sema_add_ast_func_info(SemaModule *sema, FileLocation at, bool public, AstFuncInfo *info) {	
@@ -41,6 +39,14 @@ void sema_stmt_const(SemaModule *sema, FileLocation loc, bool is_global, bool pu
 
 void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 	switch (node->type) {
+		case AST_MODULE_NODE_EXTERNAL_VAR: {
+			SemaType *type = sema_ast_type(sema, node->ext_var_decl.type);
+			if (!type) {
+				break;
+			}
+            node->ext_var_decl.sema.decl = sema_module_push_module_decl(sema, node->loc, node->public, sema_decl_new(node->ext_var_decl.ext_name, sema_value_var(type)));
+            break;
+        }
 		case AST_MODULE_NODE_TYPE_ALIAS: {
 			SemaType *type = sema_ast_type(sema, node->type_alias.type);
 			if (!type) {
@@ -129,6 +135,7 @@ void sema_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 		case AST_MODULE_NODE_TYPE_ALIAS:
 		case AST_MODULE_NODE_VAL_DECL:
 		case AST_MODULE_NODE_EXTERNAL_FUNC:
+		case AST_MODULE_NODE_EXTERNAL_VAR:
 		case AST_MODULE_NODE_USE:
 		case AST_MODULE_NODE_IMPORT:
 		case AST_MODULE_NODE_STRUCT_DEF:

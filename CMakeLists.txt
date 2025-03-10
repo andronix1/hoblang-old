@@ -58,6 +58,7 @@ set(SOURCE_FILES
 	src/parser/parts/stmts/loop_control.c
 	src/parser/parts/decls/struct.c
 	src/parser/parts/decls/ext_func.c
+	src/parser/parts/decls/ext_var.c
 	src/parser/parts/decls/func_info.c
 	src/parser/parts/decls/func.c
 	src/parser/parts/module.c

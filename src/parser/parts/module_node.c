@@ -1,6 +1,5 @@
 #include "ast/private/module_node.h"
 #include "lexer/token.h"
-#include "parser/parts/const.h"
 #include "parser/parts/module_node.h"
 #include "parser/parts/type.h"
 #include "parser/parts/path.h"
@@ -9,7 +8,8 @@
 #include "parser/private.h"
 #include "parser/token_stops.h"
 
-bool parse_ext_func_decl(Parser *parser, AstExtFuncDecl *info);
+bool parse_ext_func_decl(Parser *parser, Slice name, AstExtFuncDecl *info);
+bool parse_ext_var_decl(Parser *parser, Slice name, AstExtVarDecl *info);
 bool parse_func_decl(Parser *parser, AstFuncDecl *decl);
 
 bool parse_module_node_decl(Parser *parser, AstModuleNode *node) {
@@ -67,8 +67,20 @@ bool parse_module_node_decl(Parser *parser, AstModuleNode *node) {
 			node->type = AST_MODULE_NODE_FUNC;
 			return parse_func_decl(parser, &node->func_decl);
 		case TOKEN_EXTERN:
-			node->type = AST_MODULE_NODE_EXTERNAL_FUNC;
-			return parse_ext_func_decl(parser, &node->ext_func_decl);
+            PARSER_EXPECT_NEXT(TOKEN_OPENING_CIRCLE_BRACE, "external name opening");
+            Slice ext_name = PARSER_EXPECT_NEXT(TOKEN_IDENT, "external name")->ident;
+            PARSER_EXPECT_NEXT(TOKEN_CLOSING_CIRCLE_BRACE, "external name closing");
+            switch (parser_next(parser)->type) {
+                case TOKEN_FUN:
+                    node->type = AST_MODULE_NODE_EXTERNAL_FUNC;
+                    return parse_ext_func_decl(parser, ext_name, &node->ext_func_decl);
+                case TOKEN_VAR:
+                    node->type = AST_MODULE_NODE_EXTERNAL_VAR;
+                    return parse_ext_var_decl(parser, ext_name, &node->ext_var_decl);
+                default:
+                    PARSE_ERROR(EXPECTED("ext declaration"));
+                    return NULL;
+            }
 		default:
 			PARSE_ERROR("unexpected {tok} while parsing module node", parser_token(parser));
 			return false;

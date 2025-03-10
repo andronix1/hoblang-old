@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 #include "ast/private/val_decl.h"
+#include "sema/module/decls/decls.h"
 #include "stmts/const.h"
 #include "core/location.h"
 #include "path.h"
@@ -30,6 +31,16 @@ typedef struct {
 } AstFuncDecl;
 
 typedef struct {
+    AstType *type;
+	Slice ext_name;
+	Slice public_name;
+
+    struct {
+        SemaDecl *decl;
+    } sema;
+} AstExtVarDecl;
+
+typedef struct {
 	AstFuncInfo info;
 	Slice ext_name;
 } AstExtFuncDecl;
@@ -52,6 +63,7 @@ typedef enum {
 	AST_MODULE_NODE_VAL_DECL,
 	AST_MODULE_NODE_FUNC,
 	AST_MODULE_NODE_EXTERNAL_FUNC,
+	AST_MODULE_NODE_EXTERNAL_VAR,
 	AST_MODULE_NODE_USE,
 	AST_MODULE_NODE_IMPORT,
 	AST_MODULE_NODE_TYPE_ALIAS,
@@ -65,6 +77,7 @@ typedef struct AstModuleNode {
 	union {
 		AstFuncDecl func_decl;		
 		AstExtFuncDecl ext_func_decl;		
+		AstExtVarDecl ext_var_decl;		
 		AstImport import;	
 		AstTypeAlias type_alias;
 		AstStructDef struct_def;
