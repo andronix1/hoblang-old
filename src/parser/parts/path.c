@@ -1,8 +1,12 @@
+#include "parser/parts/path.h"
+#include "ast/api/path.h"
 #include "ast/private/path.h"
 #include "lexer/token.h"
 #include "parser/private.h"
+#include <stdlib.h>
 
-bool parse_path(Parser *parser, AstPath *path) {
+AstPath *parse_path(Parser *parser) {
+    AstPath *path = malloc(sizeof(AstPath));
     path->segments = vec_new(AstPathSegment);
     while (true) {
 		Token *token = parser_next(parser);
@@ -24,11 +28,11 @@ bool parse_path(Parser *parser, AstPath *path) {
 				break;
 			default:
 				PARSE_ERROR(EXPECTED("inner path segment"));
-				return false;
+				return NULL;
 		}
         path->segments = vec_push(path->segments, &segment);
         if (parser_next_is_not(parser, TOKEN_DOT)) {
-            return true;
+            return path;
         }
     }
 }

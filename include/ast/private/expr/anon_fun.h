@@ -4,8 +4,7 @@
 #include "ast/private/func_info.h"
 
 typedef struct AstExprAnonFun {
-    AstFuncArg *args;
-	AstType returning;
+    AstFuncTypeInfo info;
     AstBody body;
 
 	SemaDecl *decl;

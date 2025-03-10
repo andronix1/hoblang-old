@@ -2,10 +2,11 @@
 #include "ast/private/stmts/loop_control.h"
 #include "ast/private/expr/binop.h"
 #include "ast/private/expr.h"
-#include "core/location.h"
+#include "ast/impl/expr.h"
 #include "lexer/token.h"
 #include "parser/parts/expr.h"
 #include "parser/parts/const.h"
+#include "parser/parts/val_decl.h"
 #include "parser/private.h"
 #include "parser/token_stops.h"
 
@@ -13,7 +14,6 @@ bool parse_loop_control(Parser *parser, AstStmtLoopControl *loop_control);
 bool parse_defer(Parser *parser, AstDefer *defer);
 bool parse_if_else(Parser *parser, AstIfElse *if_else);
 bool parse_return(Parser *parser, AstReturn *ret);
-bool parse_var(Parser *parser, AstVar *var);
 bool parse_while(Parser *parser, AstWhile *while_loop);
 bool parse_asm_body(Parser *parser, AstInlineAsm *inline_asm);
 
@@ -81,9 +81,6 @@ bool parse_stmt(Parser *parser, AstStmt *stmt) {
 					return false;
 			}
 		}
-		case TOKEN_CONST:
-            stmt->type = AST_STMT_CONST;
-            return parse_const(parser, &stmt->constant);
 		case TOKEN_CONTINUE:
             stmt->type = AST_STMT_CONTINUE;
 			stmt->continue_loop.loc = token->location;
@@ -106,10 +103,12 @@ bool parse_stmt(Parser *parser, AstStmt *stmt) {
 			stmt->type = AST_STMT_WHILE;
 			stmt->while_loop.loc = token->location;
 			return parse_while(parser, &stmt->while_loop);
+		case TOKEN_CONST:
+		case TOKEN_FINAL:
 		case TOKEN_VAR:
-			stmt->type = AST_STMT_VAR;
-			stmt->var.loc = token->location;
-			return parse_var(parser, &stmt->var);
+            parser_skip_next(parser);
+			stmt->type = AST_STMT_VAL_DECL;
+			return parse_val_decl(parser, &stmt->val_decl);
 		case TOKEN_ASM:
 			stmt->type = AST_STMT_INLINE_ASM;
 			return parse_asm_body(parser, &stmt->inline_asm);

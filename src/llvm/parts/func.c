@@ -12,7 +12,9 @@
 #include <llvm-c/Core.h>
 #include <llvm-c/Types.h>
 
-void llvm_emit_func(LlvmBackend *llvm, LLVMValueRef func, SemaDecl *ext, AstFuncArg *args, AstBody *body, SemaType *returning) {
+void llvm_emit_func(LlvmBackend *llvm, LLVMValueRef func, SemaDecl *ext, AstFuncTypeInfo *info, AstBody *body) {
+    AstFuncArg *args = info->args;
+    SemaType *returning = info->returning->sema;
     LLVMValueRef curr_func = llvm_current_func(llvm);
     LLVMBasicBlockRef code_block = llvm_code_block(llvm);
     LLVMBasicBlockRef def_block = llvm_definitions_block(llvm);
@@ -29,7 +31,7 @@ void llvm_emit_func(LlvmBackend *llvm, LLVMValueRef func, SemaDecl *ext, AstFunc
     }
     for (size_t i = 0; i < vec_len(args); i++) {
         AstFuncArg *arg = &args[i];
-        LLVMValueRef value = arg->decl->llvm.value = llvm_alloca(llvm, llvm_resolve_type(arg->type.sema));
+        LLVMValueRef value = arg->decl->llvm.value = llvm_alloca(llvm, llvm_resolve_type(arg->type->sema));
         LLVMPositionBuilderAtEnd(llvm_builder(llvm), entry);
         LLVMBuildStore(llvm_builder(llvm), LLVMGetParam(llvm_current_func(llvm), i + (ext ? 1 : 0)), value);
     }

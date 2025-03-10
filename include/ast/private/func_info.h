@@ -4,10 +4,10 @@
 #include "sema/module/decls.h"
 #include "core/vec.h"
 #include "core/slice.h"
-#include "type.h"
+#include "ast/api/type.h"
 
 typedef struct AstFuncArg {
-	AstType type;
+	AstType *type;
 	Slice name;
     FileLocation loc;
 
@@ -15,13 +15,17 @@ typedef struct AstFuncArg {
 } AstFuncArg;
 
 typedef struct {
-	AstType of;
+	AstType *of;
 } AstExtFuncInfo;
+
+typedef struct AstFuncTypeInfo {
+	AstType *returning;
+	AstFuncArg *args;
+} AstFuncTypeInfo;
 
 typedef struct AstFuncInfo {
 	Slice name;
-	AstType returning;
-	AstFuncArg *args;
+    AstFuncTypeInfo type;
 
 	bool is_extension;
     AstExtFuncInfo ext;

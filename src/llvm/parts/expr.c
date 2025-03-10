@@ -89,7 +89,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
                 llvm_current_module(llvm),
                 "",
                 llvm_sema_function_type(&expr->value->sema_type->func));
-            llvm_emit_func(llvm, func, NULL, expr->anon_fun.args, &expr->anon_fun.body, expr->anon_fun.returning.sema);
+            llvm_emit_func(llvm, func, NULL, &expr->anon_fun.info, &expr->anon_fun.body);
             return func;
         }
 		case AST_EXPR_UNWRAP: {
@@ -146,7 +146,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 			LLVMValueRef value = llvm_resolve_path(
 				llvm,
 				llvm_expr(llvm, expr->get_inner.of, false),
-				&expr->get_inner.path,
+				expr->get_inner.path,
 				expr->value
 			);
 			if (load && expr->value->type == SEMA_VALUE_VAR) {
@@ -160,7 +160,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr, bool load) {
 			return value;
 		}
 		case AST_EXPR_GET_LOCAL_PATH: {
-            LLVMValueRef value = llvm_resolve_path(llvm, NULL, &expr->get_local.path, expr->value);
+            LLVMValueRef value = llvm_resolve_path(llvm, NULL, expr->get_local.path, expr->value);
             if (load && expr->value->type == SEMA_VALUE_VAR) {
                 return LLVMBuildLoad2(
                     llvm_builder(llvm),

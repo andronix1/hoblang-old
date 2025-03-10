@@ -13,7 +13,7 @@ SemaType *sema_ast_func(SemaModule *sema, FileLocation at, SemaType *ext_of, Ast
 	}
 	for (size_t i = 0; i < vec_len(args); i++) {
 		AstFuncArg *arg = &args[i];
-		SemaType *type = sema_ast_type(sema, &arg->type);
+		SemaType *type = sema_ast_type(sema, arg->type);
 		if (!type) {
 			return NULL;
 		}

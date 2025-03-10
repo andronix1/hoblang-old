@@ -1,5 +1,6 @@
 #include "llvm/parts/body.h"
 #include "llvm/parts/expr.h"
+#include "llvm/parts/val_decl.h"
 #include "ast/private/stmts/loop_control.h"
 #include "core/vec.h"
 #include "ast/private/body.h"
@@ -23,7 +24,7 @@ bool llvm_body(LlvmBackend *llvm, AstBody *body) {
 	for (size_t i = 0; i < vec_len(body->stmts); i++) {
 		AstStmt *stmt = &body->stmts[i];
 		switch (stmt->type) {
-			case AST_STMT_VAR: llvm_stmt_var(llvm, &stmt->var); break;
+			case AST_STMT_VAL_DECL: llvm_val_decl(llvm, &stmt->val_decl); break;
 			case AST_STMT_RETURN: llvm_stmt_return(llvm, &stmt->ret); return false;
 			case AST_STMT_BREAK: llvm_stmt_break(llvm, &stmt->break_loop); return false;
             case AST_STMT_CONTINUE: llvm_stmt_continue(llvm, &stmt->continue_loop); return false;
@@ -32,7 +33,6 @@ bool llvm_body(LlvmBackend *llvm, AstBody *body) {
 			case AST_STMT_ASSIGN: llvm_stmt_assign(llvm, &stmt->assign); break;
 			case AST_STMT_INLINE_ASM: llvm_stmt_asm(llvm, &stmt->inline_asm); break;
 			case AST_STMT_EXPR: llvm_expr(llvm, stmt->expr, false); break;
-			case AST_STMT_CONST:
 			case AST_STMT_DEFER:
                 break;
 		}

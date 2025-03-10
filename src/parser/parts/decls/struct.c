@@ -10,7 +10,7 @@ bool parse_ast_struct_member(Parser *parser, AstStructMember *member) {
 	member->name = token->ident;
     member->loc = token->location;
 	PARSER_EXPECT_NEXT(TOKEN_COLON, "colon");
-	return parse_type(parser, member->type = malloc(sizeof(AstType)));
+	return (member->type = parse_type(parser));
 }
 
 bool parse_ast_struct_def(Parser *parser, AstStructDef *struct_type) {

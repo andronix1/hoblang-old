@@ -30,6 +30,7 @@ syntax keyword hobKeywords
 	\ const
 	\ public 
 	\ undefined 
+	\ final 
 
 syntax keyword hobType
 	\ i8

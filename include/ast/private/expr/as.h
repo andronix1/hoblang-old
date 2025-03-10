@@ -37,7 +37,7 @@ typedef struct {
     FileLocation loc;
 
     union {
-	    AstType as_type;
+	    AstType *as_type;
     };
 
 	SemaAsConvType conv_type;

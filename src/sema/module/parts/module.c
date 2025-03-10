@@ -1,5 +1,7 @@
+#include "ast/private/module_node.h"
 #include "core/location.h"
 #include "sema/module/parts/func_info.h"
+#include "sema/module/parts/val_decl.h"
 #include "sema/module/scopes/api.h"
 #include "sema/module/scopes/scope.h"
 #include "sema/project/api.h"
@@ -14,21 +16,22 @@
 #include "sema/module/parts/expr.h"
 #include "sema/module/parts/type.h"
 #include "sema/module/decls/api.h"
+#include "sema/value/api.h"
 #include "sema/value/private.h"
 
 void sema_add_ast_func_info(SemaModule *sema, FileLocation at, bool public, AstFuncInfo *info) {	
     SemaType *ext_of = NULL;
 	if (info->is_extension) {
-        if (!(ext_of = sema_ast_type(sema, &info->ext.of))) {
+        if (!(ext_of = sema_ast_type(sema, info->ext.of))) {
             return;
         }
 	}
 
-    SemaType *func_type = sema_ast_func(sema, at, ext_of, info->args, &info->returning);
+    SemaType *func_type = sema_ast_func(sema, at, ext_of, info->type.args, info->type.returning);
 
 	info->decl = sema_module_push_module_decl(sema, at, public, sema_decl_new_in_type(
 		info->name,
-        info->is_extension ? info->ext.of.sema : NULL,
+        info->is_extension ? info->ext.of->sema : NULL,
         sema_value_final(func_type)
 	));
 }
@@ -39,7 +42,7 @@ void sema_stmt_const(SemaModule *sema, FileLocation loc, bool is_global, bool pu
 void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 	switch (node->type) {
 		case AST_MODULE_NODE_TYPE_ALIAS: {
-			SemaType *type = sema_ast_type(sema, &node->type_alias.type);
+			SemaType *type = sema_ast_type(sema, node->type_alias.type);
 			if (!type) {
 				break;
 			}
@@ -61,13 +64,18 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 			sema_module_push_module_decl(sema, node->loc, node->public, sema_decl_new(node->struct_def.name, sema_value_type(sema_type_new_struct(&node->struct_def))));
 			break;
 		}
-		case AST_MODULE_NODE_CONST: {
-            sema_stmt_const(sema, node->loc, true, node->public, &node->constant);
+		case AST_MODULE_NODE_VAL_DECL: {
+            SemaDecl *decl = sema_val_decl(sema, &node->val_decl, true);
+            if (!decl) {
+                break;
+            }
+
+            sema_module_push_module_decl(sema, node->loc, node->public, decl);
 			break;
 		}
 
 		case AST_MODULE_NODE_USE: {
-			SemaDecl *decl = sema_resolve_decl_path(sema, &node->use.path);
+			SemaDecl *decl = sema_resolve_decl_path(sema, node->use.path);
             if (!decl) {
                 break;
             }
@@ -107,11 +115,11 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 void sema_push_ast_func_info(SemaModule *sema, FileLocation at, AstFuncInfo *info) {
 	if (info->is_extension) {
         // TODO: self is final
-		info->self = sema_module_push_scope_decl(sema, at, sema_decl_new(slice_from_cstr("self"), sema_value_var(info->ext.of.sema)));
+		info->self = sema_module_push_scope_decl(sema, at, sema_decl_new(slice_from_cstr("self"), sema_value_var(info->ext.of->sema)));
 	}
-	for (size_t i = 0; i < vec_len(info->args); i++) {
-		AstFuncArg *arg = &info->args[i];
-		SemaType *type = sema_ast_type(sema, &arg->type);
+	for (size_t i = 0; i < vec_len(info->type.args); i++) {
+		AstFuncArg *arg = &info->type.args[i];
+		SemaType *type = sema_ast_type(sema, arg->type);
 		arg->decl = sema_module_push_scope_decl(sema, at, sema_decl_new(arg->name, sema_value_var(type)));
 	}
 }
@@ -119,18 +127,15 @@ void sema_push_ast_func_info(SemaModule *sema, FileLocation at, AstFuncInfo *inf
 void sema_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 	switch (node->type) {
 		case AST_MODULE_NODE_TYPE_ALIAS:
+		case AST_MODULE_NODE_VAL_DECL:
 		case AST_MODULE_NODE_EXTERNAL_FUNC:
 		case AST_MODULE_NODE_USE:
 		case AST_MODULE_NODE_IMPORT:
 		case AST_MODULE_NODE_STRUCT_DEF:
 			break;
 
-		case AST_MODULE_NODE_CONST:
-			sema_const_expr(sema, node->constant.expr, sema_expr_ctx_default_of(node->constant.type.sema));
-			break;
-
 		case AST_MODULE_NODE_FUNC: {
-            SemaScopeStack new_ss = sema_ss_new(node->func_decl.info.returning.sema);
+            SemaScopeStack new_ss = sema_ss_new(node->func_decl.info.type.returning->sema);
             SemaScopeStack *ss = sema_module_ss_swap(sema, &new_ss);
             sema_module_push_scope(sema);
 			sema_push_ast_func_info(sema, node->loc, &node->func_decl.info);

@@ -259,7 +259,7 @@ SemaValue *sema_analyze_expr_as(SemaModule *sema, AstExprAs *as, SemaExprCtx ctx
     ctx.loc = as->loc;
     switch (as->type) {
         case AST_EXPR_AS_TYPE:
-            as_type = sema_ast_type(sema, &as->as_type);
+            as_type = sema_ast_type(sema, as->as_type);
             break;
         case AST_EXPR_AS_AUTO:
             if (!ctx.expectation) {

@@ -4,5 +4,5 @@
 #include "core/slice.h"
 
 typedef struct {
-    AstPath path;
+    AstPath *path;
 } AstExprGetLocal;

@@ -44,12 +44,12 @@ set(SOURCE_FILES
 	src/lexer/parts/str.c
 	
     src/ast/expr.c
+    src/ast/type.c
 
 	src/parser/api.c
 	src/parser/private.c
+	src/parser/parts/val_decl.c
 	src/parser/parts/types/func.c
-	src/parser/parts/stmts/var.c
-	src/parser/parts/stmts/const.c
 	src/parser/parts/stmts/return.c
 	src/parser/parts/stmts/while.c
 	src/parser/parts/stmts/defer.c
@@ -79,6 +79,7 @@ set(SOURCE_FILES
 	src/sema/module/loop/api.c
 	src/sema/module/decls/api.c
 	src/sema/module/value/api.c
+	src/sema/module/parts/val_decl.c
 	src/sema/module/parts/decls/struct.c
 	src/sema/module/parts/exprs/anon_fun.c
 	src/sema/module/parts/exprs/struct.c
@@ -117,6 +118,7 @@ set(SOURCE_FILES
 	src/llvm/api.c
 	src/llvm/utils/member.c
 	src/llvm/utils/alloca.c
+	src/llvm/parts/val_decl.c
 	src/llvm/parts/types/slice.c
 	src/llvm/parts/types/optional.c
 	src/llvm/parts/path.c

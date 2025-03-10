@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include "ast/private/val_decl.h"
 #include "stmts/const.h"
 #include "core/location.h"
 #include "path.h"
@@ -8,12 +9,12 @@
 #include "body.h"
 
 typedef struct {
-	AstType type;
+	AstType *type;
 	Slice alias;
 } AstTypeAlias;
 
 typedef struct {
-	AstPath path;
+	AstPath *path;
 	bool has_alias;
 	Slice alias;
 } AstUse;
@@ -48,7 +49,7 @@ typedef struct AstStructDef {
 } AstStructDef;
 
 typedef enum {
-	AST_MODULE_NODE_CONST,
+	AST_MODULE_NODE_VAL_DECL,
 	AST_MODULE_NODE_FUNC,
 	AST_MODULE_NODE_EXTERNAL_FUNC,
 	AST_MODULE_NODE_USE,
@@ -67,7 +68,7 @@ typedef struct AstModuleNode {
 		AstImport import;	
 		AstTypeAlias type_alias;
 		AstStructDef struct_def;
-		AstConst constant;	
+        AstValDecl val_decl;
 		AstUse use;	
 	};
 } AstModuleNode;

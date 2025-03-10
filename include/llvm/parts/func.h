@@ -6,4 +6,4 @@
 #include "llvm/llvm.h"
 #include <llvm-c/Types.h>
 
-void llvm_emit_func(LlvmBackend *llvm, LLVMValueRef func, SemaDecl *ext, AstFuncArg *args, AstBody *body, SemaType *returning);
+void llvm_emit_func(LlvmBackend *llvm, LLVMValueRef func, SemaDecl *ext, AstFuncTypeInfo *info, AstBody *body);

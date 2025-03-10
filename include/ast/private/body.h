@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdarg.h>
+#include "ast/private/val_decl.h"
 #include "ast/private/stmts/loop_control.h"
 #include "stmts/var.h"
 #include "stmts/if_else.h"
@@ -13,9 +14,8 @@
 #include "stmts/const.h"
 
 typedef enum {
+    AST_STMT_VAL_DECL,
 	AST_STMT_IF,
-	AST_STMT_CONST,
-	AST_STMT_VAR,
 	AST_STMT_RETURN,
 	AST_STMT_WHILE,
 	AST_STMT_INLINE_ASM,
@@ -29,8 +29,7 @@ typedef enum {
 typedef struct {
 	AstStmtType type;
 	union {
-		AstVar var;
-		AstConst constant;
+        AstValDecl val_decl;
 		AstExpr *expr;
 		AstIfElse if_else;
 		AstReturn ret;

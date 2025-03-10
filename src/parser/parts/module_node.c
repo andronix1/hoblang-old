@@ -5,6 +5,7 @@
 #include "parser/parts/type.h"
 #include "parser/parts/path.h"
 #include "parser/parts/expr.h"
+#include "parser/parts/val_decl.h"
 #include "parser/private.h"
 #include "parser/token_stops.h"
 
@@ -31,7 +32,7 @@ bool parse_module_node_decl(Parser *parser, AstModuleNode *node) {
 		}
 		case TOKEN_USE:
 			node->type = AST_MODULE_NODE_USE;
-			if (!parse_path(parser, &node->use.path)) {
+			if (!(node->use.path = parse_path(parser))) {
 				return false;
 			}
 			node->use.has_alias = false;
@@ -48,13 +49,16 @@ bool parse_module_node_decl(Parser *parser, AstModuleNode *node) {
 			}
 			return true;
 		case TOKEN_CONST:
-			node->type = AST_MODULE_NODE_CONST;
-			return parse_const(parser, &node->constant);
+		case TOKEN_VAR:
+		case TOKEN_FINAL:
+            parser_skip_next(parser);
+			node->type = AST_MODULE_NODE_VAL_DECL;
+			return parse_val_decl(parser, &node->val_decl);
 		case TOKEN_TYPE:
 			node->type = AST_MODULE_NODE_TYPE_ALIAS;
 			node->type_alias.alias = PARSER_EXPECT_NEXT(TOKEN_IDENT, "alias")->ident;
 			PARSER_EXPECT_NEXT(TOKEN_ASSIGN, "assign");
-			if (!parse_type(parser, &node->type_alias.type)) {
+			if (!(node->type_alias.type = parse_type(parser))) {
 				return false;
 			}
 			PARSER_EXPECT_NEXT(TOKEN_SEMICOLON, "semicolon");

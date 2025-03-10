@@ -1,3 +1,4 @@
+#include "ast/impl/expr.h"
 #include "ast/private/expr.h"
 #include "ast/private/body.h"
 #include "ast/private/expr/as.h"
@@ -16,12 +17,11 @@
         return result; \
     }
 
-AstExpr *ast_expr_anon_fun(FileLocation loc, AstFuncArg *args, AstType returning, AstBody body) CONSTR(AST_EXPR_ANON_FUN, {
-    FIELD(anon_fun.args, args)
+AstExpr *ast_expr_anon_fun(FileLocation loc, AstFuncTypeInfo info, AstBody body) CONSTR(AST_EXPR_ANON_FUN, {
+    FIELD(anon_fun.info, info)
     FIELD(anon_fun.body, body)
-    FIELD(anon_fun.returning, returning)
 })
-AstExpr *ast_expr_struct(FileLocation loc, AstPath path, AstExprStructMember *members) CONSTR(AST_EXPR_STRUCT, {
+AstExpr *ast_expr_struct(FileLocation loc, AstPath *path, AstExprStructMember *members) CONSTR(AST_EXPR_STRUCT, {
     FIELD(structure.path, path)
     FIELD(structure.members, members)
 })
@@ -36,10 +36,10 @@ AstExpr *ast_expr_idx(FileLocation loc, AstExpr *of, AstExpr *idx) CONSTR(AST_EX
     FIELD(idx.of, of)
     FIELD(idx.idx, idx)
 })
-AstExpr *ast_expr_get_local_path(FileLocation loc, AstPath path) CONSTR(AST_EXPR_GET_LOCAL_PATH, {
+AstExpr *ast_expr_get_local_path(FileLocation loc, AstPath *path) CONSTR(AST_EXPR_GET_LOCAL_PATH, {
     FIELD(get_local.path, path)
 })
-AstExpr *ast_expr_get_inner_path(FileLocation loc, AstExpr *of, AstPath path) CONSTR(AST_EXPR_GET_INNER_PATH, {
+AstExpr *ast_expr_get_inner_path(FileLocation loc, AstExpr *of, AstPath *path) CONSTR(AST_EXPR_GET_INNER_PATH, {
     FIELD(get_inner.of, of)
     FIELD(get_inner.path, path)
 })
@@ -66,7 +66,7 @@ AstExpr *ast_expr_not(FileLocation loc, AstExpr *expr) CONSTR(AST_EXPR_NOT, {
     FIELD(not_expr, expr)
 })
 #include "core/print.h"
-AstExpr *ast_expr_as_type(FileLocation loc, FileLocation as_loc, AstExpr *expr, AstType type) CONSTR(AST_EXPR_AS, {
+AstExpr *ast_expr_as_type(FileLocation loc, FileLocation as_loc, AstExpr *expr, AstType *type) CONSTR(AST_EXPR_AS, {
     FIELD(as.loc, as_loc)
     FIELD(as.type, AST_EXPR_AS_TYPE)
     FIELD(as.expr, expr)

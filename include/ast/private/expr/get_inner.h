@@ -6,5 +6,5 @@
 
 typedef struct {
     AstExpr *of;
-    AstPath path;
+    AstPath *path;
 } AstExprGetInner;

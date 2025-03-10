@@ -10,19 +10,20 @@
 #include "sema/value/private.h"
 
 SemaValue *sema_analyze_expr_anon_fun(SemaModule *sema, FileLocation at, AstExprAnonFun *anon_fun, SemaExprCtx ctx) {
-    SemaType *func_type = sema_ast_func(sema, at, NULL, anon_fun->args, &anon_fun->returning);
-    SemaScopeStack new_ss = sema_ss_new(anon_fun->returning.sema);
+    AstFuncTypeInfo *info = &anon_fun->info;
+    SemaType *func_type = sema_ast_func(sema, at, NULL, info->args, info->returning);
+    SemaScopeStack new_ss = sema_ss_new(info->returning->sema);
     SemaScopeStack *ss = sema_module_ss_swap(sema, &new_ss);
     if (!func_type) {
         sema_module_ss_swap(sema, ss);
         return NULL;
     }
     sema_module_push_scope(sema);
-    for (size_t i = 0; i < vec_len(anon_fun->args); i++) {
-        AstFuncArg *arg = &anon_fun->args[i];
+    for (size_t i = 0; i < vec_len(info->args); i++) {
+        AstFuncArg *arg = &info->args[i];
         arg->decl = sema_module_push_scope_decl(sema, arg->loc, sema_decl_new(
             arg->name,
-            sema_value_var(arg->type.sema)
+            sema_value_var(arg->type->sema)
         ));
     }
     sema_ast_body(sema, &anon_fun->body);

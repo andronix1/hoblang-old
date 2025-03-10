@@ -165,6 +165,7 @@ bool lexer_try_next(Lexer *lexer) {
 	KEYWORD("continue", TOKEN_CONTINUE);
 	KEYWORD("public", TOKEN_PUBLIC);
 	KEYWORD("undefined", TOKEN_UNDEFINED);
+	KEYWORD("final", TOKEN_FINAL);
 	KEYWORD("null", TOKEN_NULL);
 	KEYWORD("sizeof", TOKEN_SIZEOF);
 	KEYWORD("const", TOKEN_CONST);

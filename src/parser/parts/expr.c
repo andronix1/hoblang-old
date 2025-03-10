@@ -1,5 +1,6 @@
 #include "ast/private/expr.h"
 #include "ast/api/expr.h"
+#include "ast/impl/expr.h"
 #include "ast/api/func_info.h"
 #include "ast/private/expr/struct.h"
 #include "ast/private/type.h"
@@ -148,16 +149,15 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 		
 		switch (token->type) {
             case TOKEN_FUN: {
-                AstFuncArg *args;
-                AstType returning;
-                if (!parse_func_type(parser, &args, &returning)) {
+                AstFuncTypeInfo info;
+                if (!parse_func_type_info(parser, &info)) {
                     return NULL;
                 }
                 AstBody body;
                 if (!parse_body(parser, &body)) {
                     return NULL;
                 }
-                current_expr = ast_expr_anon_fun(loc, args, returning, body);
+                current_expr = ast_expr_anon_fun(loc, info, body);
                 break;
             }
             case TOKEN_QUESTION_MARK:
@@ -193,8 +193,8 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
                 current_expr = ast_expr_float(loc, token->float_value);
                 break;
 			case TOKEN_STRUCT: {
-                AstPath path;
-                if (!parse_path(parser, &path)) {
+                AstPath *path = parse_path(parser);
+                if (!path) {
                     return NULL;
                 }
                 PARSER_EXPECT_NEXT(TOKEN_OPENING_FIGURE_BRACE, "opening figure brace");
@@ -219,11 +219,11 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
             }
 			case TOKEN_IDENT: {
 				parser_skip_next(parser);
-				AstPath path;
-				if (!parse_path(parser, &path)) {
+				AstPath *path = parse_path(parser);
+				if (!path) {
 					return NULL;
 				}
-				current_expr= ast_expr_get_local_path(loc, path);
+				current_expr = ast_expr_get_local_path(loc, path);
 				break;
 			}
             case TOKEN_UNWRAP:
@@ -241,7 +241,11 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
                 break;
 			case TOKEN_BITAND: {
 				if (first) {
-					current_expr = ast_expr_ref(loc, NOT_NULL(_parse_expr(parser, stop, false)));
+                    AstExpr *expr = _parse_expr(parser, stop, false);
+                    if (!expr) {
+                        return NULL;
+                    }
+					current_expr = ast_expr_ref(loc, NOT_NULL(expr));
 				} else {
 					PARSE_BINOP(AST_BINOP_BITAND);
 				}
@@ -313,8 +317,8 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
 					}
                     FileLocation as_loc = token->location;
                     if (parser_next_is_not(parser, TOKEN_AUTO)) {
-                        AstType type;
-                        if (!parse_type(parser, &type)) {
+                        AstType *type = parse_type(parser);
+                        if (!type) {
                             return NULL;
                         }
                         current_expr = ast_expr_as_type(loc, as_loc, current_expr, type);
@@ -324,8 +328,8 @@ AstExpr *_parse_expr(Parser *parser, bool (*stop)(TokenType), bool post_parse) {
                     break;
                 }
 				case TOKEN_DOT: {
-					AstPath path;
-					if (!parse_path(parser, &path)) {
+					AstPath *path = parse_path(parser);
+					if (!path) {
 						return NULL;
 					}
 					current_expr = ast_expr_get_inner_path(loc, current_expr, path);

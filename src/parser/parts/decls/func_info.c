@@ -4,11 +4,11 @@
 #include "lexer/token.h"
 #include "parser/private.h"
 
-bool parse_func_type(Parser *parser, AstFuncArg **args, AstType *returning) {
+bool parse_func_type_info(Parser *parser, AstFuncTypeInfo *info) {
 	PARSER_EXPECT_NEXT(TOKEN_OPENING_CIRCLE_BRACE, "opening args brace");
 	bool parsing_args = true;
 	bool was_arg = false;
-	*args = vec_new(AstFuncArg);
+	info->args = vec_new(AstFuncArg);
 	while (parsing_args) {
 		Token *token = parser_next(parser);
 		switch (token->type) {
@@ -27,10 +27,10 @@ bool parse_func_type(Parser *parser, AstFuncArg **args, AstType *returning) {
 				arg.name = token->ident;
                 arg.loc = token->location;
 				PARSER_EXPECT_NEXT(TOKEN_COLON, "arg type delimeter");
-				if (!parse_type(parser, &arg.type)) {
+				if (!(arg.type = parse_type(parser))) {
 					return false;
 				}
-				*args = vec_push(*args, &arg);
+				info->args = vec_push(info->args, &arg);
 				was_arg = true;
 				break;
 			}
@@ -41,16 +41,17 @@ bool parse_func_type(Parser *parser, AstFuncArg **args, AstType *returning) {
 	}
 
 	PARSER_EXPECT_NEXT(TOKEN_FUNC_RETURNS, "returning type");
-	return parse_type(parser, returning);
+	return (info->returning = parse_type(parser));
 }
 
 bool parse_func_info(Parser *parser, AstFuncInfo *info) {
 	if ((info->is_extension = parser_next_is(parser, TOKEN_OPENING_CIRCLE_BRACE))) {
-        if (!parse_type(parser, &info->ext.of)) {
+        
+        if (!(info->ext.of = parse_type(parser))) {
             return false;
         }
 		PARSER_EXPECT_NEXT(TOKEN_CLOSING_CIRCLE_BRACE, "extension type closing");
 	}
 	info->name = PARSER_EXPECT_NEXT(TOKEN_IDENT, "function name")->ident;
-	return parse_func_type(parser, &info->args, &info->returning);
+	return parse_func_type_info(parser, &info->type);
 }

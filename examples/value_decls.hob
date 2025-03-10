@@ -1,0 +1,23 @@
+import "std/process.hob" as process;
+import "std/io.hob" as io;
+
+var glob_a: i32 = 123;
+final print_i32 = io.print_i32;
+
+fun main() -> i32 {
+    const a = 0;
+    var b = 0;
+    final c = b + a;
+    print_i32(c as _);
+    io.println("");
+    print_i32(glob_a);
+    io.println("");
+    glob_a += 1;
+    print_i32(glob_a);
+    io.println("");
+    return 0;
+}
+
+fun _start() -> void {
+    process.exit(main());
+}

@@ -15,7 +15,7 @@ typedef struct {
 } AstExprStructMember;
 
 typedef struct {
-    AstPath path;
+    AstPath *path;
     AstExprStructMember *members;
 
     SemaType *struct_type;

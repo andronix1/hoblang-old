@@ -18,7 +18,7 @@ SemaType *sema_ast_type(SemaModule *sema, AstType *type) {
 		case AST_TYPE_FUNCTION: {
 			SemaType **args = vec_new(SemaType*);
 			for (size_t i = 0; i < vec_len(type->func.args); i++) {
-				SemaType* arg_type = sema_ast_type(sema, &type->func.args[i]);
+				SemaType* arg_type = sema_ast_type(sema, type->func.args[i]);
 				if (!arg_type) {
 					return NULL;
 				}
@@ -40,7 +40,7 @@ SemaType *sema_ast_type(SemaModule *sema, AstType *type) {
 			break;
 		}
 		case AST_TYPE_PATH: {
-			type->sema = sema_resolve_type_path(sema, NULL, &type->path);
+			type->sema = sema_resolve_type_path(sema, NULL, type->path);
 			break;
 		}
 		case AST_TYPE_ARRAY: {

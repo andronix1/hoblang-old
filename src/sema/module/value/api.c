@@ -30,8 +30,27 @@ bool sema_value_is_type_of(SemaValue *value, SemaTypeKind kind) {
     return value->type == SEMA_VALUE_TYPE && value->sema_type->type == kind;
 }
 
-bool sema_value_is_const(SemaValue *value) {
+inline bool sema_value_is_final(SemaValue *value) {
+    return value->type == SEMA_VALUE_FINAL;
+}
+
+inline bool sema_value_is_var(SemaValue *value) {
+    return value->type == SEMA_VALUE_VAR;
+}
+
+inline bool sema_value_is_const(SemaValue *value) {
     return value->type == SEMA_VALUE_CONST;
+}
+
+inline bool sema_value_is_not_mut(SemaValue *value) {
+    return sema_value_is_const(value) ||
+        value->type == SEMA_VALUE_FINAL;
+}
+
+inline bool sema_value_is_value(SemaValue *value) {
+    return sema_value_is_not_mut(value) ||
+        value->type == SEMA_VALUE_VAR;
+
 }
 
 bool sema_value_is_runtime(SemaValue *value) {

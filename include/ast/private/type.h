@@ -17,7 +17,7 @@ typedef enum {
 } AstTypeKind;
 
 typedef struct AstFunctionType {
-	AstType *args;
+	AstType **args;
 	AstType *returns;
 } AstFunctionType;
 
@@ -29,7 +29,7 @@ typedef struct {
 typedef struct AstType {
 	AstTypeKind type;
 	union {
-		AstPath path;
+		AstPath *path;
 		AstFunctionType func;
 		AstType *ptr_to;
 		AstType *slice_of;
