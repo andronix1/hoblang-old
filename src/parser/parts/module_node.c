@@ -125,7 +125,11 @@ bool parse_module_node_decl(Parser *parser, AstModuleNode *node) {
                     return parse_ext_func_decl(parser, ext_name, &node->ext_func_decl);
                 case TOKEN_VAR:
                     node->type = AST_MODULE_NODE_EXTERNAL_VAR;
-                    return parse_ext_var_decl(parser, ext_name, &node->ext_var_decl);
+                    if (!parse_ext_var_decl(parser, ext_name, &node->ext_var_decl)) {
+                        return false;
+                    }
+                    PARSER_EXPECT_NEXT(TOKEN_SEMICOLON, "semicolon");
+                    return true;
                 default:
                     PARSE_ERROR(EXPECTED("ext declaration"));
                     return NULL;
