@@ -1,3 +1,5 @@
+#include <malloc.h>
+#include "core/vec.h"
 #include "parser/private.h"
 #include "parser/token_stops.h"
 #include "parser/parts/expr.h"

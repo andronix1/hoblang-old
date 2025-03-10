@@ -2,7 +2,6 @@
 #include "llvm-c/Types.h"
 #include "llvm/private.h"
 #include "llvm/parts/type.h"
-#include "llvm/parts/expr.h"
 #include "llvm/parts/body.h"
 #include "llvm/parts/val_decl.h"
 #include "llvm/utils/alloca.h"
@@ -15,6 +14,7 @@
 void llvm_module_node(LlvmBackend *llvm, AstModuleNode *node) {
 	switch (node->type) {
 		case AST_MODULE_NODE_USE:
+		case AST_MODULE_NODE_FROM_USE:
 		case AST_MODULE_NODE_TYPE_ALIAS:
 		case AST_MODULE_NODE_IMPORT:
 		case AST_MODULE_NODE_EXTERNAL_FUNC:
@@ -66,6 +66,7 @@ void llvm_module_init(LlvmBackend *llvm, AstModule *module) {
 			case AST_MODULE_NODE_VAL_DECL:
                 llvm_val_decl_global_init(llvm, &node->val_decl);
                 break;
+		    case AST_MODULE_NODE_FROM_USE:
 			case AST_MODULE_NODE_USE:
 			case AST_MODULE_NODE_TYPE_ALIAS:
 			case AST_MODULE_NODE_IMPORT:

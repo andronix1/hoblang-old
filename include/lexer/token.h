@@ -4,9 +4,7 @@
 #include <stdbool.h>
 #include <printf.h>
 #include <stdint.h>
-#include "core/vec.h"
 #include "core/location.h"
-#include "core/slice.h"
 
 typedef enum { 
 	TOKEN_FUN,
@@ -31,6 +29,7 @@ typedef enum {
 	TOKEN_PUBLIC,
 	TOKEN_UNDEFINED,
 	TOKEN_FINAL,
+	TOKEN_FROM,
     
 	TOKEN_STRUCT,
     TOKEN_FUNC_RETURNS,

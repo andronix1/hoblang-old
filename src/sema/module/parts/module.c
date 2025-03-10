@@ -1,5 +1,6 @@
 #include "ast/private/module_node.h"
 #include "core/location.h"
+#include "sema/module/decls/decls.h"
 #include "sema/module/parts/func_info.h"
 #include "sema/module/parts/val_decl.h"
 #include "sema/module/scopes/api.h"
@@ -80,6 +81,35 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 			break;
 		}
 
+		case AST_MODULE_NODE_FROM_USE: {
+			SemaDecl *decl = sema_resolve_decl_path(sema, node->from_use.module_path);
+            if (!decl) {
+                break;
+            }
+            if (decl->value->type != SEMA_VALUE_MODULE) {
+                SEMA_ERROR(node->from_use.module_path->segments[0].loc, "path is not a module");
+                break;
+            }
+            switch (node->from_use.type) {
+                case AST_FROM_USE_ALL:
+                    sema_module_append_all_from(sema, node->loc, node->public, decl->value->module);
+                    break;
+                case AST_FROM_USE_LIST:
+                    for (size_t i = 0; i < vec_len(node->from_use.items); i++) {
+                        AstFromUseListItem *item = &node->from_use.items[i];
+                        SemaDecl *item_decl = sema_module_resolve_public_decl(decl->value->module, &item->what);
+                        if (!item_decl) {
+                            SEMA_ERROR(item->loc, "`{slice}` is undefined", &item->what);
+                            continue;
+                        }
+                        sema_module_push_module_decl(sema, item->loc, node->public, item_decl);
+                    }
+                    break;
+            }
+			// TODO: alias
+			break;
+		}
+
 		case AST_MODULE_NODE_USE: {
 			SemaDecl *decl = sema_resolve_decl_path(sema, node->use.path);
             if (!decl) {
@@ -90,10 +120,6 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
                 sema_module_append_ext_funcs_from(sema, node->loc, decl->value->module);
             }
 			// TODO: alias
-			//  sema_scope_decl_new_module(
-			// 	node->use.has_alias ? node->use.alias : *(Slice*)vec_top(node->use.path.segments),
-			// 	module
-			// ));
 			break;
 		}
 
@@ -137,6 +163,7 @@ void sema_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 		case AST_MODULE_NODE_EXTERNAL_FUNC:
 		case AST_MODULE_NODE_EXTERNAL_VAR:
 		case AST_MODULE_NODE_USE:
+		case AST_MODULE_NODE_FROM_USE:
 		case AST_MODULE_NODE_IMPORT:
 		case AST_MODULE_NODE_STRUCT_DEF:
 			break;

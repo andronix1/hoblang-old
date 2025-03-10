@@ -3,7 +3,8 @@
 #include "ast/private/path.h"
 #include "lexer/token.h"
 #include "parser/private.h"
-#include <stdlib.h>
+#include <malloc.h>
+#include "core/vec.h"
 
 AstPath *parse_path(Parser *parser) {
     AstPath *path = malloc(sizeof(AstPath));

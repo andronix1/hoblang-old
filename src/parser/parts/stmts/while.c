@@ -5,6 +5,7 @@
 #include "ast/private/stmts/while.h"
 #include "ast/private/body.h"
 #include "parser/parts/body.h"
+#include <malloc.h>
 
 bool parse_while(Parser *parser, AstWhile *while_loop) {
     Token *token = parser_next_is_or(parser, TOKEN_OPENING_SQUARE_BRACE);

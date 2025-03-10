@@ -1,16 +1,40 @@
 #include "ast/private/module_node.h"
+#include "core/vec.h"
 #include "lexer/token.h"
 #include "parser/parts/module_node.h"
 #include "parser/parts/type.h"
 #include "parser/parts/path.h"
-#include "parser/parts/expr.h"
 #include "parser/parts/val_decl.h"
 #include "parser/private.h"
-#include "parser/token_stops.h"
 
 bool parse_ext_func_decl(Parser *parser, Slice name, AstExtFuncDecl *info);
 bool parse_ext_var_decl(Parser *parser, Slice name, AstExtVarDecl *info);
 bool parse_func_decl(Parser *parser, AstFuncDecl *decl);
+
+bool parse_from_use_list(Parser *parser, AstFromUse *from_use) {
+    from_use->items = vec_new(AstFromUseListItem);
+    while (true) {
+        AstFromUseListItem item;
+        Token *what_token = PARSER_EXPECT_NEXT(TOKEN_IDENT, "import name");
+        item.loc = what_token->location;
+        item.what = what_token->ident;
+        item.has_alias = false;
+        if (parser_next_is(parser, TOKEN_AS)) {
+            item.has_alias = true;
+            item.alias = PARSER_EXPECT_NEXT(TOKEN_IDENT, "alias name")->ident;
+        }
+        from_use->items = vec_push(from_use->items, &item);
+        switch (parser_next(parser)->type) {
+            case TOKEN_COMMA:
+                break;
+            case TOKEN_CLOSING_FIGURE_BRACE:
+                return true;
+            default:
+                PARSE_ERROR(EXPECTED("list item end"));
+                return false;
+        }
+    }
+}
 
 bool parse_module_node_decl(Parser *parser, AstModuleNode *node) {
 	Token *token = parser_next(parser);
@@ -30,6 +54,31 @@ bool parse_module_node_decl(Parser *parser, AstModuleNode *node) {
 			node->type = AST_MODULE_NODE_STRUCT_DEF;
 			return parse_ast_struct_def(parser, &node->struct_def);
 		}
+		case TOKEN_FROM: {
+			node->type = AST_MODULE_NODE_FROM_USE;
+            AstPath *module_path = parse_path(parser);
+            if (!module_path) {
+                return false;
+            }
+            PARSER_EXPECT_NEXT(TOKEN_USE, "use");
+            node->from_use.module_path = module_path;
+            switch (parser_next(parser)->type) {
+                case TOKEN_MULTIPLY:
+                    node->from_use.type = AST_FROM_USE_ALL;
+                    PARSER_EXPECT_NEXT(TOKEN_SEMICOLON, "semicolon");
+                    return true;
+                case TOKEN_OPENING_FIGURE_BRACE:
+                    node->from_use.type = AST_FROM_USE_LIST;
+                    if (!parse_from_use_list(parser, &node->from_use)) {
+                        return false;
+                    }
+                    PARSER_EXPECT_NEXT(TOKEN_SEMICOLON, "semicolon");
+                    return true;
+                default:
+                    PARSE_ERROR(EXPECTED("* or import list"));
+                    return false;
+            }
+        }
 		case TOKEN_USE:
 			node->type = AST_MODULE_NODE_USE;
 			if (!(node->use.path = parse_path(parser))) {

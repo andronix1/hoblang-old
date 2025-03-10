@@ -1,4 +1,5 @@
 #include "lexer/api.h"
+#include <malloc.h>
 #include "parser/impl.h"
 
 Parser *parser_new(Lexer *lexer) {

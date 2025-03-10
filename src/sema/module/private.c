@@ -107,6 +107,15 @@ AstDefer **sema_module_defers_up_to(SemaModule *sema, AstBody *to) {
     return result;
 }
 
+void sema_module_append_all_from(SemaModule *sema, FileLocation at, bool public, SemaModule *from) {
+    for (size_t i = 0; i < vec_len(from->public_decls); i++) {
+        SemaDecl *decl = from->public_decls[i];
+        if (!decl->in_type) {
+            sema_module_push_module_decl(sema, at, public, decl);
+        }
+    }
+}
+
 void sema_module_append_ext_funcs_from(SemaModule *sema, FileLocation at, SemaModule *from) {
     for (size_t i = 0; i < vec_len(from->public_decls); i++) {
         SemaDecl *decl = from->public_decls[i];

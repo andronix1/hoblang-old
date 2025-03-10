@@ -25,8 +25,8 @@ public fun close(fd: Fd) ->i64 {
 	return syscall.arg1(syscall.CLOSE, fd as i64);
 }
 
-public fun sendfile(to: Fd, from: Fd, offset: *i64, len: i64) ->i64 {
-	return syscall.arg4(syscall.SENDFILE, to as i64, from as i64, offset as i64, len);
+public fun sendfile(to: Fd, input: Fd, offset: *i64, len: i64) ->i64 {
+	return syscall.arg4(syscall.SENDFILE, to as i64, input as i64, offset as i64, len);
 }
 
 public fun lseek(fd: Fd, offset: i64, whence: i64) ->i64 {

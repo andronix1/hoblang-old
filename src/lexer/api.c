@@ -1,6 +1,9 @@
 #include "lexer/api.h"
+#include <malloc.h>
 #include "core/location.h"
 #include "lexer/impl.h"
+#include "core/slice/api.h"
+#include "core/log.h"
 
 InFilePosition lexer_position(const Lexer *lexer) {
     InFilePosition result;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/log.h"
 #include "api.h"
 #include "lexer.h"
 #include "token.h"

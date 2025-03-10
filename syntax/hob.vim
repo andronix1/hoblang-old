@@ -31,6 +31,7 @@ syntax keyword hobKeywords
 	\ public 
 	\ undefined 
 	\ final 
+	\ from 
 
 syntax keyword hobType
 	\ i8

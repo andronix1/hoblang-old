@@ -3,16 +3,35 @@
 #include <stdbool.h>
 #include "ast/private/val_decl.h"
 #include "sema/module/decls/decls.h"
-#include "stmts/const.h"
 #include "core/location.h"
 #include "path.h"
 #include "func_info.h"
 #include "body.h"
 
 typedef struct {
-	AstType *type;
+    AstType *type;
 	Slice alias;
 } AstTypeAlias;
+
+typedef enum {
+    AST_FROM_USE_ALL,
+    AST_FROM_USE_LIST,
+} AstFromUseType;
+
+typedef struct {
+    FileLocation loc;
+    Slice what;
+	bool has_alias;
+	Slice alias;
+} AstFromUseListItem;
+
+typedef struct {
+    AstFromUseType type;
+	AstPath *module_path;
+    union {
+        AstFromUseListItem *items;
+    };
+} AstFromUse;
 
 typedef struct {
 	AstPath *path;
@@ -62,10 +81,14 @@ typedef struct AstStructDef {
 typedef enum {
 	AST_MODULE_NODE_VAL_DECL,
 	AST_MODULE_NODE_FUNC,
+
 	AST_MODULE_NODE_EXTERNAL_FUNC,
 	AST_MODULE_NODE_EXTERNAL_VAR,
-	AST_MODULE_NODE_USE,
+
+	AST_MODULE_NODE_FROM_USE,
 	AST_MODULE_NODE_IMPORT,
+	AST_MODULE_NODE_USE,
+
 	AST_MODULE_NODE_TYPE_ALIAS,
 	AST_MODULE_NODE_STRUCT_DEF,
 } AstModuleNodeType;
@@ -75,6 +98,7 @@ typedef struct AstModuleNode {
     FileLocation loc;
     bool public;
 	union {
+        AstFromUse from_use;
 		AstFuncDecl func_decl;		
 		AstExtFuncDecl ext_func_decl;		
 		AstExtVarDecl ext_var_decl;		

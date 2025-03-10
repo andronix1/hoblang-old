@@ -33,6 +33,7 @@ SemaDecl *sema_module_resolve_public_decl(SemaModule *sema, Slice *name);
 void sema_module_push_defer(SemaModule *sema, AstDefer *defer);
 AstDefer **sema_module_defers_up_to(SemaModule *sema, AstBody *to);
 
+void sema_module_append_all_from(SemaModule *sema, FileLocation at, bool public, SemaModule *from);
 void sema_module_append_ext_funcs_from(SemaModule *sema, FileLocation at, SemaModule *from);
 SemaDecl *sema_module_push_module_decl(SemaModule *sema, FileLocation at, bool public, SemaDecl *decl);
 SemaDecl *sema_module_push_scope_decl(SemaModule *sema, FileLocation at, SemaDecl *decl);

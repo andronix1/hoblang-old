@@ -9,10 +9,10 @@ public fun fd_remains(fd: io.Fd) -> i64 {
     return end_pos - pos;
 }
 
-public fun full_forward(from: io.Fd, to: io.Fd) -> void {
+public fun full_forward(input: io.Fd, to: io.Fd) -> void {
     var offset = 0 as i64;
-    io.lseek(from, 0, io.SEEK_SET);
-    io.sendfile(to, from, &offset, fd_remains(from));
+    io.lseek(input, 0, io.SEEK_SET);
+    io.sendfile(to, input, &offset, fd_remains(input));
 }
 
 public fun write_to(fd: io.Fd, str: []u8) -> void {

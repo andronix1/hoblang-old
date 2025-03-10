@@ -1,5 +1,4 @@
-#include "parser/private.h"
-#include "parser/token_stops.h"
+#include <malloc.h>
 #include "parser/parts/body.h"
 #include "ast/private/stmts/defer.h"
 #include "ast/private/body.h"

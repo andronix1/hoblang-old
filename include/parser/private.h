@@ -3,6 +3,7 @@
 #include "parser.h"
 #include "api.h"
 #include "lexer/token.h"
+#include "core/log.h"
 
 #define parse_log(level, fmt, ...) \
 	do { \

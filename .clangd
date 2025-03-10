@@ -4,3 +4,4 @@ CompileFlags:
     - "-I/home/andronix1/Projects/hoblang/include"
     - "-I/usr/include/llvm-c-14"
     - "-I/usr/include/llvm-14"
+    - "-xc"
