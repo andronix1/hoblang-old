@@ -228,8 +228,8 @@ SemaValue *sema_conv_primitive(
 				}
 
 				case SEMA_TYPE_POINTER: {
-					if (source->primitive.integer != SEMA_PRIMITIVE_UINT64 && source->primitive.integer != SEMA_PRIMITIVE_INT64) {
-						SEMA_ERROR(at, "only i64 integers can be casted to pointer {sema::type}, not {sema::type}", dest, source);
+					if (!sema_type_is_int(source)) {
+						SEMA_ERROR(at, "only integers can be casted to pointer {sema::type}, not {sema::type}", dest, source);
                         return NULL;
 					}
 					*type = SEMA_AS_CONV_INT_TO_PTR;
