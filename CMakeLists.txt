@@ -61,6 +61,7 @@ set(SOURCE_FILES
 	src/parser/parts/decls/ext_var.c
 	src/parser/parts/decls/func_info.c
 	src/parser/parts/decls/func.c
+	src/parser/parts/decls/behaviour.c
 	src/parser/parts/module.c
 	src/parser/parts/module_node.c
 	src/parser/parts/type.c
@@ -82,6 +83,7 @@ set(SOURCE_FILES
 	src/sema/module/value/api.c
 	src/sema/module/parts/val_decl.c
 	src/sema/module/parts/decls/struct.c
+	src/sema/module/parts/decls/behaviour.c
 	src/sema/module/parts/exprs/anon_fun.c
 	src/sema/module/parts/exprs/struct.c
 	src/sema/module/parts/exprs/array.c

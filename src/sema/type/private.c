@@ -1,5 +1,13 @@
 #include "sema/type/private.h"
+#include "sema/module/behaviour/behaviour.h"
 #include <malloc.h>
+
+SemaType *sema_type_new_generic(SemaBehaviour *behaviour) {
+	SemaType *result = malloc(sizeof(SemaType));
+	result->type = SEMA_TYPE_GENERIC;
+	result->generic.behaviour = behaviour;
+	return result;
+}
 
 SemaType *sema_type_new_array(size_t length, SemaType *of) {
 	SemaType *result = malloc(sizeof(SemaType));

@@ -21,6 +21,7 @@ void print_token(FILE *stream, va_list list) {
     	case TOKEN_UNDEFINED: fprintf(stream, "undefined"); return;
     	case TOKEN_FINAL: fprintf(stream, "final"); return;
     	case TOKEN_FROM: fprintf(stream, "from"); return;
+    	case TOKEN_BEHAVIOUR: fprintf(stream, "behaviour"); return;
     	case TOKEN_AUTO: fprintf(stream, "_"); return;
     	case TOKEN_UNWRAP: fprintf(stream, "unwrap"); return;
     	case TOKEN_SIZEOF: fprintf(stream, "sizeof"); return;

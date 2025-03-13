@@ -1,5 +1,6 @@
 #include "ast/api/type.h"
 #include "ast/impl/type.h"
+#include "lexer/token.h"
 #include "parser/private.h"
 #include "parser/token_stops.h"
 #include "parser/parts/type.h"

@@ -3,6 +3,7 @@
 #include <llvm-c/Core.h>
 #include <string.h>
 #include <malloc.h>
+#include "sema/module/behaviour/impl.h"
 #include "sema/type.h"
 #include "sema/module.h"
 #include "sema/const/const.h"
@@ -13,6 +14,7 @@ typedef enum {
     SEMA_VALUE_VAR,
     SEMA_VALUE_TYPE,
     SEMA_VALUE_EXT_FUNC_HANDLE,
+    SEMA_VALUE_BEHAVIOUR,
     SEMA_VALUE_MODULE
 } SemaValueType;
 
@@ -22,6 +24,7 @@ typedef struct SemaValue {
         SemaConst constant;
         SemaType *sema_type;
         SemaModule *module;
+        SemaBehaviour *behaviour;
     };
 	LLVMValueRef ext_func_handle;
 } SemaValue;
@@ -45,6 +48,13 @@ static inline SemaValue *sema_value_const(SemaConst constant) {
     SemaValue *result = malloc(sizeof(SemaValue));
 	result->type = SEMA_VALUE_CONST;
 	result->constant = constant;
+	return result;
+}
+
+static inline SemaValue *sema_value_behaviour(SemaBehaviour *behaviour) {
+    SemaValue *result = malloc(sizeof(SemaValue));
+	result->type = SEMA_VALUE_BEHAVIOUR;
+	result->behaviour = behaviour;
 	return result;
 }
 

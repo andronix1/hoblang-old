@@ -4,6 +4,7 @@
 #include "lexer/parts/simple.h"
 #include "lexer/impl.h"
 #include "core/chars.h"
+#include "lexer/token.h"
 
 Token *lexer_token(Lexer *lexer) {
 	return &lexer->token;
@@ -167,6 +168,7 @@ bool lexer_try_next(Lexer *lexer) {
 	KEYWORD("undefined", TOKEN_UNDEFINED);
 	KEYWORD("final", TOKEN_FINAL);
 	KEYWORD("from", TOKEN_FROM);
+	KEYWORD("behaviour", TOKEN_BEHAVIOUR);
 	KEYWORD("null", TOKEN_NULL);
 	KEYWORD("sizeof", TOKEN_SIZEOF);
 	KEYWORD("const", TOKEN_CONST);

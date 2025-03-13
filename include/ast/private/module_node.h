@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include "ast/private/decls/behaviour.h"
 #include "ast/private/val_decl.h"
 #include "sema/module/decls/decls.h"
 #include "core/location.h"
@@ -80,6 +81,7 @@ typedef struct AstStructDef {
 
 typedef enum {
 	AST_MODULE_NODE_VAL_DECL,
+    AST_MODULE_NODE_BEHAVIOUR_DECL,
 	AST_MODULE_NODE_FUNC,
 
 	AST_MODULE_NODE_EXTERNAL_FUNC,
@@ -107,6 +109,7 @@ typedef struct AstModuleNode {
 		AstStructDef struct_def;
         AstValDecl val_decl;
 		AstUse use;	
+        AstDeclBehaviour behaviour_decl;
 	};
 } AstModuleNode;
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include <stddef.h>
 #include "core/slice.h"
 #include "core/location.h"
 #include "ast/api/module_node.h"

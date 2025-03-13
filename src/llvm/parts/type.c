@@ -67,6 +67,8 @@ LLVMTypeRef llvm_resolve_type(SemaType *type) {
 		case SEMA_TYPE_POINTER: {
 			return LLVMPointerType(llvm_resolve_type(type->ptr_to), 0);
 		}
+        case SEMA_TYPE_GENERIC:
+	        assert(0, "trying to resolve generic", type->type);
 	}
 	assert(0, "invalid type {int}", type->type);
 }

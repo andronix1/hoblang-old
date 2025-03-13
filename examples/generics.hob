@@ -1,0 +1,14 @@
+import "std/process.hob" as process;
+
+behaviour BasicMath {
+    fun (Self) add(other: Self) -> Self
+    fun (Self) sub(other: Self) -> Self
+}
+
+fun main() -> i32 {
+    return 0;
+}
+
+fun _start() -> void {
+    process.exit(main());
+}

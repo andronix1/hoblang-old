@@ -1,6 +1,8 @@
 #include "ast/private/module_node.h"
 #include "core/location.h"
+#include "sema/module/behaviour/impl.h"
 #include "sema/module/decls/decls.h"
+#include "sema/module/parts/decls/behaviour.h"
 #include "sema/module/parts/func_info.h"
 #include "sema/module/parts/val_decl.h"
 #include "sema/module/scopes/api.h"
@@ -17,6 +19,7 @@
 #include "sema/module/parts/type.h"
 #include "sema/module/decls/api.h"
 #include "sema/value/private.h"
+#include "core/assert.h"
 
 void sema_add_ast_func_info(SemaModule *sema, FileLocation at, bool public, AstFuncInfo *info) {	
     SemaType *ext_of = NULL;
@@ -35,11 +38,19 @@ void sema_add_ast_func_info(SemaModule *sema, FileLocation at, bool public, AstF
 	));
 }
 
-// TODO: remove duplicate
-void sema_stmt_const(SemaModule *sema, FileLocation loc, bool is_global, bool public, AstConst *constant);
-
 void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 	switch (node->type) {
+		case AST_MODULE_NODE_BEHAVIOUR_DECL: {
+            SemaScopeStack new_ss = sema_ss_new(NULL);
+            SemaScopeStack *ss = sema_module_ss_swap(sema, &new_ss);
+            SemaBehaviour *behaviour = sema_analyze_behaviour_decl(sema, &node->behaviour_decl);
+            sema_module_ss_swap(sema, ss);
+            if (!behaviour) {
+                break;
+            }
+            node->behaviour_decl.sema.decl = sema_module_push_module_decl(sema, node->loc, node->public, sema_decl_new(node->behaviour_decl.name, sema_value_behaviour(behaviour)));
+            break;
+        }
 		case AST_MODULE_NODE_EXTERNAL_VAR: {
 			SemaType *type = sema_ast_type(sema, node->ext_var_decl.type);
 			if (!type) {
@@ -158,6 +169,7 @@ void sema_push_ast_func_info(SemaModule *sema, FileLocation at, AstFuncInfo *inf
 
 void sema_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 	switch (node->type) {
+		case AST_MODULE_NODE_BEHAVIOUR_DECL:
 		case AST_MODULE_NODE_TYPE_ALIAS:
 		case AST_MODULE_NODE_VAL_DECL:
 		case AST_MODULE_NODE_EXTERNAL_FUNC:

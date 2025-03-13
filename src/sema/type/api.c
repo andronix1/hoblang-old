@@ -11,6 +11,8 @@ bool sema_types_equals(SemaType *type, SemaType *other) {
 		return false;
 	}
 	switch (type->type) {
+		case SEMA_TYPE_GENERIC:
+            return type->generic.decl == other->generic.decl;
 		case SEMA_TYPE_STRUCT:
 			if (vec_len(type->struct_def->members) != vec_len(other->struct_def->members)) {
 				return false;

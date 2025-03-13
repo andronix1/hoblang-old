@@ -1,9 +1,7 @@
 #pragma once
 
-#include "core/slice.h"
 #include "sema/type/type.h"
 #include "ast/api/type.h"
-#include "ast/api/module_node.h"
 #include "path.h"
 #include "ast/api/expr.h"
 

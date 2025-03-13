@@ -1,11 +1,15 @@
 #include "ast/private/type.h"
 #include "sema/type/private.h"
+#include "sema/module/decls/impl.h"
 #include "ast/private/module_node.h"
 #include "core/vec.h"
 
 void print_sema_type(FILE* stream, va_list list) {
 	SemaType *type = va_arg(list, SemaType*);
 	switch (type->type) {
+		case SEMA_TYPE_GENERIC:
+			print_to(stream, "generic {slice}", &type->generic.decl->name);
+			break;
 		case SEMA_TYPE_STRUCT:
 			print_to(stream, "struct {slice}", &type->struct_def->name);
 			break;

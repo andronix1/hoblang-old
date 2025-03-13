@@ -3,15 +3,9 @@
 #include <stddef.h>
 #include "ast/api/type.h"
 #include "ast/api/module_node.h"
+#include "sema/module/behaviour/impl.h"
 #include "sema/type/api.h"
-#include "sema/type.h"
-
-typedef struct SemaType SemaType;
-
-typedef struct SemaFunction {
-	SemaType **args;
-	SemaType *returning;
-} SemaFunction;
+#include "func.h"
 
 typedef enum {
 	SEMA_TYPE_PRIMITIVE,
@@ -21,6 +15,7 @@ typedef enum {
 	SEMA_TYPE_STRUCT,
 	SEMA_TYPE_SLICE,
 	SEMA_TYPE_ARRAY,
+	SEMA_TYPE_GENERIC,
 } SemaTypeKind;
 
 typedef struct {
@@ -59,6 +54,11 @@ typedef struct {
 	};
 } SemaPrimitive;
 
+typedef struct SemaTypeGeneric {
+    SemaDecl *decl;
+	SemaBehaviour *behaviour;
+} SemaTypeGeneric;
+
 typedef struct SemaType {
 	SemaTypeKind type;
 	union {
@@ -69,6 +69,7 @@ typedef struct SemaType {
 		SemaType *optional_of;
 		AstStructDef *struct_def;
 		SemaArrayType array;
+        SemaTypeGeneric generic;
 	};
 } SemaType;
 
@@ -78,6 +79,7 @@ SemaType *sema_type_new_pointer(SemaType *to);
 SemaType *sema_type_new_func(SemaType *returning, SemaType **args);
 SemaType *sema_type_new_struct(AstStructDef *struct_def);
 SemaType *sema_type_new_optional(SemaType *of);
+SemaType *sema_type_new_generic(SemaBehaviour *behaviour);
 
 #define SEMA_TYPE_PRIMITIVE(name) SemaType *sema_type_primitive_##name();
 

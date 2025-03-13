@@ -5,6 +5,7 @@
 SemaType *sema_value_typeof(SemaValue *value) {
     switch (value->type) {
         case SEMA_VALUE_TYPE:
+        case SEMA_VALUE_BEHAVIOUR:
         case SEMA_VALUE_VAR:
         case SEMA_VALUE_FINAL:
         case SEMA_VALUE_EXT_FUNC_HANDLE:

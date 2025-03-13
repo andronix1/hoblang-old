@@ -32,6 +32,7 @@ syntax keyword hobKeywords
 	\ undefined 
 	\ final 
 	\ from 
+	\ behaviour
 
 syntax keyword hobType
 	\ i8

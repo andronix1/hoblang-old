@@ -13,6 +13,7 @@
 
 void llvm_module_node(LlvmBackend *llvm, AstModuleNode *node) {
 	switch (node->type) {
+		case AST_MODULE_NODE_BEHAVIOUR_DECL:
 		case AST_MODULE_NODE_USE:
 		case AST_MODULE_NODE_FROM_USE:
 		case AST_MODULE_NODE_TYPE_ALIAS:
@@ -66,6 +67,7 @@ void llvm_module_init(LlvmBackend *llvm, AstModule *module) {
 			case AST_MODULE_NODE_VAL_DECL:
                 llvm_val_decl_global_init(llvm, &node->val_decl);
                 break;
+		    case AST_MODULE_NODE_BEHAVIOUR_DECL:
 		    case AST_MODULE_NODE_FROM_USE:
 			case AST_MODULE_NODE_USE:
 			case AST_MODULE_NODE_TYPE_ALIAS:

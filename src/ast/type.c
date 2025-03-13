@@ -1,4 +1,5 @@
 #include "ast/impl/type.h"
+#include <malloc.h>
 #include "ast/private/type.h"
 
 #define FIELD(src, dst) result->src = dst;

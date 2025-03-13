@@ -1,4 +1,5 @@
 #include "ast/private/module_node.h"
+#include "ast/private/decls/behaviour.h"
 #include "core/vec.h"
 #include "lexer/token.h"
 #include "parser/parts/module_node.h"
@@ -10,6 +11,7 @@
 bool parse_ext_func_decl(Parser *parser, Slice name, AstExtFuncDecl *info);
 bool parse_ext_var_decl(Parser *parser, Slice name, AstExtVarDecl *info);
 bool parse_func_decl(Parser *parser, AstFuncDecl *decl);
+bool parse_behaviour_decl(Parser *parser, AstDeclBehaviour *decl);
 
 bool parse_from_use_list(Parser *parser, AstFromUse *from_use) {
     from_use->items = vec_new(AstFromUseListItem);
@@ -79,6 +81,10 @@ bool parse_module_node_decl(Parser *parser, AstModuleNode *node) {
                     return false;
             }
         }
+        case TOKEN_BEHAVIOUR:
+            node->type = AST_MODULE_NODE_BEHAVIOUR_DECL;
+            node->behaviour_decl.loc = token->location;
+            return parse_behaviour_decl(parser, &node->behaviour_decl);
 		case TOKEN_USE:
 			node->type = AST_MODULE_NODE_USE;
 			if (!(node->use.path = parse_path(parser))) {

@@ -236,6 +236,7 @@ SemaValue *sema_conv_primitive(
                     return sema_value_final(dest);
 				}
 
+				case SEMA_TYPE_GENERIC:
 				case SEMA_TYPE_ARRAY:
 				case SEMA_TYPE_FUNCTION:
 				case SEMA_TYPE_SLICE:
@@ -303,6 +304,7 @@ SemaValue *sema_analyze_expr_as(SemaModule *sema, AstExprAs *as, SemaExprCtx ctx
 
 			case SEMA_TYPE_FUNCTION: return sema_conv_function(sema, ctx.loc, as->expr->value, as_type, &as->conv_type); break;
 			case SEMA_TYPE_OPTIONAL: return sema_conv_optional(sema, ctx.loc, as->expr->value, as_type, &as->conv_type); break;
+			case SEMA_TYPE_GENERIC:
 			case SEMA_TYPE_STRUCT:
 				SEMA_ERROR(ctx.loc, "{sema::type} cannot be casted to anything, including {sema::type}", expr_type, as_type);
 				return false;

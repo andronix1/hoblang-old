@@ -176,6 +176,9 @@ SemaValue *sema_resolve_path(SemaModule *sema, SemaValue *from, AstPath *path) {
                 }
                 break;
             }
+            case SEMA_VALUE_BEHAVIOUR:
+        	    SEMA_ERROR(segment->loc, "cannot get path from behaviour");
+                break;
             case SEMA_VALUE_EXT_FUNC_HANDLE:
         	    SEMA_ERROR(segment->loc, "cannot get path from ext func handle");
                 break;
@@ -219,6 +222,7 @@ SemaType *sema_resolve_type_path(SemaModule *sema, SemaValue *from, AstPath *pat
     }
     switch (value->type) {
         case SEMA_VALUE_VAR:
+        case SEMA_VALUE_BEHAVIOUR:
         case SEMA_VALUE_FINAL:
         case SEMA_VALUE_CONST:
         case SEMA_VALUE_MODULE:
@@ -243,6 +247,7 @@ SemaType *sema_resolve_value_path(SemaModule *sema, SemaValue *from, AstPath *pa
         case SEMA_VALUE_TYPE:
         case SEMA_VALUE_MODULE:
         case SEMA_VALUE_EXT_FUNC_HANDLE:
+        case SEMA_VALUE_BEHAVIOUR:
             SEMA_ERROR(path->segments[0].loc, "{ast::path} is not a value", path);
             return false;
     }
