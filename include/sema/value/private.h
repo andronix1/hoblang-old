@@ -3,10 +3,12 @@
 #include <llvm-c/Core.h>
 #include <string.h>
 #include <malloc.h>
+#include "ast/api/module_node.h"
 #include "sema/module/behaviour/impl.h"
 #include "sema/type.h"
 #include "sema/module.h"
 #include "sema/const/const.h"
+#include "sema/type/private.h"
 
 typedef enum {
     SEMA_VALUE_CONST,
@@ -15,8 +17,16 @@ typedef enum {
     SEMA_VALUE_TYPE,
     SEMA_VALUE_EXT_FUNC_HANDLE,
     SEMA_VALUE_BEHAVIOUR,
+    SEMA_VALUE_GENERIC,
     SEMA_VALUE_MODULE
 } SemaValueType;
+
+typedef struct {
+    SemaTypeGeneric **types;
+    // TODO: split generic/non-generic nodes
+    AstModuleNode *node;
+    SemaType *target_type;
+} SemaValueGeneric;
 
 typedef struct SemaValue {
     SemaValueType type;
@@ -25,6 +35,7 @@ typedef struct SemaValue {
         SemaType *sema_type;
         SemaModule *module;
         SemaBehaviour *behaviour;
+        SemaValueGeneric generic;
     };
 	LLVMValueRef ext_func_handle;
 } SemaValue;
@@ -36,6 +47,15 @@ typedef struct SemaValue {
 		result->sema_type = type; \
 		return result; \
 	}
+	
+static inline SemaValue *sema_value_generic(SemaTypeGeneric **types, AstModuleNode *node, SemaType *target_type) {
+    SemaValue *result = malloc(sizeof(SemaValue));
+	result->type = SEMA_VALUE_GENERIC;
+	result->generic.types = types;
+	result->generic.node = node;
+	result->generic.target_type = target_type;
+	return result;
+}
 	
 static inline SemaValue *sema_value_module(SemaModule *module) {
     SemaValue *result = malloc(sizeof(SemaValue));

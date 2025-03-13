@@ -1,5 +1,6 @@
 #include "ast/private/func_info.h"
 #include "parser/parts/func_info.h"
+#include "parser/parts/generic.h"
 #include "parser/parts/type.h"
 #include "lexer/token.h"
 #include "parser/private.h"
@@ -44,7 +45,7 @@ bool parse_func_type_info(Parser *parser, AstFuncTypeInfo *info) {
 	return (info->returning = parse_type(parser));
 }
 
-bool parse_func_info(Parser *parser, AstFuncInfo *info) {
+bool parse_func_decl_info(Parser *parser, AstFuncInfo *info) {
 	if ((info->is_extension = parser_next_is(parser, TOKEN_OPENING_CIRCLE_BRACE))) {
         
         if (!(info->ext.of = parse_type(parser))) {
@@ -53,5 +54,12 @@ bool parse_func_info(Parser *parser, AstFuncInfo *info) {
 		PARSER_EXPECT_NEXT(TOKEN_CLOSING_CIRCLE_BRACE, "extension type closing");
 	}
 	info->name = PARSER_EXPECT_NEXT(TOKEN_IDENT, "function name")->ident;
+    return true;
+}
+
+bool parse_func_info(Parser *parser, AstFuncInfo *info) {
+    if (!parse_func_decl_info(parser, info)) {
+        return false;
+    }
 	return parse_func_type_info(parser, &info->type);
 }

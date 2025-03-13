@@ -55,8 +55,9 @@ typedef struct {
 } SemaPrimitive;
 
 typedef struct SemaTypeGeneric {
-    SemaDecl *decl;
 	SemaBehaviour *behaviour;
+
+    SemaType *replace;
 } SemaTypeGeneric;
 
 typedef struct SemaType {

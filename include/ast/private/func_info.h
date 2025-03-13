@@ -1,10 +1,12 @@
 #pragma once
 
+#include "ast/api/generic.h"
 #include "core/location.h"
 #include "sema/module/decls.h"
 #include "core/vec.h"
 #include "core/slice.h"
 #include "ast/api/type.h"
+#include "sema/type.h"
 
 typedef struct AstFuncArg {
 	AstType *type;

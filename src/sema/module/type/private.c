@@ -6,6 +6,7 @@ SemaType *sema_type_new_generic(SemaBehaviour *behaviour) {
 	SemaType *result = malloc(sizeof(SemaType));
 	result->type = SEMA_TYPE_GENERIC;
 	result->generic.behaviour = behaviour;
+	result->generic.replace = NULL;
 	return result;
 }
 

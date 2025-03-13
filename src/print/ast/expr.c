@@ -37,6 +37,16 @@ void print_ast_path(FILE *stream, va_list list) {
         }
 		AstPathSegment *seg = &path->segments[i];
 		switch (seg->type) {
+			case AST_PATH_SEG_GENERIC:
+				print_to(stream, "<");
+                for (size_t j = 0; j < vec_len(seg->generic_params); j++) {
+                    if (j != 0) {
+				        print_to(stream, ", ");
+                    }
+				    print_to(stream, "{ast::expr}", seg->generic_params[j]);
+                }
+				print_to(stream, ">");
+				break;
 			case AST_PATH_SEG_NULL:
 				print_to(stream, "null");
 				break;

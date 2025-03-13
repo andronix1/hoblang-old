@@ -8,11 +8,23 @@ bool sema_types_equals(SemaType *type, SemaType *other) {
 		return true;
 	}
 	if (type->type != other->type) {
+        if (type->type == SEMA_TYPE_GENERIC && type->generic.replace) {
+            return sema_types_equals(type->generic.replace, other);
+        }
+        if (other->type == SEMA_TYPE_GENERIC && other->generic.replace) {
+            return sema_types_equals(other->generic.replace, type);
+        }
 		return false;
 	}
 	switch (type->type) {
 		case SEMA_TYPE_GENERIC:
-            return type->generic.decl == other->generic.decl;
+            if (!type->generic.replace) {
+                return other->generic.replace == type;
+            }
+            if (!other->generic.replace) {
+                return type->generic.replace == other;
+            }
+            return sema_types_equals(type->generic.replace, other->generic.replace);
 		case SEMA_TYPE_STRUCT:
 			if (vec_len(type->struct_def->members) != vec_len(other->struct_def->members)) {
 				return false;

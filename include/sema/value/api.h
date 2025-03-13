@@ -11,8 +11,12 @@ SemaModule *sema_value_module_of(SemaValue *value);
 
 bool sema_value_is_runtime(SemaValue *value);
 
+SemaType *sema_value_is_type(SemaValue *value);
 bool sema_value_is_const(SemaValue *value);
 bool sema_value_is_final(SemaValue *value);
 bool sema_value_is_var(SemaValue *value);
 bool sema_value_is_not_mut(SemaValue *value);
 bool sema_value_is_value(SemaValue *value);
+
+bool sema_value_is_generic(SemaValue *value);
+bool sema_value_is_behaviour(SemaValue *value);

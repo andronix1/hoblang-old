@@ -13,6 +13,8 @@ typedef struct SemaBehaviourRuleFunc {
     Slice name;
     SemaType *in_type;
     SemaFunction function;
+
+    SemaType *type;
 } SemaBehaviourRuleFunc;
 
 typedef struct SemaBehaviourRule {
@@ -23,6 +25,21 @@ typedef struct SemaBehaviourRule {
     };
 } SemaBehaviourRule;
 
-typedef struct SemaBehaviour {
+typedef enum {
+    SEMA_BEHAVIOUR_DECL,
+    SEMA_BEHAVIOUR_LIST
+} SemaBehaviourKind;
+
+typedef struct SemaBehaviourDecl {
     SemaBehaviourRule *rules;
+    SemaType *self;
+} SemaBehaviourDecl;
+
+typedef struct SemaBehaviour {
+    SemaBehaviourKind type;
+
+    union {
+        SemaBehaviourDecl decl;
+        struct SemaBehaviour **list;
+    };
 } SemaBehaviour;

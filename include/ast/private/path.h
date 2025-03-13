@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "ast/api/expr.h"
 #include "core/location.h"
 #include "core/slice.h"
 #include "sema/module/decls/decls.h"
@@ -16,6 +17,7 @@ typedef enum {
 	AST_PATH_SEG_DEREF,
 	AST_PATH_SEG_SIZEOF,
 	AST_PATH_SEG_NULL,
+    AST_PATH_SEG_GENERIC,
 } AstPathSegmentType;
 
 typedef enum {
@@ -59,6 +61,7 @@ typedef struct {
     FileLocation loc;
 	union {
 		Slice ident;
+        AstExpr **generic_params;
 	};
     SemaPath sema;
 } AstPathSegment;

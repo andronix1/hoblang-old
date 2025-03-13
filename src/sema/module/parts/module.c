@@ -1,3 +1,5 @@
+#include "ast/private/func_info.h"
+#include "ast/private/generic.h"
 #include "ast/private/module_node.h"
 #include "core/location.h"
 #include "sema/module/behaviour/impl.h"
@@ -17,25 +19,21 @@
 #include "sema/module/parts/path.h"
 #include "sema/module/parts/body.h"
 #include "sema/module/parts/type.h"
+#include "sema/module/parts/generic.h"
 #include "sema/module/decls/api.h"
 #include "sema/value/private.h"
 #include "core/assert.h"
 
-void sema_add_ast_func_info(SemaModule *sema, FileLocation at, bool public, AstFuncInfo *info) {	
+SemaType *sema_get_ast_func_type(SemaModule *sema, FileLocation at, bool public, AstFuncInfo *info) {	
     SemaType *ext_of = NULL;
 	if (info->is_extension) {
         if (!(ext_of = sema_ast_type(sema, info->ext.of))) {
-            return;
+            return NULL;
         }
 	}
 
     SemaType *func_type = sema_ast_func(sema, at, ext_of, info->type.args, info->type.returning);
-
-	info->decl = sema_module_push_module_decl(sema, at, public, sema_decl_new_in_type(
-		info->name,
-        info->is_extension ? info->ext.of->sema : NULL,
-        sema_value_final(func_type)
-	));
+    return func_type;
 }
 
 void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
@@ -145,13 +143,61 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
 			break;
 		}
 
-		case AST_MODULE_NODE_FUNC:
-			sema_add_ast_func_info(sema, node->loc, node->public, &node->func_decl.info);
+		case AST_MODULE_NODE_FUNC: {
+            if (node->func_decl.generics) {
+                SemaScopeStack new_ss = sema_ss_new(NULL);
+                SemaScopeStack *ss = sema_module_ss_swap(sema, &new_ss);
+                sema_module_push_scope(sema);
+                AstGenericParam *params = node->func_decl.generics->params;
+                SemaTypeGeneric **types = vec_new(SemaTypeGeneric*);
+                for (size_t i = 0; i < vec_len(params); i++) {
+                    AstGenericParam *param = &params[i];
+                    SemaType *sema_type = sema_analyze_generic_param(sema, param);
+                    if (!sema_type) {
+                        return;
+                    }
+                    SemaTypeGeneric *generic_ptr = &sema_type->generic;
+                    types = vec_push(types, &generic_ptr);
+                    sema_module_push_scope_decl(sema, param->loc, sema_decl_new(
+                        param->name,
+                        sema_value_type(sema_type)
+                    ));
+                }
+			    SemaType *func_type = sema_get_ast_func_type(sema, node->loc, node->public, &node->func_decl.info);
+                if (func_type) {
+                    AstFuncInfo *info = &node->func_decl.info;
+                    info->decl = sema_module_push_module_decl(sema, node->loc, node->public, sema_decl_new_in_type(
+                        info->name,
+                        info->is_extension ? info->ext.of->sema : NULL,
+                        sema_value_generic(types, node, func_type)
+                    ));
+                }
+                sema_module_pop_scope(sema);
+                sema_module_ss_swap(sema, ss);
+            } else {
+			    SemaType *func_type = sema_get_ast_func_type(sema, node->loc, node->public, &node->func_decl.info);
+                AstFuncInfo *info = &node->func_decl.info;
+                info->decl = sema_module_push_module_decl(sema, node->loc, node->public, sema_decl_new_in_type(
+                    info->name,
+                    info->is_extension ? info->ext.of->sema : NULL,
+                    sema_value_final(func_type)
+                ));
+            }
 			break;
+        }
 		
-		case AST_MODULE_NODE_EXTERNAL_FUNC:
-			sema_add_ast_func_info(sema, node->loc, node->public, &node->ext_func_decl.info);
+		case AST_MODULE_NODE_EXTERNAL_FUNC: {
+            SemaType *func_type = sema_get_ast_func_type(sema, node->loc, node->public, &node->func_decl.info);
+            if (func_type) {
+                AstFuncInfo *info = &node->func_decl.info;
+                info->decl = sema_module_push_module_decl(sema, node->loc, node->public, sema_decl_new_in_type(
+                    info->name,
+                    info->is_extension ? info->ext.of->sema : NULL,
+                    sema_value_final(func_type)
+                ));
+            }
 			break;
+        }
 	}
 }
 

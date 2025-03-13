@@ -48,6 +48,7 @@ typedef struct {
 typedef struct {
 	AstFuncInfo info;
 	AstBody body;
+    AstGeneric *generics;
 } AstFuncDecl;
 
 typedef struct {
