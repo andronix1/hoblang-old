@@ -1,11 +1,26 @@
 import "std/process.hob" as process;
+import "std/io.hob" as io;
 
 behaviour BasicMath {
     fun (Self) add(other: Self) -> Self
     fun (Self) sub(other: Self) -> Self
 }
 
+behaviour Printable {
+    fun (Self) print() -> void
+}
+
+fun (i64) add(other: i64) -> i64 { return self + other; }
+fun (i64) sub(other: i64) -> i64 { return self - other; }
+fun (i64) print() -> void { io.print_i32(self as _); }
+
+fun (i64) print_sum_sub(b: i64) -> void {
+    self.add(b).sub(b).print();
+    io.println("");
+}
+
 fun main() -> i32 {
+    (123).print_sum_sub(345);
     return 0;
 }
 

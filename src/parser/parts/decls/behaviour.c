@@ -15,13 +15,12 @@ bool parse_behaviour_decl(Parser *parser, AstDeclBehaviour *decl) {
         if (parser_next_is(parser, TOKEN_CLOSING_FIGURE_BRACE)) {
             return true;
         }
-        PARSER_EXPECT_NEXT(TOKEN_FUN, "fun");
+        rule.loc = PARSER_EXPECT_NEXT(TOKEN_FUN, "fun")->location;
         rule.type = AST_BEHAVIOUR_RULE_FUNC;
         rule.func.in_type = NULL;
-        if (parser_next_is(parser, TOKEN_OPENING_CIRCLE_BRACE)) {
-            if (!(rule.func.in_type = parse_type(parser))) {
-                return false;
-            }
+        PARSER_EXPECT_NEXT(TOKEN_OPENING_CIRCLE_BRACE, "in_type");
+        if (!(rule.func.in_type = parse_type(parser))) {
+            return false;
         }
         PARSER_EXPECT_NEXT(TOKEN_CLOSING_CIRCLE_BRACE, "closing circle brace"); 
         rule.func.name = PARSER_EXPECT_NEXT(TOKEN_IDENT, "func name")->ident;

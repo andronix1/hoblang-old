@@ -13,10 +13,10 @@
 SemaBehaviour *sema_analyze_behaviour_decl(SemaModule *sema, AstDeclBehaviour *decl) {
     // TODO: check duplicates
     sema_module_push_scope(sema);
-    SemaType *type = sema_type_new_generic(NULL);
-    type->generic.decl = sema_module_push_scope_decl(sema, decl->loc, sema_decl_new(
+    SemaType *self_type = sema_type_new_generic(NULL);
+    self_type->generic.decl = sema_module_push_scope_decl(sema, decl->loc, sema_decl_new(
         slice_from_cstr("Self"),
-        sema_value_type(type)
+        sema_value_type(self_type)
     ));
     SemaBehaviour *behaviour = malloc(sizeof(SemaBehaviour));
     for (size_t i = 0; i < vec_len(decl->rules); i++) {
@@ -27,8 +27,15 @@ SemaBehaviour *sema_analyze_behaviour_decl(SemaModule *sema, AstDeclBehaviour *d
                 AstBehaviourRuleFunc *func = &rule->func;
                 sema_rule.type = SEMA_BEHAVIOUR_RULE_FUN;
                 SemaBehaviourRuleFunc *sema_func = &sema_rule.func;
-                if (func->in_type) {
                     sema_func->in_type = sema_ast_type(sema, func->in_type);
+                if (
+                    !sema_types_equals(sema_func->in_type, self_type) &&
+                    !(
+                        sema_func->in_type->type == SEMA_TYPE_POINTER &&
+                        sema_types_equals(sema_func->in_type->ptr_to, self_type)
+                     )
+                ) {
+                    SEMA_ERROR(rule->loc, "behaviour's functions must be in Self or *Self");
                 }
                 // TODO: check duplicates and move in func
                 sema_func->function.args = vec_new(SemaType*);

@@ -8,7 +8,7 @@
 
 typedef enum {
     AST_BEHAVIOUR_RULE_FUNC
-} AstBehaviourRuleType ;
+} AstBehaviourRuleType;
 
 typedef struct AstBehaviourRuleFunc {
     Slice name;
@@ -18,6 +18,7 @@ typedef struct AstBehaviourRuleFunc {
 
 typedef struct AstBehaviourRule {
     AstBehaviourRuleType type;
+    FileLocation loc;
 
     union {
         AstBehaviourRuleFunc func;
