@@ -12,15 +12,27 @@ behaviour Printable {
 
 fun (i64) add(other: i64) -> i64 { return self + other; }
 fun (i64) sub(other: i64) -> i64 { return self - other; }
-fun (i64) print() -> void { io.print_i32(self as _); }
 
-fun print_sum_sub<T: BasicMath + Printable>(a: T, b: T) -> void {
-    a.add(b).sub(b).print();
+fun (i64) print() -> void { io.print_i32(self as _); }
+fun (i32) print() -> void { io.print_i32(self as _); }
+fun (i16) print() -> void { io.print_i32(self as _); }
+fun (i8) print() -> void { io.print_i32(self as _); }
+
+fun print<T: Printable>(t: T) -> void { t.print(); }
+
+fun print_sum_sub<T: BasicMath + Printable>(a: T, b: T) -> T {
+    final res = a.add(b).sub(b);
+    res.print();
     io.println("");
+    return res;
 }
 
 fun main() -> i32 {
-    print_sum_sub.<i64>(123, 345);
+    final i: i64 = print_sum_sub.<i64>(123, 345);
+    print.<i8>(1 as i8);
+    print.<i16>(2 as i16);
+    print.<i32>(3 as i32);
+    print.<i64>(4 as i64);
     return 0;
 }
 

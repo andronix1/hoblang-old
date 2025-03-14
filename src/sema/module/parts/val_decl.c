@@ -18,6 +18,9 @@ SemaDecl *sema_val_decl(SemaModule *sema, AstValDecl *val_decl, bool is_global) 
     SemaValue *value = NULL;
     if (val_decl->initializer) {
         value = sema_expr(sema, val_decl->initializer, sema_expr_ctx_default_of(expected));
+        if (!value) {
+            return NULL;
+        }
         if (!sema_value_is_value(value)) {
             SEMA_ERROR(val_decl->loc, "only values can be assigned to value declaration `{slice}`");
             return NULL;

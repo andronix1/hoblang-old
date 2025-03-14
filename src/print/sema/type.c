@@ -7,7 +7,11 @@ void print_sema_type(FILE* stream, va_list list) {
 	SemaType *type = va_arg(list, SemaType*);
 	switch (type->type) {
 		case SEMA_TYPE_GENERIC:
-			print_to(stream, "<generic>");
+			print_to(stream, "<");
+            if (type->generic.replace) {
+                print_to(stream, "({sema::type})", type->generic.replace);
+            }
+			print_to(stream, ">");
 			break;
 		case SEMA_TYPE_STRUCT:
 			print_to(stream, "struct {slice}", &type->struct_def->name);

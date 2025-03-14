@@ -99,7 +99,7 @@ SemaValue *sema_resolve_inner_value_path(SemaModule *sema, SemaValue *from, AstP
                 sema_behaviour_swap_self_type(from->sema_type->generic.behaviour, from->sema_type);
                 if ((segment->sema.value = sema_behaviour_resolve(from->sema_type->generic.behaviour, &segment->ident))) {
                     // TODO: specify
-                    return segment->sema.value;
+                    return sema_value_ext_func_handle(sema_value_typeof(segment->sema.value));
                 } else {
                     SEMA_ERROR(segment->loc, "there is not member `{slice}` described in generic constraints", &segment->ident);
                     return NULL;
