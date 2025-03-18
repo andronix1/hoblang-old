@@ -33,6 +33,7 @@ fun main() -> i32 {
     print.<i16>(2 as i16);
     print.<i32>(3 as i32);
     print.<i64>(4 as i64);
+    io.println("");
     return 0;
 }
 

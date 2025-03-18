@@ -1,7 +1,6 @@
 #include "sema/module/parts/decls/behaviour.h"
 #include "ast/private/decls/behaviour.h"
 #include "ast/private/func_info.h"
-#include "core/location.h"
 #include "core/slice/api.h"
 #include "core/vec.h"
 #include "sema/module/behaviour/impl.h"
@@ -10,54 +9,8 @@
 #include "sema/module/private.h"
 #include "sema/type/api.h"
 #include "sema/type/private.h"
-#include "sema/value/api.h"
 #include "sema/value/private.h"
-#include "sema/module/decls/impl.h"
 #include <stdlib.h>
-
-bool sema_type_behaves_as_decl(SemaModule *sema, FileLocation at, SemaType *type, SemaBehaviour *behaviour) {
-    for (size_t i = 0; i < vec_len(behaviour->decl.rules); i++) {
-        SemaBehaviourRule *rule = &behaviour->decl.rules[i];
-        switch (rule->type) {
-            case SEMA_BEHAVIOUR_RULE_FUN: {
-                SemaDecl *decl = sema_module_resolve_ext_func(sema, &rule->func.name, type);
-                if (!decl) {
-                    SEMA_ERROR(at, "no ext func `{slice}` found", &rule->func.name);
-                    return false;
-                }
-                behaviour->decl.self->generic.replace = type;
-                SemaType *found_type = sema_value_typeof(decl->value);
-                if (!sema_types_equals(found_type, rule->func.type)) {
-                    SEMA_ERROR(at, "invalid `{slice}` type {sema::type}. Expected {sema::type}", &rule->func.name, found_type, rule->func.type);
-                    return false;
-                }
-                break;
-            }
-        }
-    }
-    
-    return true;
-}
-
-bool sema_type_behaves_as(SemaModule *sema, FileLocation at, SemaType *type, SemaBehaviour *behaviour) {
-    if (!behaviour) {
-        return true;
-    }
-    switch (behaviour->type) {
-        case SEMA_BEHAVIOUR_DECL:
-            return sema_type_behaves_as_decl(sema, at, type, behaviour);
-        case SEMA_BEHAVIOUR_LIST: {
-            bool behaves = true;
-            for (size_t i = 0; i < vec_len(behaviour->list); i++) {
-                if (!sema_type_behaves_as(sema, at, type, behaviour->list[i])) {
-                    behaves = false;
-                }
-            }
-            return behaves;
-        }
-    }
-    assert(0, "unreachable");
-}
 
 SemaBehaviour *sema_analyze_behaviour_decl(SemaModule *sema, AstDeclBehaviour *decl) {
     // TODO: check duplicates

@@ -15,6 +15,7 @@ typedef struct {
 
 typedef struct {
     const char *target;
+    bool no_verify;
 } CmdLlvm;
 
 typedef struct {

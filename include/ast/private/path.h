@@ -4,6 +4,8 @@
 #include "ast/api/expr.h"
 #include "core/location.h"
 #include "core/slice.h"
+#include "sema/module/behaviour/table/api.h"
+#include "sema/module/behaviour/table/path.h"
 #include "sema/module/decls/decls.h"
 #include "sema/value.h"
 #include "sema/module/decls.h"
@@ -30,6 +32,8 @@ typedef enum {
     SEMA_PATH_DECL,
     SEMA_PATH_EXT_FUNC_DIRECT,
     SEMA_PATH_EXT_FUNC_REF,
+    SEMA_PATH_BUILD_GENERIC,
+    SEMA_PATH_BTABLE_PATH,
     SEMA_PATH_SIZEOF
 } SemaPathType;
 
@@ -46,6 +50,9 @@ typedef struct {
             SemaType *type;
             SemaType *output_type;
         } sizeof_op;
+        struct {
+            SemaBehaviourTable *table;
+        } generic;
         SemaType *deref_type;
         SemaType *slice_type;
         SemaType *optional_type;
@@ -53,6 +60,7 @@ typedef struct {
         SemaDecl *ext_func_decl;
 		size_t array_length;
         SemaPathStructMember struct_member;
+        SemaBehaviourTablePath btable_path;
     };
 } SemaPath;
 

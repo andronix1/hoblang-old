@@ -3,6 +3,8 @@
 #include "core/vec.h"
 #include "ast/private/path.h"
 #include "ast/private/module_node.h"
+#include "sema/module/behaviour/impl.h"
+#include "sema/module/behaviour/table/path.h"
 #include "sema/value/api.h"
 #include "sema/value/private.h"
 #include "sema/module/decls/impl.h"
@@ -10,6 +12,7 @@
 #include "llvm/parts/types/slice.h"
 #include "llvm/parts/types/optional.h"
 #include "llvm/utils/member.h"
+#include "core/assert.h"
 
 LLVMValueRef llvm_resolve_path(LlvmBackend *llvm, LLVMValueRef value, AstPath *path, SemaValue *from) {
     for (size_t i = 0; i < vec_len(path->segments); i++) {
@@ -82,6 +85,37 @@ LLVMValueRef llvm_resolve_path(LlvmBackend *llvm, LLVMValueRef value, AstPath *p
             case SEMA_PATH_SLICE_LEN:
                 value = llvm_slice_len(llvm, llvm_resolve_type(segment->slice_type), value, false);
                 break;
+            case SEMA_PATH_BUILD_GENERIC: {
+                value = segment->generic.table->llvm.value;
+                break;
+            }
+            case SEMA_PATH_BTABLE_PATH: {
+                // TODO: REDO THIS VERRY BAAAAD THING!!!!
+                if (LLVMGetTypeKind(LLVMTypeOf(value)) == LLVMPointerTypeKind) {
+                    value = LLVMBuildLoad2(
+                        llvm_builder(llvm),
+                        llvm_resolve_type(sema_value_typeof(path->segments[i].sema.value)->func.args[0]),
+                        value,
+                        ""
+                    );
+                }
+                SemaType *type = segment->btable_path.generic;
+                SemaBehaviourTable *table = type->generic.table;
+                SemaBehaviourTablePathElement *path = segment->btable_path.path;
+                for (size_t i = 0; i < vec_len(path); i++) {
+                    assert((int)path[i].kind == table->kind, "btable and behaviour doesn't matches at {size} iteration!", i);
+                    switch (path[i].kind) {
+                        case SEMA_BEHAVIOUR_DECL:
+                            from->ext_func_handle = value;
+                            value = table->decl[path[i].idx].decl->llvm.value;
+                            break;
+                        case SEMA_BEHAVIOUR_LIST:
+                            table = table->list[path[i].idx];
+                            break;
+                    }
+                }
+                break;
+            }
         }
     }
     return value;

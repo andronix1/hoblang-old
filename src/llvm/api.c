@@ -2,11 +2,11 @@
 #include <llvm-c/Target.h>
 #include <llvm-c/TargetMachine.h>
 #include <malloc.h>
+#include <stdio.h>
 #include "llvm/api.h"
 #include "llvm/impl.h"
 #include "llvm/llvm.h"
 #include "core/log.h"
-#include "sema/module/impl.h"
 #include "sema/module/api.h"
 #include "core/vec.h"
 #include "core/ansi.h"
@@ -54,9 +54,12 @@ bool llvm_write_module_ir(LlvmBackend *llvm, char *output_path) {
 	return true;
 }
 
-bool llvm_write_module(LlvmBackend *llvm, const char *target_name, char *output_path) {
-	if (LLVMVerifyModule(llvm->module, LLVMAbortProcessAction | LLVMPrintMessageAction | LLVMReturnStatusAction, NULL)) {
-		return false;
+bool llvm_write_module(LlvmBackend *llvm, bool verify, const char *target_name, char *output_path) {
+	if (verify && LLVMVerifyModule(llvm->module, LLVMAbortProcessAction | LLVMPrintMessageAction | LLVMReturnStatusAction, NULL)) {
+        printf("failed to verify module! continue? [y/N] ");
+        if (getchar() != 'y') {
+            return false;    
+        }
 	}
     
 	LLVMTargetRef target = NULL;

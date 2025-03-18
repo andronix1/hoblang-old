@@ -10,7 +10,7 @@
 #include "sema/value/private.h"
 #include "sema/module/parts/path.h"
 
-SemaType *sema_analyze_generic_rules(SemaModule *sema, AstGenericRules *rules) {
+SemaType *sema_analyze_generic_rules(SemaModule *sema, AstGenericRules *rules, AstGenericParam *param) {
     SemaBehaviour **behaviours = vec_new(SemaBehaviour*);
     for (size_t i = 0; i < vec_len(rules->behaviours); i++) {
         AstPath *path = rules->behaviours[i];
@@ -28,5 +28,5 @@ SemaType *sema_analyze_generic_rules(SemaModule *sema, AstGenericRules *rules) {
 }
 
 SemaType *sema_analyze_generic_param(SemaModule *sema, AstGenericParam *param) {
-    return sema_analyze_generic_rules(sema, &param->rules);
+    return param->sema.type = sema_analyze_generic_rules(sema, &param->rules, param);
 }

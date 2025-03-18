@@ -3,6 +3,7 @@
 #include "ast/private/module_node.h"
 #include "core/location.h"
 #include "sema/module/behaviour/impl.h"
+#include "sema/module/behaviour/table/api.h"
 #include "sema/module/decls/decls.h"
 #include "sema/module/parts/decls/behaviour.h"
 #include "sema/module/parts/func_info.h"
@@ -22,7 +23,6 @@
 #include "sema/module/parts/generic.h"
 #include "sema/module/decls/api.h"
 #include "sema/value/private.h"
-#include "core/assert.h"
 
 SemaType *sema_get_ast_func_type(SemaModule *sema, FileLocation at, bool public, AstFuncInfo *info) {	
     SemaType *ext_of = NULL;
@@ -163,13 +163,14 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
                         sema_value_type(sema_type)
                     ));
                 }
+                node->func_decl.generics->sema.tables = vec_new(SemaBehaviourTable*);
 			    SemaType *func_type = sema_get_ast_func_type(sema, node->loc, node->public, &node->func_decl.info);
                 if (func_type) {
                     AstFuncInfo *info = &node->func_decl.info;
                     info->decl = sema_module_push_module_decl(sema, node->loc, node->public, sema_decl_new_in_type(
                         info->name,
                         info->is_extension ? info->ext.of->sema : NULL,
-                        sema_value_generic(types, node, func_type)
+                        sema_value_generic(types, node->func_decl.generics, func_type)
                     ));
                 }
                 sema_module_pop_scope(sema);

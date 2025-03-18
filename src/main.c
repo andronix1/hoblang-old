@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
             if (!llvm) {
                 return 1;
             }
-            if (!llvm_write_module(llvm, cmd.build_exe.llvm.target, (char*)cmd.build_exe.temp_obj)) {
+            if (!llvm_write_module(llvm, !cmd.build_exe.llvm.no_verify, cmd.build_exe.llvm.target, (char*)cmd.build_exe.temp_obj)) {
                 return 1;
             }
             const char **args = vec_new(const char*);
@@ -105,7 +105,7 @@ int main(int argc, char **argv) {
             if (!llvm) {
                 return 1;
             }
-            if (!llvm_write_module(llvm, cmd.build_obj.llvm.target, (char*)cmd.build_obj.output)) {
+            if (!llvm_write_module(llvm, !cmd.build_obj.llvm.no_verify, cmd.build_obj.llvm.target, (char*)cmd.build_obj.output)) {
                 return 1;
             }
             return 0;

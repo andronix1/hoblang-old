@@ -58,6 +58,8 @@ typedef struct SemaTypeGeneric {
 	SemaBehaviour *behaviour;
 
     SemaType *replace;
+
+    SemaBehaviourTable *table;
 } SemaTypeGeneric;
 
 typedef struct SemaType {

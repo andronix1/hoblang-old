@@ -3,10 +3,8 @@
 #include <llvm-c/Core.h>
 #include <string.h>
 #include <malloc.h>
-#include "ast/api/module_node.h"
+#include "ast/private/generic.h"
 #include "sema/module/behaviour/impl.h"
-#include "sema/type.h"
-#include "sema/module.h"
 #include "sema/const/const.h"
 #include "sema/type/private.h"
 
@@ -23,8 +21,7 @@ typedef enum {
 
 typedef struct {
     SemaTypeGeneric **types;
-    // TODO: split generic/non-generic nodes
-    AstModuleNode *node;
+    AstGeneric *generic;
     SemaType *target_type;
 } SemaValueGeneric;
 
@@ -48,11 +45,11 @@ typedef struct SemaValue {
 		return result; \
 	}
 	
-static inline SemaValue *sema_value_generic(SemaTypeGeneric **types, AstModuleNode *node, SemaType *target_type) {
+static inline SemaValue *sema_value_generic(SemaTypeGeneric **types, AstGeneric *generic, SemaType *target_type) {
     SemaValue *result = malloc(sizeof(SemaValue));
 	result->type = SEMA_VALUE_GENERIC;
 	result->generic.types = types;
-	result->generic.node = node;
+	result->generic.generic = generic;
 	result->generic.target_type = target_type;
 	return result;
 }

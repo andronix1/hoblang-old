@@ -7,6 +7,7 @@ SemaType *sema_type_new_generic(SemaBehaviour *behaviour) {
 	result->type = SEMA_TYPE_GENERIC;
 	result->generic.behaviour = behaviour;
 	result->generic.replace = NULL;
+	result->generic.table = NULL;
 	return result;
 }
 

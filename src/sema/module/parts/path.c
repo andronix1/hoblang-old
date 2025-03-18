@@ -5,7 +5,9 @@
 #include "core/vec.h"
 #include "sema/arch/bits/private.h"
 #include "sema/const/const.h"
-#include "sema/module/behaviour/impl.h"
+#include "sema/module/behaviour/table/api.h"
+#include "sema/module/behaviour/table/impl.h"
+#include "sema/module/behaviour/table/path.h"
 #include "sema/module/module.h"
 #include "sema/module/parts/expr.h"
 #include "sema/type/private.h"
@@ -97,8 +99,9 @@ SemaValue *sema_resolve_inner_value_path(SemaModule *sema, SemaValue *from, AstP
                     return sema_resolve_inner_value_path(sema, sema_value_with_type(from, from->sema_type->generic.replace), segment);
                 }
                 sema_behaviour_swap_self_type(from->sema_type->generic.behaviour, from->sema_type);
-                if ((segment->sema.value = sema_behaviour_resolve(from->sema_type->generic.behaviour, &segment->ident))) {
-                    // TODO: specify
+                if ((segment->sema.value = sema_behaviour_resolve(from->sema_type->generic.behaviour, &segment->ident, &segment->sema.btable_path))) {
+                    segment->sema.type = SEMA_PATH_BTABLE_PATH;
+                    segment->sema.btable_path.generic = from->sema_type;
                     return sema_value_ext_func_handle(sema_value_typeof(segment->sema.value));
                 } else {
                     SEMA_ERROR(segment->loc, "there is not member `{slice}` described in generic constraints", &segment->ident);
@@ -180,9 +183,14 @@ SemaValue *sema_resolve_inner_generic_path(SemaModule *sema, SemaValue *from, As
                     SEMA_ERROR(expr->loc, "generic accepts types only");
                     return NULL;
                 }
-                if (!sema_type_behaves_as(sema, expr->loc, type, from->generic.types[i]->behaviour)) {
+                SemaBehaviourTable *table = sema_type_build_behaviour_table(sema, expr->loc, type, from->generic.types[i]->behaviour);
+                table->of = type;
+                if (!table) {
                     return NULL;
                 }
+                from->generic.generic->sema.tables = vec_push(from->generic.generic->sema.tables, &table);
+                segment->sema.type = SEMA_PATH_BUILD_GENERIC;
+                segment->sema.generic.table = table;
                 from->generic.types[i]->replace = type;
             }
             return sema_value_final(from->generic.target_type);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/slice/slice.h"
+#include "sema/module/behaviour/table/impl.h"
 #include "sema/module/decls/decls.h"
 #include "sema/type.h"
 #include "sema/type/func.h"
