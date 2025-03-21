@@ -90,16 +90,15 @@ LLVMValueRef llvm_resolve_path(LlvmBackend *llvm, LLVMValueRef value, AstPath *p
                 break;
             }
             case SEMA_PATH_BTABLE_PATH: {
-                // TODO: REDO THIS VERRY BAAAAD THING!!!!
+                SemaType *type = segment->btable_path.generic;
                 if (LLVMGetTypeKind(LLVMTypeOf(value)) == LLVMPointerTypeKind) {
                     value = LLVMBuildLoad2(
                         llvm_builder(llvm),
-                        llvm_resolve_type(sema_value_typeof(path->segments[i].sema.value)->func.args[0]),
+                        llvm_resolve_type(type),
                         value,
                         ""
                     );
                 }
-                SemaType *type = segment->btable_path.generic;
                 SemaBehaviourTable *table = type->generic.table;
                 SemaBehaviourTablePathElement *path = segment->btable_path.path;
                 for (size_t i = 0; i < vec_len(path); i++) {

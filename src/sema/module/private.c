@@ -131,7 +131,7 @@ SemaDecl *sema_module_push_scope_decl(SemaModule *sema, FileLocation at, SemaDec
 }
 
 SemaDecl *sema_module_push_module_decl(SemaModule *sema, FileLocation at, bool public, SemaDecl *decl) {
-    if (sema_module_resolve_scope_decl(sema, &decl->name)) {
+    if (sema_module_resolve_module_decl_in_type(sema, decl->in_type, &decl->name)) {
         SEMA_ERROR(at, "`{slice}` was already declared", &decl->name);
         return NULL;
     }

@@ -1,4 +1,4 @@
-#include "parser/parts/path.h"
+#include "parser/parts/type.h"
 #include "parser/parts/expr.h"
 #include "ast/api/expr.h"
 #include "ast/api/path.h"
@@ -37,16 +37,16 @@ AstPath *parse_path(Parser *parser) {
 				break;
             case TOKEN_LESS: {
                 segment.type = AST_PATH_SEG_GENERIC;
-                segment.generic_params = vec_new(AstExpr*);
+                segment.generic_params = vec_new(AstType*);
                 while (true) {
                     if (parser_next_is(parser, TOKEN_GREATER)) {
                         break;
                     }
-                    AstExpr *param = parse_expr(parser, token_stop_generic);
-                    if (!param) {
+                    AstType *type = parse_type(parser);
+                    if (!type) {
                         return NULL;
                     }
-                    segment.generic_params = vec_push(segment.generic_params, &param);
+                    segment.generic_params = vec_push(segment.generic_params, &type);
                     if (parser_next_is(parser, TOKEN_GREATER)) {
                         break;
                     }

@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include "ast/api/expr.h"
+#include "ast/api/type.h"
 #include "core/location.h"
 #include "core/slice.h"
 #include "sema/module/behaviour/table/api.h"
@@ -69,7 +70,7 @@ typedef struct {
     FileLocation loc;
 	union {
 		Slice ident;
-        AstExpr **generic_params;
+        AstType **generic_params;
 	};
     SemaPath sema;
 } AstPathSegment;

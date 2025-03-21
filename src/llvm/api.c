@@ -56,10 +56,7 @@ bool llvm_write_module_ir(LlvmBackend *llvm, char *output_path) {
 
 bool llvm_write_module(LlvmBackend *llvm, bool verify, const char *target_name, char *output_path) {
 	if (verify && LLVMVerifyModule(llvm->module, LLVMAbortProcessAction | LLVMPrintMessageAction | LLVMReturnStatusAction, NULL)) {
-        printf("failed to verify module! continue? [y/N] ");
-        if (getchar() != 'y') {
-            return false;    
-        }
+        return false;    
 	}
     
 	LLVMTargetRef target = NULL;

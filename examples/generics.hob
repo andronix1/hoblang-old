@@ -13,12 +13,17 @@ behaviour Printable {
 fun (i64) add(other: i64) -> i64 { return self + other; }
 fun (i64) sub(other: i64) -> i64 { return self - other; }
 
-fun (i64) print() -> void { io.print_i32(self as _); }
-fun (i32) print() -> void { io.print_i32(self as _); }
-fun (i16) print() -> void { io.print_i32(self as _); }
 fun (i8) print() -> void { io.print_i32(self as _); }
+fun (i16) print() -> void { io.print_i32(self as _); }
+fun (i32) print() -> void { io.print_i32(self as _); }
+fun (i64) print() -> void { io.print_i32(self as _); }
+fun ([]u8) print() -> void { io.print(self); }
+fun (bool) print() -> void { if self { io.print("true"); } else { io.print("false"); } }
 
-fun print<T: Printable>(t: T) -> void { t.print(); }
+fun println<T: Printable>(t: T) -> void {
+    t.print();
+    io.println("");
+}
 
 fun print_sum_sub<T: BasicMath + Printable>(a: T, b: T) -> T {
     final res = a.add(b).sub(b);
@@ -27,13 +32,34 @@ fun print_sum_sub<T: BasicMath + Printable>(a: T, b: T) -> T {
     return res;
 }
 
+struct Asd {
+    a: i32,
+    b: i64,
+    c: bool
+}
+
+fun (Asd) print() -> void {
+    io.print("struct Ast { a: ");
+    self.a.print();
+    io.print(", b: ");
+    self.b.print();
+    io.print(", c: ");
+    self.c.print();
+    io.print(" }");
+}
+
 fun main() -> i32 {
     final i: i64 = print_sum_sub.<i64>(123, 345);
-    print.<i8>(1 as i8);
-    print.<i16>(2 as i16);
-    print.<i32>(3 as i32);
-    print.<i64>(4 as i64);
-    io.println("");
+    println.<Asd>(struct Asd {
+        a: 1,
+        b: 2,
+        c: true
+    });
+    println.<[]u8>("hello, world!");
+    println.<i8>(1 as i8);
+    println.<i16>(2 as i16);
+    println.<i32>(3 as i32);
+    println.<i64>(4 as i64);
     return 0;
 }
 

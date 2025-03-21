@@ -188,9 +188,9 @@ void sema_push_ast_module_node(SemaModule *sema, AstModuleNode *node) {
         }
 		
 		case AST_MODULE_NODE_EXTERNAL_FUNC: {
-            SemaType *func_type = sema_get_ast_func_type(sema, node->loc, node->public, &node->func_decl.info);
+            SemaType *func_type = sema_get_ast_func_type(sema, node->loc, node->public, &node->ext_func_decl.info);
             if (func_type) {
-                AstFuncInfo *info = &node->func_decl.info;
+                AstFuncInfo *info = &node->ext_func_decl.info;
                 info->decl = sema_module_push_module_decl(sema, node->loc, node->public, sema_decl_new_in_type(
                     info->name,
                     info->is_extension ? info->ext.of->sema : NULL,

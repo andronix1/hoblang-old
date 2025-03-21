@@ -1,6 +1,6 @@
 #include "ast/private/path.h"
 #include "ast/private/type.h"
-#include "ast/private/expr.h"
+#include "ast/private/type.h"
 #include "ast/private/module_node.h"
 #include "core/vec.h"
 #include "sema/arch/bits/private.h"
@@ -14,6 +14,7 @@
 #include "sema/module/private.h"
 #include "sema/module/decls/impl.h"
 #include "sema/module/parts/decls/struct/api.h"
+#include "sema/module/parts/type.h"
 #include "sema/module/behaviour/api.h"
 #include "sema/value/private.h"
 #include "sema/value/api.h"
@@ -173,17 +174,12 @@ SemaValue *sema_resolve_inner_generic_path(SemaModule *sema, SemaValue *from, As
                 return NULL;
             }
             for (size_t i = 0; i < vec_len(segment->generic_params); i++) {
-                AstExpr *expr = segment->generic_params[i];
-                SemaValue *value = sema_expr(sema, expr, sema_expr_ctx_default());
-                if (!value) {
-                    return NULL;
-                }
-                SemaType *type = sema_value_is_type(value);
+                AstType *ast_type = segment->generic_params[i];
+                SemaType *type = sema_ast_type(sema, ast_type);
                 if (!type) {
-                    SEMA_ERROR(expr->loc, "generic accepts types only");
                     return NULL;
                 }
-                SemaBehaviourTable *table = sema_type_build_behaviour_table(sema, expr->loc, type, from->generic.types[i]->behaviour);
+                SemaBehaviourTable *table = sema_type_build_behaviour_table(sema, segment->loc, type, from->generic.types[i]->behaviour);
                 table->of = type;
                 if (!table) {
                     return NULL;
@@ -258,9 +254,13 @@ SemaValue *sema_resolve_path(SemaModule *sema, SemaValue *from, AstPath *path) {
             case SEMA_VALUE_BEHAVIOUR:
         	    SEMA_ERROR(segment->loc, "cannot get path from behaviour");
                 break;
-            case SEMA_VALUE_EXT_FUNC_HANDLE:
-        	    SEMA_ERROR(segment->loc, "cannot get path from ext func handle");
+            case SEMA_VALUE_EXT_FUNC_HANDLE: {
+                from = sema_resolve_inner_value_path(sema, from, segment);
+                if (!from) {
+                    return NULL;
+                }
                 break;
+            }
             case SEMA_VALUE_MODULE: {
                 SemaDecl *decl = sema_resolve_inner_module_path(sema, from->module, segment);
                 if (!decl) {
