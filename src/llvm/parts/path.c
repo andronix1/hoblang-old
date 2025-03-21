@@ -86,6 +86,10 @@ LLVMValueRef llvm_resolve_path(LlvmBackend *llvm, LLVMValueRef value, AstPath *p
                 value = llvm_slice_len(llvm, llvm_resolve_type(segment->slice_type), value, false);
                 break;
             case SEMA_PATH_BUILD_GENERIC: {
+                SemaTypeGeneric **types = segment->value->generic.types;
+                for (size_t i = 0; i < vec_len(types); i++) {
+                    types[i]->replace = segment->generic.types[i];
+                }
                 value = segment->generic.table->llvm.value;
                 break;
             }
@@ -107,6 +111,7 @@ LLVMValueRef llvm_resolve_path(LlvmBackend *llvm, LLVMValueRef value, AstPath *p
                         case SEMA_BEHAVIOUR_DECL:
                             from->ext_func_handle = value;
                             value = table->decl[path[i].idx].decl->llvm.value;
+                            path[i].self->generic.replace = type;
                             break;
                         case SEMA_BEHAVIOUR_LIST:
                             table = table->list[path[i].idx];

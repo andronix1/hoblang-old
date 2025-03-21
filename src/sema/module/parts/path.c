@@ -187,6 +187,8 @@ SemaValue *sema_resolve_inner_generic_path(SemaModule *sema, SemaValue *from, As
                 from->generic.generic->sema.tables = vec_push(from->generic.generic->sema.tables, &table);
                 segment->sema.type = SEMA_PATH_BUILD_GENERIC;
                 segment->sema.generic.table = table;
+                // TODO: fix
+                segment->sema.generic.types = vec_push(vec_new(SemaType*), &type);
                 from->generic.types[i]->replace = type;
             }
             return sema_value_final(from->generic.target_type);

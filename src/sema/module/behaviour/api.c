@@ -32,7 +32,8 @@ SemaValue *sema_behaviour_decl_resolve(SemaBehaviour *behaviour, Slice *name, Se
                 }
                 SemaBehaviourTablePathElement element = {
                     .kind = SEMA_BEHAVIOUR_DECL,
-                    .idx = i
+                    .idx = i,
+                    .self = behaviour->decl.self
                 };
                 result->path = vec_push(result->path, &element);
                 return sema_value_final(sema_type_new_func(

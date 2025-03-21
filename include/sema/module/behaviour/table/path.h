@@ -7,6 +7,7 @@
 typedef struct {
     SemaBehaviourKind kind;
     size_t idx;
+    SemaType *self;
 } SemaBehaviourTablePathElement;
 
 typedef struct {

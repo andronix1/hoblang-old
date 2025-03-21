@@ -1,18 +1,11 @@
 #pragma once
 
 #include <stdint.h>
-#include "ast/api/expr.h"
 #include "ast/api/type.h"
 #include "core/location.h"
-#include "core/slice.h"
 #include "sema/module/behaviour/table/api.h"
 #include "sema/module/behaviour/table/path.h"
 #include "sema/module/decls/decls.h"
-#include "sema/value.h"
-#include "sema/module/decls.h"
-#include "sema/module.h"
-#include "sema/type.h"
-#include "sema/value.h"
 #include "sema/value/value.h"
 
 typedef enum {
@@ -53,6 +46,7 @@ typedef struct {
         } sizeof_op;
         struct {
             SemaBehaviourTable *table;
+            SemaType **types;
         } generic;
         SemaType *deref_type;
         SemaType *slice_type;
