@@ -1,0 +1,14 @@
+#pragma once
+
+typedef enum {
+    SEMA_AS_IGNORE,
+    SEMA_AS_PTRCAST,
+    SEMA_AS_PTR_TO_INT,
+    SEMA_AS_INT_TO_PTR,
+    SEMA_AS_OPT_UNWRAP,
+    SEMA_AS_INT_CAST,
+    SEMA_AS_INT_TO_FLOAT,
+    SEMA_AS_FLOAT_CAST,
+    SEMA_AS_FLOAT_TO_INT,
+    SEMA_AS_ARR_TO_SLICE
+} SemaAsKind;

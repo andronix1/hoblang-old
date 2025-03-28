@@ -1,14 +1,15 @@
-#include "lexer/token.h"
+#include "lexer/token/token.h"
+#include "core/slice/io.h"
 #include "core/vec.h"
 
 void print_token(FILE *stream, va_list list) {	
 	const Token *token = va_arg(list, Token*);
-	if (token == NULL || token->type == TOKEN_EOI) {
-		fprintf(stream, "<EOF>");
+	if (token == NULL) {
+		fprintf(stream, "(null)");
 		return;
 	}
-	switch (token->type) {
-    	case TOKEN_EOI: fprintf(stream, "<EOI>"); return;
+	switch (token->kind) {
+    	case TOKEN_EOI: fprintf(stream, "EOI"); return;
         case TOKEN_ASSIGN_MOD: fprintf(stream, "%%="); return;
         case TOKEN_ASSIGN_ADD: fprintf(stream, "+="); return;
         case TOKEN_ASSIGN_MINUS: fprintf(stream, "-="); return;
@@ -57,7 +58,7 @@ void print_token(FILE *stream, va_list list) {
 		case TOKEN_OPENING_SQUARE_BRACE: fprintf(stream, "["); return;
 		case TOKEN_CLOSING_SQUARE_BRACE: fprintf(stream, "]"); return;
 		case TOKEN_NOT: fprintf(stream, "!"); return;
-		case TOKEN_MOD: fprintf(stream, "%"); return;
+		case TOKEN_MOD: fprintf(stream, "%%"); return;
 		case TOKEN_BITNOT: fprintf(stream, "~"); return;
 		case TOKEN_BITAND: fprintf(stream, "&"); return;
 		case TOKEN_BITOR: fprintf(stream, "|"); return;
@@ -94,6 +95,6 @@ void print_token(FILE *stream, va_list list) {
 			fprintf(stream, "`");
 			return;
 	}
-	fprintf(stream, "<unknown token id %x>", token->type);
+	fprintf(stream, "<unknown token id %x>", token->kind);
 }
 

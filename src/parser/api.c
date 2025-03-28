@@ -1,27 +1,79 @@
-#include "lexer/api.h"
-#include <malloc.h>
-#include "parser/impl.h"
+#include "parser/api.h"
+#include "lexer/interface/lexer.h"
 
-Parser *parser_new(Lexer *lexer) {
-    Parser *parser = malloc(sizeof(Parser));
-	parser->lexer = lexer;
-	parser->failed = false;
-	parser->skip_next = false;
-	return parser;
+inline Token *parser_token(const Parser *parser) {
+    return parser->token;
 }
 
-Parser *parser_from_file(const char *path) {
-    Lexer *lexer = lexer_from_file(path);
-    if (!lexer) {
-        return NULL;
+inline void parser_step(Parser *parser) {
+	if (parser->skip_next) {
+		parser->skip_next = false;
+		return;
+	}
+    parser->token = lexer_next(parser->lexer);
+}
+
+inline Token *parser_next(Parser *parser) {
+    parser_step(parser);
+    return parser_token(parser);
+}
+
+void parse_skip_to(Parser *parser, ParseStopFunc stop) {
+	while (stop(parser_token(parser)->kind) && parser_token(parser)->kind != TOKEN_EOI) {
+		parser_step(parser);
+	}
+}
+
+inline void parser_fail(Parser *parser) {
+    parser->failed = true;
+}
+
+inline void parser_skip_next(Parser *parser) {
+    parser->skip_next = true;
+}
+
+InFilePosition parser_position(const Parser *parser) {
+    return lexer_position(parser->lexer);
+}
+
+inline bool parser_next_is(Parser *parser, TokenKind kind) {
+    if (parser_next(parser)->kind == kind) {
+        return true;
     }
-	return parser_new(lexer);
+    parser_skip_next(parser);
+    return false;
 }
 
-bool parser_failed(const Parser *parser) {
-    return parser->failed || lexer_failed(parser->lexer);
+inline bool parser_next_is_not(Parser *parser, TokenKind kind) {
+    if (parser_next(parser)->kind != kind) {
+        parser_skip_next(parser);
+        return true;
+    }
+    return false;
 }
 
-void parser_print_line_error_at(Parser *parser, FileLocation at) {
-    lexer_print_line_error_at(parser->lexer, at);
+inline Token *parser_next_is_or(Parser *parser, TokenKind kind) {
+    Token *token = parser_next(parser);
+    if (token->kind == kind) {
+        return token;
+    }
+    parser_skip_next(parser);
+    return NULL;
 }
+
+inline Token *parser_next_is_not_or(Parser *parser, TokenKind kind) {
+    Token *token = parser_next(parser);
+    if (token->kind != kind) {
+        parser_skip_next(parser);
+        return token;
+    }
+    return NULL;
+}
+
+inline Token *parser_expect_next(Parser *parser, TokenKind kind) {
+    if (parser_next_is(parser, kind)) {
+        return parser_token(parser);
+    }
+    return NULL;
+}
+

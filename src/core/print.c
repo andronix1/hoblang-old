@@ -1,6 +1,7 @@
 #include "core/print.h"
 #include "core/slice/io.h"
 #include "core/vec.h"
+#include "core/slice/api.h"
 
 typedef struct {
 	Slice name;

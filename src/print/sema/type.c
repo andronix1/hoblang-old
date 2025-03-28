@@ -1,23 +1,17 @@
-#include "ast/private/type.h"
-#include "sema/type/private.h"
-#include "ast/private/module_node.h"
+#include "sema/type/type.h"
 #include "core/vec.h"
 
 void print_sema_type(FILE* stream, va_list list) {
 	SemaType *type = va_arg(list, SemaType*);
-	switch (type->type) {
+	switch (type->kind) {
 		case SEMA_TYPE_GENERIC:
-			print_to(stream, "<");
-            if (type->generic.replace) {
-                print_to(stream, "({sema::type})", type->generic.replace);
-            }
-			print_to(stream, ">");
+			print_to(stream, "<>");
 			break;
 		case SEMA_TYPE_STRUCT:
-			print_to(stream, "struct {slice}", &type->struct_def->name);
+			print_to(stream, "struct {slice}", &type->struct_decl->name);
 			break;
 		case SEMA_TYPE_PRIMITIVE:
-			switch (type->primitive.type) {
+			switch (type->primitive.kind) {
 				case SEMA_PRIMITIVE_BOOL: print_to(stream, "bool"); break;
 				case SEMA_PRIMITIVE_VOID: print_to(stream, "void"); break;
 				case SEMA_PRIMITIVE_INT: print_to(stream, (const char*[]){
@@ -42,7 +36,7 @@ void print_sema_type(FILE* stream, va_list list) {
 				if (i != 0) print_to(stream, ", ");
 				print_to(stream, "{sema::type}", type->func.args[i]);
 			}
-			print_to(stream, "): {sema::type}", type->func.returning);
+			print_to(stream, ") -> {sema::type}", type->func.returns);
 			break;
 		case SEMA_TYPE_OPTIONAL:
 			print_to(stream, "?{sema::type}", type->optional_of);
@@ -55,8 +49,7 @@ void print_sema_type(FILE* stream, va_list list) {
 			print_to(stream, "{sema::type}", type->array.of);
 			break;
 		case SEMA_TYPE_POINTER:
-			print_to(stream, "*{sema::type}", type->ptr_to);
+			print_to(stream, "*{sema::type}", type->pointer_to);
 			break;
 	}
 }
-
