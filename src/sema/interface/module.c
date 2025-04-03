@@ -12,9 +12,13 @@
 #include "sema/module.h"
 #include "sema/value.h"
 #include "core/slice/api.h"
+#include "sema/arch/info.h"
 #include "sema/type/type.h"
 
 #define PUSH_PRIMITIVE(_name) sema_module_push_decl(sema, file_loc_new(), sema_decl_new(slice_from_cstr(#_name), sema_value_new_comp_time(sema_value_comp_time_new_type(sema_type_primitive_##_name()))), false)
+#define PUSH_ARCH_PRIMITIVE(_name) sema_module_push_decl(sema, file_loc_new(), \
+        sema_decl_new(slice_from_cstr(#_name), \
+            sema_value_new_comp_time_type(sema_arch_info_##_name(info))), false)
 
 void sema_module_push_primitives(SemaModule *sema, SemaArchInfo *info) {
     if (info->ints & SEMA_INT_8) {
@@ -41,6 +45,7 @@ void sema_module_push_primitives(SemaModule *sema, SemaArchInfo *info) {
     }
     PUSH_PRIMITIVE(void);
     PUSH_PRIMITIVE(bool);
+    PUSH_ARCH_PRIMITIVE(usize);
 }
 
 SemaModule *sema_module_from_file(const char *path, SemaProject *project) {

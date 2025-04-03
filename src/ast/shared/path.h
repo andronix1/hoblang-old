@@ -3,6 +3,8 @@
 #include "ast/interface/type.h"
 #include "core/location.h"
 #include "core/slice/slice.h"
+#include "sema/interface/decl.h"
+#include "sema/interface/value.h"
 #include "sema/nodes/shared/path_seg_kind.h"
 #include <malloc.h>
 
@@ -27,8 +29,10 @@ typedef struct {
     };
     struct {
         SemaPathSegKind kind;
+        SemaValue *from_value;
         union {
             size_t struct_idx;
+            SemaDecl *decl;
         };
     } sema;
 } AstPathSegment;

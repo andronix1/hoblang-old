@@ -18,7 +18,12 @@ SemaValue *sema_resolve_path_value(SemaModule *sema, SemaValue *in_value, AstPat
                 SEMA_ERROR(segment->loc, "no `{slice}` in {sema::type}", &segment->ident, in);
                 return NULL;
             }
-            return decl->value;
+            SemaType *type = sema_value_is_runtime(decl->value);
+            if (!type) {
+                SEMA_ERROR(segment->loc, "ext function `{slice}` can be called on runtime values only", &segment->ident);
+                return NULL; 
+            }
+            return sema_value_new_runtime_ext_func_handle(type);
         }
         case AST_PATH_SEGMENT_DEREF: {
             if (in->kind != SEMA_TYPE_POINTER) {

@@ -22,7 +22,7 @@
 #include "expr/unary.h"
 #include "core/assert.h"
 
-SemaValue *sema_analyze_expr(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) {
+SemaValue *_sema_analyze_expr(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) {
     switch (expr->kind) {
         case AST_EXPR_LOCAL_PATH: return sema_resolve_path(sema, expr->local_path);
         case AST_EXPR_INNER_PATH:
@@ -74,6 +74,10 @@ SemaValue *sema_analyze_expr(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) {
         case AST_EXPR_ANON_FUNC: SEMA_ERROR(file_loc_new(), "anon funcs are NIY"); return NULL;
     }
     assert(0, "invalid ast expr");
+}
+
+SemaValue *sema_analyze_expr(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) {
+    return expr->sema.value = _sema_analyze_expr(sema, expr, ctx);
 }
 
 SemaType *sema_analyze_runtime_expr(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) {

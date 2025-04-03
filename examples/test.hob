@@ -1,31 +1,19 @@
-fun initial_i32() -> i32 {
-    return 0;
+type Fd = i32;
+
+extern(write) fun write(self: Fd, data: *u8, count: usize) -> i64
+
+const STDOUT: i32 = 1;
+
+#`
+fun (Fd) write_slice(slice: []u8) -> bool {
+    return self.write(slice.ptr, slice.length) as usize == slice.length;
+}
+`#
+fun write_slice(self: Fd, slice: []u8) -> bool {
+    return write(self, slice.ptr, slice.length) as usize == slice.length;
 }
 
-behaviour Formable {
-    fun (Self) ok() -> bool
-    fun (*Self) apply() -> void
-}
-
-fun (i32) ok() -> bool {
-    return self < 10;
-}
-
-fun (*i32) apply() -> void {
-    self.* += 1;
-}
-
-fun (T) form<T: Formable>() -> T {
-    while self.ok() {
-        self.apply();
-    }
-    return self;
-}
-
-fun main() -> i32 {
-    var i = initial_i32().form.<i32>();
-    if i == 0 {
-        return 1;
-    }
+global(main) fun main() -> i32 {
+    write_slice(STDOUT, "hello, world!\n");
     return 0;
 }

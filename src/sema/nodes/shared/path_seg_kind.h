@@ -1,7 +1,9 @@
 #pragma once
 
 typedef enum {
-    SEMA_PATH_SEG_IGNORE,
+    SEMA_PATH_SEG_DECL,
     SEMA_PATH_SEG_SIZEOF_TYPE,
     SEMA_PATH_SEG_STRUCT_FIELD,
+    SEMA_PATH_SEG_SLICE_PTR,
+    SEMA_PATH_SEG_SLICE_LENGTH,
 } SemaPathSegKind;

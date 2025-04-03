@@ -13,6 +13,7 @@
 SemaValue *_sema_resolve_inner_path(SemaModule *sema, SemaValue *value, AstPath *path, size_t start) {
     for (size_t i = start; i < vec_len(path->segments); i++) {
         AstPathSegment *segment = &path->segments[i];
+        segment->sema.from_value = value;
         switch (value->kind) {
             case SEMA_VALUE_RUNTIME:
                 value = NOT_NULL(sema_resolve_path_runtime(sema, value, segment));
@@ -45,6 +46,8 @@ SemaValue *sema_resolve_path(SemaModule *sema, AstPath *path) {
     assert(vec_len(path->segments) > 0, "empty path");
     AstPathSegment *segment = &path->segments[0];
     assert(segment->kind == AST_PATH_SEGMENT_IDENT, "first segment must be an ident");
-    SemaValue *value = NOT_NULL(sema_module_resolve_req_decl(sema, segment->loc, &segment->ident, NULL))->value;
+    segment->sema.kind = SEMA_PATH_SEG_DECL;
+    SemaDecl *decl = segment->sema.decl = sema_module_resolve_req_decl(sema, segment->loc, &segment->ident, NULL);
+    SemaValue *value = NOT_NULL(decl)->value;
     return _sema_resolve_inner_path(sema, value, path, 1);
 }

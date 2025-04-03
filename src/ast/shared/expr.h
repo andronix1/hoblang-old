@@ -17,6 +17,7 @@
 #include "expr/binop.h"
 #include "expr/inner_path.h"
 #include "core/slice/slice.h"
+#include "sema/interface/value.h"
 
 typedef enum {
     AST_EXPR_LOCAL_PATH,
@@ -63,6 +64,10 @@ typedef struct AstExpr {
         AstExprStructure structure;
         AstExprAnonFunc anon_func;
     };
+
+    struct {
+        SemaValue *value;
+    } sema;
 } AstExpr;
 
 static inline AstExpr *ast_expr_new_anon_func(FileLocation loc, AstExprAnonFuncArg *args, AstType *returns, AstBody *body) {

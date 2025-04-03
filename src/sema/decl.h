@@ -1,5 +1,6 @@
 #pragma once
 
+#include <llvm-c/Types.h>
 #include <malloc.h>
 #include "core/slice/slice.h"
 #include "sema/interface/value.h"
@@ -9,6 +10,10 @@ typedef struct SemaDecl {
     Slice name;
     SemaType *in_type;
     SemaValue *value;
+
+    struct {
+        LLVMValueRef value;
+    } llvm;
 } SemaDecl;
 
 static inline SemaDecl *sema_decl_new_in_type(Slice name, SemaType *in_type, SemaValue *value) {

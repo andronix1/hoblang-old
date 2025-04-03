@@ -1,6 +1,4 @@
 CompileFlags:
   Add: 
     - "-I/home/andronix1/Projects/hoblang/src"
-    - "-I/usr/include/llvm-c"
-    - "-I/usr/include/llvm"
     - "-xc"

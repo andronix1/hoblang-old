@@ -1,15 +1,18 @@
 #pragma once
 
+#include "ast/interface/global_decl.h"
 #include "ast/node/decl/behaviour.h"
+#include "ast/node/decl/global.h"
 #include "ast/node/decl/import.h"
 #include "ast/node/decl/val.h"
 #include "ast/node/decl/func.h"
-#include "ast/node/decl/external.h"
 #include "ast/node/decl/use.h"
 #include "ast/node/decl/from_use.h"
 #include "ast/node/decl/type_alias.h"
 #include "ast/node/decl/struct.h"
+#include "ast/interface/global.h"
 #include "ast/interface/generic.h"
+#include "ast/shared/global.h"
 #include <stdlib.h>
 
 typedef enum {
@@ -23,7 +26,7 @@ typedef struct AstNodeDeclGeneric {
     AstNodeDeclGenericKind kind;
     AstGenerics *generics;
     union {
-        AstFuncDecl func_decl;
+        AstFuncDecl *func_decl;
         AstStructDecl struct_decl;
         AstTypeAlias type_alias;
         AstBehaviourDecl behaviour;
@@ -34,6 +37,7 @@ typedef enum {
     AST_NODE_DECL_GENERIC,
     AST_NODE_DECL_VAL,
     AST_NODE_DECL_EXTERNAL,
+    AST_NODE_DECL_GLOBAL,
     AST_NODE_DECL_USE,
     AST_NODE_DECL_FROM_USE,
     AST_NODE_DECL_IMPORT,
@@ -44,8 +48,9 @@ typedef struct AstNodeDecl {
     FileLocation decl_loc;
     bool public;
     union {
-        AstValDecl val;
-        AstExternalDecl external;
+        AstValDecl *val;
+        AstGlobalDeclInfo *external;
+        AstGlobalDecl global_decl;
         AstUse use;
         AstFromUse from_use;
         AstNodeDeclGeneric generic;
@@ -68,7 +73,10 @@ static inline AstNodeDeclGeneric ast_node_decl_generic_new_struct(AstGenerics *g
         .generics = generics,
         .struct_decl = struct_decl
     };
-    return result; } static inline AstNodeDeclGeneric ast_node_decl_generic_new_func(AstGenerics *generics, AstFuncDecl func_decl) {
+    return result;
+} 
+
+static inline AstNodeDeclGeneric ast_node_decl_generic_new_func(AstGenerics *generics, AstFuncDecl *func_decl) {
     AstNodeDeclGeneric result = {
         .kind = AST_NODE_DECL_GENERIC_FUNC,
         .generics = generics,
@@ -110,15 +118,23 @@ static inline AstNodeDecl *ast_node_decl_new_use(FileLocation decl_loc, AstUse u
     return result;
 }
 
-static inline AstNodeDecl *ast_node_decl_new_external(FileLocation decl_loc, AstExternalDecl external) {
+static inline AstNodeDecl *ast_node_decl_new_global(AstGlobalDecl decl) {
+    AstNodeDecl *result = malloc(sizeof(AstNodeDecl));
+    result->kind = AST_NODE_DECL_GLOBAL;
+    result->decl_loc = ast_global_decl_decl_loc(&decl);
+    result->global_decl = decl;
+    return result;
+}
+
+static inline AstNodeDecl *ast_node_decl_new_external(AstGlobalDeclInfo *external) {
     AstNodeDecl *result = malloc(sizeof(AstNodeDecl));
     result->kind = AST_NODE_DECL_EXTERNAL;
-    result->decl_loc = decl_loc;
+    result->decl_loc = ast_global_decl_info_decl_loc(external);
     result->external = external;
     return result;
 }
 
-static inline AstNodeDecl *ast_node_decl_new_val(FileLocation decl_loc, AstValDecl val) {
+static inline AstNodeDecl *ast_node_decl_new_val(FileLocation decl_loc, AstValDecl *val) {
     AstNodeDecl *result = malloc(sizeof(AstNodeDecl));
     result->kind = AST_NODE_DECL_VAL;
     result->decl_loc = decl_loc;

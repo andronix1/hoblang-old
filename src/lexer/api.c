@@ -161,6 +161,7 @@ bool lexer_try_next(Lexer *lexer) {
 	KEYWORD("asm", TOKEN_ASM);
 	KEYWORD("_", TOKEN_AUTO);
 	KEYWORD("unwrap", TOKEN_UNWRAP);
+	KEYWORD("global", TOKEN_GLOBAL);
 	KEYWORD("break", TOKEN_BREAK);
 	KEYWORD("continue", TOKEN_CONTINUE);
 	KEYWORD("public", TOKEN_PUBLIC);

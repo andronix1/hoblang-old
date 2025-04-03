@@ -33,7 +33,6 @@ SemaDecl *sema_scope_resolve_decl(SemaModule *sema, SemaScope *scope, Slice *nam
         SemaTypeMatches *matches = sema_type_matches_new();
         if (sema_type_matches(sema, in_type, decl->in_type, matches)) {
            if (vec_len(matches->matches) > 0) {
-    if (in_type) print("match {slice} {sema::type}\n", name, in_type);
                 return sema_decl_new(
                     decl->name,
                     sema_value_new_runtime(sema_value_runtime_new_final(

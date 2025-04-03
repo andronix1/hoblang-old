@@ -8,6 +8,7 @@
 #include "ast/shared/val_info.h"
 
 void sema_module_read_val_decl(SemaModule *sema, AstValDecl *decl, bool public) {
+    decl->info->sema.is_global = sema_module_is_global(sema);
     SemaType *type = decl->info->type ? RET_ON_NULL(sema_resolve_type(sema, decl->info->type)) : NULL;
     SemaValue *value = decl->initializer ? sema_analyze_expr(sema, decl->initializer, sema_expr_ctx_new(type)) : NULL;
     sema_resolve_val_info(sema, decl->info, value, public);

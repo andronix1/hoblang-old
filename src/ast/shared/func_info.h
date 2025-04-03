@@ -3,12 +3,18 @@
 #include "ast/interface/type.h"
 #include "core/location.h"
 #include "core/slice/slice.h"
+#include "sema/interface/type.h"
+#include "sema/decl.h"
 #include <stdlib.h>
 
 typedef struct {
     Slice name;
     FileLocation name_loc;
     AstType *type;
+
+    struct {
+        SemaDecl *decl;
+    } sema;
 } AstFuncInfoArg;
 
 typedef struct AstFuncInfo {
@@ -17,6 +23,11 @@ typedef struct AstFuncInfo {
     AstFuncInfoArg *args;
     AstType *ext_of;
     AstType *returns;
+
+    struct {
+        SemaType *type;
+        SemaDecl *decl;
+    } sema;
 } AstFuncInfo;
 
 static inline AstFuncInfoArg ast_func_info_arg_new(Slice name, FileLocation name_loc, AstType *type) {

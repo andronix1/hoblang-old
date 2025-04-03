@@ -33,6 +33,7 @@ syntax keyword hobKeywords
 	\ final 
 	\ from 
 	\ behaviour
+	\ global
 
 syntax keyword hobType
 	\ i8

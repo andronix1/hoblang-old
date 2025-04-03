@@ -4,3 +4,4 @@
 #include "sema/interface/module.h"
 
 void sema_module_read_func(SemaModule *sema, AstFuncDecl *decl, bool is_generic, bool public);
+void sema_analyze_func_decl(SemaModule *sema, AstFuncDecl *func);

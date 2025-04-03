@@ -52,6 +52,8 @@ SemaValue *sema_resolve_val_info(SemaModule *sema, AstValInfo *val_info, SemaVal
             break;
     }
     assert(result, "invalid val info type");
-    sema_module_push_decl(sema, val_info->name_loc, sema_decl_new(val_info->name, result), public);
+    SemaDecl *decl = sema_decl_new(val_info->name, result);
+    val_info->sema.decl = decl;
+    sema_module_push_decl(sema, val_info->name_loc, decl, public);
     return result;
 }

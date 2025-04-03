@@ -17,14 +17,15 @@ SemaType *sema_resolve_func_info_type(SemaModule *sema, AstFuncInfo *func_info) 
     for (size_t i = 0; i < vec_len(func_info->args); i++) {
         args = vec_push_dir(args, NOT_NULL(sema_resolve_type(sema, func_info->args[i].type)));
     }
-    return sema_type_new_func(args, returns);
+    return func_info->sema.type = sema_type_new_func(args, returns);
 }
 
 void sema_read_func_info(SemaModule *sema, AstFuncInfo *func_info, bool public) {
-    sema_module_push_decl(sema, func_info->name_loc, sema_decl_new_in_type(
+    SemaDecl *decl = func_info->sema.decl = sema_decl_new_in_type(
         func_info->name,
         func_info->ext_of ? RET_ON_NULL(sema_resolve_type(sema, func_info->ext_of)) : NULL,
         sema_value_new_runtime(
             sema_value_runtime_new_final(RET_ON_NULL(sema_resolve_func_info_type(sema, func_info))))
-    ), public);
+    );
+    sema_module_push_decl(sema, func_info->name_loc, decl, public);
 }

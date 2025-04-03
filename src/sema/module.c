@@ -53,7 +53,6 @@ SemaDecl *sema_module_resolve_decl(SemaModule *sema, Slice *name, SemaType *in_t
             return trial;
         }
     }
-    if (in_type) print("asd {slice} {sema::type}\n", name, in_type);
     return sema_scope_resolve_decl(sema, sema->private, name, in_type);
 }
 

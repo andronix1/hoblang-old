@@ -18,7 +18,7 @@ bool sema_type_matches(SemaModule *sema, SemaType *type, SemaType *other, SemaTy
         return sema_type_matches_generic(sema, type, other, output);
     }
     if (other->kind == SEMA_TYPE_GENERIC) {
-        return sema_type_matches_generic(sema, type, other, output);
+        return sema_type_matches_generic(sema, other, type, output);
     }
     if (type->kind != other->kind) {
         return false;

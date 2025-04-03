@@ -6,15 +6,16 @@
 #include "core/not_null.h"
 #include "lexer/token/kind.h"
 #include "parser/ast/decl/behaviour.h"
-#include "parser/ast/decl/external.h"
 #include "parser/ast/decl/from_use.h"
 #include "parser/ast/decl/func.h"
+#include "parser/ast/decl/global.h"
 #include "parser/ast/decl/import.h"
 #include "parser/ast/decl/struct.h"
 #include "parser/ast/decl/type.h"
 #include "parser/ast/decl/use.h"
 #include "parser/ast/decl/val.h"
 #include "parser/ast/shared/expr.h"
+#include "parser/ast/shared/global.h"
 #include "parser/ast/stmt/asm.h"
 #include "parser/ast/stmt/defer.h"
 #include "parser/ast/stmt/loop_control.h"
@@ -72,7 +73,8 @@ static AstNodeDecl *parse_decl_node(Parser *parser) {
         case TOKEN_FUN: result = parse_func_decl(parser); break;
         case TOKEN_STRUCT: result = parse_struct_decl(parser); break;
         case TOKEN_TYPE: result = parse_type_alias(parser); break;
-        case TOKEN_EXTERN: result = parse_external(parser); break;
+        case TOKEN_EXTERN: result = ast_node_decl_new_external(parse_global_decl_info(parser)); break;
+        case TOKEN_GLOBAL: result = parse_global_decl(parser); break;
         case TOKEN_BEHAVIOUR: result = parse_behaviour_decl(parser); break;
         case TOKEN_IMPORT: result = parse_import(parser); break;
         case TOKEN_USE: result = parse_use(parser); break;

@@ -21,12 +21,14 @@ SemaValue *sema_module_analyze_expr_call(SemaModule *sema, AstExprCall *call) {
         SEMA_ERROR(call->callable->loc, "callable expression must be function");
         return NULL;
     }
-    size_t len = vec_len(type->func.args);
+    size_t args_offset = inner_value->runtime.kind == SEMA_VALUE_RUNTIME_EXT_FUNC_HANDLE;
+    size_t len = vec_len(type->func.args) - args_offset;
     if (vec_len(call->args) < len) {
         len = vec_len(call->args);
     }
     for (size_t i = 0; i < len; i++) {
-        SemaValue *inner_value = sema_analyze_expr(sema, call->args[i], sema_expr_ctx_new(type->func.args[i]));
+        SemaType *func_arg = type->func.args[i + args_offset];
+        SemaValue *inner_value = sema_analyze_expr(sema, call->args[i], sema_expr_ctx_new(func_arg));
         if (!inner_value) {
             continue;
         }
@@ -35,8 +37,8 @@ SemaValue *sema_module_analyze_expr_call(SemaModule *sema, AstExprCall *call) {
             SEMA_ERROR(call->args[i]->loc, "call parameters must be runtime");
             continue;
         }
-        if (!sema_types_equals(arg_type, type->func.args[i])) {
-            SEMA_ERROR(call->args[i]->loc, "expected call argument to be {sema::type} but got {sema::type}", arg_type, type->func.args[i]);
+        if (!sema_types_equals(arg_type, func_arg)) {
+            SEMA_ERROR(call->args[i]->loc, "expected call argument to be {sema::type} but got {sema::type}", func_arg, arg_type);
             continue;
         }
     }

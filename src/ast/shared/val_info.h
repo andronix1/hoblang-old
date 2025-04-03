@@ -3,6 +3,8 @@
 #include "ast/interface/type.h"
 #include "core/location.h"
 #include "core/slice/slice.h"
+#include "sema/decl.h"
+#include <stdbool.h>
 #include <stdlib.h>
 
 typedef enum {
@@ -16,6 +18,11 @@ typedef struct AstValInfo {
     Slice name;
     FileLocation name_loc;
     AstType *type;
+
+    struct {
+        bool is_global;
+        SemaDecl *decl;
+    } sema;
 } AstValInfo;
 
 static inline AstValInfo *ast_val_info_new(AstValInfoKind kind, Slice name, FileLocation name_loc, AstType *type) {

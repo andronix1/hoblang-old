@@ -6,6 +6,7 @@
 #include "sema/interface/const.h"
 #include "sema/interface/module.h"
 #include "sema/interface/type.h"
+#include "core/assert.h"
 
 typedef enum {
     SEMA_VALUE_COMPTIME_TYPE,
@@ -133,3 +134,25 @@ static inline SemaValue *sema_value_new_runtime(SemaValueRuntime runtime) {
     result->runtime = runtime;
     return result;
 }
+
+static inline SemaValue *sema_value_new_runtime_const(SemaConst *constant) {
+    return sema_value_new_runtime(sema_value_runtime_new_const(constant));
+}
+
+static inline SemaValue *sema_value_new_runtime_var(SemaType *type) {
+    return sema_value_new_runtime(sema_value_runtime_new_var(type));
+}
+
+static inline SemaValue *sema_value_new_runtime_ext_func_handle(SemaType *type) {
+    return sema_value_new_runtime(sema_value_runtime_new_ext_func_handle(type));
+}
+
+static inline SemaValue *sema_value_new_runtime_final(SemaType *type) {
+    return sema_value_new_runtime(sema_value_runtime_new_final(type));
+}
+
+static inline SemaValue *sema_value_new_comp_time_type(SemaType *type) {
+    return sema_value_new_comp_time(sema_value_comp_time_new_type(type));
+}
+
+SemaValue *sema_value_runtime_nest(SemaValue *value, SemaType *type);
