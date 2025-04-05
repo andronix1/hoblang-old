@@ -1,3 +1,4 @@
+#include "core/slice/api.h"
 #include "lexer/api.h"
 #include "lexer/token/token.h"
 #include "core/vec.h"
@@ -17,6 +18,6 @@ LexPartErr lex_str(Lexer *lexer) {
 	lexer_next_char(lexer);
 	Token *token = lexer_token(lexer);
 	token->kind = TOKEN_STR;
-	token->str = result;
+	token->str = slice_new(result, vec_len(result));
 	return LEX_PART_OK;
 }

@@ -11,6 +11,6 @@ typedef struct Lexer {
     FileLocation location, start_location;
 	size_t line_offset, delta;
     Token token;
-	bool failed;
+	bool failed, quiet;
 } Lexer;
 

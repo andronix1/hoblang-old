@@ -2,16 +2,19 @@
 
 #include <stdbool.h>
 #include "core/location.h"
+#include "core/slice/slice.h"
 #include "lexer/interface/token.h"
 
 typedef struct Lexer Lexer;
 
+Lexer *lexer_new(Slice content, const char *path);
 Lexer *lexer_new_from_file(const char *path);
 
 Token *lexer_next(Lexer *lexer);
 void lexer_begin(Lexer *lexer);
 void lexer_rollback(Lexer *lexer);
 bool lexer_finished(const Lexer *lexer);
+void lexer_shut_up(Lexer *lexer);
 
 bool lexer_failed(const Lexer *lexer);
 InFilePosition lexer_position(const Lexer *lexer);

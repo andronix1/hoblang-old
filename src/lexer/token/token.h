@@ -13,6 +13,6 @@ typedef struct Token {
         uint64_t integer;
         long double float_value;
 		char character;
-        char *str;
+        Slice str;
     };
 } Token;

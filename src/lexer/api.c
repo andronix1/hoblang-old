@@ -149,6 +149,7 @@ bool lexer_try_next(Lexer *lexer) {
 	SYMBOL('.', TOKEN_DOT);
 	SYMBOL('~', TOKEN_BITNOT);
 	SYMBOL('$', TOKEN_DOLLAR);
+	SYMBOL('^', TOKEN_XOR);
 	SYMBOL_DUAL('%', '=', TOKEN_MOD, TOKEN_ASSIGN_MOD);
     SYMBOL('?', TOKEN_QUESTION_MARK);
 	SYMBOL(':', TOKEN_COLON);
@@ -198,4 +199,6 @@ bool lexer_try_next(Lexer *lexer) {
 	return false;
 }
 
-
+bool lexer_quiet(Lexer *lexer) {
+    return lexer->quiet;
+}

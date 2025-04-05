@@ -1,14 +1,11 @@
 #include "import.h"
 #include "ast/node/decl.h"
-#include "core/slice/api.h"
-#include "core/vec.h"
 #include "parser/api.h"
 
 AstNodeDecl *parse_import(Parser *parser) {
     Token *file_path_token = PARSER_EXPECT_NEXT(TOKEN_STR, "file path");
     FileLocation file_path_loc = file_path_token->location;
-    char *file_path_str = file_path_token->str;
-    Slice file_path = slice_new(file_path_str, vec_len(file_path_str));
+    Slice file_path = file_path_token->str;
     PARSER_EXPECT_NEXT(TOKEN_AS, "`as`");
     Token *alias_token = PARSER_EXPECT_NEXT(TOKEN_IDENT, "alias");
     FileLocation alias_loc = alias_token->location;

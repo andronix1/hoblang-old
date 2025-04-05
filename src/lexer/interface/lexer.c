@@ -58,6 +58,7 @@ Lexer *lexer_new(Slice content, const char *path) {
 	lexer->location = lexer->start_location = file_loc_new();
 	lexer->line_offset = 0;
 	lexer->delta = 0;
+    lexer->quiet = false;
     return lexer;
 }
 
@@ -87,4 +88,7 @@ bool lexer_finished(const Lexer *lexer) {
 	return lexer->remain.len == 0;
 }
 
+void lexer_shut_up(Lexer *lexer) {
+    lexer->quiet = true;
+}
 

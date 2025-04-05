@@ -1,7 +1,6 @@
 #include "expr.h"
 #include "core/location.h"
 #include "core/not_null.h"
-#include "core/slice/api.h"
 #include "core/vec.h"
 #include "parser/api.h"
 #include "ast/shared/expr.h"
@@ -20,7 +19,7 @@ AstExpr *parse_expr_middle(Parser *parser) {
         case TOKEN_INTEGER: return ast_expr_new_integer(loc, token->integer);
         case TOKEN_CHAR: return ast_expr_new_character(loc, token->character);
         case TOKEN_FLOAT: return ast_expr_new_fp(loc, token->float_value);
-        case TOKEN_STR: return ast_expr_new_str(loc, slice_new(token->str, vec_len(token->str)));
+        case TOKEN_STR: return ast_expr_new_str(loc, token->str);
         case TOKEN_TRUE: return ast_expr_new_bool(loc, true);
         case TOKEN_FALSE: return ast_expr_new_bool(loc, false);
         case TOKEN_NULL: return ast_expr_new_null(loc );
