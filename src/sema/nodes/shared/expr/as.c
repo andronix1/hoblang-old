@@ -9,7 +9,6 @@
 #include "sema/nodes/shared/expr/as_kind.h"
 #include "sema/value.h"
 #include "sema/module.h"
-#include "sema/project.h"
 #include "core/assert.h"
 #include "sema/nodes/shared/expr.h"
 #include "sema/nodes/shared/type.h"
@@ -46,6 +45,18 @@ SemaValue *_sema_module_analyze_expr_as(SemaModule *sema, FileLocation loc, Sema
             return SEMA_AS_FINAL;
         }
         case SEMA_TYPE_POINTER: {
+            if (as->kind == SEMA_TYPE_SLICE) {
+                if (inner->pointer_to->kind != SEMA_TYPE_ARRAY) {
+                    SEMA_ERROR(loc, "only pointers to array can be casted to slice, not {sema::type}", as); 
+                    return NULL;
+                }
+                if (!sema_types_equals(inner->pointer_to->array.of, as->slice_of)) {
+                    SEMA_ERROR(loc, "cannot cast pointer to array of {sema::type} to slice {sema::type}", inner->pointer_to->array.of, as); 
+                    return NULL;
+                }
+                *as_kind = SEMA_AS_ARR_TO_SLICE;
+                return SEMA_AS_FINAL;
+            }
             SemaType *ptr_int = sema_arch_info_ptr(sema_module_arch_info(sema));
             if (sema_types_equals(inner, ptr_int)) {
                 *as_kind = SEMA_AS_PTR_TO_INT;

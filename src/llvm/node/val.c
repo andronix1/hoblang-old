@@ -1,6 +1,7 @@
 #include "val.h"
 #include "core/assert.h"
 #include <llvm-c/Core.h>
+#include "llvm/alloca.h"
 #include "llvm/llvm.h"
 #include "llvm/node/expr.h"
 #include "llvm/type.h"
@@ -13,15 +14,12 @@ void llvm_setup_val_info(LlvmBackend *llvm, AstValInfo *val_info, const char *na
         val_info->sema.decl->llvm.value = llvm_const(llvm, constant);
         return;
     }
+    SemaDecl *decl = val_info->sema.decl;
+    LLVMTypeRef type = llvm_type(sema_value_is_runtime(decl->value));
     if (val_info->sema.is_global) {
-        SemaDecl *decl = val_info->sema.decl;
-        decl->llvm.value = LLVMAddGlobal(
-            llvm->module,
-            llvm_type(sema_value_is_runtime(decl->value)),
-            ""
-        );
+        decl->llvm.value = LLVMAddGlobal(llvm->module, type, "");
     } else {
-        assert(0, "NIY");
+        decl->llvm.value = llvm_alloca(llvm, type, NULL);
     }
 }
 
@@ -33,6 +31,12 @@ void llvm_emit_val_decl(LlvmBackend *llvm, AstValDecl *decl) {
     if (sema_value_is_const(decl->info->sema.decl->value)) {
         return;
     }
-    assert(0, "NIY");
+    if (decl->initializer) {
+        LLVMBuildStore(
+            llvm->builder,
+            llvm_expr_get(llvm, decl->initializer),
+            decl->info->sema.decl->llvm.value
+        );
+    }
 }
 
