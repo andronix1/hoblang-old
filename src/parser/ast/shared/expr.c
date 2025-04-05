@@ -105,13 +105,13 @@ AstExpr *parse_expr_begin(Parser *parser) {
     FileLocation loc = token->location;
     switch (token->kind) {
         case TOKEN_MINUS: return ast_expr_new_unary(loc, ast_expr_unary_new_arithmetic(
-            NOT_NULL(parse_expr(parser)), AST_EXPR_UNARY_ARITHMETIC_MINUS
+            NOT_NULL(parse_expr_begin(parser)), AST_EXPR_UNARY_ARITHMETIC_MINUS
         ));
         case TOKEN_NOT: return ast_expr_new_unary(loc, ast_expr_unary_new_bool(
-            NOT_NULL(parse_expr(parser)), AST_EXPR_UNARY_BOOL_NOT
+            NOT_NULL(parse_expr_begin(parser)), AST_EXPR_UNARY_BOOL_NOT
         ));
         case TOKEN_BITAND: return ast_expr_new_unary(loc, ast_expr_unary_new_ref(
-            NOT_NULL(parse_expr(parser))
+            NOT_NULL(parse_expr_begin(parser))
         ));
         default:
             parser_skip_next(parser);
