@@ -6,6 +6,7 @@
 #include "sema/interface/decl.h"
 #include "sema/interface/value.h"
 #include "sema/nodes/shared/path_seg_kind.h"
+#include <llvm-c/Types.h>
 #include <malloc.h>
 
 typedef enum {
@@ -33,12 +34,17 @@ typedef struct {
         union {
             size_t struct_idx;
             SemaDecl *decl;
+            SemaDecl *ext_func_decl;
         };
     } sema;
 } AstPathSegment;
 
 typedef struct AstPath {
     AstPathSegment *segments;
+
+    struct {
+        LLVMValueRef ext_handle;
+    } llvm;
 } AstPath;
 
 static inline AstPathSegment ast_path_segment_new_generic(FileLocation loc, AstType **params) {

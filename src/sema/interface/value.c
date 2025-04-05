@@ -18,6 +18,14 @@ SemaConst *sema_value_is_const(SemaValue *value) {
     return NULL; 
 }
 
+SemaType *sema_value_is_ext_func_handle(SemaValue *value) {
+    if (value->kind == SEMA_VALUE_RUNTIME &&
+            value->runtime.kind == SEMA_VALUE_RUNTIME_EXT_FUNC_HANDLE) {
+        return value->runtime.type;
+    }
+    return NULL; 
+}
+
 SemaType *sema_value_is_var(SemaValue *value) {
     if (value->kind == SEMA_VALUE_RUNTIME &&
             value->runtime.kind == SEMA_VALUE_RUNTIME_VAR) {

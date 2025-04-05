@@ -1,5 +1,6 @@
 #include "expr.h"
 #include "ast/shared/expr.h"
+#include "ast/shared/path.h"
 #include "core/vec.h"
 #include "sema/const.h"
 #include "core/assert.h"
@@ -19,21 +20,33 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
     }
     switch (expr->kind) {
         case AST_EXPR_CALL: {
-            LLVMValueRef *args = alloca(sizeof(LLVMValueRef) * vec_len(expr->call.args));
+            LLVMValueRef callable = llvm_expr_get(llvm, expr->call.callable);
+            LLVMValueRef ext_func_handle = expr->call.callable->llvm.ext_func_handle;
+            bool is_ext = sema_value_is_ext_func_handle(expr->call.callable->sema.value);
+            size_t args_offset = is_ext;
+            LLVMValueRef *args = alloca(sizeof(LLVMValueRef) * (vec_len(expr->call.args) + args_offset));
+            if (is_ext) {
+                args[0] = ext_func_handle;
+            }
             for (size_t i = 0; i < vec_len(expr->call.args); i++) {
-                args[i] = llvm_expr_get(llvm, expr->call.args[i]);
+                args[i + args_offset] = llvm_expr_get(llvm, expr->call.args[i]);
             }
             return LLVMBuildCall2(
                 llvm->builder,
                 llvm_type(sema_value_is_runtime(expr->call.callable->sema.value)),
-                llvm_expr_get(llvm, expr->call.callable),
+                callable,
                 args,
-                vec_len(expr->call.args),
+                vec_len(expr->call.args) + args_offset,
                 ""
             );
         }
-        case AST_EXPR_LOCAL_PATH: return llvm_path(llvm, expr->local_path);
+        case AST_EXPR_LOCAL_PATH: {
+            LLVMValueRef val = llvm_path(llvm, expr->local_path);
+            expr->llvm.ext_func_handle = expr->local_path->llvm.ext_handle;
+            return val;
+        }
         case AST_EXPR_INNER_PATH:
+            expr->llvm.ext_func_handle = expr->inner_path.path->llvm.ext_handle;
             assert(0, "paths are NIY");
         case AST_EXPR_SCOPE:
             return llvm_expr(llvm, expr->scope);

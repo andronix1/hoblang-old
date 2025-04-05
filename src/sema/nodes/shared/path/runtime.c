@@ -23,6 +23,8 @@ SemaValue *sema_resolve_path_value(SemaModule *sema, SemaValue *in_value, AstPat
                 SEMA_ERROR(segment->loc, "ext function `{slice}` can be called on runtime values only", &segment->ident);
                 return NULL; 
             }
+            segment->sema.kind = SEMA_PATH_SEG_EXT_FUNC_HANDLE;
+            segment->sema.ext_func_decl = decl;
             return sema_value_new_runtime_ext_func_handle(type);
         }
         case AST_PATH_SEGMENT_DEREF: {

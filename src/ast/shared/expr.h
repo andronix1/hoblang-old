@@ -1,5 +1,6 @@
 #pragma once
 
+#include <llvm-c/Types.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -68,6 +69,10 @@ typedef struct AstExpr {
     struct {
         SemaValue *value;
     } sema;
+
+    struct {
+        LLVMValueRef ext_func_handle;
+    } llvm;
 } AstExpr;
 
 static inline AstExpr *ast_expr_new_anon_func(FileLocation loc, AstExprAnonFuncArg *args, AstType *returns, AstBody *body) {

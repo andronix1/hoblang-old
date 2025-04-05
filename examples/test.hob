@@ -1,19 +1,14 @@
 type Fd = i32;
 
-extern(write) fun write(self: Fd, data: *u8, count: usize) -> i64
+extern(write) fun (Fd) write_raw(data: *u8, count: usize) -> i64
 
 const STDOUT: i32 = 1;
 
-#`
 fun (Fd) write_slice(slice: []u8) -> bool {
-    return self.write(slice.ptr, slice.length) as usize == slice.length;
-}
-`#
-fun write_slice(self: Fd, slice: []u8) -> bool {
-    return write(self, slice.ptr, slice.length) as usize == slice.length;
+    return self.write_raw(slice.ptr, slice.length) as usize == slice.length;
 }
 
 global(main) fun main() -> i32 {
-    write_slice(STDOUT, "hello, world!\n");
+    STDOUT.write_slice("hello, world!\n");
     return 0;
 }

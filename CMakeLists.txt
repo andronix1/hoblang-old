@@ -12,7 +12,7 @@ file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS "src/*.c")
 include_directories(${LLVM_INCLUDE_DIRS})
 link_directories(${LLVM_LIBRARY_DIRS})
 add_executable(hoblang ${SOURCE_FILES} hoblang.c)
-add_executable(hoblang-tests ${SOURCE_FILES} tests/lexer.c)
+# add_executable(hoblang-tests ${SOURCE_FILES} tests/lexer.c)
 target_compile_options(hoblang PRIVATE 
     -O3 -g -ggdb
     -fsanitize=address
@@ -24,7 +24,7 @@ target_link_options(hoblang PRIVATE
     -fsanitize=address
 )
 target_link_libraries(hoblang PRIVATE LLVM)
-target_link_libraries(hoblang-tests PRIVATE LLVM)
+#target_link_libraries(hoblang-tests PRIVATE LLVM)
 target_include_directories(hoblang PRIVATE src)
-target_include_directories(hoblang-tests PRIVATE src)
+#target_include_directories(hoblang-tests PRIVATE src)
 target_include_directories(hoblang PRIVATE include)

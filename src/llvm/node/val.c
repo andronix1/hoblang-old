@@ -2,12 +2,15 @@
 #include "core/assert.h"
 #include <llvm-c/Core.h>
 #include "llvm/llvm.h"
+#include "llvm/node/expr.h"
 #include "llvm/type.h"
 #include "sema/interface/value.h"
 #include "ast/shared/val_info.h"
 
 void llvm_setup_val_info(LlvmBackend *llvm, AstValInfo *val_info, const char *name) {
-    if (sema_value_is_const(val_info->sema.decl->value)) {
+    SemaConst *constant = sema_value_is_const(val_info->sema.decl->value);
+    if (constant) {
+        val_info->sema.decl->llvm.value = llvm_const(llvm, constant);
         return;
     }
     if (val_info->sema.is_global) {

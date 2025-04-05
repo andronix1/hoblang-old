@@ -12,6 +12,10 @@ LLVMValueRef llvm_path(LlvmBackend *llvm, AstPath *path) {
             case SEMA_PATH_SEG_DECL:
                 value = segment->sema.decl->llvm.value;
                 break;
+            case SEMA_PATH_SEG_EXT_FUNC_HANDLE:
+                path->llvm.ext_handle = value;
+                value = segment->sema.ext_func_decl->llvm.value;
+                break;
             case SEMA_PATH_SEG_SLICE_PTR:
                 return llvm_slice_ptr(llvm, segment->sema.from_value, value);
             case SEMA_PATH_SEG_SLICE_LENGTH:
