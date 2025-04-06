@@ -17,5 +17,6 @@ fun (i32) print(fd: Fd) -> bool {
 
 global(main) fun main() -> i32 {
     STDOUT.write_slice("hello, world!\n");
+    (123 as i32).print(STDOUT);
     return 0;
 }

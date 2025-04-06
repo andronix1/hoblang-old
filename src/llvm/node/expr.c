@@ -46,9 +46,11 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
             expr->llvm.ext_func_handle = expr->local_path->llvm.ext_handle;
             return val;
         }
-        case AST_EXPR_INNER_PATH:
+        case AST_EXPR_INNER_PATH: {
+            LLVMValueRef val = llvm_inner_path(llvm, expr->inner_path.path, llvm_expr(llvm, expr->inner_path.inner));
             expr->llvm.ext_func_handle = expr->inner_path.path->llvm.ext_handle;
-            assert(0, "paths are NIY");
+            return val;
+        }
         case AST_EXPR_SCOPE:
             return llvm_expr(llvm, expr->scope);
         case AST_EXPR_STR: return llvm_slice_from_string(llvm, &expr->str);

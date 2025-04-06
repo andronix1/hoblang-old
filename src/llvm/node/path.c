@@ -5,8 +5,7 @@
 #include "llvm/slice.h"
 #include "llvm/value.h"
 
-LLVMValueRef llvm_path(LlvmBackend *llvm, AstPath *path) {
-    LLVMValueRef value = NULL;
+LLVMValueRef llvm_inner_path(LlvmBackend *llvm, AstPath *path, LLVMValueRef value) {
     for (size_t i = 0; i < vec_len(path->segments); i++) {
         AstPathSegment *segment = &path->segments[i];
         switch (segment->sema.kind) {
@@ -28,4 +27,8 @@ LLVMValueRef llvm_path(LlvmBackend *llvm, AstPath *path) {
     }
     assert(value, "invalid path");
     return value;
+}
+
+LLVMValueRef llvm_path(LlvmBackend *llvm, AstPath *path) {
+    return llvm_inner_path(llvm, path, NULL);
 }
