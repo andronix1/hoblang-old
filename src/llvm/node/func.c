@@ -1,5 +1,6 @@
 #include "func.h"
 #include "core/vec.h"
+#include "llvm/alloca.h"
 #include "llvm/llvm.h"
 #include "llvm/node/body.h"
 #include "llvm/type.h"
@@ -23,11 +24,11 @@ void llvm_emit_func_decl(LlvmBackend *llvm, AstFuncDecl *decl) {
     LLVMPositionBuilderAtEnd(llvm->builder, LLVMAppendBasicBlock(cur_func, ""));
     if (decl->info->ext_of) {
         args_offset = 1;
-        decl->sema.self->llvm.value = LLVMGetParam(llvm->func, 0);
+        decl->sema.self->llvm.value = llvm_alloca(llvm, llvm_type(sema_value_is_runtime(decl->sema.self->value)), LLVMGetParam(llvm->func, 0));
     }
     for (size_t i = 0; i < vec_len(decl->info->args); i++) {
-        decl->info->args[i].sema.decl->llvm.value =
-            LLVMGetParam(llvm->func, i + args_offset);
+        SemaDecl *arg_decl = decl->info->args[i].sema.decl;
+        arg_decl->llvm.value = llvm_alloca(llvm, llvm_type(sema_value_is_runtime(arg_decl->value)), LLVMGetParam(llvm->func, i + args_offset));
     }
     llvm_emit_body(llvm, decl->body);
     llvm_switch_func(llvm, func);

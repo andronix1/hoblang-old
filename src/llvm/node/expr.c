@@ -9,10 +9,10 @@
 #include "llvm/slice.h"
 #include "llvm/type.h"
 #include "llvm/llvm.h"
+#include "llvm/value.h"
 #include "sema/type/type.h"
 #include <alloca.h>
 #include <llvm-c/Core.h>
-#include "ast/shared/type.h"
 
 LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
     SemaConst *constant = sema_value_is_const(expr->sema.value);
@@ -63,8 +63,8 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
                 case SEMA_AS_INT_TO_PTR: return LLVMBuildIntToPtr(llvm->builder, inner, target, "");
                 case SEMA_AS_ARR_TO_SLICE: {
                     LLVMValueRef indices[] = {
-                        LLVMConstInt(LLVMInt64Type(), 0, false), // TODO: is 64-bit allowed??
-                        LLVMConstInt(LLVMInt64Type(), 0, false), // TODO: is 64-bit allowed??
+                        LLVMConstInt(LLVMInt32Type(), 0, false), // TODO: is 64-bit allowed??
+                        LLVMConstInt(LLVMInt32Type(), 0, false), // TODO: is 64-bit allowed??
                     };
                     LLVMValueRef array_ptr = LLVMBuildGEP2(
                         llvm->builder,
@@ -151,17 +151,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
 }
 
 LLVMValueRef llvm_expr_get(LlvmBackend *llvm, AstExpr *expr) {
-    LLVMValueRef value = llvm_expr(llvm, expr);
-    SemaType *var = sema_value_is_var(expr->sema.value);
-    if (var) {
-        value = LLVMBuildLoad2(
-            llvm->builder,
-            llvm_type(var),
-            value,
-            ""
-        );
-    }
-    return value;
+    return llvm_value_get(llvm, llvm_expr(llvm, expr), expr->sema.value);
 }
 
 LLVMValueRef llvm_const(LlvmBackend *llvm, SemaConst *constant) {

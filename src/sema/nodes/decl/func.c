@@ -28,7 +28,7 @@ void sema_analyze_func_decl(SemaModule *sema, AstFuncDecl *func) {
         if (type) {
             SemaDecl *self = func->sema.self = sema_decl_new(
                 slice_from_cstr("self"),
-                sema_value_new_runtime(sema_value_runtime_new_final(type))
+                sema_value_new_runtime(sema_value_runtime_new_var(type))
             );
             sema_module_push_decl(sema, func->info->name_loc, self, false);
         }
@@ -40,7 +40,7 @@ void sema_analyze_func_decl(SemaModule *sema, AstFuncDecl *func) {
             continue;
         }
         SemaDecl *decl = arg->sema.decl = sema_decl_new(arg->name,
-            sema_value_new_runtime(sema_value_runtime_new_final(type)));
+            sema_value_new_runtime(sema_value_runtime_new_var(type)));
         sema_module_push_decl(sema, arg->name_loc, decl, false);
     }
     sema_analyze_body(sema, func->body);

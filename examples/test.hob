@@ -1,6 +1,6 @@
 type Fd = i32;
 
-extern(write) fun (Fd) write_raw(data: *u8, count: usize) -> i64
+extern(write) fun (Fd) write_raw(data: *u8, count: usize) -> i32
 
 const STDOUT: i32 = 1;
 

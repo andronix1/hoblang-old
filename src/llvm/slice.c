@@ -14,12 +14,12 @@ LLVMTypeRef llvm_slice_type(LLVMTypeRef of) {
 }
 
 LLVMValueRef llvm_slice_length_ptr(LlvmBackend *llvm, SemaType *type, LLVMValueRef slice) {
-    LLVMValueRef indices[1] = { LLVMConstInt(LLVMInt64Type(), 0, false) };
+    LLVMValueRef indices[1] = { LLVMConstInt(LLVMInt32Type(), 0, false) };
     return LLVMBuildGEP2(llvm->builder, llvm_type(type), slice, indices, 1, ""); 
 }
 
 LLVMValueRef llvm_slice_ptr_ptr(LlvmBackend *llvm, SemaType *type, LLVMValueRef slice) {
-    LLVMValueRef indices[1] = { LLVMConstInt(LLVMInt64Type(), 1, false) };
+    LLVMValueRef indices[1] = { LLVMConstInt(LLVMInt32Type(), 1, false) };
     return LLVMBuildGEP2(llvm->builder, llvm_type(type), slice, indices, 1, ""); 
 }
 
@@ -59,8 +59,11 @@ LLVMValueRef llvm_slice_from_string(LlvmBackend *llvm, Slice *string) {
 LLVMValueRef llvm_slice_length(LlvmBackend *llvm, SemaValue *value, LLVMValueRef slice) {
     SemaType *type = sema_value_is_runtime(value);
     if (sema_value_is_var(value)) {
-        LLVMValueRef indices[1] = { LLVMConstInt(LLVMInt64Type(), 0, false) };
-        return LLVMBuildGEP2(llvm->builder, llvm_type(type), slice, indices, 1, ""); 
+        LLVMValueRef indices[] = {
+            LLVMConstInt(LLVMInt32Type(), 0, false),
+            LLVMConstInt(LLVMInt32Type(), 0, false)
+        };
+        return LLVMBuildGEP2(llvm->builder, llvm_type(type), slice, indices, 2, ""); 
     } else {
         return LLVMBuildExtractValue(llvm->builder, slice, 0, "");
     }
@@ -69,8 +72,11 @@ LLVMValueRef llvm_slice_length(LlvmBackend *llvm, SemaValue *value, LLVMValueRef
 LLVMValueRef llvm_slice_ptr(LlvmBackend *llvm, SemaValue *value, LLVMValueRef slice) {
     SemaType *type = sema_value_is_runtime(value);
     if (sema_value_is_var(value)) {
-        LLVMValueRef indices[1] = { LLVMConstInt(LLVMInt64Type(), 1, false) };
-        return LLVMBuildGEP2(llvm->builder, llvm_type(type), slice, indices, 1, ""); 
+        LLVMValueRef indices[] = {
+            LLVMConstInt(LLVMInt32Type(), 0, false),
+            LLVMConstInt(LLVMInt32Type(), 1, false)
+        };
+        return LLVMBuildGEP2(llvm->builder, llvm_type(type), slice, indices, 2, ""); 
     } else {
         return LLVMBuildExtractValue(llvm->builder, slice, 1, "");
     }
