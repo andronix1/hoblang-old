@@ -9,14 +9,19 @@ fun (Fd) write_slice(slice: []u8) -> bool {
 }
 
 fun (i32) print(fd: Fd) -> bool {
-    const BUF_SIZE: usize = 32;
-    var buf: [BUF_SIZE]u8;
-    var buf_slice = &buf as []u8;
-    return fd.write_slice(buf_slice);
+    var i: i32 = 0;
+    var buf: u8;
+    while self > 0 {
+        buf = (self % 10) as u8 + '0';        
+        STDOUT.write_raw(&buf, 1);
+        self /= 10;
+    }
+    return true;
 }
 
 global(main) fun main() -> i32 {
     STDOUT.write_slice("hello, world!\n");
     (123 as i32).print(STDOUT);
+    STDOUT.write_slice("\n");
     return 0;
 }

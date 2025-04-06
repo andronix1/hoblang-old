@@ -12,7 +12,7 @@ void sema_analyze_stmt_assign(SemaModule *sema, AstAssign *assign) {
         SEMA_ERROR(assign->assign_to->loc, "left side of assign statement must be variable");
         return;
     }
-    SemaType *assigned = RET_ON_NULL(sema_analyze_runtime_expr(sema, assign->assign_to, sema_expr_ctx_new(source)));
+    SemaType *assigned = RET_ON_NULL(sema_analyze_runtime_expr(sema, assign->expr, sema_expr_ctx_new(source)));
     if (!sema_types_equals(source, assigned)) {
         SEMA_ERROR(assign->assign_to->loc, "left and right part of assign expression must have one type, but {sema::type} != {sema::type}", source, assigned);
         return; 

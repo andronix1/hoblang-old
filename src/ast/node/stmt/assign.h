@@ -19,7 +19,7 @@ typedef struct {
 
 static inline AstAssign ast_assign_new_binop(AstExpr *to, AstExpr *value, AstBinopKind binop) {
     AstAssign result;
-    result.kind = AST_STMT_ASSIGN_DIRECT;
+    result.kind = AST_STMT_ASSIGN_BINOP;
     result.assign_to = to;
     result.expr = value;
     result.binop = binop;

@@ -58,7 +58,7 @@ SemaValue *_sema_module_analyze_expr_as(SemaModule *sema, FileLocation loc, Sema
                 return SEMA_AS_FINAL;
             }
             SemaType *ptr_int = sema_arch_info_ptr(sema_module_arch_info(sema));
-            if (sema_types_equals(inner, ptr_int)) {
+            if (sema_types_equals(as, ptr_int)) {
                 *as_kind = SEMA_AS_PTR_TO_INT;
                 return SEMA_AS_FINAL;
             } else if (as->kind == SEMA_TYPE_POINTER) {

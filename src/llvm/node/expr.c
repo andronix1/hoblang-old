@@ -119,28 +119,7 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
         case AST_EXPR_BINOP: {
             LLVMValueRef left = llvm_expr_get(llvm, expr->binop.left);
             LLVMValueRef right = llvm_expr_get(llvm, expr->binop.right);
-            switch (expr->binop.kind) {
-                case AST_BINOP_AND: return LLVMBuildAnd(llvm->builder, left, right, "");
-                case AST_BINOP_MOD: return LLVMBuildURem(llvm->builder, left, right, "");
-                case AST_BINOP_ADD: return LLVMBuildAdd(llvm->builder, left, right, "");
-                case AST_BINOP_SUB: return LLVMBuildSub(llvm->builder, left, right, "");
-                case AST_BINOP_MUL: return LLVMBuildMul(llvm->builder, left, right, "");
-                case AST_BINOP_DIV: return LLVMBuildUDiv(llvm->builder, left, right, "");
-                case AST_BINOP_EQ: return LLVMBuildICmp(llvm->builder, LLVMIntEQ, left, right, "");
-                case AST_BINOP_NEQ: return LLVMBuildICmp(llvm->builder, LLVMIntNE, left, right, "");
-                case AST_BINOP_GT: return LLVMBuildICmp(llvm->builder, LLVMIntUGT, left, right, "");
-                case AST_BINOP_GE: return LLVMBuildICmp(llvm->builder, LLVMIntUGE, left, right, "");
-                case AST_BINOP_LT: return LLVMBuildICmp(llvm->builder, LLVMIntULT, left, right, "");
-                case AST_BINOP_LE: return LLVMBuildICmp(llvm->builder, LLVMIntULE, left, right, "");
-                case AST_BINOP_OR: return LLVMBuildOr(llvm->builder, left, right, "");
-                case AST_BINOP_BITAND: return LLVMBuildAnd(llvm->builder, left, right, "");
-                case AST_BINOP_BITOR: return LLVMBuildOr(llvm->builder, left, right, "");
-                case AST_BINOP_SHR: return LLVMBuildLShr(llvm->builder, left, right, "");
-                case AST_BINOP_SHL: return LLVMBuildShl(llvm->builder, left, right, "");
-                case AST_BINOP_XOR: return LLVMBuildXor(llvm->builder, left, right, "");
-            }
-            assert(0, "invalid binop");
-            break;
+            return llvm_binop(llvm, left, right, expr->binop.kind);
         }
         case AST_EXPR_INTEGER:
         case AST_EXPR_FP:
@@ -163,9 +142,34 @@ LLVMValueRef llvm_const(LlvmBackend *llvm, SemaConst *constant) {
         case SEMA_CONST_FLOAT:
             return LLVMConstReal(llvm_type(constant->type), constant->fp);
         case SEMA_CONST_BOOL:
+            return LLVMConstInt(LLVMInt1Type(), constant->boolean, false);
         case SEMA_CONST_ARRAY:
         case SEMA_CONST_STRUCT:
-          break;
+            assert(0, "this const type is NIY");
     }
     assert(0, "falled through");
+}
+
+LLVMValueRef llvm_binop(LlvmBackend *llvm, LLVMValueRef left, LLVMValueRef right, AstBinopKind kind) {
+    switch (kind) {
+        case AST_BINOP_AND: return LLVMBuildAnd(llvm->builder, left, right, "");
+        case AST_BINOP_MOD: return LLVMBuildURem(llvm->builder, left, right, "");
+        case AST_BINOP_ADD: return LLVMBuildAdd(llvm->builder, left, right, "");
+        case AST_BINOP_SUB: return LLVMBuildSub(llvm->builder, left, right, "");
+        case AST_BINOP_MUL: return LLVMBuildMul(llvm->builder, left, right, "");
+        case AST_BINOP_DIV: return LLVMBuildUDiv(llvm->builder, left, right, "");
+        case AST_BINOP_EQ: return LLVMBuildICmp(llvm->builder, LLVMIntEQ, left, right, "");
+        case AST_BINOP_NEQ: return LLVMBuildICmp(llvm->builder, LLVMIntNE, left, right, "");
+        case AST_BINOP_GT: return LLVMBuildICmp(llvm->builder, LLVMIntUGT, left, right, "");
+        case AST_BINOP_GE: return LLVMBuildICmp(llvm->builder, LLVMIntUGE, left, right, "");
+        case AST_BINOP_LT: return LLVMBuildICmp(llvm->builder, LLVMIntULT, left, right, "");
+        case AST_BINOP_LE: return LLVMBuildICmp(llvm->builder, LLVMIntULE, left, right, "");
+        case AST_BINOP_OR: return LLVMBuildOr(llvm->builder, left, right, "");
+        case AST_BINOP_BITAND: return LLVMBuildAnd(llvm->builder, left, right, "");
+        case AST_BINOP_BITOR: return LLVMBuildOr(llvm->builder, left, right, "");
+        case AST_BINOP_SHR: return LLVMBuildLShr(llvm->builder, left, right, "");
+        case AST_BINOP_SHL: return LLVMBuildShl(llvm->builder, left, right, "");
+        case AST_BINOP_XOR: return LLVMBuildXor(llvm->builder, left, right, "");
+    }
+    assert(0, "invalid binop");
 }

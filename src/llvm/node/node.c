@@ -1,10 +1,15 @@
 #include "node.h"
 #include "ast/node.h"
+#include "ast/shared/expr.h"
 #include "core/assert.h"
 #include "core/slice/api.h"
+#include "sema/interface/type.h"
+#include "llvm/node/body.h"
 #include "llvm/node/expr.h"
 #include "llvm/node/func.h"
 #include "llvm/node/val.h"
+#include "llvm/type.h"
+#include "llvm/value.h"
 #include <llvm-c/Core.h>
 
 void llvm_setup_node(LlvmBackend *llvm, AstNode *node) {
@@ -108,18 +113,61 @@ void llvm_emit_node(LlvmBackend *llvm, AstNode *node) {
         case AST_NODE_STMT:
             switch (node->stmt->kind) {
                 case AST_NODE_STMT_RETURN:
-                    LLVMBuildRet(llvm->builder, llvm_expr(llvm, node->stmt->ret->value));
+                    if (node->stmt->ret->value) {
+                        LLVMBuildRet(llvm->builder, llvm_expr(llvm, node->stmt->ret->value));
+                    } else {
+                        LLVMBuildRetVoid(llvm->builder);
+                    }
                     break;
                 case AST_NODE_STMT_EXPR:
                     llvm_expr(llvm, node->stmt->expr);
                     break;
+                case AST_NODE_STMT_WHILE: {
+                    LLVMBasicBlockRef cond = LLVMAppendBasicBlock(llvm->state.func, "");
+                    LLVMBasicBlockRef body = LLVMAppendBasicBlock(llvm->state.func, "");
+                    LLVMBasicBlockRef code = LLVMAppendBasicBlock(llvm->state.func, "");
+                    LLVMBuildBr(llvm->builder, cond);
+
+                    llvm_pos_code(llvm, cond);
+                    LLVMBuildCondBr(
+                        llvm->builder,
+                        llvm_expr_get(llvm, node->stmt->while_loop->cond),
+                        body, code
+                    );
+
+                    llvm_pos_code(llvm, body);
+                    llvm_emit_body(llvm, node->stmt->while_loop->body);
+                    LLVMBuildBr(llvm->builder, cond);
+
+                    llvm_pos_defs(llvm, code);
+                    llvm_pos_code(llvm, code);
+                    break;
+                }
+                case AST_NODE_STMT_ASSIGN: {
+                    LLVMValueRef to = llvm_expr(llvm, node->stmt->assign.assign_to);
+                    LLVMValueRef what = llvm_expr_get(llvm, node->stmt->assign.expr);
+                    switch (node->stmt->assign.kind) {
+                        case AST_STMT_ASSIGN_DIRECT:
+                            LLVMBuildStore(llvm->builder, what, to);
+                            break;
+                        case AST_STMT_ASSIGN_BINOP: {
+                            SemaValue *to_val = node->stmt->assign.assign_to->sema.value;
+                            LLVMValueRef to_load = LLVMBuildLoad2(
+                                llvm->builder,
+                                llvm_type(sema_value_is_runtime(to_val)),
+                                to, ""
+                            );
+                            LLVMBuildStore(llvm->builder, llvm_binop(llvm, to_load, what, node->stmt->assign.binop), to);
+                            break;
+                        }
+                    }
+                    break;
+                }
                 case AST_NODE_STMT_IF:
-                case AST_NODE_STMT_WHILE:
                 case AST_NODE_STMT_INLINE_ASM:
                 case AST_NODE_STMT_DEFER:
                 case AST_NODE_STMT_BREAK:
                 case AST_NODE_STMT_CONTINUE:
-                case AST_NODE_STMT_ASSIGN:
                     assert(0, "NIY");
             }
             break;
