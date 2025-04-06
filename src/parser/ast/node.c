@@ -40,7 +40,7 @@ AstNodeStmt *parse_stmt_node(Parser *parser) {
         case TOKEN_BREAK: return ast_node_stmt_new_break(NOT_NULL(parse_loop_control(parser)));
         case TOKEN_RETURN: return ast_node_stmt_new_return(NOT_NULL(parse_return(parser)));
         case TOKEN_WHILE: return ast_node_stmt_new_while(NOT_NULL(parse_while(parser)));
-        case TOKEN_IDENT: {
+        default: {
             parser_skip_next(parser);
             AstExpr *expr = NOT_NULL(parse_expr(parser));
             switch (parser_next(parser)->kind) {
@@ -59,9 +59,8 @@ AstNodeStmt *parse_stmt_node(Parser *parser) {
                     PARSE_ERROR("end of expression");
                     return NULL;
             }
-        }
-        default:
             return NULL;
+        }
     }
 }
 
