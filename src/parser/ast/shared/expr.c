@@ -156,8 +156,6 @@ void ast_expr_swap_binop_lprioritized(AstExpr *expr) {
     int leftp = ast_binop_priority(left->binop.kind);
     int middlep = ast_binop_priority(expr->binop.kind);
     if (leftp < middlep) {
-        // (a == c) + d
-        // a == (c+d)
         AstBinopKind binopk = expr->binop.kind;
         AstExpr *ll = left->binop.left;
         AstExpr *lr = left->binop.right;
@@ -175,10 +173,18 @@ void ast_expr_swap_binop_lprioritized(AstExpr *expr) {
 AstExpr *ast_expr_binop_prioritized(AstExpr *left, AstExpr *right, FileLocation bloc, AstBinopKind binop) {
     AstExpr *expr = ast_expr_new_binop(left->loc, bloc, left, right, binop);
     while (right->kind == AST_EXPR_BINOP) {
-        AstBinopKind kind = right->binop.kind;
-        right->binop.kind = expr->binop.kind;
-        expr->binop.kind = kind;
-        expr->binop.right = right->binop.left;
+        // TODO: reduce memory allocations
+        expr = ast_expr_new_binop(
+            expr->loc, right->binop.binop_loc,
+            ast_expr_new_binop(right->loc,
+                expr->binop.binop_loc,
+                expr->binop.left,
+                right->binop.left,
+                expr->binop.kind
+            ),
+            right->binop.right,
+            right->binop.kind
+        );
         right = right->binop.right;
     }
     ast_expr_swap_binop_lprioritized(expr);
