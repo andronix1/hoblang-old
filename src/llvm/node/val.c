@@ -16,10 +16,14 @@ void llvm_setup_val_info(LlvmBackend *llvm, AstValInfo *val_info, const char *na
     }
     SemaDecl *decl = val_info->sema.decl;
     LLVMTypeRef type = llvm_type(sema_value_is_runtime(decl->value));
+    bool is_var = sema_value_is_var(decl->value);
     if (val_info->sema.is_global) {
+        assert(is_var, "only vars can be initialized as global");
         decl->llvm.value = LLVMAddGlobal(llvm->module, type, "");
     } else {
-        decl->llvm.value = llvm_alloca(llvm, type, NULL);
+        if (is_var) {
+            decl->llvm.value = llvm_alloca(llvm, type, NULL);
+        }
     }
 }
 
@@ -31,12 +35,17 @@ void llvm_emit_val_decl(LlvmBackend *llvm, AstValDecl *decl) {
     if (sema_value_is_const(decl->info->sema.decl->value)) {
         return;
     }
+    bool is_var = sema_value_is_var(decl->info->sema.decl->value);
     if (decl->initializer) {
-        LLVMBuildStore(
-            llvm->builder,
-            llvm_expr_get(llvm, decl->initializer),
-            decl->info->sema.decl->llvm.value
-        );
+        if (is_var) {
+            LLVMBuildStore(
+                llvm->builder,
+                llvm_expr_get(llvm, decl->initializer),
+                decl->info->sema.decl->llvm.value
+            );
+        } else {
+            decl->info->sema.decl->llvm.value = llvm_expr_get(llvm, decl->initializer);
+        }
     }
 }
 
