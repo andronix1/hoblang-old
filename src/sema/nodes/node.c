@@ -17,6 +17,7 @@
 #include "sema/nodes/shared/global.h"
 #include "sema/nodes/shared/type.h"
 #include "ast/shared/func_info.h"
+#include "sema/nodes/stmt/asm.h"
 #include "sema/nodes/stmt/assign.h"
 #include "sema/nodes/stmt/if.h"
 #include "sema/nodes/stmt/return.h"
@@ -33,7 +34,7 @@ void sema_module_analyze_node_stmt(SemaModule *sema, FileLocation loc, AstNodeSt
         case AST_NODE_STMT_IF: sema_analyze_stmt_if(sema, stmt->if_else); break;
         case AST_NODE_STMT_RETURN: sema_analyze_stmt_return(sema, loc, stmt->ret); break;
         case AST_NODE_STMT_WHILE: sema_analyze_stmt_while(sema, stmt->while_loop); break;
-        case AST_NODE_STMT_INLINE_ASM: SEMA_ERROR(loc, "NIY"); break;
+        case AST_NODE_STMT_INLINE_ASM: sema_analyze_inline_asm(sema, stmt->inline_asm); break;
         case AST_NODE_STMT_DEFER: SEMA_ERROR(loc, "NIY"); break;
         case AST_NODE_STMT_EXPR: sema_analyze_expr(sema, stmt->expr, sema_expr_ctx_new(NULL)); break;
         case AST_NODE_STMT_BREAK: SEMA_ERROR(loc, "NIY"); break;

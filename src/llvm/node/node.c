@@ -3,13 +3,12 @@
 #include "ast/shared/expr.h"
 #include "core/assert.h"
 #include "core/slice/api.h"
-#include "sema/interface/type.h"
+#include "llvm/node/asm.h"
 #include "llvm/node/body.h"
 #include "llvm/node/expr.h"
 #include "llvm/node/func.h"
 #include "llvm/node/val.h"
 #include "llvm/type.h"
-#include "llvm/value.h"
 #include <llvm-c/Core.h>
 
 void llvm_setup_node(LlvmBackend *llvm, AstNode *node) {
@@ -163,8 +162,10 @@ void llvm_emit_node(LlvmBackend *llvm, AstNode *node) {
                     }
                     break;
                 }
-                case AST_NODE_STMT_IF:
                 case AST_NODE_STMT_INLINE_ASM:
+                    llvm_inline_asm(llvm, node->stmt->inline_asm);
+                    break;
+                case AST_NODE_STMT_IF:
                 case AST_NODE_STMT_DEFER:
                 case AST_NODE_STMT_BREAK:
                 case AST_NODE_STMT_CONTINUE:

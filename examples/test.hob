@@ -1,11 +1,42 @@
 type Fd = i32;
 
-extern(write) fun (Fd) write_raw(data: *u8, count: usize) -> i32
+public fun arg1(num: i64, a: i64) -> i64 {
+    var res: i64;
+	asm (rax, rdi, rcx, r11) {
+		mov $rax, num;
+		mov $rdi, a;
+		syscall;
+		mov [res], $rax;
+	}
+	return res;
+}
+
+public fun arg3(num: i64, a: i64, b: i64, c: i64) -> i64 {
+    var res: i64;
+	asm (rax, rdi, rsi, rdx, rcx, r11) {
+		mov $rax, num;
+		mov $rdi, a;
+		mov $rsi, b;
+		mov $rdx, c;
+		syscall;
+		mov [res], $rax;
+	}
+	return res;
+}
+
+fun exit(status: i32) -> void {
+    arg1(60, status as _);
+    return; # TODO: fix reduntant returns
+}
+
+fun (Fd) write_super_raw(data: *u8, count: usize) -> i32 {
+	return arg3(1, self as _, data as usize as _, count as _) as _;
+}
 
 const STDOUT: i32 = 1;
 
 fun (Fd) write_slice(slice: []u8) -> bool {
-    return self.write_raw(slice.ptr, slice.length) as usize == slice.length;
+    return self.write_super_raw(slice.ptr, slice.length) as usize == slice.length;
 }
 
 fun new_slice(ptr: *u8, length: usize) -> []u8 {
@@ -29,9 +60,10 @@ fun (i32) print(fd: Fd) -> bool {
     return fd.write_slice(new_slice(&(buf[BUF_SIZE - i]) as _, i));
 }
 
-global(main) fun main() -> i32 {
+global(_start) fun main() -> void {
     STDOUT.write_slice("hello, world!\n");
     (1234 as i32).print(STDOUT);
     STDOUT.write_slice("\n");
-    return 0;
+    exit(0);
+    return; # TODO: remove reduntant returns
 }
