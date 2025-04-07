@@ -23,7 +23,9 @@ AstNodeDecl *parse_from_use(Parser *parser, FileLocation from_loc) {
             list = vec_push_dir(list, NOT_NULL(parse_path(parser)));
             switch (parser_next(parser)->kind) {
                 case TOKEN_COMMA: break;
-                case TOKEN_SEMICOLON: break;
+                case TOKEN_SEMICOLON:
+                    parser_skip_next(parser);
+                    break;
                 default:
                     PARSE_ERROR(EXPECTED("comma or semicolon"));
                     return NULL;

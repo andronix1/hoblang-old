@@ -3,6 +3,7 @@
 #include "core/not_null.h"
 #include "core/vec.h"
 #include "sema/decl.h"
+#include "sema/interface/value.h"
 #include "sema/module.h"
 #include "sema/nodes/shared/path/module.h"
 #include "sema/nodes/shared/path/runtime.h"
@@ -40,6 +41,32 @@ SemaValue *_sema_resolve_inner_path(SemaModule *sema, SemaValue *value, AstPath 
 
 SemaValue *sema_resolve_inner_path(SemaModule *sema, SemaValue *value, AstPath *path) {
     return _sema_resolve_inner_path(sema, value, path, 0);
+}
+
+SemaDecl *sema_resolve_decl_path(SemaModule *sema, SemaModule *in, AstPath *path) {
+    SemaDecl *decl = NULL;
+    for (size_t i = 0; i < vec_len(path->segments); i++) {
+        AstPathSegment *segment = &path->segments[i];
+        switch (segment->kind) {
+            case AST_PATH_SEGMENT_IDENT: {
+                decl = sema_module_resolve_decl(in, &segment->ident, NULL);
+                if (!decl) {
+                    SEMA_ERROR(segment->loc, "`{slice}` was not found", &segment->ident);
+                    return NULL;
+                } 
+                if (i != vec_len(path->segments) - 1 && !(in = sema_value_is_module(decl->value))) { 
+                    SEMA_ERROR(segment->loc, "`{slice}` is not a module", &segment->ident);
+                    return NULL;
+                }
+                break;
+            }
+            default:
+                SEMA_ERROR(segment->loc, "cannot get this from decl path");
+                return NULL;
+        }
+    }
+    assert(decl, "empty path");
+    return decl;
 }
 
 SemaValue *sema_resolve_path(SemaModule *sema, AstPath *path) {

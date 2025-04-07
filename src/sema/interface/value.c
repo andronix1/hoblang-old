@@ -4,7 +4,7 @@
 
 SemaModule *sema_value_is_module(SemaValue *value) {
     if (value->kind == SEMA_VALUE_COMP_TIME &&
-            value->comp_time.kind == SEMA_VALUE_COMPTIME_GENERIC_PARAM) {
+            value->comp_time.kind == SEMA_VALUE_COMPTIME_MODULE) {
         return value->comp_time.module;
     }
     return NULL;

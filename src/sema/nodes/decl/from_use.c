@@ -16,13 +16,16 @@ void sema_module_read_from_use(SemaModule *sema, AstFromUse *from_use, bool publ
         case AST_FROM_USE_LIST:
             for (size_t i = 0; i < vec_len(from_use->list); i++) {
                 AstPath *path = from_use->list[i];
-                SemaValue *value = sema_resolve_path(module, path);
-                if (value) {
-                    sema_module_push_decl(sema, ast_path_loc(path),
-                            sema_decl_new(ast_path_name(path), value), public);
+                SemaDecl *decl = sema_resolve_decl_path(sema, module, path);
+                if (decl) {
+                    sema_module_push_decl(sema, ast_path_loc(path), decl, public);
                 }
             }
             break;
-        case AST_FROM_USE_ALL: SEMA_ERROR(from_use->all_loc, "NIY"); break;
+        case AST_FROM_USE_ALL: {
+            for (size_t i = 0; i < vec_len(module->public->decls); i++) {
+                sema_module_push_decl(sema, from_use->all_loc, module->public->decls[i], public);
+            }
+        }
     }
 }
