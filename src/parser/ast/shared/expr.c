@@ -55,12 +55,14 @@ AstExpr *parse_expr_middle(Parser *parser) {
             PARSER_EXPECT_NEXT(TOKEN_OPENING_CIRCLE_BRACE, "(");
             AstExprAnonFuncArg *args = vec_new(AstExprAnonFuncArg);
             while (parser_next_is_not(parser, TOKEN_CLOSING_CIRCLE_BRACE)) {
-                Slice name = PARSER_EXPECT_NEXT(TOKEN_IDENT, "arg name")->ident;
+                Token *name_token = PARSER_EXPECT_NEXT(TOKEN_IDENT, "arg name");
+                Slice name = name_token->ident;
+                FileLocation name_loc = name_token->location;
                 AstType *type = NULL;
                 if (parser_next_is(parser, TOKEN_COLON)) {
                     type = NOT_NULL(parse_type(parser));
                 }
-                args = vec_push_dir(args, ast_expr_anon_fun_arg_new(name, type));
+                args = vec_push_dir(args, ast_expr_anon_fun_arg_new(name_loc, name, type));
                 switch (parser_next(parser)->kind) {
                     case TOKEN_COMMA: break;
                     case TOKEN_CLOSING_CIRCLE_BRACE:

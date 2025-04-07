@@ -61,9 +61,12 @@ fun (i32) print(fd: Fd) -> bool {
 }
 
 global(_start) fun main() -> void {
-    STDOUT.write_slice("hello, world!\n");
-    (1234 as i32).print(STDOUT);
-    STDOUT.write_slice("\n");
-    exit(0);
-    return; # TODO: remove reduntant returns
+    exit((fun (num: i32) -> i32 {
+        const STDOUT = STDOUT;
+        STDOUT.write_slice("hello, world!\n");
+        num.print(STDOUT);
+        STDOUT.write_slice("\n");
+        return 0;
+    })(1234)); # JUST FOR FUN :)
+    return;
 }

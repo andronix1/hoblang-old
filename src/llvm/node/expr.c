@@ -3,6 +3,7 @@
 #include "ast/shared/path.h"
 #include "core/vec.h"
 #include "sema/const.h"
+#include "sema/decl.h"
 #include "core/assert.h"
 #include "sema/interface/value.h"
 #include "llvm/node/path.h"
@@ -10,6 +11,8 @@
 #include "llvm/type.h"
 #include "llvm/llvm.h"
 #include "llvm/value.h"
+#include "llvm/alloca.h"
+#include "llvm/node/body.h"
 #include "sema/type/type.h"
 #include <alloca.h>
 #include <llvm-c/Core.h>
@@ -151,9 +154,23 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
             assert(0, "invalid idx type");
             break;
         }
+        case AST_EXPR_ANON_FUNC: {
+            SemaType *func_type = sema_value_is_runtime(expr->sema.value);
+            LLVMValueRef fn = LLVMAddFunction(llvm->module, "", llvm_type(func_type)); 
+            LLVMBasicBlockRef entry = LLVMAppendBasicBlock(fn, "");
+            LlvmState old_state = llvm_switch_state(llvm, llvm_state(fn, entry, entry));
+            llvm_pos_code(llvm, entry);
+            for (size_t i = 0; i < vec_len(expr->anon_func.args); i++) {
+                AstExprAnonFuncArg *arg = &expr->anon_func.args[i];
+                arg->sema.decl->llvm.value = llvm_alloca(llvm, llvm_type(func_type->func.args[i]), LLVMGetParam(fn, i));
+            }
+            llvm_emit_body(llvm, expr->anon_func.body);
+            llvm_switch_state(llvm, old_state);
+            llvm_pos_code(llvm, old_state.code);
+            return fn;
+        }
         case AST_EXPR_ARRAY:
         case AST_EXPR_STRUCTURE:
-        case AST_EXPR_ANON_FUNC:
         case AST_EXPR_RET_ON_NULL:
         case AST_EXPR_UNWRAP:
             assert(0, "NIY");

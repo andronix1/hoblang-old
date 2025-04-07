@@ -7,6 +7,7 @@
 #include "sema/interface/type.h"
 #include "sema/interface/value.h"
 #include "sema/module.h"
+#include "sema/nodes/shared/expr/anon_func.h"
 #include "sema/nodes/shared/expr/array.h"
 #include "sema/nodes/shared/expr/as.h"
 #include "sema/nodes/shared/expr/binop.h"
@@ -71,7 +72,8 @@ SemaValue *_sema_analyze_expr(SemaModule *sema, AstExpr *expr, SemaExprCtx ctx) 
             return sema_module_analyze_expr_as(sema, &expr->as, ctx);
         case AST_EXPR_BINOP:
             return sema_module_analyze_expr_binop(sema, &expr->binop);
-        case AST_EXPR_ANON_FUNC: SEMA_ERROR(file_loc_new(), "anon funcs are NIY"); return NULL;
+        case AST_EXPR_ANON_FUNC:
+            return sema_module_analyze_expr_anon_func(sema, expr->loc, &expr->anon_func, ctx);
     }
     assert(0, "invalid ast expr");
 }
