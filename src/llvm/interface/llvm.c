@@ -24,7 +24,7 @@ LlvmBackend *llvm_new_host() {
     const char *features = LLVMGetHostCPUFeatures();
     const char *cpu = LLVMGetHostCPUName();
     const char *triple = LLVMGetDefaultTargetTriple();
-    llvm->machine = LLVMCreateTargetMachine(target, triple, cpu, features, LLVMCodeGenLevelAggressive, LLVMRelocDefault, LLVMCodeModelDefault);
+    llvm->machine = LLVMCreateTargetMachine(target, triple, cpu, features, LLVMCodeGenLevelNone, LLVMRelocDefault, LLVMCodeModelDefault);
     llvm->state = llvm_state(NULL, NULL, NULL);
     llvm->builder = LLVMCreateBuilder();
     llvm->module = LLVMModuleCreateWithName("main");
