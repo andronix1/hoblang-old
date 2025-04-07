@@ -11,7 +11,7 @@ AstInlineAsm *parse_inline_asm(Parser *parser) {
     if (parser_next_is(parser, TOKEN_OPENING_CIRCLE_BRACE)) {
         while (parser_next_is_not(parser, TOKEN_CLOSING_CIRCLE_BRACE)) {
             Token *clobber_token = PARSER_EXPECT_NEXT(TOKEN_IDENT, "register name");
-            clobbers = vec_push_dir(clobbers, ast_inline_asm_clobber_new(clobber_token->ident));
+            clobbers = vec_push_dir(clobbers, ast_inline_asm_clobber_new(clobber_token->ident, clobber_token->location));
             switch (parser_next(parser)->kind) {
                 case TOKEN_CLOSING_CIRCLE_BRACE:
                     parser_skip_next(parser);
@@ -40,17 +40,19 @@ AstInlineAsm *parse_inline_asm(Parser *parser) {
         Slice name = PARSER_EXPECT_NEXT(TOKEN_IDENT, "mnemonic name")->ident;
         AstInlineAsmArg *args = vec_new(AstInlineAsmArg);
         while (parser_next_is_not(parser, TOKEN_SEMICOLON)) {
-            switch (parser_next(parser)->kind) {
+            Token *token = parser_next(parser);
+            FileLocation loc = token->location;
+            switch (token->kind) {
                 case TOKEN_DOLLAR:
-                    args = vec_push_dir(args, ast_inline_asm_arg_new_reg(PARSER_EXPECT_NEXT(TOKEN_IDENT, "register name")->ident));
+                    args = vec_push_dir(args, ast_inline_asm_arg_new_reg(loc, PARSER_EXPECT_NEXT(TOKEN_IDENT, "register name")->ident));
                     break;
                 case TOKEN_OPENING_SQUARE_BRACE:
-                    args = vec_push_dir(args, ast_inline_asm_arg_new_address(NOT_NULL(parse_expr(parser))));
+                    args = vec_push_dir(args, ast_inline_asm_arg_new_address(loc, NOT_NULL(parse_expr(parser))));
                     PARSER_EXPECT_NEXT(TOKEN_CLOSING_SQUARE_BRACE, "]");
                     break;
                 default:
                     parser_skip_next(parser);
-                    args = vec_push_dir(args, ast_inline_asm_arg_new_expr(NOT_NULL(parse_expr(parser))));
+                    args = vec_push_dir(args, ast_inline_asm_arg_new_expr(loc, NOT_NULL(parse_expr(parser))));
                     break;
             }
             switch (parser_next(parser)->kind) {

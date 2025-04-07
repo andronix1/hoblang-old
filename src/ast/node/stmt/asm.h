@@ -2,9 +2,13 @@
 
 #include <malloc.h>
 #include "ast/interface/expr.h"
+#include "core/location.h"
 #include "core/slice/slice.h"
 
-typedef Slice AstClobber;
+typedef struct {
+    Slice name;
+    FileLocation loc;
+} AstClobber;
 
 typedef enum {
     AST_INLINE_ASM_ARG_REGISTER,
@@ -14,6 +18,7 @@ typedef enum {
 
 typedef struct {
     AstInlineAsmArgKind kind;
+    FileLocation loc;
     union {
         Slice reg;
         AstExpr *address_expr;
@@ -36,24 +41,27 @@ typedef struct {
     AstInlineAsmMnemonic *mnemonics;
 } AstInlineAsm;
 
-static inline AstInlineAsmArg ast_inline_asm_arg_new_address(AstExpr *expr) {
+static inline AstInlineAsmArg ast_inline_asm_arg_new_address(FileLocation loc, AstExpr *expr) {
     AstInlineAsmArg result;
     result.kind = AST_INLINE_ASM_ARG_ADDRESS;
     result.address_expr = expr;
+    result.loc = loc;
     return result;
 }
 
-static inline AstInlineAsmArg ast_inline_asm_arg_new_expr(AstExpr *expr) {
+static inline AstInlineAsmArg ast_inline_asm_arg_new_expr(FileLocation loc, AstExpr *expr) {
     AstInlineAsmArg result;
     result.kind = AST_INLINE_ASM_ARG_EXPR;
     result.expr = expr;
+    result.loc = loc;
     return result;
 }
 
-static inline AstInlineAsmArg ast_inline_asm_arg_new_reg(Slice name) {
+static inline AstInlineAsmArg ast_inline_asm_arg_new_reg(FileLocation loc, Slice name) {
     AstInlineAsmArg result;
     result.kind = AST_INLINE_ASM_ARG_REGISTER;
     result.reg = name;
+    result.loc = loc;
     return result;
 }
 
@@ -64,8 +72,12 @@ static inline AstInlineAsmMnemonic ast_inline_asm_mnemonic_new(Slice name, AstIn
     return result;
 }
 
-static inline AstClobber ast_inline_asm_clobber_new(Slice name) {
-    return name;
+static inline AstClobber ast_inline_asm_clobber_new(Slice name, FileLocation loc) {
+    AstClobber result = {
+        .name = name,
+        .loc = loc
+    };
+    return result;
 }
 
 static inline AstInlineAsm *ast_inline_asm_new(AstInlineAsmFlags flags, AstClobber *clobbers, AstInlineAsmMnemonic *mnemonics) {

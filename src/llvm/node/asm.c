@@ -79,7 +79,7 @@ void llvm_inline_asm(LlvmBackend *llvm, AstInlineAsm *inline_asm) {
     for (size_t i = 0; i < vec_len(inline_asm->clobbers); i++) {
         APPEND_CONSTR("~{");
         args_count++;
-        Slice *clobber = &inline_asm->clobbers[i];
+        Slice *clobber = &inline_asm->clobbers[i].name;
         APPEND_CONSTR_RAW(clobber->str, clobber->len);
         APPEND_CONSTR_RAW("}", 1);
     }
