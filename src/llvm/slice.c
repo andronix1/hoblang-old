@@ -14,13 +14,19 @@ LLVMTypeRef llvm_slice_type(LLVMTypeRef of) {
 }
 
 LLVMValueRef llvm_slice_length_ptr(LlvmBackend *llvm, SemaType *type, LLVMValueRef slice) {
-    LLVMValueRef indices[1] = { LLVMConstInt(LLVMInt32Type(), 0, false) };
-    return LLVMBuildGEP2(llvm->builder, llvm_type(type), slice, indices, 1, ""); 
+    LLVMValueRef indices[] = {
+        LLVMConstInt(LLVMInt32Type(), 0, false),
+        LLVMConstInt(LLVMInt32Type(), 0, false),
+    };
+    return LLVMBuildGEP2(llvm->builder, llvm_type(type), slice, indices, 2, ""); 
 }
 
 LLVMValueRef llvm_slice_ptr_ptr(LlvmBackend *llvm, SemaType *type, LLVMValueRef slice) {
-    LLVMValueRef indices[1] = { LLVMConstInt(LLVMInt32Type(), 1, false) };
-    return LLVMBuildGEP2(llvm->builder, llvm_type(type), slice, indices, 1, ""); 
+    LLVMValueRef indices[] = {
+        LLVMConstInt(LLVMInt32Type(), 0, false),
+        LLVMConstInt(LLVMInt32Type(), 1, false),
+    };
+    return LLVMBuildGEP2(llvm->builder, llvm_type(type), slice, indices, 2, ""); 
 }
 
 LLVMValueRef llvm_slice_new_const(LLVMValueRef ptr, size_t length) {

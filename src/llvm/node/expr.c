@@ -65,8 +65,8 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
                 case SEMA_AS_INT_TO_PTR: return LLVMBuildIntToPtr(llvm->builder, inner, target, "");
                 case SEMA_AS_ARR_TO_SLICE: {
                     LLVMValueRef indices[] = {
-                        LLVMConstInt(LLVMInt32Type(), 0, false), // TODO: is 64-bit allowed??
-                        LLVMConstInt(LLVMInt32Type(), 0, false), // TODO: is 64-bit allowed??
+                        LLVMConstInt(LLVMInt32Type(), 0, false),
+                        LLVMConstInt(LLVMInt32Type(), 0, false),
                     };
                     LLVMValueRef array_ptr = LLVMBuildGEP2(
                         llvm->builder,
@@ -109,10 +109,51 @@ LLVMValueRef llvm_expr(LlvmBackend *llvm, AstExpr *expr) {
                   break;
             }
             assert(0, "invalid unary-expression");
+        case AST_EXPR_IDX: {
+            LLVMTypeRef out_type = llvm_type(sema_value_is_runtime(expr->sema.value));
+            LLVMValueRef idx = llvm_expr_get(llvm, expr->idx.idx);
+            switch (expr->idx.sema.kind) {
+                case SEMA_IDX_POINTER:
+                    return LLVMBuildGEP2(
+                        llvm->builder,
+                        out_type,
+                        llvm_expr_get(llvm, expr->idx.inner),
+                        &idx, 1,
+                        ""
+                    );
+                case SEMA_IDX_SLICE:
+                    return LLVMBuildGEP2(
+                        llvm->builder,
+                        out_type,
+                        llvm_slice_ptr(llvm, expr->idx.inner->sema.value, llvm_expr(llvm, expr->idx.inner)),
+                        &idx, 1,
+                        ""
+                    );
+                case SEMA_IDX_ARRAY: {
+                    SemaType *inner = sema_value_is_var(expr->idx.inner->sema.value);
+                    if (inner) {
+                        LLVMValueRef indices[] = {
+                            LLVMConstInt(LLVMInt32Type(), 0, false),
+                            idx,
+                        };
+                        return LLVMBuildGEP2(
+                            llvm->builder,
+                            llvm_type(inner),
+                            llvm_expr(llvm, expr->idx.inner),
+                            indices, 2,
+                            ""
+                        );
+                    } else {
+                        assert(0, "final arrays idx'es are NIY!");
+                    }
+                }
+            }
+            assert(0, "invalid idx type");
+            break;
+        }
         case AST_EXPR_ARRAY:
         case AST_EXPR_STRUCTURE:
         case AST_EXPR_ANON_FUNC:
-        case AST_EXPR_IDX:
         case AST_EXPR_RET_ON_NULL:
         case AST_EXPR_UNWRAP:
             assert(0, "NIY");

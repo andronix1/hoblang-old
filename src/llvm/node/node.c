@@ -114,7 +114,7 @@ void llvm_emit_node(LlvmBackend *llvm, AstNode *node) {
             switch (node->stmt->kind) {
                 case AST_NODE_STMT_RETURN:
                     if (node->stmt->ret->value) {
-                        LLVMBuildRet(llvm->builder, llvm_expr(llvm, node->stmt->ret->value));
+                        LLVMBuildRet(llvm->builder, llvm_expr_get(llvm, node->stmt->ret->value));
                     } else {
                         LLVMBuildRetVoid(llvm->builder);
                     }

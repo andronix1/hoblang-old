@@ -50,7 +50,7 @@ SemaType *sema_value_is_type(SemaValue *value) {
 }
 
 SemaValue *sema_runtime_value_nest_with(SemaValue *source, SemaType *type) {
-    assert(!sema_value_is_runtime(source), "passed non-runtime value");
+    assert(sema_value_is_runtime(source), "passed non-runtime value");
     switch (source->runtime.kind) {
         case SEMA_VALUE_RUNTIME_CONST: assert(0, "const values cannot be nested");
         case SEMA_VALUE_RUNTIME_EXT_FUNC_HANDLE:

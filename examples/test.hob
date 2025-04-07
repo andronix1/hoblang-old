@@ -8,20 +8,38 @@ fun (Fd) write_slice(slice: []u8) -> bool {
     return self.write_raw(slice.ptr, slice.length) as usize == slice.length;
 }
 
+fun new_slice(ptr: *u8, length: usize) -> []u8 {
+    var res: []u8;
+    res.ptr = ptr;
+    res.length = length;
+    return res;
+}
+
 fun (i32) print(fd: Fd) -> bool {
-    var i: i32 = 0;
-    var buf: u8;
-    while self > 0 {
-        buf = (self % 10) as u8 + '0';        
-        STDOUT.write_raw(&buf, 1);
-        self /= 10;
+    const BUF_SIZE: usize = 32;
+    var buf: [BUF_SIZE]u8;
+
+    var j: usize = 0;
+    while j < BUF_SIZE {
+        buf[j] = 'x';
+        j += 1;
     }
-    return true;
+
+    var i: usize = 0;
+    while self > 0 {
+        # TODO: looks like there is error in proirity when
+        # i removes the scope around BUF_SIZE - 1
+        buf[(BUF_SIZE - 1)- i] = '0' + (self % 10) as _; # (self % 10) as u8 + '0';
+        self /= 10;
+        i += 1;
+    }
+
+    return fd.write_slice(new_slice(&(buf[BUF_SIZE - i]) as _, i));
 }
 
 global(main) fun main() -> i32 {
     STDOUT.write_slice("hello, world!\n");
-    (123 as i32).print(STDOUT);
+    (1234 as i32).print(STDOUT);
     STDOUT.write_slice("\n");
     return 0;
 }

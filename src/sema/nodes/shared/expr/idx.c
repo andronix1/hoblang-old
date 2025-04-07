@@ -6,7 +6,6 @@
 #include "sema/interface/value.h"
 #include "sema/nodes/shared/expr.h"
 #include "sema/module.h"
-#include "sema/project.h"
 #include "sema/type/type.h"
 #include "sema/value.h"
 #include <stddef.h>
@@ -32,9 +31,14 @@ SemaValue *sema_module_analyze_expr_idx(SemaModule *sema, AstExprIdx *idx) {
     }
     if (type->kind == SEMA_TYPE_ARRAY) {
         // TODO: warning on constants
+        idx->sema.kind = SEMA_IDX_ARRAY;
         return sema_runtime_value_nest_with(inner_value, type->array.of);
     } else if (type->kind == SEMA_TYPE_SLICE) {
-        return sema_runtime_value_nest_with(inner_value, type->slice_of);
+        idx->sema.kind = SEMA_IDX_SLICE;
+        return sema_value_new_runtime(sema_value_runtime_new_var(type->slice_of));
+    } else if (type->kind == SEMA_TYPE_POINTER) {
+        idx->sema.kind = SEMA_IDX_POINTER;
+        return sema_value_new_runtime(sema_value_runtime_new_var(type->slice_of));
     } else {
         SEMA_ERROR(idx->inner->loc, "only arrays or slicis can be indexed");
         return NULL;
