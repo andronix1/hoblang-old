@@ -7,6 +7,7 @@
 #include "llvm/node/body.h"
 #include "llvm/node/expr.h"
 #include "llvm/node/func.h"
+#include "llvm/node/if.h"
 #include "llvm/node/val.h"
 #include "llvm/type.h"
 #include <llvm-c/Core.h>
@@ -165,8 +166,12 @@ void llvm_emit_node(LlvmBackend *llvm, AstNode *node) {
                 case AST_NODE_STMT_INLINE_ASM:
                     llvm_inline_asm(llvm, node->stmt->inline_asm);
                     break;
-                case AST_NODE_STMT_IF:
+                case AST_NODE_STMT_IF: {
+                    llvm_if(llvm, node->stmt->if_else);
+                    break;
+                }
                 case AST_NODE_STMT_DEFER:
+                    break;
                 case AST_NODE_STMT_BREAK:
                 case AST_NODE_STMT_CONTINUE:
                     assert(0, "NIY");
