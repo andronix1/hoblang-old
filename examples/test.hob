@@ -6,7 +6,6 @@ type Fd = i32;
 
 fun exit(status: i32) -> void {
     arg1(60, status as _);
-    return; # TODO: fix reduntant returns
 }
 
 fun (Fd) write_super_raw(data: *u8, count: usize) -> i32 {
@@ -48,5 +47,4 @@ global(_start) fun main() -> void {
         STDOUT.write_slice("\n");
         return 0;
     })(1234)); # JUST FOR FUN :)
-    return;
 }

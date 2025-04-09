@@ -25,22 +25,33 @@
 #include "sema/scope.h"
 #include "sema/value.h"
 
-void sema_module_analyze_node_stmt(SemaModule *sema, FileLocation loc, AstNodeStmt *stmt) {
+bool sema_module_analyze_node_stmt(SemaModule *sema, FileLocation loc, AstNodeStmt *stmt) {
     if (sema_module_is_global(sema)) {
         SEMA_ERROR(loc, "statements are not allowed in global scope");
-        return;
+        return true;
     }
     switch (stmt->kind) {
-        case AST_NODE_STMT_IF: sema_analyze_stmt_if(sema, stmt->if_else); break;
-        case AST_NODE_STMT_RETURN: sema_analyze_stmt_return(sema, loc, stmt->ret); break;
-        case AST_NODE_STMT_WHILE: sema_analyze_stmt_while(sema, stmt->while_loop); break;
-        case AST_NODE_STMT_INLINE_ASM: sema_analyze_inline_asm(sema, stmt->inline_asm); break;
-        case AST_NODE_STMT_DEFER: SEMA_ERROR(loc, "NIY"); break;
-        case AST_NODE_STMT_EXPR: sema_analyze_expr(sema, stmt->expr, sema_expr_ctx_new(NULL)); break;
-        case AST_NODE_STMT_BREAK: SEMA_ERROR(loc, "NIY"); break;
-        case AST_NODE_STMT_CONTINUE: SEMA_ERROR(loc, "NIY"); break;
-        case AST_NODE_STMT_ASSIGN: sema_analyze_stmt_assign(sema, &stmt->assign); break;
+        case AST_NODE_STMT_IF: return sema_analyze_stmt_if(sema, stmt->if_else);
+        case AST_NODE_STMT_RETURN:
+            sema_analyze_stmt_return(sema, loc, stmt->ret);
+            return false;
+        case AST_NODE_STMT_WHILE:
+            sema_analyze_stmt_while(sema, stmt->while_loop);
+            return true;
+        case AST_NODE_STMT_INLINE_ASM:
+            sema_analyze_inline_asm(sema, stmt->inline_asm);
+            return true;
+        case AST_NODE_STMT_DEFER: SEMA_ERROR(loc, "NIY"); return true;
+        case AST_NODE_STMT_EXPR:
+            sema_analyze_expr(sema, stmt->expr, sema_expr_ctx_new(NULL));
+            return true;
+        case AST_NODE_STMT_BREAK: SEMA_ERROR(loc, "NIY"); return false;
+        case AST_NODE_STMT_CONTINUE: SEMA_ERROR(loc, "NIY"); return false;
+        case AST_NODE_STMT_ASSIGN:
+            sema_analyze_stmt_assign(sema, &stmt->assign);
+            return true;
     }
+    assert(0, "invalid statament node");
 }
 
 void sema_module_read_node_decl(SemaModule *sema, AstNodeDecl *decl) {
@@ -82,7 +93,7 @@ void sema_module_read_node_decl(SemaModule *sema, AstNodeDecl *decl) {
     }
 }
 
-void sema_module_analyze_node_decl(SemaModule *sema, FileLocation loc, AstNodeDecl *decl) {
+bool sema_module_analyze_node_decl(SemaModule *sema, FileLocation loc, AstNodeDecl *decl) {
     if (!sema_module_is_global(sema)) {
         sema_module_read_node_decl(sema, decl);
     }
@@ -109,6 +120,7 @@ void sema_module_analyze_node_decl(SemaModule *sema, FileLocation loc, AstNodeDe
         case AST_NODE_DECL_IMPORT:
             break;
     }
+    return true;
 }
 
 void sema_module_read_node(SemaModule *sema, AstNode *node) {
@@ -118,9 +130,10 @@ void sema_module_read_node(SemaModule *sema, AstNode *node) {
     }
 }
 
-void sema_module_analyze_node(SemaModule *sema, AstNode *node) {
+bool sema_module_analyze_node(SemaModule *sema, AstNode *node) {
     switch (node->kind) {
-        case AST_NODE_DECL: sema_module_analyze_node_decl(sema, node->loc, node->decl); break;
-        case AST_NODE_STMT: sema_module_analyze_node_stmt(sema, node->loc, node->stmt); break;
+        case AST_NODE_DECL: return sema_module_analyze_node_decl(sema, node->loc, node->decl);
+        case AST_NODE_STMT: return sema_module_analyze_node_stmt(sema, node->loc, node->stmt);
     }
+    assert(0, "invalid ast node");
 }

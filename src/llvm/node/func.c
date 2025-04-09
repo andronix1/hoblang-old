@@ -1,4 +1,5 @@
 #include "func.h"
+#include "ast/shared/body.h"
 #include "core/vec.h"
 #include "llvm/alloca.h"
 #include "llvm/llvm.h"
@@ -32,5 +33,8 @@ void llvm_emit_func_decl(LlvmBackend *llvm, AstFuncDecl *decl) {
         arg_decl->llvm.value = llvm_alloca(llvm, llvm_type(sema_value_is_runtime(arg_decl->value)), LLVMGetParam(llvm->state.func, i + args_offset));
     }
     llvm_emit_body(llvm, decl->body);
+    if (!decl->body->sema.breaks) {
+        LLVMBuildRetVoid(llvm->builder);
+    }
     llvm_switch_state(llvm, state);
 }

@@ -1,13 +1,23 @@
 #include "body.h"
+#include "ast/node.h"
 #include "ast/shared/body.h"
 #include "core/vec.h"
 #include "sema/module.h"
 #include "sema/nodes/node.h"
 
-void sema_analyze_body(SemaModule *sema, AstBody *body) {
+bool sema_analyze_body(SemaModule *sema, AstBody *body) {
     sema_module_push_scope(sema, sema_scope_new(NULL));
+    body->sema.breaks = false;
     for (size_t i = 0; i < vec_len(body->nodes); i++) {
-        sema_module_analyze_node(sema, body->nodes[i]);
+        AstNode *node = body->nodes[i];
+        if (body->sema.breaks) {
+            SEMA_ERROR(node->loc, "unreachable code");
+            break;
+        }
+        if (!sema_module_analyze_node(sema, node)) {
+            body->sema.breaks = true;
+        }
     }
     sema_module_pop_scope(sema);
+    return !body->sema.breaks;
 }

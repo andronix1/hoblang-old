@@ -1,4 +1,5 @@
 #include "if.h"
+#include "ast/shared/body.h"
 #include <llvm-c/Core.h>
 #include <llvm-c/Types.h>
 #include "llvm/llvm.h"
@@ -14,7 +15,9 @@ void llvm_if_block(LlvmBackend *llvm, AstIfCondBlock *if_block, LLVMBasicBlockRe
     llvm_pos_defs(llvm, if_body); // TODO: block defs set in loops
     llvm_pos_code(llvm, if_body);
     llvm_emit_body(llvm, if_block->body);
-    LLVMBuildBr(llvm->builder, end);
+    if (!if_block->body->sema.breaks) {
+        LLVMBuildBr(llvm->builder, end);
+    }
     llvm_pos_defs(llvm, else_body);
     llvm_pos_code(llvm, else_body);
 }
@@ -27,8 +30,14 @@ void llvm_if(LlvmBackend *llvm, AstIf *if_else) {
     }
     if (if_else->else_body) {
         llvm_emit_body(llvm, if_else->else_body);        
+        if (!if_else->else_body->sema.breaks) {
+            LLVMBuildBr(llvm->builder, end);
+        } else {
+            LLVMRemoveBasicBlockFromParent(end);
+        }
+    } else {
+        LLVMBuildBr(llvm->builder, end);
     }
-    LLVMBuildBr(llvm->builder, end);
     llvm_pos_defs(llvm, end);
     llvm_pos_code(llvm, end);
 }
