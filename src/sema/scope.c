@@ -6,6 +6,7 @@
 #include "sema/interface/decl.h"
 #include "sema/decl.h"
 #include "sema/interface/value.h"
+#include "sema/loop.h"
 #include "sema/module.h"
 #include "sema/type/matches.h"
 #include "sema/value.h"
@@ -55,9 +56,32 @@ void sema_scope_push_decl(SemaModule *sema, FileLocation at, SemaScope *scope, S
 
 SemaScopeStack sema_scope_stack_new() {
     SemaScopeStack result = {
-        .scopes = vec_new(SemaScope*)
+        .scopes = vec_new(SemaScope*),
+        .loops = vec_new(SemaLoop*)
     };
     return result;
+}
+
+void sema_ss_push_loop(SemaScopeStack *ss, SemaLoop *loop) {
+    ss->loops = vec_push_dir(ss->loops, loop);
+}
+
+void sema_ss_pop_loop(SemaScopeStack *ss) {
+    vec_pop(ss->loops);
+}
+
+SemaLoop *sema_ss_resolve_loop(SemaScopeStack *ss) {
+    return vec_len(ss->loops) ? *vec_top(ss->loops) : NULL;
+}
+
+SemaLoop *sema_ss_resolve_named_loop(SemaScopeStack *ss, Slice *name) {
+    for (ssize_t i = vec_len(ss->loops) - 1; i >= 0; i--) {
+        SemaLoop *loop = ss->loops[i];
+        if (loop->is_labelled && slice_eq(name, &loop->label)) {
+            return loop;
+        }
+    }
+    return NULL;
 }
 
 void sema_ss_push_scope(SemaScopeStack *ss, SemaScope *scope) {

@@ -3,6 +3,7 @@
 #include "ast/interface/expr.h"
 #include "ast/interface/body.h"
 #include "core/slice/slice.h"
+#include "sema/interface/loop.h"
 #include <stdbool.h>
 #include <stdlib.h>
 
@@ -11,6 +12,10 @@ typedef struct {
     AstBody *body;
     bool is_named;
     Slice name;
+
+    struct {
+        SemaLoop *loop;
+    } sema;
 } AstWhile;
 
 static inline AstWhile *ast_while_new_named(AstExpr *cond, AstBody *body, Slice name) {

@@ -78,3 +78,15 @@ bool sema_module_is_global(SemaModule *sema) {
 SemaArchInfo *sema_module_arch_info(SemaModule *sema) {
     return &sema->project->arch_info;
 }
+
+void sema_module_push_loop(SemaModule *sema, SemaLoop *loop) {
+    return sema_ss_push_loop(sema->ss, loop);
+}
+void sema_module_pop_loop(SemaModule *sema) {
+    return sema_ss_pop_loop(sema->ss);
+}
+SemaLoop *sema_module_resolve_loop(SemaModule *sema, Slice *name) {
+    return name ? 
+        sema_ss_resolve_named_loop(sema->ss, name) :
+        sema_ss_resolve_loop(sema->ss);
+}

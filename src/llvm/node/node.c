@@ -1,6 +1,8 @@
 #include "node.h"
 #include "ast/node.h"
 #include "ast/shared/expr.h"
+#include "ast/shared/body.h"
+#include "sema/loop.h"
 #include "core/assert.h"
 #include "core/slice/api.h"
 #include "llvm/node/asm.h"
@@ -123,9 +125,13 @@ void llvm_emit_node(LlvmBackend *llvm, AstNode *node) {
                     llvm_expr(llvm, node->stmt->expr);
                     break;
                 case AST_NODE_STMT_WHILE: {
-                    LLVMBasicBlockRef cond = LLVMAppendBasicBlock(llvm->state.func, "");
+                    LLVMBasicBlockRef cond
+                        = node->stmt->while_loop->sema.loop->llvm.begin
+                        = LLVMAppendBasicBlock(llvm->state.func, "");
                     LLVMBasicBlockRef body = LLVMAppendBasicBlock(llvm->state.func, "");
-                    LLVMBasicBlockRef code = LLVMAppendBasicBlock(llvm->state.func, "");
+                    LLVMBasicBlockRef code
+                        = node->stmt->while_loop->sema.loop->llvm.end
+                        = LLVMAppendBasicBlock(llvm->state.func, "");
                     LLVMBuildBr(llvm->builder, cond);
 
                     llvm_pos_code(llvm, cond);
@@ -137,7 +143,9 @@ void llvm_emit_node(LlvmBackend *llvm, AstNode *node) {
 
                     llvm_pos_code(llvm, body);
                     llvm_emit_body(llvm, node->stmt->while_loop->body);
-                    LLVMBuildBr(llvm->builder, cond);
+                    if (!node->stmt->while_loop->body->sema.breaks) {
+                        LLVMBuildBr(llvm->builder, cond);
+                    }
 
                     llvm_pos_defs(llvm, code);
                     llvm_pos_code(llvm, code);
@@ -173,8 +181,11 @@ void llvm_emit_node(LlvmBackend *llvm, AstNode *node) {
                 case AST_NODE_STMT_DEFER:
                     break;
                 case AST_NODE_STMT_BREAK:
+                    LLVMBuildBr(llvm->builder, node->stmt->break_loop->sema.loop->llvm.end);
+                    break;
                 case AST_NODE_STMT_CONTINUE:
-                    assert(0, "NIY");
+                    LLVMBuildBr(llvm->builder, node->stmt->break_loop->sema.loop->llvm.begin);
+                    break;
             }
             break;
     }

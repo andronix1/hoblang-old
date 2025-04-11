@@ -30,10 +30,16 @@ fun (i32) print(fd: Fd) -> bool {
     var buf: [BUF_SIZE]u8;
 
     var i: usize = 0;
-    while self > 0 {
+    while[outer] self > 0 {
         buf[BUF_SIZE - i - 1] = '0' + (self % 10) as _;
         self /= 10;
         i += 1;
+        while true {
+            if self == 0 {
+                break outer;
+            }
+            break;
+        }
     }
 
     return fd.write_slice(new_slice(&(buf[BUF_SIZE - i]) as _, i));

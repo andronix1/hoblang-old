@@ -27,6 +27,9 @@ typedef struct SemaModule {
 void sema_module_push_scope(SemaModule *sema, SemaScope *scope);
 void sema_module_pop_scope(SemaModule *sema);
 void sema_module_push_decl(SemaModule *sema, FileLocation at, SemaDecl *decl, bool public);
+void sema_module_push_loop(SemaModule *sema, SemaLoop *loop);
+void sema_module_pop_loop(SemaModule *sema);
+SemaLoop *sema_module_resolve_loop(SemaModule *sema, Slice *name);
 SemaDecl *sema_module_resolve_decl(SemaModule *sema, Slice *name, SemaType *in_type);
 SemaDecl *sema_module_resolve_req_decl(SemaModule *sema, FileLocation at, Slice *name, SemaType *in_type);
 void sema_module_print_line_error_at(SemaModule *sema, FileLocation at);

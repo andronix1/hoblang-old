@@ -3,10 +3,15 @@
 #include <stdbool.h>
 #include <malloc.h>
 #include "core/slice/slice.h"
+#include "sema/interface/loop.h"
 
 typedef struct {
     bool is_labelled;
     Slice label;
+
+    struct {
+        SemaLoop *loop;
+    } sema;
 } AstLoopControl;
 
 typedef AstLoopControl AstBreak;

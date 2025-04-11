@@ -2,6 +2,7 @@
 #include "ast/node.h"
 #include "ast/node/decl.h"
 #include "sema/decl.h"
+#include "sema/loop.h"
 #include "sema/module.h"
 #include "sema/nodes/decl/behaviour.h"
 #include "sema/nodes/decl/from_use.h"
@@ -20,6 +21,7 @@
 #include "sema/nodes/stmt/asm.h"
 #include "sema/nodes/stmt/assign.h"
 #include "sema/nodes/stmt/if.h"
+#include "sema/nodes/stmt/loop_control.h"
 #include "sema/nodes/stmt/return.h"
 #include "sema/nodes/stmt/while.h"
 #include "sema/scope.h"
@@ -45,8 +47,12 @@ bool sema_module_analyze_node_stmt(SemaModule *sema, FileLocation loc, AstNodeSt
         case AST_NODE_STMT_EXPR:
             sema_analyze_expr(sema, stmt->expr, sema_expr_ctx_new(NULL));
             return true;
-        case AST_NODE_STMT_BREAK: SEMA_ERROR(loc, "NIY"); return false;
-        case AST_NODE_STMT_CONTINUE: SEMA_ERROR(loc, "NIY"); return false;
+        case AST_NODE_STMT_BREAK:
+            sema_analyze_stmt_loop_control(sema, loc, stmt->break_loop);
+            return false;
+        case AST_NODE_STMT_CONTINUE:
+            sema_analyze_stmt_loop_control(sema, loc, stmt->continue_loop);
+            return false;
         case AST_NODE_STMT_ASSIGN:
             sema_analyze_stmt_assign(sema, &stmt->assign);
             return true;
