@@ -32,6 +32,12 @@ fun (i32) print(fd: Fd) -> bool {
     var i: usize = 0;
     while[outer] self > 0 {
         buf[BUF_SIZE - i - 1] = '0' + (self % 10) as _;
+        defer {
+            fd.write_slice("writing ");
+            var c = buf[BUF_SIZE - i];
+            fd.write_super_raw(&c, 1);
+            fd.write_slice("\n");
+        }
         self /= 10;
         i += 1;
         while true {
@@ -47,6 +53,12 @@ fun (i32) print(fd: Fd) -> bool {
 
 global(_start) fun main() -> void {
     exit((fun (num: i32) -> i32 {
+        defer {
+            STDOUT.write_slice("seriously...\n");
+        }
+        defer {
+            STDOUT.write_slice("end of program...\n");
+        }
         const STDOUT = STDOUT;
         STDOUT.write_slice("hello, world!\n");
         num.print(STDOUT);

@@ -12,11 +12,17 @@
 #include "sema/value.h"
 #include <stdlib.h>
 
-SemaScope *sema_scope_new(SemaType *returns) {
+SemaScope *sema_scope_new_in_body(SemaType *returns, AstBody *body) {
     SemaScope *result = malloc(sizeof(SemaScope));
     result->decls = vec_new(SemaDecl*);
     result->returns = returns;
+    result->defers = vec_new(AstBody*);
+    result->body = body;
     return result;
+}
+
+SemaScope *sema_scope_new(SemaType *returns) {
+    return sema_scope_new_in_body(returns, NULL);
 }
 
 SemaDecl *sema_scope_resolve_decl(SemaModule *sema, SemaScope *scope, Slice *name, SemaType *in_type) {
@@ -57,7 +63,7 @@ void sema_scope_push_decl(SemaModule *sema, FileLocation at, SemaScope *scope, S
 SemaScopeStack sema_scope_stack_new() {
     SemaScopeStack result = {
         .scopes = vec_new(SemaScope*),
-        .loops = vec_new(SemaLoop*)
+        .loops = vec_new(SemaLoop*),
     };
     return result;
 }
@@ -85,11 +91,19 @@ SemaLoop *sema_ss_resolve_named_loop(SemaScopeStack *ss, Slice *name) {
 }
 
 void sema_ss_push_scope(SemaScopeStack *ss, SemaScope *scope) {
+    if (!scope->body && vec_len(ss->scopes) > 0) {
+        scope->body = sema_ss_top(ss)->body;
+    }
     ss->scopes = vec_push(ss->scopes, &scope);
 }
 
 void sema_ss_pop_scope(SemaScopeStack *ss) {
     vec_pop(ss->scopes);
+}
+
+void sema_ss_push_defer(SemaScopeStack *ss, AstBody *body) {
+    SemaScope *scope = sema_ss_top(ss);
+    scope->defers = vec_push(scope->defers, &body);
 }
 
 SemaScope *sema_ss_top(SemaScopeStack *ss) {

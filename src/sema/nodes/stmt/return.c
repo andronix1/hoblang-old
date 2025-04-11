@@ -2,6 +2,7 @@
 #include "core/location.h"
 #include "core/not_null.h"
 #include "ast/shared/expr.h"
+#include "sema/interface/body_break.h"
 #include "sema/interface/type.h"
 #include "sema/module.h"
 #include "sema/nodes/shared/expr.h"
@@ -19,4 +20,5 @@ void sema_analyze_stmt_return(SemaModule *sema, FileLocation loc, AstReturn *ret
             SEMA_ERROR(ret->value->loc, "expected to return {sema::type} but got {sema::type}", returns, type);
         }
     }
+    ret->sema.body_break = sema_module_bb_collect_until(sema, NULL);
 }

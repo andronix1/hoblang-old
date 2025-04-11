@@ -20,6 +20,7 @@
 #include "ast/shared/func_info.h"
 #include "sema/nodes/stmt/asm.h"
 #include "sema/nodes/stmt/assign.h"
+#include "sema/nodes/stmt/defer.h"
 #include "sema/nodes/stmt/if.h"
 #include "sema/nodes/stmt/loop_control.h"
 #include "sema/nodes/stmt/return.h"
@@ -43,7 +44,9 @@ bool sema_module_analyze_node_stmt(SemaModule *sema, FileLocation loc, AstNodeSt
         case AST_NODE_STMT_INLINE_ASM:
             sema_analyze_inline_asm(sema, stmt->inline_asm);
             return true;
-        case AST_NODE_STMT_DEFER: SEMA_ERROR(loc, "NIY"); return true;
+        case AST_NODE_STMT_DEFER:
+            sema_analyze_stmt_defer(sema, loc, stmt->defer);
+            return true;
         case AST_NODE_STMT_EXPR:
             sema_analyze_expr(sema, stmt->expr, sema_expr_ctx_new(NULL));
             return true;

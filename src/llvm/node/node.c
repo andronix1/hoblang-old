@@ -5,6 +5,7 @@
 #include "sema/loop.h"
 #include "core/assert.h"
 #include "core/slice/api.h"
+#include "llvm/node/body_break.h"
 #include "llvm/node/asm.h"
 #include "llvm/node/body.h"
 #include "llvm/node/expr.h"
@@ -115,6 +116,7 @@ void llvm_emit_node(LlvmBackend *llvm, AstNode *node) {
         case AST_NODE_STMT:
             switch (node->stmt->kind) {
                 case AST_NODE_STMT_RETURN:
+                    llvm_emit_bb(llvm, node->stmt->ret->sema.body_break);
                     if (node->stmt->ret->value) {
                         LLVMBuildRet(llvm->builder, llvm_expr_get(llvm, node->stmt->ret->value));
                     } else {
@@ -181,10 +183,12 @@ void llvm_emit_node(LlvmBackend *llvm, AstNode *node) {
                 case AST_NODE_STMT_DEFER:
                     break;
                 case AST_NODE_STMT_BREAK:
+                    llvm_emit_bb(llvm, node->stmt->break_loop->sema.body_break);
                     LLVMBuildBr(llvm->builder, node->stmt->break_loop->sema.loop->llvm.end);
                     break;
                 case AST_NODE_STMT_CONTINUE:
-                    LLVMBuildBr(llvm->builder, node->stmt->break_loop->sema.loop->llvm.begin);
+                    llvm_emit_bb(llvm, node->stmt->continue_loop->sema.body_break);
+                    LLVMBuildBr(llvm->builder, node->stmt->continue_loop->sema.loop->llvm.begin);
                     break;
             }
             break;

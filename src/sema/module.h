@@ -29,6 +29,7 @@ void sema_module_pop_scope(SemaModule *sema);
 void sema_module_push_decl(SemaModule *sema, FileLocation at, SemaDecl *decl, bool public);
 void sema_module_push_loop(SemaModule *sema, SemaLoop *loop);
 void sema_module_pop_loop(SemaModule *sema);
+void sema_module_push_defer(SemaModule *sema, AstBody *body);
 SemaLoop *sema_module_resolve_loop(SemaModule *sema, Slice *name);
 SemaDecl *sema_module_resolve_decl(SemaModule *sema, Slice *name, SemaType *in_type);
 SemaDecl *sema_module_resolve_req_decl(SemaModule *sema, FileLocation at, Slice *name, SemaType *in_type);

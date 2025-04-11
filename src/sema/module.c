@@ -1,4 +1,5 @@
 #include "module.h"
+#include "ast/interface/body.h"
 #include "ast/interface/module.h"
 #include "core/location.h"
 #include "parser/interface/parser.h"
@@ -77,6 +78,10 @@ bool sema_module_is_global(SemaModule *sema) {
 
 SemaArchInfo *sema_module_arch_info(SemaModule *sema) {
     return &sema->project->arch_info;
+}
+
+void sema_module_push_defer(SemaModule *sema, AstBody *body) {
+    sema_ss_push_defer(sema->ss, body);
 }
 
 void sema_module_push_loop(SemaModule *sema, SemaLoop *loop) {

@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <malloc.h>
 #include "core/slice/slice.h"
+#include "sema/interface/body_break.h"
 #include "sema/interface/loop.h"
 
 typedef struct {
@@ -11,6 +12,7 @@ typedef struct {
 
     struct {
         SemaLoop *loop;
+        SemaBodyBreak *body_break;
     } sema;
 } AstLoopControl;
 

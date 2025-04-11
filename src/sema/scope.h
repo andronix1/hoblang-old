@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ast/interface/body.h"
 #include "core/location.h"
 #include "core/slice/slice.h"
 #include "sema/interface/decl.h"
@@ -10,6 +11,9 @@
 typedef struct SemaScope {
     SemaDecl **decls;
     SemaType *returns;
+    AstBody **defers;
+
+    AstBody *body;
 } SemaScope;
 
 typedef struct {
@@ -18,12 +22,14 @@ typedef struct {
 } SemaScopeStack;
 
 SemaScope *sema_scope_new(SemaType *returns);
+SemaScope *sema_scope_new_in_body(SemaType *returns, AstBody *body);
 SemaDecl *sema_scope_resolve_decl(SemaModule *sema, SemaScope *scope, Slice *name, SemaType *in_type);
 void sema_scope_push_decl(SemaModule *sema, FileLocation at, SemaScope *scope, SemaDecl *decl);
 
 SemaScopeStack sema_scope_stack_new();
 void sema_ss_push_scope(SemaScopeStack *ss, SemaScope *scope);
 void sema_ss_push_loop(SemaScopeStack *ss, SemaLoop *loop);
+void sema_ss_push_defer(SemaScopeStack *ss, AstBody *body);
 void sema_ss_pop_scope(SemaScopeStack *ss);
 void sema_ss_pop_loop(SemaScopeStack *ss);
 SemaScope *sema_ss_top(SemaScopeStack *ss);

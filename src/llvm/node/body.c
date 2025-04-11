@@ -1,6 +1,7 @@
 #include "body.h"
 #include "core/vec.h"
 #include "ast/shared/body.h"
+#include "llvm/node/body_break.h"
 #include "llvm/node/node.h"
 
 void llvm_emit_body(LlvmBackend *llvm, AstBody *body) {
@@ -8,5 +9,8 @@ void llvm_emit_body(LlvmBackend *llvm, AstBody *body) {
         AstNode *node = body->nodes[i];
         llvm_setup_node(llvm, node);
         llvm_emit_node(llvm, node);
+    }
+    if (!body->sema.breaks) {
+        llvm_emit_bb(llvm, body->sema.body_break);
     }
 }

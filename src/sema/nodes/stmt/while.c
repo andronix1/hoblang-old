@@ -14,7 +14,9 @@ void sema_analyze_stmt_while(SemaModule *sema, AstWhile *while_loop) {
         SEMA_ERROR(while_loop->cond->loc, "while loop condition must be boolean, not {sema::type}", cond_type);
     }
     sema_module_push_loop(sema, while_loop->sema.loop =
-        while_loop->is_named ? sema_loop_named(while_loop->name) : sema_loop());
+        while_loop->is_named ?
+            sema_loop_named(while_loop->body, while_loop->name) :
+            sema_loop(while_loop->body));
     sema_analyze_body(sema, while_loop->body);
     sema_module_pop_loop(sema);
 }
