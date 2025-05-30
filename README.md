@@ -1,4 +1,4 @@
-DEPRECATED
+MOVED TO https://github.com/andronix1/hoblang
 
 # Hob-lang
 ## Getting Started
